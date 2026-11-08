@@ -1,15 +1,14 @@
 # Genre Legends — Game Design Document
 
-(Note) Points are tagged by how firmly heromedel has agreed to them, per the Design Doc Labelling Guide (https://claude.ai/artifact/Kc7Yw88RfpDbi1yhyqB6Ah). Strongest first: Hard Rule, Decided, Likely, Proposed, Ai-Generated-Proposal, Open, Unlikely, Rejected. Points are referenced as section number plus letter, e.g. 1A.
+(Note) Points are tagged by how firmly heromedel has agreed to them, per the Design Doc Labelling Guide (`docs/DESIGN_DOC_LABELLING_GUIDE.md`). Strongest first: Hard Rule, Decided, Likely, Proposed, Ai-Generated-Proposal, Open, Unlikely, Rejected. Points are referenced as section number plus letter, e.g. 1A.
 
 ## 1. Core Rules
 
 - **1A. Decided (2026-11-08):** Features and abilities follow the so-called "Rule of Cool".
-  - **Ai-Generated-Proposal (2026-11-08) — definition:** The Rule of Cool says a player will accept anything that is unrealistic, over the top or barely justified, as long as it is cool enough. The cooler something is, the less it needs to make sense.
-  - **Ai-Generated-Proposal (2026-11-08) — how it applies here:**
-    - When choosing between a sensible feature and a spectacular one, pick the spectacular one, then make it fit the game.
-    - Cool overrides realism and logic. It does not override balance, fairness or readability (see the Game Project Standards).
-    - Coolness has to show: a cool ability looks, sounds and plays differently from what came before, so the player feels it.
+  - **Definition:** When designing a feature or ability, go with the cool option, not the expected, standard or bare-minimum one.
+  - **Cool means exciting to get and to use.** It should feel game-changing, or give the player something new to experiment with (Game Project Standards, Engagement & Discovery).
+  - **It covers the effect, not just the name.** A cooler name should come with a cooler effect, not a standard ability renamed.
+  - **Realism is never the reason to cut a cool idea.** Things that make no physical sense, like ricochet shots or sound in space, are fine when they make the game cooler.
 - **1B. Likely (2026-11-08):** The game leans heavily into its genres' tropes.
 - **1C. Likely (2026-11-08):** Power-ups are interesting and change how the game plays. Plain stat or utility upgrades such as a dash or more energy are not enough, even for beginner equipment.
 
@@ -23,6 +22,6 @@
 
 | Date | Points | Decision |
 |---|---|---|
-| 2026-11-08 | 1A | Features and abilities follow the Rule of Cool. |
+| 2026-11-08 | 1A | Features and abilities follow the Rule of Cool, with its definition. |
 | 2026-11-08 | 1B, 1C | Lean into the tropes; power-ups must be interesting, not plain dash/energy upgrades. |
 | 2026-11-08 | 2A–2C | Rebuild in Godot for web, hosted on GitHub Pages and playable on iPad mini; earlier prototype is reference only. |
