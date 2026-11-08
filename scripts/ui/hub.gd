@@ -3,7 +3,8 @@ extends Control
 ## The command center (GDD 5A): a console menu with text and icons. A rail on the left switches pages:
 ## Star Map (pick where to go), Hangar (frame and loadout), R&D (spend blueprints) and Settings.
 
-signal launch_requested(node_id: String)
+## event: what a route event (RouteEvents) leaves for the mission, or {} for a quiet trip.
+signal launch_requested(node_id: String, event: Dictionary)
 
 var star_map: StarMap
 var page := "map"
@@ -67,6 +68,76 @@ func _show_radio_queue() -> void:
 		popup.queue_free()
 		_show_radio_queue(), "Radio: understood", true))
 	add_child(popup)
+
+
+## On the way to a planet something may happen (RouteEvents): a choice, its outcome, then the launch.
+func _launch(node: Dictionary) -> void:
+	var missions_flown: int = Save.data["stats"]["missions"]
+	var event_id := RouteEvents.roll(node, missions_flown, Save.data["map_seed"])
+	if event_id == "":
+		launch_requested.emit(node["id"], {})
+		return
+	var event: Dictionary = RouteEvents.EVENTS[event_id]
+	PlayLog.note("event", "On the way to %s: %s" % [node["name"], event["title"]])
+	Sound.play("radio")
+	var box := UiKit.panel(Color(0.04, 0.06, 0.1, 0.98), Color(1, 0.75, 0.35))
+	var column := VBoxContainer.new()
+	column.custom_minimum_size = Vector2(600, 0)
+	column.add_theme_constant_override("separation", 10)
+	box.add_child(column)
+	column.add_child(UiKit.label("EN ROUTE TO " + node["name"].to_upper(), 13, Color(1, 0.75, 0.35), "bold"))
+	column.add_child(UiKit.label(event["title"], 26, Color(1, 1, 1), "title"))
+	column.add_child(UiKit.wrapped(event["text"], 17, Color(0.85, 0.9, 1.0)))
+	var popup := Overlays._floating(box)
+	var choices: Array = event["choices"]
+	for i in choices.size():
+		var choice: Dictionary = choices[i]
+		var affordable: bool = _largest_blueprint_pile() >= int(choice.get("needs_blueprints", 0))
+		var label: String = choice["label"] + ("" if choice["hint"] == "" else "  -  " + choice["hint"])
+		var button := UiKit.button(label, func():
+			var outcome := RouteEvents.resolve(event_id, i, node["id"], missions_flown, Save.data["map_seed"])
+			_route_outcome(popup, column, node, event, choice, outcome), "Event %s: %s" % [event_id, choice["label"]])
+		button.disabled = not affordable
+		column.add_child(button)
+	add_child(popup)
+
+
+## Shows what happened, pays out anything immediate, and launches with the rest.
+func _route_outcome(popup: Control, column: VBoxContainer, node: Dictionary, event: Dictionary, choice: Dictionary, outcome: Array) -> void:
+	for child in column.get_children():
+		if child is Button:
+			child.queue_free()
+	var effects: Dictionary = outcome[1]
+	column.add_child(UiKit.wrapped(outcome[0], 17, Color(1, 0.85, 0.55)))
+	if effects.has("blueprints_random"):
+		var ids := TechData.TECH.keys()
+		for n in int(effects["blueprints_random"]):
+			Save.add_blueprints(ids[randi() % ids.size()], 1)
+	if effects.has("blueprints_planet"):
+		Save.add_blueprints(node["reward_tech"], int(effects["blueprints_planet"]))
+	if effects.has("spend_blueprints"):
+		var pile := _largest_blueprint_pile_id()
+		Save.add_blueprints(pile, -int(effects["spend_blueprints"]))
+	Save.write()
+	PlayLog.note("event", "%s: chose \"%s\" - %s" % [event["title"], choice["label"], outcome[0]])
+	var carried := effects.duplicate()
+	carried["title"] = event["title"]
+	column.add_child(UiKit.button("Launch", func():
+		popup.queue_free()
+		launch_requested.emit(node["id"], carried), "Event: launch", true))
+
+
+func _largest_blueprint_pile() -> int:
+	var pile := _largest_blueprint_pile_id()
+	return Save.blueprints(pile) if pile != "" else 0
+
+
+func _largest_blueprint_pile_id() -> String:
+	var best := ""
+	for tech_id in Save.data["blueprints"]:
+		if best == "" or Save.blueprints(tech_id) > Save.blueprints(best):
+			best = tech_id
+	return best
 
 
 func _build_rail() -> Control:
@@ -273,7 +344,7 @@ func _fill_info(node_id: String) -> void:
 	if Save.is_cleared(node_id):
 		_info.add_child(UiKit.label("Cleared — fly it again any time.", 14, Color(0.5, 1.0, 0.65)))
 	if available:
-		_info.add_child(UiKit.button("LAUNCH", func(): launch_requested.emit(node_id), "Launch %s" % node_id, true))
+		_info.add_child(UiKit.button("LAUNCH", func(): _launch(node), "Launch %s" % node_id, true))
 	else:
 		_info.add_child(UiKit.wrapped("Out of reach. Clear a planet linked to this one first.", 14, Color(0.65, 0.7, 0.8)))
 
@@ -661,7 +732,7 @@ func _build_settings_page() -> Control:
 	admin = AdminConsole.new()
 	admin.star_map = star_map
 	admin.changed.connect(func(): _rebuild())
-	admin.launch_test.connect(func(mission_type): launch_requested.emit("test:" + mission_type))
+	admin.launch_test.connect(func(mission_type): launch_requested.emit("test:" + mission_type, {}))
 	column.add_child(admin.build())
 	column.add_child(UiKit.label("RESET", 18, Color(1, 0.4, 0.4), "title"))
 	var reset_button := UiKit.button("Reset all progress", func(): pass, "Settings: reset (first tap)")

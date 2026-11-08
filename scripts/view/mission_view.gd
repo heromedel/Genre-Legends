@@ -31,6 +31,7 @@ var transform_time := 0.0
 var hit_flash := 0.0
 var tech_online_since := {}      # tech id -> view time it came online, for GearArt's unfold
 var _accumulator := 0.0
+var hitstop := 0.0              # seconds the action freezes on a big moment (view only; no ticks run)
 
 
 class DrawLayer:
@@ -142,8 +143,12 @@ func _notification(what: int) -> void:
 
 # ---------------------------------------------------------------- stepping
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if paused or done or mission == null:
+		return
+	# Hit-stop: the world holds still for a heartbeat on big kills. No tick runs, so replays are unaffected.
+	if hitstop > 0.0:
+		hitstop -= delta
 		return
 	if mission.state == "offer" and (overlay_kind != "offer" or shown_offer_serial != mission.offer_serial):
 		_open_offer()
@@ -202,6 +207,11 @@ func _handle_events(events: Array) -> void:
 				hud.show_banner("%s ESCAPED" % event["name"].to_upper(), "red")
 			"boss_defeated":
 				Sound.play_music(mission.node["type"])
+				_big_moment(event["pos"], Color(1, 0.9, 0.7), 3.0, 0.45)
+			"elite_down":
+				_big_moment(event["pos"], event["color"], 0.6, 0.06)
+			"power_moment":
+				_big_moment(mission.player.pos, event["color"], float(event["size"]), 0.12 * float(event["size"]))
 			"wave":
 				if event["index"] > 1:
 					hud.show_banner("WAVE %d" % event["index"], "cyan")
@@ -216,6 +226,17 @@ func _open_offer() -> void:
 		Sound.play("pick"), mission.run, func(): input.queue_choice(UpgradeOffers.REROLL_CHOICE)))
 	if first_showing:
 		Sound.play("level_up")
+
+
+## A big moment: the action freezes for a heartbeat, the screen flashes, and rings burst out.
+func _big_moment(at: Vector2, color: Color, size: float, freeze: float) -> void:
+	hitstop = maxf(hitstop, freeze)
+	for i in int(2 + size * 2):
+		fx.ring(at, 120.0 * size + i * 140.0 * size, 0.5 + i * 0.12, color, 6.0 - i)
+	fx.sparks(at, color, int(20 * size), 420.0 * size)
+	hud.flash(color, minf(0.25 * size, 0.9))
+	if size >= 2.0:
+		Sound.play("jackpot")
 
 
 func _open_crate() -> void:

@@ -35,8 +35,9 @@ func show_hub(page: String) -> void:
 	_set_screen(hub)
 
 
-func launch_mission(node_id: String) -> void:
+func launch_mission(node_id: String, event: Dictionary = {}) -> void:
 	var node := _test_node(node_id.trim_prefix("test:")) if node_id.begins_with("test:") else star_map.get_node(node_id).duplicate(true)
+	node["event"] = event
 	node["threat"] = Save.setting("threat")
 	node["arrivals"] = Save.data["enemies_unlocked"].duplicate()
 	var first_clear := not Save.is_cleared(node_id)
@@ -99,7 +100,7 @@ func finish_mission(node_id: String, result: Dictionary) -> void:
 ##   god=1        invulnerable             page=<map|hangar|rnd|guide|records|settings>  open the hub on a page
 ##   frame=<id>   fly a frame              mk=3     all tech unlocked at that Mk
 ##   bossid=<id> / minibossid=<id>   pick the test planet's boss or mini-boss (see BossRoster)
-##   crate=<n>    open n Salvage Crates as soon as play starts      phase=<n>  with boss=1, the boss starts in phase n
+##   crate=<n>    open n Salvage Crates as soon as play starts      event=<id>  the next launch meets that route event      phase=<n>  with boss=1, the boss starts in phase n
 func _debug_launch() -> bool:
 	var options := {}
 	var raw := ""
@@ -126,6 +127,7 @@ func _debug_launch() -> bool:
 		Save.data["loadout"] = Array(options["loadout"].split(","))
 		Save.data = Save.repair(Save.data)
 	AdminConsole.god_mode = options.has("god")
+	RouteEvents.forced = options.get("event", "")
 	if options.has("test"):
 		launch_mission("test:" + options["test"])
 		var view := screen as MissionView

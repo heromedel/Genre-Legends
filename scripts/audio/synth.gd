@@ -184,14 +184,24 @@ func make_effect(effect: String) -> AudioStreamWAV:
 
 ## Track styles: tempo, root note, chord progression (scale degrees in natural minor), and character.
 const TRACKS := {
-	"title": {"bpm": 92, "root": 45, "progression": [0, 5, 3, 4], "drums": false, "lead": true, "bars": 8},
-	"hub": {"bpm": 96, "root": 50, "progression": [0, 3, 5, 4], "drums": false, "lead": false, "bars": 8},
-	"star_cluster": {"bpm": 140, "root": 45, "progression": [0, 5, 6, 4], "drums": true, "lead": true, "bars": 8},
-	"corridor": {"bpm": 150, "root": 47, "progression": [0, 0, 5, 6], "drums": true, "lead": true, "bars": 8},
-	"planet": {"bpm": 120, "root": 43, "progression": [0, 3, 4, 5], "drums": true, "lead": true, "bars": 8},
-	"dungeon": {"bpm": 104, "root": 40, "progression": [0, 1, 0, 6], "drums": true, "lead": false, "bars": 8},
-	"boss": {"bpm": 158, "root": 40, "progression": [0, 1, 5, 4], "drums": true, "lead": true, "bars": 8},
+	"title": {"bpm": 92, "root": 45, "progression": [0, 5, 3, 4], "drums": "", "lead": true, "bars": 8},
+	"hub": {"bpm": 96, "root": 50, "progression": [0, 3, 5, 4], "drums": "", "lead": false, "bars": 8},
+	"star_cluster": {"bpm": 140, "root": 45, "progression": [0, 5, 6, 4], "drums": "rock", "lead": true, "bars": 8},
+	"corridor": {"bpm": 150, "root": 47, "progression": [0, 0, 5, 6], "drums": "four", "lead": true, "bars": 8},
+	"planet": {"bpm": 120, "root": 43, "progression": [0, 3, 4, 5], "drums": "toms", "lead": true, "bars": 8},
+	"dungeon": {"bpm": 104, "root": 40, "progression": [0, 1, 0, 6], "drums": "heartbeat", "lead": false, "bars": 8},
+	"boss": {"bpm": 158, "root": 40, "progression": [0, 1, 5, 4], "drums": "rock", "lead": true, "bars": 8},
 }
+## Each genre's instruments (GDD 1B: lean into the tropes): the arcade shooter's chip arpeggios, the
+## corridor's galloping saw bass, the planet's toms, the dungeon's slow bells over a heartbeat.
+const SOUNDS := {
+	"star_cluster": {"arp": "square", "arp_steps": 16, "bass": "square", "bass_style": "octave", "lead": "square", "pad": false},
+	"corridor": {"arp": "saw", "arp_steps": 8, "bass": "saw", "bass_style": "gallop", "lead": "saw", "pad": false},
+	"planet": {"arp": "triangle", "arp_steps": 8, "bass": "triangle", "bass_style": "octave", "lead": "triangle", "pad": true},
+	"dungeon": {"arp": "sine", "arp_steps": 4, "bass": "triangle", "bass_style": "drone", "lead": "sine", "pad": true},
+	"boss": {"arp": "saw", "arp_steps": 16, "bass": "saw", "bass_style": "gallop", "lead": "square", "pad": false},
+}
+const DEFAULT_SOUND := {"arp": "square", "arp_steps": 16, "bass": "triangle", "bass_style": "octave", "lead": "square", "pad": true}
 const MINOR := [0, 2, 3, 5, 7, 8, 10]
 
 
@@ -209,22 +219,23 @@ func make_track(name: String) -> PackedFloat32Array:
 	var progression: Array = style["progression"]
 	var root: int = style["root"]
 	var melody_seed := hash(name) % 1000
+	var sound: Dictionary = SOUNDS.get(name, DEFAULT_SOUND)
+	var drums: String = style["drums"]
 	for bar in bars:
 		var degree: int = progression[bar % progression.size()]
 		var chord_root: int = root + MINOR[degree % 7] + 12 * int(degree / 7)
 		var chord: Array = [chord_root, chord_root + _third(degree), chord_root + 7]
 		var bar_start := bar * beat * 4.0
-		# Bass: eighth notes on the chord root, octave jumps on the offbeat.
-		for step in 8:
-			var note: int = chord_root - 12 + (12 if step % 2 == 1 and style["drums"] else 0)
-			voice(buffer, bar_start + step * beat * 0.5, beat * 0.45, midi_to_freq(note), midi_to_freq(note), "triangle", 0.2, 0.004)
-		# Arpeggio: sixteenths up and down the chord.
+		_bass(buffer, bar_start, beat, chord_root - 12, sound)
+		# Arpeggio up and down the chord; the dungeon's is a few slow bell notes.
 		var pattern := [0, 1, 2, 1, 0, 2, 1, 2]
-		for step in 16:
-			var note: int = chord[pattern[step % pattern.size()]] + 12
-			voice(buffer, bar_start + step * beat * 0.25, beat * 0.22, midi_to_freq(note), midi_to_freq(note), "square", 0.045, 0.002, 0.25)
-		# Pad for the calm tracks.
-		if not style["drums"]:
+		var steps: int = sound["arp_steps"]
+		for step in steps:
+			var note: int = chord[pattern[step % pattern.size()]] + (24 if sound["arp"] == "sine" else 12)
+			var length := beat * 4.0 / steps
+			voice(buffer, bar_start + step * length, length * 0.88, midi_to_freq(note), midi_to_freq(note), sound["arp"],
+				0.06 if sound["arp"] == "sine" else 0.04, 0.002, 0.25)
+		if sound["pad"] or drums == "":
 			for tone in chord:
 				voice(buffer, bar_start, beat * 4.0, midi_to_freq(tone), midi_to_freq(tone), "sine", 0.05, 0.4)
 		# Lead: a simple melody from the scale, seeded per track, repeating every two bars.
@@ -239,19 +250,51 @@ func make_track(name: String) -> PackedFloat32Array:
 					var note: int = root + 24 + MINOR[scale_step]
 					if motif_rng.randf() < 0.5:
 						note = chord[motif_rng.randi() % 3] + 24
-					voice(buffer, bar_start + t * beat, length * beat * 0.9, midi_to_freq(note), midi_to_freq(note), "square", 0.06, 0.01, 0.5)
+					voice(buffer, bar_start + t * beat, length * beat * 0.9, midi_to_freq(note), midi_to_freq(note), sound["lead"],
+						0.05 if sound["lead"] == "saw" else 0.06, 0.01, 0.5)
 				t += length
-		# Drums: kick on 1 and 3, snare on 2 and 4, hats on eighths.
-		if style["drums"]:
+		_drums(buffer, bar_start, beat, drums)
+	return buffer
+
+
+## The bass line: octave jumps, a galloping 1-and-a rhythm, or one long drone per bar.
+func _bass(buffer: PackedFloat32Array, bar_start: float, beat: float, note: int, sound: Dictionary) -> void:
+	var wave: String = sound["bass"]
+	match sound["bass_style"]:
+		"drone":
+			voice(buffer, bar_start, beat * 4.0, midi_to_freq(note), midi_to_freq(note), wave, 0.16, 0.2)
+		"gallop":
+			for beat_index in 4:
+				for offset in [0.0, 0.5, 0.75]:
+					var at: float = bar_start + (beat_index + offset) * beat
+					voice(buffer, at, beat * 0.22, midi_to_freq(note), midi_to_freq(note), wave, 0.12, 0.003)
+		_:
+			for step in 8:
+				var pitch := note + (12 if step % 2 == 1 else 0)
+				voice(buffer, bar_start + step * beat * 0.5, beat * 0.45, midi_to_freq(pitch), midi_to_freq(pitch), wave, 0.16 if wave != "square" else 0.09, 0.004)
+
+
+## Drum kits: rock (kick 1 and 3, snare 2 and 4), four on the floor, tribal toms, or a slow heartbeat.
+func _drums(buffer: PackedFloat32Array, bar_start: float, beat: float, kit: String) -> void:
+	match kit:
+		"rock", "four":
 			for step in 8:
 				var at := bar_start + step * beat * 0.5
-				if step % 4 == 0:
+				if (kit == "four" and step % 2 == 0) or (kit == "rock" and step % 4 == 0):
 					voice(buffer, at, 0.18, 140, 40, "sine", 0.55)
 				if step % 4 == 2:
 					voice(buffer, at, 0.14, 3000, 1200, "noise", 0.22)
 					voice(buffer, at, 0.1, 220, 160, "triangle", 0.15)
-				voice(buffer, at, 0.04, 9000, 9000, "noise", 0.06)
-	return buffer
+				voice(buffer, at, 0.04, 9000, 9000, "noise", 0.06 if kit == "rock" else 0.09)
+		"toms":
+			for hit: Array in [[0.0, 110.0], [0.75, 150.0], [1.5, 110.0], [2.0, 90.0], [2.5, 150.0], [3.0, 110.0], [3.25, 130.0]]:
+				voice(buffer, bar_start + hit[0] * beat, 0.22, hit[1], hit[1] * 0.55, "sine", 0.45)
+			for step in 4:
+				voice(buffer, bar_start + step * beat + beat * 0.5, 0.05, 5000, 5000, "noise", 0.05)
+		"heartbeat":
+			for offset in [0.0, 0.35]:
+				voice(buffer, bar_start + offset * beat, 0.2, 90, 45, "sine", 0.5)
+			voice(buffer, bar_start + 2.0 * beat, 0.2, 90, 45, "sine", 0.4)
 
 
 func _third(degree: int) -> int:

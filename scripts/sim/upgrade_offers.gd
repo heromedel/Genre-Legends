@@ -84,9 +84,8 @@ func _card_pool(include_forks: bool, include_risky: bool) -> Array:
 		var weight := 0.7
 		if upgrade_id == "field_repair":
 			weight = 2.2 if world.player.armor_fraction() < 0.6 else 0.25
-		var card := _card("field", "", upgrade["name"], upgrade["text"], "field", weight)
-		card["field"] = upgrade_id
-		card["element"] = upgrade.get("element", "")
+		var card := field_card(upgrade_id)
+		card["weight"] = weight
 		pool.append(card)
 	if include_risky:
 		for upgrade_id in UpgradeData.RISKY_FIELD:
@@ -104,6 +103,15 @@ func _card(kind: String, tech_id: String, title: String, text: String, rarity: S
 	return {"kind": kind, "tech": tech_id, "fork": "", "fusion": "", "field": "",
 		"title": title, "text": text, "rarity": rarity, "weight": weight,
 		"element": TechData.TECH[tech_id]["element"] if tech_id != "" else "", "points": 0, "synergy": "", "fusion_hint": ""}
+
+
+## A card for one ordinary field upgrade (route events hand these out too).
+func field_card(upgrade_id: String) -> Dictionary:
+	var upgrade: Dictionary = UpgradeData.FIELD[upgrade_id]
+	var card := _card("field", "", upgrade["name"], upgrade["text"], "field", 0.7)
+	card["field"] = upgrade_id
+	card["element"] = upgrade.get("element", "")
+	return card
 
 
 ## When everything is maxed out: something still worth having.
@@ -179,6 +187,7 @@ func apply(card: Dictionary) -> void:
 		"fusion":
 			run.fusions.append(card["fusion"])
 			world.emit("banner", {"text": "FUSION: %s" % UpgradeData.FUSIONS[card["fusion"]]["name"].to_upper(), "style": "gold"})
+			world.emit("power_moment", {"color": Color(1.0, 0.82, 0.35), "size": 2.0})
 			world.emit("flash", {"color": Color(1, 0.85, 0.4), "amount": 0.5})
 		"field":
 			run.field[card["field"]] = run.field_count(card["field"]) + 1
@@ -209,6 +218,7 @@ func _announce_resonance(tiers_before: Dictionary) -> void:
 		if tier > int(tiers_before.get(element, 0)):
 			var info: Dictionary = UpgradeData.RESONANCE[element]
 			world.emit("banner", {"text": "%s RESONANCE %s" % [info["name"].to_upper(), ROMAN[tier]], "style": element})
+			world.emit("power_moment", {"color": TechData.ELEMENT_COLORS[element], "size": 1.0})
 			world.emit("resonance", {"element": element, "tier": tier})
 			world.emit("sound", {"name": "overdrive"})
 

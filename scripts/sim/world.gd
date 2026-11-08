@@ -343,6 +343,8 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 	if enemy.boss != null:
 		enemy.boss.on_part_destroyed(self, enemy)
 		return
+	if enemy.elite:
+		emit("elite_down", {"pos": enemy.pos, "color": enemy.color})
 	# Data Shards: bigger enemies drop more.
 	var shard_total := enemy.xp * xp_scale
 	while shard_total > 0.0:

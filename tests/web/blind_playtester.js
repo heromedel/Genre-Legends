@@ -21,7 +21,7 @@ const playSeconds = Number(process.argv[3] || 150);
   await page.mouse.click(566, 400);            // "TAP TO START" - anywhere works
   await page.waitForTimeout(2500);
   await snap('hub');
-  await page.mouse.click(960, 412);            // the big LAUNCH button on the planet card
+  await page.mouse.click(960, 437);            // the big LAUNCH button on the planet card
   await page.waitForTimeout(3000);
   // Play: a thumb drags the ship around in loose sweeps, and taps the middle card whenever cards appear.
   let x = 566, y = 620;

@@ -57,6 +57,24 @@ func _init(map_node: Dictionary, mission_seed: int, frame_id: String, loadout: A
 	world.on_collect = _on_collect
 	world.on_player_hurt = _on_player_hurt
 	start_stage(StageFactory.make(node["type"], self))
+	_apply_route_event(node.get("event", {}))
+
+
+## What happened on the way here (RouteEvents): a scored hull, a crate waiting, more elites, faster
+## enemy bullets, or a field upgrade from a Mawjig beacon.
+func _apply_route_event(effects: Dictionary) -> void:
+	if effects.is_empty():
+		return
+	player.armor = player.max_armor * float(effects.get("start_armor", 1.0))
+	pending_crates += int(effects.get("start_crates", 0))
+	run.rerolls += int(effects.get("rerolls", 0))
+	world.elite_chance *= float(effects.get("elites", 1.0))
+	world.bullet_speed_scale *= float(effects.get("bullet_speed", 1.0))
+	if effects.get("start_field", "") == "random":
+		var choices := UpgradeData.FIELD.keys().filter(func(id): return id != "field_repair")
+		offers.apply(offers.field_card(choices[world.rng.randi() % choices.size()]))
+	if effects.has("title"):
+		note("En route: %s" % effects["title"])
 
 
 ## Difficulty from the planet's danger, and its special condition (GDD 5C proposal).

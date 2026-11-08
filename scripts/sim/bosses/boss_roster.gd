@@ -14,6 +14,9 @@ const POOLS := {
 ## The boss (kind "boss") or mini-boss (kind "miniboss") a planet fields.
 static func pick(mission_type: String, kind: String, node_id: String, map_seed: int) -> String:
 	var pool: Array = POOLS[mission_type][kind]
+	# The very first planet eases you in with the classic pair.
+	if node_id == "r0c0n0":
+		return pool[0]
 	return pool[absi(hash("%s|%s|%d" % [node_id, kind, map_seed])) % pool.size()]
 
 
