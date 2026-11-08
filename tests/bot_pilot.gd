@@ -190,7 +190,14 @@ func _dungeon_goal(stage: DungeonStage) -> Vector2:
 	var lineup := rect.get_center() + Vector2(DungeonStage.DIRECTIONS[direction]) * (rect.size * 0.5 - Vector2(140, 140))
 	var horizontal := direction == "e" or direction == "w"
 	var aligned := absf((player.pos.y - rect.get_center().y) if horizontal else (player.pos.x - rect.get_center().x)) < 40.0
-	return door if aligned else lineup
+	var goal := door if aligned else lineup
+	# Something in the way (a block in the middle of the room)? Detour round the side first.
+	if not _clear_line(player.pos, goal):
+		var side := Vector2(DungeonStage.DIRECTIONS[direction]).orthogonal()
+		for detour in [player.pos + side * 260.0, player.pos - side * 260.0, rect.get_center() + side * 300.0, rect.get_center() - side * 300.0]:
+			if not mission.world.point_in_wall(detour) and _clear_line(player.pos, detour):
+				return detour
+	return goal
 
 
 func _clear_line(from: Vector2, to: Vector2) -> bool:

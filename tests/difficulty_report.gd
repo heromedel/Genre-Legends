@@ -17,7 +17,8 @@ func _init() -> void:
 		print("Planet %d   target: %s" % [column + 1, TARGETS[column]])
 		var types: Array = ["star_cluster"] if column == 0 or column == 5 else MissionData.PLAYABLE_TYPES
 		for mission_type in types:
-			var variants := [[TechData.STARTING_LOADOUT, "starter kit"]]
+			# From planet 4 on, a real player has the Mirror Aegis the needle planet handed over.
+			var variants := [[TechData.STARTING_LOADOUT if column < 3 else ["pulse_driver", "arc_blade", "", "mirror_aegis", "nova_bomb"], "starter kit" if column < 3 else "+ Mirror Aegis"]]
 			if column == 2:
 				variants = [[TechData.STARTING_LOADOUT, "no shields"], [["pulse_driver", "arc_blade", "", "mirror_aegis", "nova_bomb"], "with Mirror Aegis"]]
 			if column == 5:

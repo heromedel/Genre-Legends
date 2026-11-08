@@ -32,6 +32,10 @@
 1. Planet Exploration that dives into a Corridor Run mid-mission (GDD 6G, heromedel's first example).
 2. More depth for the first three: more enemies, bosses, branch themes and fusions.
 
+## Build 0.2 (2026-11-08, approved plan A–H in GDD 9)
+
+(Note) Done: strategic upgrades, intentional first-region difficulty, five-minute stages and mini-bosses, lesson planets, losses that pay and milestones, radio officer, enemy traits, Hazard routes, full screen, version stamp, hangar pop-up.
+
 ## Plan C: Defense and tanks
 
 1. Planetary Defense and Tank Assault, sharing the tank form.
