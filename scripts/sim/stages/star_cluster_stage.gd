@@ -46,7 +46,7 @@ func step(dt: float) -> void:
 			wave_started_at = world.time
 			_start_wave(wave_plan[wave_index])
 		elif alive == 0 and spawn_queue.is_empty():
-			start_boss(HiveCarrier.new(world))
+			start_boss(MirrorDreadnought.new(world) if mission.node.get("boss", "") == "mirror_dreadnought" else HiveCarrier.new(world))
 	if not barge_sent and wave_index == 2:
 		barge_sent = true
 		var from_left := world.rng.randf() < 0.5

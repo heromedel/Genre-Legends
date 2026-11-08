@@ -23,6 +23,7 @@ const RARITY := {
 	"epic": Color(0.8, 0.45, 1.0),
 	"legendary": Color(1.0, 0.75, 0.25),
 	"field": Color(0.45, 1.0, 0.6),
+	"risky": Color(1.0, 0.35, 0.35),
 }
 
 

@@ -23,4 +23,4 @@ godot --headless --import >/dev/null 2>&1 || true
 rm -rf play && mkdir -p play
 godot --headless --export-release "Web" play/index.html
 touch play/.gdignore
-echo "Exported $(grep -o 'v[^"]*' scripts/core/build_info.gd | head -1) to play/"
+echo "Exported $VERSION ($BUILT, $COMMIT) to play/"

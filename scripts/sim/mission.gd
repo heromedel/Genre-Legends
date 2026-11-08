@@ -19,6 +19,7 @@ var player: PlayerFrame
 var weapons: WeaponSystem
 var enemy_system: EnemySystem
 var offers: UpgradeOffers
+var lesson_hazards: LessonHazards
 var stage: Stage
 
 var state := "intro"            # intro, play, offer, crate, won, lost
@@ -29,6 +30,7 @@ var pending_crates := 0
 var pending_pedestals := 0
 var offer_cards: Array = []
 var offer_source := ""          # level_up or pedestal
+var offer_serial := 0           # changes whenever a new set of cards is shown (new offer or reroll)
 var crate_cards: Array = []
 var stages_played: Array = []
 var time_brake_active := false
@@ -50,6 +52,7 @@ func _init(map_node: Dictionary, mission_seed: int, frame_id: String, loadout: A
 	weapons = WeaponSystem.new(world)
 	enemy_system = EnemySystem.new(world)
 	offers = UpgradeOffers.new(world)
+	lesson_hazards = LessonHazards.new(world, node.get("lesson", ""))
 	world.on_collect = _on_collect
 	world.on_player_hurt = _on_player_hurt
 	start_stage(StageFactory.make(node["type"], self))
@@ -127,14 +130,21 @@ func step(input: InputFrame) -> void:
 
 ## One tick of play: move, fire, run the stage and enemies, then shots, blades, zones and pickups.
 func _update_world(input: InputFrame, player_active: bool) -> void:
+	world.refresh_resonance()
 	if player_active and player.alive:
 		player.move(input, DT, 1.0 + 0.15 * run.field_count("overclocked_servos"))
 		_keep_player_in_bounds()
 		var shield_regen := 1.6 if FrameData.get_frame(run.frame_id)["trait"] == "fortress_field" else 1.0
+		if run.resonance_tier("energy") >= 2:
+			shield_regen *= 1.6
+		if run.field_count("blood_pact") > 0:
+			shield_regen = 0.0
 		player.tick_timers(DT, shield_regen)
 		weapons.update(input, DT)
 		_track_time_brake()
 	stage.step(DT)
+	if player_active:
+		lesson_hazards.update(DT)
 	enemy_system.update(DT)
 	world.update_player_shots(DT)
 	world.update_blades(DT)
@@ -203,12 +213,22 @@ func _open_pending() -> void:
 
 func open_offer(source: String, count: int) -> void:
 	offer_cards = offers.build_cards(count)
+	offer_serial += 1
 	offer_source = source
 	state = "offer"
 	world.emit("offer_opened", {"source": source})
 
 
 func _resolve_offer(choice: int) -> void:
+	if choice == UpgradeOffers.REROLL_CHOICE:
+		var fresh := offers.reroll(3)
+		if not fresh.is_empty():
+			offer_cards = fresh
+			offer_serial += 1
+			note("Rerolled the offer (%d rerolls left)" % run.rerolls)
+			world.emit("offer_rerolled", {})
+			world.emit("sound", {"name": "reel"})
+		return
 	if choice < 0 or choice >= offer_cards.size():
 		return
 	var card: Dictionary = offer_cards[choice]
@@ -247,7 +267,10 @@ func _on_collect(kind: String, value: float, tech: String) -> void:
 			stage.on_key_collected()
 			world.emit("sound", {"name": "key"})
 		"graze":
-			weapons.on_graze()
+			if run.is_online("graze_engine"):
+				weapons.on_graze()
+			if run.field_count("adrenaline_junkie") > 0:
+				_on_collect("shard", 0.35, "")
 
 
 func _on_player_hurt(amount: float, source: String) -> void:

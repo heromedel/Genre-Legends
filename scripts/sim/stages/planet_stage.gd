@@ -78,7 +78,7 @@ func _place_loot() -> void:
 		var repair := world.drop_pickup("repair", Vector2(world.rng.randf_range(300, WORLD_SIZE.x - 300), world.rng.randf_range(300, WORLD_SIZE.y - 300)))
 		repair.vel = Vector2.ZERO
 		repair.anchored = true
-	for i in 2:
+	for i in 1:
 		var crate := world.drop_pickup("crate", Vector2(world.rng.randf_range(300, WORLD_SIZE.x - 300), world.rng.randf_range(300, WORLD_SIZE.y - 300)))
 		crate.vel = Vector2.ZERO
 		crate.anchored = true

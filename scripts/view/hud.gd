@@ -16,6 +16,8 @@ var banners: Array = []          # queued {text, style}
 var banner_time := 0.0
 var current_banner: Dictionary = {}
 var warning_time := 0.0
+var radio_text := ""
+var radio_time := 0.0
 var warning_name := ""
 var warning_title := ""
 var flash_color := Color.WHITE
@@ -26,6 +28,7 @@ var time := 0.0
 const STYLE_COLORS := {
 	"gold": Color(1.0, 0.8, 0.35), "red": Color(1.0, 0.35, 0.4), "cyan": Color(0.45, 0.9, 1.0),
 	"violet": Color(0.8, 0.55, 1.0), "blue": Color(0.5, 0.75, 1.0),
+	"energy": Color(0.45, 0.9, 1.0), "explosive": Color(1.0, 0.6, 0.3), "kinetic": Color(1.0, 0.85, 0.45), "mawjig": Color(0.85, 0.55, 1.0),
 }
 
 
@@ -40,6 +43,12 @@ func _ready() -> void:
 func show_banner(text: String, style: String) -> void:
 	if banners.size() < 4:
 		banners.append({"text": text, "style": style})
+
+
+## One short line from the operations officer, shown for a few seconds (GDD 9E).
+func show_radio(text: String) -> void:
+	radio_text = text
+	radio_time = 5.0
 
 
 func show_warning(boss_name: String, title: String) -> void:
@@ -62,6 +71,7 @@ func tick(delta: float) -> void:
 	flash_amount = maxf(flash_amount - delta * 2.5, 0.0)
 	damage_vignette = maxf(damage_vignette - delta * 2.0, 0.0)
 	warning_time = maxf(warning_time - delta, 0.0)
+	radio_time = maxf(radio_time - delta, 0.0)
 	if banner_time > 0.0:
 		banner_time -= delta
 	elif not banners.is_empty():
@@ -113,6 +123,7 @@ func _draw() -> void:
 		_draw_minimap(screen, mission.stage)
 	_draw_banner(screen)
 	_draw_warning(screen)
+	_draw_radio(screen)
 	if flash_amount > 0.0:
 		draw_rect(Rect2(Vector2.ZERO, screen), Color(flash_color.r, flash_color.g, flash_color.b, flash_amount * 0.6))
 
@@ -160,6 +171,20 @@ func _draw_tech_chips(screen: Vector2) -> void:
 		if run.fork_of(tech_id) != "":
 			draw_circle(at + Vector2(size - 6, 6), 4.0, Color(0.85, 0.55, 1.0))
 		at.x += size + 8
+	# Resonance: one chip per element you've put points into, with its tier.
+	at.x += 6
+	for element in UpgradeData.ELEMENTS:
+		var points := run.resonance_points(element)
+		if points <= 0:
+			continue
+		var tier := run.resonance_tier(element)
+		var color: Color = BuildPanel.ELEMENT_COLORS[element]
+		var center := at + Vector2(16, size * 0.5)
+		var diamond := PackedVector2Array([center + Vector2(0, -15), center + Vector2(15, 0), center + Vector2(0, 15), center + Vector2(-15, 0)])
+		draw_colored_polygon(diamond, Art.with_alpha(color, 0.25 + 0.2 * tier))
+		draw_polyline(diamond + PackedVector2Array([diamond[0]]), color, 2.0, true)
+		draw_string(font_bold, center + Vector2(-16, 6), str(tier), HORIZONTAL_ALIGNMENT_CENTER, 32, 16, Color(1, 1, 1))
+		at.x += 38
 
 
 func _draw_minimap(screen: Vector2, stage: DungeonStage) -> void:
@@ -242,6 +267,18 @@ func _draw_warning(screen: Vector2) -> void:
 	draw_string_outline(font_title, Vector2(0, y + 4), "WARNING", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 56, 8, Color(0, 0, 0, fade))
 	draw_string(font_title, Vector2(0, y + 4), "WARNING", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 56, Color(1, 0.2, 0.25, blink * fade))
 	draw_string(font_bold, Vector2(0, y + 38), "%s  —  %s" % [warning_name.to_upper(), warning_title], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 18, Color(1, 0.85, 0.8, fade))
+
+
+func _draw_radio(screen: Vector2) -> void:
+	if radio_time <= 0.0:
+		return
+	var fade := clampf(radio_time / 0.4, 0.0, 1.0) * clampf((5.0 - radio_time) / 0.3, 0.0, 1.0)
+	var width := minf(screen.x * 0.6, 620.0)
+	var box := Rect2(Vector2((screen.x - width) * 0.5, 50), Vector2(width, 64))
+	draw_rect(box, Color(0.02, 0.06, 0.1, 0.85 * fade))
+	draw_rect(box, Color(0.4, 0.85, 1.0, 0.8 * fade), false, 2.0)
+	draw_string(font_bold, box.position + Vector2(12, 20), "OPS  " + Radio.OFFICER.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.5, 0.9, 1.0, fade))
+	draw_string(font_body, box.position + Vector2(12, 46), radio_text, HORIZONTAL_ALIGNMENT_LEFT, width - 24, 16, Color(1, 1, 1, fade))
 
 
 func _draw_vignette(screen: Vector2) -> void:

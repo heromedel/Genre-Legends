@@ -39,7 +39,11 @@ func fresh_data() -> Dictionary:
 		"prizes_claimed": [],
 		"settings": {"music": 0.6, "sfx": 0.8, "play_log": true, "screen_shake": true, "fullscreen": true, "threat": "standard"},
 		"stats": {"missions": 0, "wins": 0, "kills": 0, "play_seconds": 0.0},
-		"seen_tech": [],
+		"new_unlocks": [],
+		"radio_queue": [],
+		"milestones": {},
+		"counters": {},
+		"enemies_unlocked": [],
 	}
 
 
@@ -176,6 +180,8 @@ func upgrade_tech(tech_id: String) -> bool:
 		return false
 	data["blueprints"][tech_id] = blueprints(tech_id) - cost
 	data["tech_mk"][tech_id] = mk + 1
+	if mk == 0:
+		mark_new(tech_id)
 	_log("rnd", "%s raised to Mk %d" % [TechData.TECH[tech_id]["name"], mk + 1])
 	write()
 	return true
@@ -184,6 +190,23 @@ func upgrade_tech(tech_id: String) -> bool:
 func unlock_tech(tech_id: String) -> void:
 	if tech_mk(tech_id) == 0:
 		data["tech_mk"][tech_id] = 1
+		mark_new(tech_id)
+
+
+## New unlocks show a green dot until equipped (GDD 9C).
+func mark_new(tech_id: String) -> void:
+	if not data["new_unlocks"].has(tech_id):
+		data["new_unlocks"].append(tech_id)
+
+
+func is_new(tech_id: String) -> bool:
+	return data["new_unlocks"].has(tech_id)
+
+
+## Radio messages wait here until the command center shows them (GDD 9E).
+func queue_radio(text: String) -> void:
+	if not data["radio_queue"].has(text):
+		data["radio_queue"].append(text)
 
 
 func equip(slot_index: int, tech_id: String) -> void:
@@ -193,6 +216,7 @@ func equip(slot_index: int, tech_id: String) -> void:
 		if loadout[i] == tech_id:
 			loadout[i] = ""
 	loadout[slot_index] = tech_id
+	data["new_unlocks"].erase(tech_id)
 	data["loadout"] = _repair_loadout(loadout, data["tech_mk"])
 	write()
 

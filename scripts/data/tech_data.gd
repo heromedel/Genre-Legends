@@ -39,7 +39,7 @@ const ELEMENT_COLORS := {
 const TECH := {
 	# ---- Main weapons: fire on their own from the moment the mission starts.
 	"pulse_driver": {
-		"name": "Pulse Driver", "slot": "main", "element": "energy", "starter": true,
+		"name": "Pulse Driver", "slot": "main", "element": "energy",
 		"text": "Rapid energy bolts. A blank slate that grows into something wild.",
 		"levels": ["Rapid bolts", "Twin bolts", "Fork", "Triple fan", "Overcharged bolts"],
 		"blueprint_from": ["star_cluster", "corridor"],
@@ -142,7 +142,7 @@ const TECH := {
 	},
 	# ---- Specials: fired with the special button, on a cooldown.
 	"nova_bomb": {
-		"name": "Nova Bomb", "slot": "special", "element": "energy", "starter": true,
+		"name": "Nova Bomb", "slot": "special", "element": "explosive",
 		"text": "The panic button. Wipes every bullet on screen and blasts everything near you.",
 		"levels": ["Nova", "Faster recharge", "Fork", "Bigger nova", "Star-killer"],
 		"blueprint_from": ["star_cluster", "dungeon"],
@@ -164,8 +164,9 @@ const TECH := {
 }
 
 ## Starting kit: interesting from minute one (GDD 1C). Starters are unlocked at Mk 1.
-const STARTING_LOADOUT := ["pulse_driver", "arc_blade", "swarm_pods", "mirror_aegis", "nova_bomb"]
-const STARTING_UNLOCKS := ["pulse_driver", "arc_blade", "swarm_pods", "mirror_aegis", "nova_bomb"]
+## Two slots start empty on purpose: Mirror Aegis and Swarm Pods are earned at the lesson planets (GDD 9C).
+const STARTING_LOADOUT := ["pulse_driver", "arc_blade", "", "", "nova_bomb"]
+const STARTING_UNLOCKS := ["pulse_driver", "arc_blade", "nova_bomb"]
 
 
 static func get_tech(tech_id: String) -> Dictionary:

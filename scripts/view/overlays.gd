@@ -48,7 +48,7 @@ class Card:
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
-		custom_minimum_size = Vector2(230, 300)
+		custom_minimum_size = Vector2(236, 360)
 
 	func _process(delta: float) -> void:
 		appear = minf(appear + delta * 4.0, 1.0)
@@ -71,16 +71,31 @@ class Card:
 		var icon_id: String = card["tech"] if card["tech"] != "" else card.get("field", "")
 		if card["kind"] == "fusion":
 			icon_id = "fusion"
-		if card["kind"] == "repair":
-			icon_id = "repair"
+		if card["kind"] == "cache":
+			icon_id = "crate"
 		var icon_rect := Rect2(Vector2(size.x * 0.5 - 40, 28 + lift), Vector2(80, 80))
 		draw_texture_rect(Art.glow(), icon_rect.grow(30), false, Art.with_alpha(rarity, 0.25 * appear))
 		IconPainter.draw(self, icon_id, icon_rect, Art.with_alpha(rarity.lightened(0.3), appear))
 		var kind_text: String = {"online": "BRING ONLINE", "upgrade": "UPGRADE", "fork": "CHOOSE A PATH", "fusion": "FUSION",
-			"field": "FIELD UPGRADE", "repair": "REPAIR"}.get(card["kind"], "")
+			"field": "FIELD UPGRADE", "cache": "SALVAGE"}.get(card["kind"], "")
+		if card["rarity"] == "risky":
+			kind_text = "RISKY"
+		# Element chip in the corner.
+		var element: String = card.get("element", "")
+		if element != "":
+			var chip_color: Color = BuildPanel.ELEMENT_COLORS[element]
+			draw_string(UiKit.font("bold"), Vector2(0, 24 + lift), element.to_upper(), HORIZONTAL_ALIGNMENT_RIGHT, size.x - 10, 11, Art.with_alpha(chip_color, appear))
 		draw_string(UiKit.font("bold"), Vector2(0, 130 + lift), kind_text, HORIZONTAL_ALIGNMENT_CENTER, size.x, 13, Art.with_alpha(rarity, appear))
 		_draw_wrapped(UiKit.font("bold"), card["title"], Vector2(14, 158 + lift), size.x - 28, 19, Art.with_alpha(Color(1, 1, 1), appear))
 		_draw_wrapped(UiKit.font("body"), card["text"], Vector2(14, 214 + lift), size.x - 28, 15, Art.with_alpha(Color(0.75, 0.85, 0.95), appear))
+		# What it builds toward (GDD 9H).
+		var y := size.y - 44 + lift
+		if card.get("fusion_hint", "") != "":
+			_draw_wrapped(UiKit.font("bold"), card["fusion_hint"], Vector2(10, y - 22), size.x - 20, 12, Art.with_alpha(Color(0.85, 0.6, 1.0), appear))
+		if card.get("synergy", "") != "":
+			var unlocks: bool = card["synergy"].begins_with("Unlocks")
+			var synergy_color: Color = Art.GOLD if unlocks else BuildPanel.ELEMENT_COLORS.get(element, Color(0.7, 0.8, 0.9))
+			_draw_wrapped(UiKit.font("bold"), card["synergy"], Vector2(10, y), size.x - 20, 12 if unlocks else 13, Art.with_alpha(synergy_color, appear))
 
 	func _draw_wrapped(font: Font, text: String, at: Vector2, width: float, font_size: int, color: Color) -> void:
 		var lines := []
@@ -97,7 +112,7 @@ class Card:
 			draw_string(font, at + Vector2(0, i * (font_size + 4)), lines[i], HORIZONTAL_ALIGNMENT_CENTER, width, font_size, color)
 
 
-static func build_offer(cards: Array, source: String, on_pick: Callable) -> Control:
+static func build_offer(cards: Array, source: String, on_pick: Callable, run: RunState, on_reroll: Callable) -> Control:
 	var root := Control.new()
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -129,7 +144,45 @@ static func build_offer(cards: Array, source: String, on_pick: Callable) -> Cont
 		var index := i
 		view.on_pick = func(): on_pick.call(index)
 		row.add_child(view)
+	# Reroll and a look at the whole build before choosing.
+	var actions := HBoxContainer.new()
+	actions.alignment = BoxContainer.ALIGNMENT_CENTER
+	actions.add_theme_constant_override("separation", 16)
+	column.add_child(actions)
+	var reroll := UiKit.button("Reroll (%d left)" % run.rerolls, on_reroll, "Level-up: reroll")
+	reroll.disabled = run.rerolls <= 0
+	reroll.custom_minimum_size = Vector2(200, 50)
+	actions.add_child(reroll)
+	var build_view: Control = null
+	var view_build := UiKit.button("View build", func(): pass, "Level-up: view build")
+	view_build.custom_minimum_size = Vector2(200, 50)
+	view_build.pressed.connect(func():
+		if build_view != null:
+			build_view.queue_free()
+			build_view = null
+			view_build.text = "View build"
+			return
+		build_view = _floating(BuildPanel.build(run))
+		root.add_child(build_view)
+		view_build.text = "Back to cards"
+		root.move_child(build_view, root.get_child_count() - 1))
+	actions.add_child(view_build)
 	return root
+
+
+## Centres a panel over everything, with a tap-anywhere-outside backdrop that does nothing (so taps
+## don't fall through to the cards underneath).
+static func _floating(panel: Control) -> Control:
+	var holder := CenterContainer.new()
+	holder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	holder.mouse_filter = Control.MOUSE_FILTER_STOP
+	var shade := ColorRect.new()
+	shade.color = Color(0, 0, 0, 0.55)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	holder.add_child(shade)
+	holder.add_child(panel)
+	return holder
 
 
 ## The Salvage Crate: three slot-machine reels spin, then land on how many upgrades you got.
@@ -192,7 +245,7 @@ class CrateReel:
 			draw_string(UiKit.font("body"), Vector2(0, screen.y - 40), "Tap to continue", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 18, Color(1, 1, 1, blink))
 
 
-static func build_pause(on_resume: Callable, on_abandon: Callable) -> Control:
+static func build_pause(on_resume: Callable, on_abandon: Callable, run: RunState) -> Control:
 	var root := Control.new()
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -203,10 +256,14 @@ static func build_pause(on_resume: Callable, on_abandon: Callable) -> Control:
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.add_child(center)
+	var split := HBoxContainer.new()
+	split.add_theme_constant_override("separation", 16)
+	center.add_child(split)
 	var box := UiKit.panel()
-	center.add_child(box)
+	split.add_child(box)
+	split.add_child(BuildPanel.build(run))
 	var column := VBoxContainer.new()
-	column.custom_minimum_size = Vector2(360, 0)
+	column.custom_minimum_size = Vector2(330, 0)
 	column.add_theme_constant_override("separation", 14)
 	box.add_child(column)
 	var title := UiKit.label("PAUSED", 34, Color(0.6, 0.9, 1.0), "title")
@@ -220,5 +277,5 @@ static func build_pause(on_resume: Callable, on_abandon: Callable) -> Control:
 		Save.set_setting("screen_shake", not Save.setting("screen_shake"))
 		refresh.call())
 	column.add_child(shake_button)
-	column.add_child(UiKit.button("Abandon mission (keep half the blueprints)", on_abandon, "Pause: Abandon"))
+	column.add_child(UiKit.button("Abandon mission", on_abandon, "Pause: Abandon"))
 	return root

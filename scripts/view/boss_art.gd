@@ -9,6 +9,7 @@ static func draw(ci: CanvasItem, boss: BossBase, time: float) -> void:
 		"wyrm_engine": _wyrm_engine(ci, boss, time)
 		"siege_crawler": _siege_crawler(ci, boss, time)
 		"hollow_king": _hollow_king(ci, boss, time)
+		"mirror_dreadnought": _mirror_dreadnought(ci, boss, time)
 
 
 static func draw_glow(ci: CanvasItem, boss: BossBase, time: float) -> void:
@@ -156,3 +157,49 @@ static func _hollow_king(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	for orb: Enemy in boss.living_parts("orb"):
 		ci.draw_circle(orb.pos, 16.0, _flash(orb, Color(0.35, 0.2, 0.6, alpha)))
 		Art.shape(ci, Transform2D(time * 2.0, orb.pos) * Art.ngon(4, 12), Color(0.8, 0.65, 1.0, alpha), Color(1, 1, 1, alpha), 1.5)
+
+
+static func _mirror_dreadnought(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var o := boss.origin
+	var hull := PackedVector2Array([Vector2(-300, -30), Vector2(-220, -96), Vector2(220, -96), Vector2(300, -30),
+		Vector2(270, 40), Vector2(0, 92), Vector2(-270, 40)])
+	ci.draw_set_transform(o, 0.0, Vector2.ONE)
+	Art.shape(ci, hull, Color(0.1, 0.13, 0.2), Color(0.6, 0.8, 1.0), 3.0)
+	Art.shape(ci, Art.scaled(hull, Vector2(0.8, 0.62)), Color(0.15, 0.2, 0.3), Color(0.45, 0.6, 0.8), 1.5)
+	for i in 7:
+		var x := -210.0 + i * 70.0
+		ci.draw_line(Vector2(x, -80), Vector2(x * 0.92, 30), Color(0.25, 0.32, 0.45), 1.0)
+	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	# Vents on its back: glowing grilles, smoking once broken.
+	for i in MirrorDreadnought.VENT_OFFSETS.size():
+		var vent := boss.part_named("vent%d" % i)
+		if vent == null:
+			continue
+		var at: Vector2 = o + MirrorDreadnought.VENT_OFFSETS[i]
+		if vent.dead:
+			ci.draw_rect(Rect2(at - Vector2(26, 12), Vector2(52, 24)), Color(0.05, 0.04, 0.04))
+			for s in 3:
+				ci.draw_circle(at + Vector2(sin(time * 3.0 + s) * 8.0, -12.0 - fmod(time * 30.0 + s * 12.0, 36.0)), 6.0 + s * 2.0, Color(0.25, 0.25, 0.25, 0.5))
+			continue
+		ci.draw_rect(Rect2(at - Vector2(28, 14), Vector2(56, 28)), _flash(vent, Color(0.3, 0.12, 0.05)))
+		for g in 4:
+			ci.draw_line(at + Vector2(-20 + g * 13, -10), at + Vector2(-20 + g * 13, 10), Color(1, 0.55 + 0.2 * sin(time * 8.0 + g), 0.2), 3.0)
+		ci.draw_rect(Rect2(at - Vector2(28, 14), Vector2(56, 28)), Color(1, 0.6, 0.3), false, 2.0)
+	# Mirror plates on its underside: bright, with a shine that sweeps across them.
+	for i in MirrorDreadnought.MIRROR_OFFSETS.size():
+		var mirror := boss.part_named("mirror%d" % i)
+		if mirror == null or mirror.dead:
+			continue
+		var at: Vector2 = o + MirrorDreadnought.MIRROR_OFFSETS[i]
+		var plate := PackedVector2Array([at + Vector2(-40, -20), at + Vector2(40, -20), at + Vector2(32, 22), at + Vector2(-32, 22)])
+		Art.shape(ci, plate, Color(0.55, 0.7, 0.85), Color(0.95, 1, 1), 2.0)
+		var sweep := fmod(time * 0.8 + i * 0.2, 1.6) - 0.3
+		if sweep >= 0.0 and sweep <= 1.0:
+			var x := lerpf(-36, 36, sweep)
+			ci.draw_line(at + Vector2(x, -18), at + Vector2(x - 12, 20), Color(1, 1, 1, 0.85), 5.0)
+	var core := boss.part_named("core")
+	if core != null and not core.dead:
+		ci.draw_circle(core.pos, 40.0, _flash(core, Color(0.08, 0.12, 0.2)))
+		var lit := Color(0.6, 0.9, 1.0) if not core.invulnerable else Color(0.3, 0.4, 0.5)
+		ci.draw_circle(core.pos, 24.0 + sin(time * 5.0) * 3.0, lit)
+		ci.draw_circle(core.pos, 10.0, Color(1, 1, 1))

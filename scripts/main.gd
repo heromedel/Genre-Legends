@@ -52,6 +52,14 @@ func launch_mission(node_id: String) -> void:
 func finish_mission(node_id: String, result: Dictionary) -> void:
 	var hints := []
 	var is_test := node_id.begins_with("test:")
+	# Lesson planets hand over their tech win or lose (GDD 9C).
+	var node := star_map.get_node(node_id) if not is_test else {}
+	var lesson_tech: String = node.get("lesson_tech", "")
+	if lesson_tech != "" and Save.tech_mk(lesson_tech) == 0:
+		Save.unlock_tech(lesson_tech)
+		Save.queue_radio(Radio.lesson_line(lesson_tech, result["won"]))
+		hints.append("New tech: %s. Equip it in the Hangar." % TechData.TECH[lesson_tech]["name"])
+		PlayLog.note("unlock", "Lesson tech %s unlocked (%s)" % [lesson_tech, "won" if result["won"] else "lost"])
 	if result["won"] and not is_test:
 		Save.mark_cleared(node_id)
 		Save.data["stats"]["wins"] += 1

@@ -47,6 +47,13 @@ var enemy_fire_scale := 1.0      # how fast enemies and bosses cycle their attac
 var on_player_hurt: Callable
 var on_collect: Callable
 
+# Resonance tiers this tick (GDD 9H), refreshed by Mission so combat checks are cheap.
+var resonance := {"energy": 0, "explosive": 0, "kinetic": 0, "mawjig": 0}
+
+
+func refresh_resonance() -> void:
+	resonance = run.resonance_tiers()
+
 
 func emit(type: String, data: Dictionary = {}) -> void:
 	data["type"] = type
@@ -123,6 +130,9 @@ func player_shot(at: Vector2, velocity: Vector2, damage: float, tech: String, lo
 	shot.tech = tech
 	shot.look = look
 	shot.color = color
+	# Kinetic resonance: everything punches through one more enemy.
+	if resonance["kinetic"] >= 1:
+		shot.pierce += 1
 	player_shots.append(shot)
 	return shot
 
@@ -234,15 +244,42 @@ func push_out_of_walls(at: Vector2, radius: float) -> Vector2:
 func hurt_enemy(enemy: Enemy, amount: float, tech: String = "") -> bool:
 	if enemy.dead or enemy.invulnerable or enemy.hidden or amount <= 0.0:
 		return false
+	var from_resonance := tech == "resonance"
+	# Mawjig resonance: hits hex, and hexed enemies take more damage.
+	if resonance["mawjig"] >= 1:
+		if enemy.hex_marked:
+			amount *= 1.2
+		elif not from_resonance:
+			enemy.hex_marked = true
 	enemy.hp -= amount
 	enemy.flash = 0.1
 	run.damage_dealt += amount
 	if enemy.state == 0 and enemy.brain == "mimic":
 		enemy.state = 1
+	if not from_resonance and resonance["energy"] >= 1:
+		_energy_resonance_hit(enemy)
 	if enemy.hp <= 0.0:
 		kill_enemy(enemy, tech)
 		return true
 	return false
+
+
+## Energy resonance: every few hits, lightning arcs from the struck enemy to another.
+func _energy_resonance_hit(enemy: Enemy) -> void:
+	run.hit_counter += 1
+	var every := 3 if resonance["energy"] >= 3 else 6
+	if run.hit_counter % every != 0:
+		return
+	var hit := {enemy.id: true}
+	var from := enemy.pos
+	for i in (2 if resonance["energy"] >= 3 else 1):
+		var next := nearest_enemy(from, 230.0, hit)
+		if next == null:
+			break
+		hit[next.id] = true
+		emit("lightning", {"from": from, "to": next.pos})
+		hurt_enemy(next, 14.0 + 4.0 * resonance["energy"], "resonance")
+		from = next.pos
 
 
 func kill_enemy(enemy: Enemy, tech: String = "") -> void:
@@ -262,7 +299,7 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 		var value := 3.0 if shard_total >= 6.0 else 1.0
 		drop_pickup("shard", enemy.pos, minf(value, shard_total))
 		shard_total -= value
-	if enemy.drops_crate or (enemy.elite and rng.randf() < crate_chance * 2.0):
+	if enemy.drops_crate or (enemy.elite and rng.randf() < crate_chance * 1.4):
 		drop_pickup("crate", enemy.pos)
 	if enemy.elite and elite_blueprint_tech != "":
 		drop_pickup("blueprint", enemy.pos, 1.0, elite_blueprint_tech)
@@ -273,7 +310,12 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 			child.memory["no_formation"] = true
 			child.vel = Vector2(-120 + 240 * i, -60)
 			child.room = enemy.room
-	if enemy.hex_marked and run.fork_of("hex_repeater") == "a":
+	if tech != "resonance" and resonance["explosive"] >= 1 and rng.randf() < 0.25:
+		explode(enemy.pos, 70.0, 22.0 + 6.0 * resonance["explosive"], "resonance", Color(1.0, 0.55, 0.25))
+	if run.field_count("blood_pact") > 0:
+		player.repair(1.5)
+	# Hexplosion fork, or Mawjig resonance II: hexed enemies burst and spread the hex.
+	if enemy.hex_marked and (run.fork_of("hex_repeater") == "a" or resonance["mawjig"] >= 2) and tech != "resonance":
 		explode(enemy.pos, 95.0, 34.0 * run.damage_multiplier("hex_repeater", player.armor_fraction()), "hex_repeater", Color(0.85, 0.45, 1.0), true)
 	var vampiric := run.field_count("vampiric_plating")
 	if vampiric > 0:
@@ -282,6 +324,11 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 
 ## A player explosion that damages every enemy in range once.
 func explode(at: Vector2, radius: float, damage: float, tech: String, color: Color, spreads_hex: bool = false) -> void:
+	# Explosive resonance: bigger blasts, then blasts that leave the ground burning.
+	if resonance["explosive"] >= 2:
+		radius *= 1.33
+	if resonance["explosive"] >= 3 and radius >= 40.0 and zones.size() < 40:
+		add_zone("fire", at, radius * 0.6, 1.6, 6.0, false, {"tick": 0.4, "color": Color(1, 0.5, 0.2)})
 	emit("explosion", {"pos": at, "size": radius, "color": color, "ring": true})
 	for enemy: Enemy in enemies.duplicate():
 		if enemy.dead or enemy.hidden:
@@ -400,6 +447,15 @@ func update_player_shots(dt: float) -> void:
 			var reach := enemy.radius + shot.radius
 			if shot.pos.distance_squared_to(enemy.pos) > reach * reach:
 				continue
+			# Mirrored hulls throw straight shots back; homing shots curve around them.
+			if enemy.reflects:
+				if shot.homing > 0.0:
+					continue
+				shot.dead = true
+				enemy_shot(shot.pos, (player.pos - shot.pos).angle() + rng.randf_range(-0.2, 0.2), 320.0,
+					{"damage": 6.0, "radius": 5.0, "color": Color(0.8, 0.95, 1.0)})
+				emit("spark", {"pos": shot.pos, "color": Color(0.85, 0.95, 1.0), "blocked": true})
+				break
 			if enemy.front_shield and _hits_front(enemy, shot) and shot.splash <= 0.0:
 				shot.dead = true
 				emit("spark", {"pos": shot.pos, "color": Color(0.6, 0.8, 1.0), "blocked": true})
@@ -410,7 +466,9 @@ func update_player_shots(dt: float) -> void:
 				emit("spark", {"pos": shot.pos, "color": Color(0.8, 0.8, 0.8), "blocked": true})
 				break
 			shot.hit_ids[enemy.id] = true
-			hurt_enemy(enemy, shot.damage, shot.tech)
+			# Kinetic resonance II: shots that have flown a while hit harder.
+			var momentum := 1.4 if resonance["kinetic"] >= 2 and shot.age > 0.3 else 1.0
+			hurt_enemy(enemy, shot.damage * momentum, shot.tech)
 			_on_shot_impact(shot, enemy)
 			if shot.bounces > 0:
 				shot.bounces -= 1
@@ -520,7 +578,7 @@ func call_meteor(at: Vector2, radius: float, damage: float, burning: bool) -> vo
 
 func update_enemy_shots(dt: float) -> void:
 	var slow := enemy_time_scale()
-	var graze_online := run.is_online("graze_engine")
+	var graze_online := run.is_online("graze_engine") or run.field_count("adrenaline_junkie") > 0
 	var mirror_up := player.mirror_time > 0.0
 	var bastion := run.fork_of("mirror_aegis") == "b" and run.is_online("mirror_aegis")
 	for shot: Shot in enemy_shots:
@@ -535,6 +593,10 @@ func update_enemy_shots(dt: float) -> void:
 				enemy_ring(shot.pos, 8, 160.0, rng.randf() * TAU, {"color": Color(1, 0.55, 0.3)})
 				emit("explosion", {"pos": shot.pos, "size": 22.0, "color": Color(1, 0.55, 0.3)})
 			continue
+		if shot.homing > 0.0 and player.alive:
+			# Homing enemy shots (needles) turn gently toward the frame.
+			var turn := clampf(angle_difference(shot.vel.angle(), (player.pos - shot.pos).angle()), -shot.homing * dt * slow, shot.homing * dt * slow)
+			shot.vel = shot.vel.rotated(turn)
 		if shot.accel != 0.0:
 			var speed := clampf(shot.vel.length() + shot.accel * dt * slow, 20.0, maxf(shot.max_speed, 20.0))
 			shot.vel = shot.vel.normalized() * speed

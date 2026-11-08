@@ -35,7 +35,7 @@ const ENEMIES := {
 	"burrower": {"name": "Burrower", "hp": 45, "radius": 16, "speed": 140, "contact": 14, "xp": 3,
 		"brain": "burrower", "look": "burrower", "color": Color(0.9, 0.75, 0.5)},
 	"hive_nest": {"name": "Hive Nest", "hp": 650, "radius": 34, "speed": 0, "contact": 14, "xp": 10,
-		"brain": "nest", "look": "nest", "color": Color(0.85, 0.45, 1.0), "objective": true, "drops_crate": true},
+		"brain": "nest", "look": "nest", "color": Color(0.85, 0.45, 1.0), "objective": true},
 	"warlord": {"name": "Warlord", "hp": 320, "radius": 24, "speed": 120, "contact": 20, "xp": 12,
 		"brain": "warlord", "look": "warlord", "color": Color(1.0, 0.3, 0.3), "elite": true},
 	# ---- Dungeon (mech form)

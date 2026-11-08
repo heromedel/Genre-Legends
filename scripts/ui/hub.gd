@@ -43,6 +43,29 @@ func _ready() -> void:
 	main.add_child(content)
 	show_page(page)
 	Sound.play_music("hub")
+	_show_radio_queue()
+
+
+## Messages waiting from the operations officer: lessons, new arrivals (GDD 9E).
+func _show_radio_queue() -> void:
+	var queue: Array = Save.data["radio_queue"]
+	if queue.is_empty():
+		return
+	var text: String = queue.pop_front()
+	Save.write()
+	PlayLog.note("radio", text)
+	var box := UiKit.panel(Color(0.03, 0.07, 0.12, 0.98), Color(0.45, 0.9, 1.0))
+	var column := VBoxContainer.new()
+	column.custom_minimum_size = Vector2(560, 0)
+	column.add_theme_constant_override("separation", 12)
+	box.add_child(column)
+	column.add_child(UiKit.label("INCOMING: " + Radio.OFFICER.to_upper(), 14, Color(0.5, 0.9, 1.0), "bold"))
+	column.add_child(UiKit.wrapped(text, 19, Color(1, 1, 1)))
+	var popup := Overlays._floating(box)
+	column.add_child(UiKit.button("Understood", func():
+		popup.queue_free()
+		_show_radio_queue(), "Radio: understood", true))
+	add_child(popup)
 
 
 func _build_rail() -> Control:
@@ -80,6 +103,8 @@ func _build_rail() -> Control:
 		button.add_child(box)
 		column.add_child(button)
 		rail_buttons[page_id] = button
+		if page_id == "hangar" and not Save.data["new_unlocks"].is_empty():
+			button.add_child(NewDot.new())
 	return rail
 
 
@@ -254,9 +279,20 @@ func _build_hangar_page() -> Control:
 	column.add_child(slots_row)
 	for slot_index in TechData.SLOTS.size():
 		slots_row.add_child(_slot_card(slot_index))
-	if picker_slot >= 0:
-		column.add_child(_tech_picker(picker_slot))
-	return scroll
+	if picker_slot < 0:
+		return scroll
+	# The picker opens as a pop-up over the hangar, so it's never off the bottom of the screen.
+	var page_root := Control.new()
+	page_root.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	page_root.add_child(scroll)
+	var popup := Overlays._floating(_tech_picker(picker_slot))
+	popup.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed:
+			picker_slot = -1
+			_rebuild())
+	page_root.add_child(popup)
+	return page_root
 
 
 func _frame_card(frame_id: String) -> Control:
@@ -308,6 +344,10 @@ func _slot_card(slot_index: int) -> Control:
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	button.add_child(box)
+	for new_id in Save.data["new_unlocks"]:
+		if TechData.TECH.has(new_id) and TechData.TECH[new_id]["slot"] == slot:
+			button.add_child(NewDot.new())
+			break
 	var slot_label := UiKit.label(TechData.SLOT_NAMES[slot].to_upper(), 12, Color(0.55, 0.7, 0.85), "bold")
 	slot_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	slot_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -334,16 +374,29 @@ func _slot_card(slot_index: int) -> Control:
 
 func _tech_picker(slot_index: int) -> Control:
 	var slot: String = TechData.SLOTS[slot_index]
-	var panel := UiKit.panel()
+	var panel := UiKit.panel(Color(0.04, 0.07, 0.12, 0.98), Color(0.5, 0.85, 1.0))
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
+	column.custom_minimum_size = Vector2(640, 0)
 	panel.add_child(column)
-	column.add_child(UiKit.label("Choose %s" % TechData.SLOT_NAMES[slot], 18, Color(0.6, 0.9, 1.0), "bold"))
+	var header := HBoxContainer.new()
+	var heading := UiKit.label("Choose %s" % TechData.SLOT_NAMES[slot], 20, Color(0.6, 0.9, 1.0), "bold")
+	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(heading)
+	header.add_child(UiKit.button("Close", func():
+		picker_slot = -1
+		_rebuild(), "Hangar: close picker"))
+	column.add_child(header)
+	var list_scroll := ScrollContainer.new()
+	list_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	list_scroll.custom_minimum_size = Vector2(640, 420)
+	column.add_child(list_scroll)
 	var grid := GridContainer.new()
-	grid.columns = 2
+	grid.columns = 1
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list_scroll.add_child(grid)
 	grid.add_theme_constant_override("h_separation", 10)
 	grid.add_theme_constant_override("v_separation", 10)
-	column.add_child(grid)
 	if slot_index > 0:
 		grid.add_child(UiKit.button("Leave empty", func():
 			Save.equip(slot_index, "")
@@ -357,7 +410,8 @@ func _tech_picker(slot_index: int) -> Control:
 		row.add_child(IconView.make(tech_id, 40, TechData.element_color(tech_id) if mk > 0 else Color(0.35, 0.4, 0.5)))
 		var text := VBoxContainer.new()
 		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		text.add_child(UiKit.label("%s  %s" % [tech["name"], ("Mk %d" % mk) if mk > 0 else "(locked)"], 16, Color(1, 1, 1) if mk > 0 else Color(0.5, 0.55, 0.65), "bold"))
+		text.add_child(UiKit.label("%s  %s%s" % [tech["name"], ("Mk %d" % mk) if mk > 0 else "(locked)", "   NEW" if Save.is_new(tech_id) else ""], 16,
+			Color(0.5, 1.0, 0.55) if Save.is_new(tech_id) else (Color(1, 1, 1) if mk > 0 else Color(0.5, 0.55, 0.65)), "bold"))
 		text.add_child(UiKit.wrapped(tech["text"], 13, Color(0.7, 0.8, 0.9)))
 		text.add_child(UiKit.wrapped("Forks: %s / %s" % [tech["forks"]["a"]["name"], tech["forks"]["b"]["name"]], 12, Color(0.8, 0.6, 1.0)))
 		row.add_child(text)
@@ -561,3 +615,23 @@ class FramePreview:
 		Art.draw_glow(self, c + Vector2(-50, 0), 40.0, Art.with_alpha(FrameData.get_frame(frame_id)["hull"], 0.25))
 		FrameArt.draw_frame(self, frame_id, "ship", c + Vector2(-50, 0), -PI * 0.5, time, {"speed": 0.4, "scale": 1.7})
 		FrameArt.draw_frame(self, frame_id, "mech", c + Vector2(50, 0), -PI * 0.5 + sin(time) * 0.4, time, {"speed": 0.6, "scale": 1.7})
+
+
+## A pulsing green dot in a control's corner: something new is waiting there (GDD 9C).
+class NewDot:
+	extends Control
+	var time := 0.0
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	func _process(delta: float) -> void:
+		time += delta
+		queue_redraw()
+
+	func _draw() -> void:
+		var at := Vector2(size.x - 12, 12)
+		var pulse := 0.6 + 0.4 * sin(time * 5.0)
+		draw_circle(at, 9.0 + pulse * 3.0, Color(0.3, 1.0, 0.45, 0.25 * pulse))
+		draw_circle(at, 7.0, Color(0.35, 1.0, 0.5))

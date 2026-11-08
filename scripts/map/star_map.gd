@@ -9,6 +9,15 @@ extends RefCounted
 ## The map holds no progress of its own: what's cleared lives in Save, and availability is worked out from it.
 
 const COLUMNS_PER_REGION := 5  # plus one gate column
+
+## Lesson planets (GDD 9C): built to beat you without one tech, which unlocks win or lose.
+## Keyed by region and column ("r0c2") or a region's gate ("r0gate").
+const LESSONS := {
+	"r0c2": {"lesson": "needles", "tech": "mirror_aegis",
+		"traits": ["Needle swarms"], "need": "Needle swarms are shredding everything that flies here."},
+	"r0gate": {"lesson": "mirror", "tech": "swarm_pods", "type": "star_cluster", "boss": "mirror_dreadnought",
+		"traits": ["Mirrored hull"], "need": "A mirror-hulled dreadnought holds the gate. Straight shots bounce right back."},
+}
 const COLUMN_SPACING := 210.0
 const ROW_SPACING := 125.0
 
@@ -88,13 +97,19 @@ func _generate_region(region: int) -> void:
 		var column := first_column + local_column
 		var is_gate := local_column == COLUMNS_PER_REGION
 		var count := 1 if is_gate or (region == 0 and local_column == 0) else (2 + int(rng.randf() < 0.55))
+		var hazard_index := rng.randi() % 3 if rng.randf() < 0.45 else -1
 		var types := _types_for_column(rng, count, region, local_column)
+		if is_gate and LESSONS.has("r%dgate" % region):
+			types = [LESSONS["r%dgate" % region]["type"]]
 		var ids := []
 		for i in count:
 			var row := 0.0 if count == 1 else lerpf(-1.0, 1.0, float(i) / float(count - 1)) * (0.8 + 0.25 * count * 0.5)
 			row += rng.randf_range(-0.18, 0.18) if count > 1 else 0.0
 			var node_id := "r%dc%dn%d" % [region, local_column, i]
 			var node := _make_node(rng, node_id, region, column, local_column, row, types[i], is_gate)
+			_apply_lesson(node, "r%dgate" % region if is_gate else "r%dc%d" % [region, local_column])
+			if not is_gate and count == 3 and local_column >= 3 and i == hazard_index:
+				_make_hazard(node)
 			nodes[node_id] = node
 			ids.append(node_id)
 		_link_columns(rng, previous_ids, ids)
@@ -157,7 +172,31 @@ func _make_node(rng: RandomNumberGenerator, node_id: String, region: int, column
 		"links": [],
 		"incoming": [],
 		"planet_look": rng.randi(),
+		"lesson": "",
+		"lesson_tech": "",
+		"boss": "",
+		"hazard": false,
+		"reward_scale": 1.0,
 	}
+
+
+func _apply_lesson(node: Dictionary, key: String) -> void:
+	if not LESSONS.has(key):
+		return
+	var lesson: Dictionary = LESSONS[key]
+	node["lesson"] = lesson["lesson"]
+	node["lesson_tech"] = lesson["tech"]
+	node["need"] = lesson["need"]
+	node["boss"] = lesson.get("boss", "")
+	node["modifier"] = ""
+
+
+## Hazard routes (GDD 9G): an optional planet that's much harder until your build is ready, and pays double.
+func _make_hazard(node: Dictionary) -> void:
+	node["hazard"] = true
+	node["difficulty"] += 0.45
+	node["danger"] = mini(node["danger"] + 2, 5)
+	node["reward_scale"] = 2.0
 
 
 ## Each planet links to the nearest one or two planets in the next column; every planet gets at least one way in.

@@ -24,6 +24,7 @@ var ghost := false            # passes through walls
 var dead := false
 var invulnerable := false
 var untargetable := false     # auto-aim ignores it (secret walls)
+var reflects := false         # mirrored plate: throws straight shots back at the player
 var hidden := false           # burrowed, or not yet emerged: can't be hit and doesn't hurt
 var flash := 0.0              # hit flash for the art
 var hex_marked := false

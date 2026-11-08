@@ -17,6 +17,7 @@ var special_button: Overlays.TouchButton
 var pause_button: Overlays.TouchButton
 var overlay: Control = null
 var overlay_kind := ""
+var shown_offer_serial := -1
 var paused := false
 var done := false
 
@@ -85,6 +86,9 @@ func _ready() -> void:
 	camera_center = mission.player.pos
 	PlayLog.set_screen("mission:%s" % node["type"])
 	PlayLog.begin_mission(mission, mission.run.loadout, mission.run.tech_mk)
+	var line := Radio.mission_start_line(node, int(Save.data["stats"]["missions"]) - 1)
+	if line != "":
+		hud.show_radio(line)
 	Sound.play_music(node["type"])
 	_handle_events(mission.drain_events())
 
@@ -111,7 +115,7 @@ func set_paused(value: bool) -> void:
 	input.clear()
 	if paused:
 		PlayLog.note("input", "paused")
-		_show_overlay("pause", Overlays.build_pause(func(): set_paused(false), _abandon))
+		_show_overlay("pause", Overlays.build_pause(func(): set_paused(false), _abandon, mission.run))
 	else:
 		PlayLog.note("input", "resumed")
 		_close_overlay()
@@ -140,7 +144,7 @@ func _notification(what: int) -> void:
 func _physics_process(_delta: float) -> void:
 	if paused or done or mission == null:
 		return
-	if mission.state == "offer" and overlay_kind != "offer":
+	if mission.state == "offer" and (overlay_kind != "offer" or shown_offer_serial != mission.offer_serial):
 		_open_offer()
 	elif mission.state == "crate" and overlay_kind != "crate":
 		_open_crate()
@@ -149,7 +153,10 @@ func _physics_process(_delta: float) -> void:
 	if mission.state in ["offer", "crate"] and not choice_made:
 		return
 	if choice_made and mission.state == "offer":
-		PlayLog.record_choice(mission.offer_cards[frame.choice], mission.offer_cards)
+		if frame.choice == UpgradeOffers.REROLL_CHOICE:
+			PlayLog.note("choice", "rerolled the cards (%d rerolls left before this)" % mission.run.rerolls)
+		elif frame.choice < mission.offer_cards.size():
+			PlayLog.record_choice(mission.offer_cards[frame.choice], mission.offer_cards)
 	PlayLog.record_input(frame)
 	mission.step(frame)
 	if AdminConsole.god_mode:
@@ -201,10 +208,13 @@ func _handle_events(events: Array) -> void:
 
 func _open_offer() -> void:
 	var cards := mission.offer_cards
+	var first_showing := overlay_kind != "offer"
+	shown_offer_serial = mission.offer_serial
 	_show_overlay("offer", Overlays.build_offer(cards, mission.offer_source, func(index: int):
 		input.queue_choice(index)
-		Sound.play("pick")))
-	Sound.play("level_up")
+		Sound.play("pick"), mission.run, func(): input.queue_choice(UpgradeOffers.REROLL_CHOICE)))
+	if first_showing:
+		Sound.play("level_up")
 
 
 func _open_crate() -> void:

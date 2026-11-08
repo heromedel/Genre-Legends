@@ -101,7 +101,11 @@ func hp_fraction() -> float:
 	var total := 0.0
 	var remaining := 0.0
 	for part: Enemy in parts:
+		if part.reflects or part.part.begins_with("mirror"):
+			continue
 		total += part.max_hp
+		if part.reflects or part.part.begins_with("mirror"):
+			continue
 		remaining += maxf(part.hp, 0.0) if not part.dead else 0.0
 	return remaining / total if total > 0.0 else 0.0
 

@@ -1,0 +1,110 @@
+class_name BuildPanel
+## The Build screen (GDD 9H): everything about your current build in one place, so you can pause and plan.
+## Each tech's level, fork and next step; Resonance progress and what each tier does; fusion progress;
+## field upgrades taken; rerolls left. Shown from the pause menu and from the level-up screen.
+
+const ELEMENT_COLORS := {
+	"energy": Color(0.45, 0.9, 1.0), "explosive": Color(1.0, 0.6, 0.3),
+	"kinetic": Color(1.0, 0.85, 0.45), "mawjig": Color(0.85, 0.55, 1.0),
+}
+
+
+static func build(run: RunState) -> Control:
+	var panel := UiKit.panel(Color(0.03, 0.05, 0.09, 0.97), Color(0.3, 0.5, 0.7))
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(560, 520)
+	panel.add_child(scroll)
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 6)
+	scroll.add_child(column)
+	column.add_child(UiKit.label("YOUR BUILD", 22, Color(0.6, 0.9, 1.0), "title"))
+	column.add_child(UiKit.label("Level %d   •   Rerolls left: %d" % [run.level, run.rerolls], 14, Color(0.7, 0.8, 0.92)))
+	_tech_section(column, run)
+	_resonance_section(column, run)
+	_fusion_section(column, run)
+	_field_section(column, run)
+	return panel
+
+
+static func _tech_section(column: VBoxContainer, run: RunState) -> void:
+	column.add_child(UiKit.label("TECH", 15, Art.GOLD, "bold"))
+	for tech_id in run.loadout:
+		if tech_id == "":
+			continue
+		var tech: Dictionary = TechData.TECH[tech_id]
+		var level := run.level_of(tech_id)
+		var cap: int = run.tech_cap.get(tech_id, 3)
+		var fork := run.fork_of(tech_id)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		var color: Color = ELEMENT_COLORS.get(tech["element"], Color.WHITE)
+		row.add_child(IconView.make(tech_id, 30, color if level > 0 else Color(0.4, 0.45, 0.55)))
+		var text := VBoxContainer.new()
+		text.add_theme_constant_override("separation", 0)
+		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var title: String = tech["name"] if fork == "" else "%s: %s" % [tech["name"], TechData.fork_name(tech_id, fork)]
+		text.add_child(UiKit.label("%s   Lv %d/%d" % [title, level, cap], 15, Color(1, 1, 1) if level > 0 else Color(0.6, 0.65, 0.75), "bold"))
+		var next := ""
+		if level == 0:
+			next = "Offline. A level-up or crate brings it online."
+		elif level >= cap:
+			next = "At its cap (Mk %d). Raise its Mk in R&D to go further." % int(run.tech_mk.get(tech_id, 1)) if cap < TechData.MAX_LEVEL else "Maxed."
+		elif level + 1 == TechData.FORK_LEVEL and fork == "":
+			next = "Next: choose a path, %s or %s." % [tech["forks"]["a"]["name"], tech["forks"]["b"]["name"]]
+		else:
+			next = "Next: %s" % TechData.level_text(tech_id, level + 1)
+		text.add_child(UiKit.wrapped(next, 13, Color(0.7, 0.8, 0.9)))
+		row.add_child(text)
+		column.add_child(row)
+
+
+static func _resonance_section(column: VBoxContainer, run: RunState) -> void:
+	column.add_child(UiKit.label("RESONANCE", 15, Art.GOLD, "bold"))
+	for element in UpgradeData.ELEMENTS:
+		var info: Dictionary = UpgradeData.RESONANCE[element]
+		var points := run.resonance_points(element)
+		var tier := run.resonance_tier(element)
+		var color: Color = ELEMENT_COLORS[element]
+		var thresholds: Array = UpgradeData.RESONANCE_THRESHOLDS
+		var progress := "maxed" if tier >= thresholds.size() else "%d/%d to tier %d" % [points, thresholds[tier], tier + 1]
+		column.add_child(UiKit.label("%s  tier %d/%d   (%s)" % [info["name"], tier, thresholds.size(), progress], 15, color if points > 0 else Color(0.5, 0.55, 0.65), "bold"))
+		for i in thresholds.size():
+			var entry: Array = info["tiers"][i]
+			var unlocked := i < tier
+			var line := UiKit.wrapped("%s  %s: %s" % ["ON" if unlocked else "--", entry[0], entry[1]], 12, color if unlocked else Color(0.5, 0.55, 0.65))
+			column.add_child(line)
+
+
+static func _fusion_section(column: VBoxContainer, run: RunState) -> void:
+	var lines := []
+	for fusion_id in UpgradeData.FUSIONS:
+		var fusion: Dictionary = UpgradeData.FUSIONS[fusion_id]
+		var needs: Array = fusion["needs"]
+		if not (run.loadout.has(needs[0]) or run.loadout.has(needs[1])):
+			continue
+		if run.has_fusion(fusion_id):
+			lines.append(["%s: fused!" % fusion["name"], Art.GOLD])
+			continue
+		var parts := []
+		for needed in needs:
+			parts.append("%s %s" % [TechData.TECH[needed]["name"], ("%d/%d" % [run.level_of(needed), TechData.MAX_LEVEL]) if run.loadout.has(needed) else "(not equipped)"])
+		lines.append(["%s: %s" % [fusion["name"], " + ".join(parts)], Color(0.8, 0.65, 1.0)])
+	if lines.is_empty():
+		return
+	column.add_child(UiKit.label("FUSIONS (both tech at level 5)", 15, Art.GOLD, "bold"))
+	for line in lines:
+		column.add_child(UiKit.wrapped(line[0], 13, line[1]))
+
+
+static func _field_section(column: VBoxContainer, run: RunState) -> void:
+	if run.field.is_empty():
+		return
+	column.add_child(UiKit.label("FIELD UPGRADES", 15, Art.GOLD, "bold"))
+	for upgrade_id in run.field:
+		var upgrade := UpgradeData.field_upgrade(upgrade_id)
+		var risky := UpgradeData.RISKY_FIELD.has(upgrade_id)
+		var count := int(run.field[upgrade_id])
+		column.add_child(UiKit.wrapped("%s%s: %s" % [upgrade["name"], (" x%d" % count) if count > 1 else "", upgrade["text"]], 13,
+			Color(1, 0.5, 0.45) if risky else Color(0.6, 1.0, 0.7)))

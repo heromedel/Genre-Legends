@@ -15,6 +15,9 @@ var halo_angle := 0.0
 var halo_pulse := 0.0
 var vent_echo := 0.0          # Chain Vent's delayed second blast
 var rage_timer := 0.0
+var railstorm_timer := 2.0
+var flare_cooldown := 0.0
+var doom_bell_timer := 8.0
 
 
 func _init(target_world: World) -> void:
@@ -34,6 +37,7 @@ func update(input: InputFrame, dt: float) -> void:
 		_update_tech(tech_id, dt)
 	_update_special(input, dt)
 	_update_overdrive(dt)
+	_update_resonance(dt)
 	if vent_echo > 0.0:
 		vent_echo -= dt
 		if vent_echo <= 0.0:
@@ -332,6 +336,17 @@ func _starfall() -> void:
 
 func _mirror_aegis() -> void:
 	var level := run.level_of("mirror_aegis")
+	# Auto-flare: when a volley closes in, the bubble snaps on by itself (GDD 9C's shield lesson).
+	flare_cooldown -= World.DT
+	if player.mirror_time <= 0.0 and flare_cooldown <= 0.0:
+		var close := 0
+		for shot: Shot in world.enemy_shots:
+			if shot.pos.distance_squared_to(player.pos) < 150.0 * 150.0:
+				close += 1
+		if close >= 4:
+			player.mirror_time = 0.6 + 0.1 * level
+			flare_cooldown = 2.2 - 0.2 * level
+			world.emit("sound", {"name": "mirror"})
 	if not _ready_to_fire("mirror_aegis", 7.0 - 0.6 * level):
 		return
 	player.mirror_time = 1.3 + 0.15 * level
@@ -392,6 +407,34 @@ func _update_overdrive(dt: float) -> void:
 		for i in 8:
 			var shot := world.player_shot(origin, Vector2.from_angle(TAU * i / 8.0) * 560.0, _damage("graze_engine", 10.0, 0.15), "graze_engine", "bolt", Color(1, 0.85, 0.3))
 			shot.life = 0.7
+
+
+# ---------------------------------------------------------------- resonance
+
+## Top-tier Resonance effects that fire on their own (GDD 9H).
+func _update_resonance(dt: float) -> void:
+	if world.resonance["kinetic"] >= 3:
+		railstorm_timer -= dt
+		if railstorm_timer <= 0.0:
+			railstorm_timer = 2.0
+			var target := world.nearest_enemy(player.pos, 900.0)
+			if target != null:
+				var slug := world.player_shot(player.pos, (target.pos - player.pos).normalized() * 2400.0, 55.0, "resonance", "rail", Color(1, 0.85, 0.45))
+				slug.pierce = 99
+				slug.radius = 9.0
+				slug.life = 0.6
+				world.emit("sound", {"name": "rail"})
+	if world.resonance["mawjig"] >= 3:
+		doom_bell_timer -= dt
+		if doom_bell_timer <= 0.0:
+			doom_bell_timer = 8.0
+			var rung := 0
+			for enemy: Enemy in world.enemies:
+				if rung < 3 and enemy.hex_marked and not enemy.dead and not enemy.hidden:
+					world.call_meteor(enemy.pos, 70.0, 50.0, false)
+					rung += 1
+			if rung > 0:
+				world.emit("sound", {"name": "blink"})
 
 
 # ---------------------------------------------------------------- special

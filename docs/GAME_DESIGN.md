@@ -80,6 +80,21 @@
 - **8D. Proposed (2026-11-08):** Co-op device to device or over the local network, with controllers, and maybe trading frames or cards.
   - **Ai-Generated-Proposal (2026-11-08):** Pairing uses a code shown on one device and entered on the other (peer-to-peer, no server to set up). Trading uses single-use trade codes that remove the item from the sender's save.
 
+## 9. Difficulty, Lessons & Progress (build 0.2)
+
+- **9A. Likely (2026-11-08):** Difficulty for the first planets is set on purpose, with a target for how much an average player gets hurt, not an arbitrary formula. Losses are expected (as in FTL); challenge with some grind is good, all grind is bad, and there are never paywalls.
+  - **Ai-Generated-Proposal (2026-11-08):** Targets on Standard: planet 1, 2–5 hits and 75–90% armor left; planets 2–3, 6–10 hits and 50–70% left; planets 4–5, 10–15 hits and 35–55% left; planet 6 (region gate), about 1 in 4 average attempts lost. Tuned with an "average player" QA bot. A Threat setting (Standard > Veteran > Casual) scales everything.
+- **9B. Likely (2026-11-08):** Stages run about five minutes, and some have mini-bosses.
+- **9C. Likely (2026-11-08):** A planet can be built to beat you without one important tech; losing (or winning) unlocks that tech, and an indicator points you to equip it. It teaches that unlocks come even when you lose, that losses are expected, and to watch your build. The tech helps a lot rather than being strictly required, and you get it either way.
+  - **Likely (2026-11-08):** Shields on planet 3, mini missiles on planet 6.
+  - **Ai-Generated-Proposal (2026-11-08):** Planet 3 throws needle swarms that Mirror Aegis stops and reflects; planet 6 is a mirror-hulled gate boss whose back vents homing Swarm Pods can reach. Both start out of the starting kit. A green dot marks new unequipped tech.
+- **9D. Likely (2026-11-08):** Losing still unlocks things: partial rewards, and achievements, including harder, rarer ones like The Binding of Isaac's. Some achievements add new enemies to the galaxy, announced (e.g. "Cluster Drones have been spotted in the galaxy").
+- **9E. Likely (2026-11-08):** Recurring characters are fine if not overly cheesy. At most one or two things to read at the start of a mission, often none; no long monologues. No in-game characters whose death loses you the mission.
+  - **Ai-Generated-Proposal (2026-11-08):** An operations officer on the radio delivers these short lines.
+- **9F. Likely (2026-11-08):** Planet cards list the enemy traits you'll face, so loadout choice matters.
+- **9G. Proposed (2026-11-08):** Some branches, forks or clusters are intentionally hard until you have a good build or grind a little.
+- **9H. Ai-Generated-Proposal (2026-11-08):** In-mission upgrades get strategy from fewer, bigger level-ups, elemental Resonance tiers, cards that show what they build toward, risky cards, two rerolls per mission and a Build screen.
+
 ## Decision Log
 
 | Date | Points | Decision |
@@ -91,3 +106,4 @@
 | 2026-11-08 | 3A | Clarified: building freely never skips discuss, plan and permission. |
 | 2026-11-08 | 4A–4D | Five testers including a first-impressions visual tester; a play log as good as watching; player behaviour isn't automatically a problem. |
 | 2026-11-08 | 5A–8D | Concept, mission types, equipment and co-op recorded from the original idea message and this session's discussion. |
+| 2026-11-08 | 9A–9H | Build 0.2 plan approved: intentional difficulty, five-minute stages, lesson planets, losses that still pay, radio officer, enemy traits, hard branches, strategic upgrades. |
