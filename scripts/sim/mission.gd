@@ -408,6 +408,7 @@ func results(first_clear: bool) -> Dictionary:
 		"kills_by_kind": run.kills_by_kind.duplicate(),
 		"bosses_defeated": run.bosses_defeated.duplicate(),
 		"banked_levels": run.banked_levels,
+		"reward_tech": node.get("reward_tech", "pulse_driver"),
 		"max_resonance": run.max_resonance,
 		"is_gate": node.get("is_gate", false),
 		"armor_left": player.armor_fraction(),

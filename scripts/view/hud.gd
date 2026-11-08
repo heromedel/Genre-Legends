@@ -79,7 +79,7 @@ func tick(delta: float) -> void:
 	warning_time = maxf(warning_time - delta, 0.0)
 	if not covered:
 		radio_time = maxf(radio_time - delta, 0.0)
-	if banner_time > 0.0:
+	if banner_time > 0.0 and not covered:
 		banner_time -= delta
 	elif not banners.is_empty():
 		current_banner = banners.pop_front()
@@ -245,7 +245,8 @@ func _draw_objective_arrows(screen: Vector2) -> void:
 
 
 func _draw_banner(screen: Vector2) -> void:
-	if current_banner.is_empty():
+	# Banners wait while a card or crate screen is up, so a big moment is never hidden behind one.
+	if current_banner.is_empty() or covered:
 		return
 	var color: Color = STYLE_COLORS.get(current_banner["style"], Color.WHITE)
 	var t := 1.2 - banner_time
