@@ -116,7 +116,7 @@ const REGION_PALETTES := [
 ## Themed branches (GDD 5D): side routes that lean on one genre and end in a prize shown up front.
 const THEMED_BRANCHES := [
 	{"id": "tempest_run", "name": "The Tempest Run", "type": "star_cluster", "length": 3, "region": 0,
-		"modifier": "bounty_hunters", "prize": "frame:tempest",
+		"modifier": "bounty_hunters", "prize": "frame:tempest", "boss": "bounty_ace",
 		"prize_text": "Unlocks the Tempest frame."},
 	{"id": "undervault", "name": "The Undervault", "type": "dungeon", "length": 3, "region": 1,
 		"modifier": "blackout", "prize": "tech:time_brake",

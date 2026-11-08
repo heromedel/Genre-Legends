@@ -92,7 +92,7 @@ func _generate() -> void:
 	# The Mimic King's hall: a plain room about halfway down (GDD 9B mini-boss).
 	var halfway := rooms.keys().filter(func(k): return rooms[k]["kind"] == "combat" and rooms[k]["depth"] >= 2)
 	if not halfway.is_empty():
-		rooms[halfway[world.rng.randi() % halfway.size()]]["kind"] = "mimic_king"
+		rooms[halfway[world.rng.randi() % halfway.size()]]["kind"] = "miniboss"
 	_add_secret_room()
 
 
@@ -201,7 +201,7 @@ func _obstacles(rect: Rect2, room: Dictionary) -> Array:
 	if room["kind"] == "boss":
 		return [Rect2(c + Vector2(-380, -240) - block * 0.5, block), Rect2(c + Vector2(380, -240) - block * 0.5, block),
 			Rect2(c + Vector2(-380, 240) - block * 0.5, block), Rect2(c + Vector2(380, 240) - block * 0.5, block)]
-	if room["kind"] in ["treasure", "shrine", "key", "secret", "mimic_king"] or room["depth"] == 0:
+	if room["kind"] in ["treasure", "shrine", "key", "secret", "miniboss"] or room["depth"] == 0:
 		return []
 	match room["layout"]:
 		0:
@@ -240,13 +240,14 @@ func _enter_room() -> void:
 				_start_combat(room)
 			"boss":
 				_start_boss_room()
-			"mimic_king":
+			"miniboss":
 				room["state"] = "active"
 				doors_closed = true
 				world.emit("doors", {"closed": true})
-				var king := MimicKing.new(world)
-				king.origin = room_rect(current).get_center() + Vector2(0, -120)
-				start_miniboss(king)
+				var guardian := BossRoster.make(BossRoster.for_node(mission.node, "miniboss"), world)
+				guardian.origin = room_rect(current).get_center() + Vector2(0, -120)
+				guardian.setup_room(room_rect(current))
+				start_miniboss(guardian)
 			"treasure":
 				var pedestal := world.drop_pickup("pedestal", room_rect(current).get_center())
 				pedestal.vel = Vector2.ZERO
@@ -321,7 +322,7 @@ func _start_boss_room() -> void:
 	rooms[current]["state"] = "active"
 	doors_closed = true
 	world.emit("doors", {"closed": true})
-	var king := HollowKing.new(world)
+	var king := BossRoster.make(BossRoster.for_node(mission.node, "boss"), world)
 	king.setup_room(room_rect(current))
 	king.memory["room_key"] = current
 	start_boss(king)
@@ -362,9 +363,9 @@ func step(dt: float) -> void:
 		world.emit("sound", {"name": "secret"})
 		_build_walls()
 	var room: Dictionary = rooms[current]
-	if room["kind"] == "mimic_king" and room["state"] == "active" and miniboss != null and miniboss.finished:
+	if room["kind"] == "miniboss" and room["state"] == "active" and miniboss != null and miniboss.finished:
 		_room_cleared(room)
-	elif room["state"] == "active" and boss == null and room["kind"] != "mimic_king" and spawn_delay <= 0.0:
+	elif room["state"] == "active" and boss == null and room["kind"] != "miniboss" and spawn_delay <= 0.0:
 		var alive := room_enemies.filter(func(id): return world.enemy_by_id(id) != null)
 		if alive.is_empty():
 			_room_cleared(room)
@@ -396,7 +397,7 @@ func debug_skip_to_boss() -> void:
 
 func debug_skip_to_miniboss() -> void:
 	for key in rooms:
-		if rooms[key]["kind"] == "mimic_king":
+		if rooms[key]["kind"] == "miniboss":
 			mission.player.pos = room_rect(key).get_center() + Vector2(0, 250)
 			for enemy: Enemy in world.enemies:
 				enemy.dead = true

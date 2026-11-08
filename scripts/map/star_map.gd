@@ -175,7 +175,8 @@ func _make_node(rng: RandomNumberGenerator, node_id: String, region: int, column
 		"planet_look": rng.randi(),
 		"lesson": "",
 		"lesson_tech": "",
-		"boss": "",
+		"boss": BossRoster.pick(mission_type, "boss", node_id, seed_value),
+		"miniboss": BossRoster.pick(mission_type, "miniboss", node_id, seed_value),
 		"hazard": false,
 		"reward_scale": 1.0,
 	}
@@ -254,6 +255,7 @@ func _add_themed_branch(rng: RandomNumberGenerator, region: int) -> void:
 			if k == branch["length"] - 1:
 				node["prize"] = branch["prize"]
 				node["prize_text"] = branch["prize_text"]
+				node["boss"] = branch.get("boss", node["boss"])
 				_make_hazard(node)
 			nodes[node_id] = node
 			_link(previous_id, node_id)

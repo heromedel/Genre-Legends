@@ -166,6 +166,7 @@ func _update_world(input: InputFrame, player_active: bool) -> void:
 	world.update_enemy_shots(DT)
 	world.update_zones(DT)
 	world.update_pickups(DT)
+	world.update_allies(DT)
 	world.cleanup()
 
 
@@ -282,6 +283,12 @@ func _on_collect(kind: String, value: float, tech: String) -> void:
 		"key":
 			stage.on_key_collected()
 			world.emit("sound", {"name": "key"})
+		"projector":
+			# A boss's dropped device (GDD 11E): whichever fight dropped it decides what it does.
+			for fight: BossBase in [stage.miniboss, stage.boss]:
+				if fight != null and not fight.finished:
+					fight.pickup_taken(kind)
+			world.emit("sound", {"name": "pedestal"})
 		"graze":
 			if run.is_online("graze_engine"):
 				weapons.on_graze()

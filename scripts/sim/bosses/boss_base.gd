@@ -24,6 +24,16 @@ func _init(target_world: World) -> void:
 	world = target_world
 
 
+## A pickup this fight dropped was collected (the Clone Projector's projector).
+func pickup_taken(_kind: String) -> void:
+	pass
+
+
+## Dungeon bosses fight inside a room; the stage hands them its rectangle before they spawn.
+func setup_room(_room_rect: Rect2) -> void:
+	pass
+
+
 ## Creates the parts and starts the entrance.
 func spawn() -> void:
 	pass
@@ -104,7 +114,7 @@ func hp_fraction() -> float:
 	var total := 0.0
 	var remaining := 0.0
 	for part: Enemy in parts:
-		if part.reflects or part.part.begins_with("mirror"):
+		if part.reflects or part.part.begins_with("mirror") or part.memory.get("unbreakable", false):
 			continue
 		total += part.max_hp
 		if part.reflects or part.part.begins_with("mirror"):

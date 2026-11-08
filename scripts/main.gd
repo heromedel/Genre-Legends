@@ -98,6 +98,7 @@ func finish_mission(node_id: String, result: Dictionary) -> void:
 ##   test=<type>  launch a test mission    boss=1   skip to its boss    power=a|b  everything online
 ##   god=1        invulnerable             page=<map|hangar|rnd|guide|records|settings>  open the hub on a page
 ##   frame=<id>   fly a frame              mk=3     all tech unlocked at that Mk
+##   bossid=<id> / minibossid=<id>   pick the test planet's boss or mini-boss (see BossRoster)
 ##   crate=<n>    open n Salvage Crates as soon as play starts      phase=<n>  with boss=1, the boss starts in phase n
 func _debug_launch() -> bool:
 	var options := {}
@@ -149,7 +150,8 @@ func _debug_launch() -> bool:
 ## A stand-in planet for the debug console's "test" command. Debug launches can make it a lesson planet.
 func _test_node(mission_type: String) -> Dictionary:
 	var lesson: String = _debug_options.get("lesson", "")
-	return {"lesson": lesson, "boss": "mirror_dreadnought" if lesson == "mirror" else "", "baseline": int(_debug_options.get("planet", "2")) - 1,"id": "test:" + mission_type, "name": "Test Range", "region": 0, "column": 2, "row": 0.0, "type": mission_type,
+	var boss_id: String = "mirror_dreadnought" if lesson == "mirror" else _debug_options.get("bossid", "")
+	return {"lesson": lesson, "boss": boss_id, "miniboss": _debug_options.get("minibossid", ""), "baseline": int(_debug_options.get("planet", "2")) - 1,"id": "test:" + mission_type, "name": "Test Range", "region": 0, "column": 2, "row": 0.0, "type": mission_type,
 		"need": MissionData.NEEDS[mission_type][0], "difficulty": 1.0, "danger": 1, "modifier": "", "reward_tech": "arc_blade",
 		"is_gate": false, "branch": "", "prize": "", "prize_text": "", "links": [], "incoming": [], "planet_look": 5}
 

@@ -16,18 +16,27 @@ const MECH_SIZES := {
 }
 
 
+## state: speed, flash, scale, and optionally gear (see GearArt), fusions, and resonance [element, tier].
 static func draw_frame(ci: CanvasItem, frame_id: String, form: String, at: Vector2, facing: float, time: float, state: Dictionary) -> void:
 	var data := FrameData.get_frame(frame_id)
 	var hull: Color = data["hull"]
 	var trim: Color = data["trim"]
+	# Resonance tints the trim toward its element as tiers come online (GDD 11F).
+	var resonance: Array = state.get("resonance", [])
+	if not resonance.is_empty() and int(resonance[1]) > 0:
+		trim = trim.lerp(TechData.ELEMENT_COLORS[resonance[0]], 0.25 + 0.2 * int(resonance[1]))
 	if state.get("flash", 0.0) > 0.0:
 		hull = hull.lerp(Color.WHITE, 0.7)
 	var scale: float = state.get("scale", 1.3)
 	ci.draw_set_transform(at, facing, Vector2(scale, scale))
+	var gear: Array = state.get("gear", [])
 	if form == "ship":
 		_draw_ship(ci, frame_id, hull, trim, time, state)
 	else:
-		_draw_mech(ci, frame_id, hull, trim, time, state)
+		_draw_mech(ci, frame_id, hull, trim, time, state, gear.is_empty())
+	if not gear.is_empty():
+		GearArt.draw_gear(ci, Transform2D(facing, Vector2(scale, scale), 0.0, at), form, gear, state.get("fusions", []), time,
+			1.0 if form == "ship" else MECH_SIZES.get(frame_id, MECH_SIZES["vanguard"])["torso"] / 15.0)
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
@@ -48,7 +57,7 @@ static func _draw_ship(ci: CanvasItem, frame_id: String, hull: Color, trim: Colo
 	ci.draw_colored_polygon(PackedVector2Array([Vector2(16, 0), Vector2(6, -4), Vector2(2, 0), Vector2(6, 4)]), Color(0.75, 0.95, 1.0))
 
 
-static func _draw_mech(ci: CanvasItem, frame_id: String, hull: Color, trim: Color, time: float, state: Dictionary) -> void:
+static func _draw_mech(ci: CanvasItem, frame_id: String, hull: Color, trim: Color, time: float, state: Dictionary, stock_arms: bool) -> void:
 	var size: Dictionary = MECH_SIZES.get(frame_id, MECH_SIZES["vanguard"])
 	var torso: float = size["torso"]
 	var shoulder: float = size["shoulder"]
@@ -78,15 +87,39 @@ static func _draw_mech(ci: CanvasItem, frame_id: String, hull: Color, trim: Colo
 		var pad := PackedVector2Array([Vector2(torso * 0.5, torso * 0.7 * side), Vector2(torso * 0.2, (torso * 0.7 + shoulder * 1.4) * side),
 			Vector2(-torso * 0.6, (torso * 0.65 + shoulder * 1.2) * side), Vector2(-torso * 0.55, torso * 0.6 * side)])
 		Art.shape(ci, pad, hull.darkened(0.3), trim, 1.8)
-	# Right arm: a long cannon. Left arm: a short blade emitter.
-	var gun: float = size["gun"]
-	Art.shape(ci, PackedVector2Array([Vector2(torso * 0.1, torso * 0.95), Vector2(gun * 1.15, torso * 0.85), Vector2(gun * 1.15, torso * 1.2), Vector2(torso * 0.1, torso * 1.3)]),
-		dark, trim, 1.5)
-	ci.draw_circle(Vector2(gun * 1.15, torso * 1.02), 3.0, Color(0.85, 1, 1))
-	ci.draw_line(Vector2(torso * 0.2, -torso * 1.05), Vector2(torso * 0.9, -torso * 1.05), trim.lightened(0.2), 4.0)
+	# Stock arms (a long cannon and a blade emitter) when there's no gear to show; otherwise the
+	# equipped tech's parts take their place (GearArt).
+	if stock_arms:
+		var gun: float = size["gun"]
+		Art.shape(ci, PackedVector2Array([Vector2(torso * 0.1, torso * 0.95), Vector2(gun * 1.15, torso * 0.85), Vector2(gun * 1.15, torso * 1.2), Vector2(torso * 0.1, torso * 1.3)]),
+			dark, trim, 1.5)
+		ci.draw_circle(Vector2(gun * 1.15, torso * 1.02), 3.0, Color(0.85, 1, 1))
+		ci.draw_line(Vector2(torso * 0.2, -torso * 1.05), Vector2(torso * 0.9, -torso * 1.05), trim.lightened(0.2), 4.0)
+	else:
+		for side in [-1.0, 1.0]:
+			ci.draw_circle(Vector2(torso * 0.35, torso * 1.1 * side), torso * 0.22, hull.darkened(0.3))
+	_draw_mech_signature(ci, frame_id, hull, trim, torso)
 	# Cockpit dome.
 	ci.draw_circle(Vector2(torso * 0.45, 0), torso * 0.28, Color(0.15, 0.3, 0.4))
 	ci.draw_circle(Vector2(torso * 0.5, -torso * 0.06), torso * 0.17, Color(0.7, 1, 1))
+
+
+## What makes each frame's mech its own (GDD 5G): the Vanguard's knightly crest, the Tempest's swept
+## fins, the Bulwark's slab armor.
+static func _draw_mech_signature(ci: CanvasItem, frame_id: String, hull: Color, trim: Color, torso: float) -> void:
+	match frame_id:
+		"vanguard":
+			for side in [-1.0, 1.0]:
+				ci.draw_line(Vector2(torso * 0.55, 0), Vector2(torso * 1.05, torso * 0.42 * side), trim, 2.2, true)
+		"tempest":
+			for side in [-1.0, 1.0]:
+				ci.draw_colored_polygon(PackedVector2Array([Vector2(-torso * 0.9, torso * 0.3 * side), Vector2(-torso * 2.1, torso * 1.3 * side),
+					Vector2(-torso * 1.2, torso * 0.45 * side)]), Art.with_alpha(trim, 0.85))
+		"bulwark":
+			ci.draw_arc(Vector2(torso * 0.2, 0), torso * 1.05, -0.9, 0.9, 12, hull.lightened(0.15), 4.0, true)
+			for side in [-1.0, 1.0]:
+				Art.shape(ci, PackedVector2Array([Vector2(-torso * 0.5, torso * 0.75 * side), Vector2(torso * 0.4, torso * 0.8 * side),
+					Vector2(torso * 0.3, torso * 1.0 * side), Vector2(-torso * 0.6, torso * 0.95 * side)]), hull.darkened(0.35), trim, 1.2)
 
 
 ## The glow that sits under the frame on the additive layer.

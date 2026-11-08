@@ -57,5 +57,13 @@ const BOSSES := {
 	"siege_crawler": ["Siege Crawler", "Every leg is a gun. Shoot out the legs and it crashes down, exposing its core."],
 	"mimic_king": ["Mimic King", "A crowned treasure chest that hops at you and lands in rings of teeth, spilling gold when hurt."],
 	"hollow_king": ["The Hollow King", "Blinks between pillars, snuffs out the lights, and finally makes the walls fire curtains with one gap."],
+	"clone_projector": ["Clone Projector", "Scans you and fields a hologram that fires your own bolts back. Kill the clone, or break the projector's shell and grab the device to make the clone fight for you."],
+	"bounty_ace": ["Bounty Hunter Ace", "A rival hunter with two shield drones. Strafes the field with mines, snipes along shown lines, then calls in other hunters and throws a closing net with one gap."],
+	"crusher_gate": ["Crusher Gate", "Pistons slam across the trench at your height, leaving one gap. Break a piston to silence its side and open the core."],
+	"leviathan": ["Leviathan", "A dreadnought longer than the screen glides overhead. Its batteries pass one by one; its engine core fights at the end."],
+	"dune_maw": ["Dune Maw", "A sand worm that tunnels toward you and erupts where the ground rumbles. Hit it while it's up."],
+	"storm_colossus": ["Storm Colossus", "Arms spray wheeling streams and lightning falls on you. Break the arms and it kneels, turning four storm beams a quarter turn."],
+	"gazer": ["Gazer", "Two eyes take turns opening. Shut, they can't be hurt; open, they lock a beam onto you."],
+	"warden": ["The Warden", "The jailer, chained by two shackles, swinging a flail that blocks shots. Break the shackles and it breaks free."],
 	"mirror_dreadnought": ["Mirror Dreadnought", "Its mirrored underside throws straight shots back. Reach the vents on its back with homing shots, meteors, blasts or nerve."],
 }

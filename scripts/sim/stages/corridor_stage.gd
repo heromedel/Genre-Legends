@@ -98,7 +98,7 @@ func step(dt: float) -> void:
 		return
 	if miniboss == null and distance >= FORTRESS_AT and not fortress_skipped:
 		# The bulkhead fits the trench where it lands, so every turret is in reach.
-		var fortress := TurretFortress.new(world)
+		var fortress := BossRoster.make(BossRoster.for_node(mission.node, "miniboss"), world)
 		var y := corridor_y_at(140.0)
 		fortress.origin.x = center_at(y)
 		fortress.memory["half_width"] = half_width_at(y)
@@ -113,7 +113,7 @@ func step(dt: float) -> void:
 		_spawn_event()
 		next_event += world.rng.randf_range(260.0, 420.0) / world.spawn_scale
 	if distance >= LENGTH + 500.0 and not boss_started:
-		start_boss(WyrmEngine.new(world))
+		start_boss(BossRoster.make(BossRoster.for_node(mission.node, "boss"), world))
 
 
 func after_player_moved() -> void:

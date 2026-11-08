@@ -226,10 +226,11 @@ func _draw_minimap(screen: Vector2, stage: DungeonStage) -> void:
 
 ## Arrows at the screen edge pointing to objectives that are off screen.
 func _draw_objective_arrows(screen: Vector2) -> void:
-	if not mission.stage.has_method("objective_positions"):
-		return
+	var targets: Array = mission.stage.objective_positions() if mission.stage.has_method("objective_positions") else []
+	# A dropped projector gets a green arrow, like a pickup (GDD 11E).
+	var projectors: Array = mission.world.pickups.filter(func(p): return p.kind == "projector").map(func(p): return p.pos)
 	var center := screen * 0.5
-	for target: Vector2 in mission.stage.objective_positions():
+	for target: Vector2 in targets + projectors:
 		var on_screen := world_to_screen * target
 		if Rect2(Vector2(40, 40), screen - Vector2(80, 80)).has_point(on_screen):
 			continue
@@ -237,7 +238,8 @@ func _draw_objective_arrows(screen: Vector2) -> void:
 		var edge := center + direction * minf(absf((screen.x * 0.5 - 50) / maxf(absf(direction.x), 0.01)), absf((screen.y * 0.5 - 50) / maxf(absf(direction.y), 0.01)))
 		var pulse := 0.7 + 0.3 * sin(time * 5.0)
 		var tip := edge + direction * 16.0
-		draw_colored_polygon(PackedVector2Array([tip, edge + direction.orthogonal() * 11.0, edge - direction.orthogonal() * 11.0]), Color(1, 0.75, 0.3, pulse))
+		var arrow_color := Color(0.5, 1.0, 0.5, pulse) if projectors.has(target) else Color(1, 0.75, 0.3, pulse)
+		draw_colored_polygon(PackedVector2Array([tip, edge + direction.orthogonal() * 11.0, edge - direction.orthogonal() * 11.0]), arrow_color)
 
 
 func _draw_banner(screen: Vector2) -> void:

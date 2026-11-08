@@ -55,7 +55,7 @@ func step(dt: float) -> void:
 			wave_started_at = world.time
 			_start_wave(wave_plan[wave_index])
 		elif alive == 0 and spawn_queue.is_empty():
-			start_boss(MirrorDreadnought.new(world) if mission.node.get("boss", "") == "mirror_dreadnought" else HiveCarrier.new(world))
+			start_boss(BossRoster.make(BossRoster.for_node(mission.node, "boss"), world))
 	if not barge_sent and wave_index == 2:
 		barge_sent = true
 		var from_left := world.rng.randf() < 0.5
@@ -115,7 +115,7 @@ func _start_wave(wave: String) -> void:
 	var density := world.spawn_scale
 	match wave:
 		"miniboss":
-			start_miniboss(TwinAces.new(world))
+			start_miniboss(BossRoster.make(BossRoster.for_node(mission.node, "miniboss"), world))
 		"cluster_drones":
 			for i in int(5 * density):
 				_queue(i * 0.7, "cluster_drone", Vector2(world.rng.randf_range(200, 1000), -40))

@@ -29,6 +29,7 @@ var shake := 0.0
 var time := 0.0
 var transform_time := 0.0
 var hit_flash := 0.0
+var tech_online_since := {}      # tech id -> view time it came online, for GearArt's unfold
 var _accumulator := 0.0
 
 
@@ -338,12 +339,15 @@ func _paint_bodies(ci: CanvasItem) -> void:
 	if mission.stage.miniboss_active():
 		BossArt.draw(ci, mission.stage.miniboss, time)
 	_draw_halo_saws(ci)
+	for ally: Dictionary in world.allies:
+		BossArt.draw_hologram(ci, mission.run.frame_id, ally["pos"], mission.player.facing, time, false)
 	var player := mission.player
 	if player.alive and mission.state != "lost":
 		var speed := clampf(player.vel.length() / 300.0, 0.0, 1.0)
 		var flicker := player.grace > 0.0 and player.grace < 5.0 and int(time * 16.0) % 2 == 0
 		FrameArt.draw_frame(ci, mission.run.frame_id, player.form, player.pos, player.facing, time,
-			{"speed": speed, "flash": 1.0 if flicker else hit_flash})
+			{"speed": speed, "flash": 1.0 if flicker else hit_flash, "gear": _gear(), "fusions": mission.run.fusions,
+			"resonance": _top_resonance()})
 	for shot: Shot in world.enemy_shots:
 		ShotArt.draw_enemy_shot(ci, shot, time)
 
@@ -366,6 +370,30 @@ func _draw_halo_saws(ci: CanvasItem) -> void:
 		ci.draw_set_transform(saw, 0.0, Vector2.ONE)
 		ci.draw_arc(Vector2.ZERO, 19.0, time * 14.0, time * 14.0 + 1.6, 10, Color(1, 1, 1, 0.35), 2.0, true)
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+## The frame's visible equipment: each slot's tech, its level and fork, and how long it has been online.
+func _gear() -> Array:
+	var run := mission.run
+	var gear := []
+	for tech_id in run.loadout:
+		var level := run.level_of(tech_id) if tech_id != "" else 0
+		if level > 0 and not tech_online_since.has(tech_id):
+			# Tech online from the very start (the main weapon) shows already unfolded.
+			tech_online_since[tech_id] = time if mission.world.time > 0.5 else -99.0
+		gear.append({"tech": tech_id, "level": level, "fork": run.fork_of(tech_id) if tech_id != "" else "",
+			"online_for": time - float(tech_online_since.get(tech_id, time))})
+	return gear
+
+
+## The element with the highest Resonance tier, for the frame's trim.
+func _top_resonance() -> Array:
+	var best := ["", 0]
+	var tiers: Dictionary = mission.run.resonance_tiers()
+	for element in tiers:
+		if int(tiers[element]) > int(best[1]):
+			best = [element, tiers[element]]
+	return best
 
 
 func _paint_glow(ci: CanvasItem) -> void:

@@ -28,6 +28,7 @@ var enemy_shots: Array = []
 var pickups: Array = []
 var zones: Array = []
 var blades: Array = []          # Arc Blade sweeps in progress
+var allies: Array = []          # {pos, fire_timer, look}: things fighting on your side, like a turned clone
 var events: Array = []          # things that happened this tick, for art and sound
 
 var bounds := Rect2(0, 0, 1200, 800)        # where the player can go
@@ -328,6 +329,21 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 	var vampiric := run.field_count("vampiric_plating")
 	if vampiric > 0:
 		player.repair(0.7 * vampiric)
+
+
+## Allies fly in formation beside you and fire your main weapon's bolts forward (GDD 11E's turned clone).
+func update_allies(dt: float) -> void:
+	for i in allies.size():
+		var ally: Dictionary = allies[i]
+		var side := -1.0 if i % 2 == 0 else 1.0
+		var slot := player.pos + Vector2.from_angle(player.facing + PI * 0.5) * 70.0 * side - Vector2.from_angle(player.facing) * 20.0
+		ally["pos"] = (ally["pos"] as Vector2).lerp(slot, minf(1.0, 6.0 * dt))
+		ally["fire_timer"] = float(ally["fire_timer"]) - dt
+		if ally["fire_timer"] <= 0.0:
+			ally["fire_timer"] = 0.2
+			var shot := player_shot(ally["pos"], Vector2.from_angle(player.facing) * 900.0, 7.0 + 1.5 * run.level_of(run.main_weapon()),
+				"ally", "bolt", Color(0.8, 0.6, 1.0))
+			shot.life = 1.1
 
 
 ## A player explosion that damages every enemy in range once.

@@ -14,6 +14,14 @@ static func draw(ci: CanvasItem, boss: BossBase, time: float) -> void:
 		"turret_fortress": _turret_fortress(ci, boss, time)
 		"brood_queen": _brood_queen(ci, boss, time)
 		"mimic_king": _mimic_king(ci, boss, time)
+		"clone_projector": _clone_projector(ci, boss, time)
+		"bounty_ace": _bounty_ace(ci, boss, time)
+		"crusher_gate": _crusher_gate(ci, boss, time)
+		"leviathan": _leviathan(ci, boss, time)
+		"dune_maw": _dune_maw(ci, boss, time)
+		"storm_colossus": _storm_colossus(ci, boss, time)
+		"gazer": _gazer(ci, boss, time)
+		"warden": _warden(ci, boss, time)
 
 
 static func draw_glow(ci: CanvasItem, boss: BossBase, time: float) -> void:
@@ -306,3 +314,208 @@ static func _mimic_king(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	ci.draw_colored_polygon(PackedVector2Array([Vector2(-10, -12 - 10 * open), Vector2(-8, -20 - 10 * open), Vector2(-4, -15 - 10 * open), Vector2(0, -22 - 10 * open),
 		Vector2(4, -15 - 10 * open), Vector2(8, -20 - 10 * open), Vector2(10, -12 - 10 * open)]), Art.GOLD)
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+# ---------------------------------------------------------------- build 0.3 bosses
+
+
+## A hologram of your own frame, facing you, with the projector's beam feeding it.
+static func _clone_projector(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var clone := boss.part_named("clone")
+	var shell := boss.part_named("shell")
+	if clone != null and not clone.dead and shell != null and not shell.dead:
+		var beam := PackedVector2Array([shell.pos, clone.pos + Vector2(-26, 0), clone.pos + Vector2(26, 0)])
+		ci.draw_colored_polygon(beam, Color(0.7, 0.5, 1.0, 0.12 + 0.05 * sin(time * 8.0)))
+	if clone != null and not clone.dead:
+		draw_hologram(ci, boss.world.run.frame_id, clone.pos, PI * 0.5, time, clone.flash > 0.0)
+	if shell != null and not shell.dead:
+		Art.shape(ci, Transform2D(time * 0.4, shell.pos) * Art.ngon(6, 30.0), _flash(shell, Color(0.12, 0.2, 0.16)), Color(0.6, 1.0, 0.7), 3.0)
+		for i in 6:
+			var a := time * 0.4 + TAU * i / 6.0
+			ci.draw_line(shell.pos + Vector2.from_angle(a) * 18.0, shell.pos + Vector2.from_angle(a) * 28.0, Color(0.4, 0.7, 0.5), 3.0)
+		ci.draw_circle(shell.pos, 10.0 + sin(time * 6.0) * 1.5, Color(0.6, 1.0, 0.7))
+
+
+## Your frame as a flickering violet hologram (also used for a turned clone fighting beside you).
+static func draw_hologram(ci: CanvasItem, frame_id: String, at: Vector2, facing: float, time: float, hit: bool) -> void:
+	var flicker := 0.75 + 0.25 * sin(time * 23.0)
+	FrameArt.draw_frame(ci, frame_id, "ship", at, facing, time, {"speed": 0.5, "scale": 1.4, "flash": 1.0 if hit else 0.0})
+	# Scanlines and a violet sheen over it, so it reads as a projection, not the real thing.
+	for i in 7:
+		var y := -24.0 + i * 8.0 + fmod(time * 30.0, 8.0)
+		ci.draw_line(at + Vector2(-30, y), at + Vector2(30, y), Color(0.75, 0.5, 1.0, 0.35 * flicker), 2.0)
+	ci.draw_arc(at, 34.0, 0, TAU, 24, Color(0.75, 0.5, 1.0, 0.5 * flicker), 2.0, true)
+
+
+static func _bounty_ace(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var core := boss.part_named("core")
+	if core == null or core.dead:
+		return
+	for drone: Enemy in boss.living_parts("drone"):
+		ci.draw_line(core.pos, drone.pos, Color(1, 0.8, 0.4, 0.35), 2.0)
+		Art.shape(ci, Transform2D(time * 3.0, drone.pos) * Art.ngon(4, 16.0), _flash(drone, Color(0.25, 0.18, 0.05)), Color(1, 0.8, 0.4), 2.0)
+		ci.draw_circle(drone.pos, 4.0, Color(1, 0.95, 0.7))
+	ci.draw_set_transform(core.pos, PI * 0.5, Vector2(1.9, 1.9))
+	var half := PackedVector2Array([Vector2(26, 0), Vector2(8, -6), Vector2(-2, -26), Vector2(-10, -24), Vector2(-6, -8), Vector2(-18, -12), Vector2(-14, 0)])
+	var hull := Art.mirrored(half)
+	Art.shape(ci, hull, _flash(core, Color(0.12, 0.1, 0.08)), Color(1, 0.75, 0.3), 2.0)
+	ci.draw_line(Vector2(-4, -22), Vector2(4, -6), Color(1, 0.3, 0.25), 2.0)
+	ci.draw_line(Vector2(-4, 22), Vector2(4, 6), Color(1, 0.3, 0.25), 2.0)
+	ci.draw_colored_polygon(PackedVector2Array([Vector2(14, 0), Vector2(4, -4), Vector2(0, 0), Vector2(4, 4)]), Color(1, 0.4, 0.3))
+	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	if core.invulnerable:
+		ci.draw_arc(core.pos, 46.0, 0, TAU, 28, Color(1, 0.8, 0.4, 0.5 + 0.2 * sin(time * 5.0)), 3.0, true)
+
+
+static func _crusher_gate(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var o := boss.origin
+	var half_width := float(boss.memory.get("half_width", 300.0))
+	var wall := Rect2(o + Vector2(-half_width, -60), Vector2(half_width * 2.0, 84))
+	ci.draw_rect(wall, Color(0.2, 0.18, 0.14))
+	for i in int(wall.size.x / 60.0):
+		var x := wall.position.x + 6 + i * 60
+		ci.draw_rect(Rect2(Vector2(x, wall.position.y + 8), Vector2(52, 40)), Color(0.28, 0.25, 0.2))
+	var band := Rect2(wall.position + Vector2(0, 58), Vector2(wall.size.x, 22))
+	ci.draw_rect(band, Color(0.15, 0.12, 0.05))
+	for i in int(wall.size.x / 40.0):
+		var x := band.position.x + i * 40
+		ci.draw_colored_polygon(PackedVector2Array([Vector2(x, band.end.y), Vector2(x + 14, band.position.y), Vector2(x + 28, band.position.y), Vector2(x + 14, band.end.y)]), Color(1, 0.8, 0.2, 0.85))
+	ci.draw_rect(wall, Color(1, 0.8, 0.35), false, 3.0)
+	for piston: Enemy in boss.living_parts("piston"):
+		var inward := 1.0 if piston.part == "piston0" else -1.0
+		ci.draw_rect(Rect2(piston.pos - Vector2(26, 30), Vector2(52, 60)), _flash(piston, Color(0.35, 0.3, 0.2)))
+		ci.draw_rect(Rect2(piston.pos - Vector2(26, 30), Vector2(52, 60)), Color(1, 0.8, 0.4), false, 2.5)
+		var rod := 18.0 + 10.0 * sin(time * 3.0)
+		ci.draw_line(piston.pos + Vector2(26 * inward, 0), piston.pos + Vector2((26 + rod) * inward, 0), Color(0.75, 0.75, 0.8), 10.0)
+	var core := boss.part_named("core")
+	if core != null and not core.dead:
+		ci.draw_circle(core.pos, 30.0, _flash(core, Color(0.3, 0.2, 0.05)))
+		ci.draw_circle(core.pos, 16.0 + sin(time * 6.0) * 2.0, Color(1, 0.7, 0.25) if not core.invulnerable else Color(0.5, 0.4, 0.25))
+		if core.invulnerable:
+			ci.draw_arc(core.pos, 36.0, 0, TAU, 20, Color(1, 0.8, 0.4, 0.6), 3.0, true)
+
+
+## A hull longer than the screen: plated, ribbed, with turret batteries and an engine core at its tail.
+static func _leviathan(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var o := boss.origin
+	var nose := o + Vector2(0, 80)
+	var tail := o + Vector2(0, -1320)
+	var hull := PackedVector2Array([nose, o + Vector2(90, -40), o + Vector2(150, -200), o + Vector2(150, -1150), o + Vector2(110, -1300),
+		tail, o + Vector2(-110, -1300), o + Vector2(-150, -1150), o + Vector2(-150, -200), o + Vector2(-90, -40)])
+	ci.draw_colored_polygon(hull, Color(0.13, 0.19, 0.3, 0.95))
+	ci.draw_polyline(hull + PackedVector2Array([nose]), Color(0.55, 0.8, 1.0), 3.0, true)
+	for i in 12:
+		var y := o.y - 120.0 - i * 95.0
+		ci.draw_line(Vector2(o.x - 140, y), Vector2(o.x + 140, y), Color(0.25, 0.35, 0.5), 2.0)
+		ci.draw_circle(Vector2(o.x - 130, y + 40), 4.0, Color(0.6, 0.85, 1.0, 0.6 + 0.4 * float(int(time * 2.0 + i) % 2)))
+	ci.draw_line(nose, tail, Color(0.2, 0.3, 0.45), 6.0)
+	for i in Leviathan.BATTERIES.size():
+		var battery := boss.part_named("battery%d" % i)
+		var at: Vector2 = o + Leviathan.BATTERIES[i]
+		if battery == null or battery.dead:
+			ci.draw_circle(at, 18.0, Color(0.15, 0.1, 0.08))
+			ci.draw_arc(at, 18.0, 0, TAU, 14, Color(1, 0.45, 0.2, 0.5), 2.0, true)
+			continue
+		ci.draw_circle(at, 22.0, _flash(battery, Color(0.15, 0.22, 0.32)))
+		ci.draw_arc(at, 22.0, 0, TAU, 18, Color(0.6, 0.85, 1.0), 2.5, true)
+		ci.draw_line(at, at + Vector2.from_angle(battery.facing) * 30.0, Color(0.8, 0.95, 1.0), 7.0)
+	var core := boss.part_named("core")
+	if core != null and not core.dead:
+		ci.draw_circle(core.pos, 44.0, _flash(core, Color(0.08, 0.15, 0.25)))
+		ci.draw_circle(core.pos, 26.0 + sin(time * 7.0) * 3.0, Color(0.6, 0.9, 1.0) if not core.invulnerable else Color(0.3, 0.45, 0.6))
+		for side in [-1.0, 1.0]:
+			ci.draw_rect(Rect2(core.pos + Vector2(side * 70 - 14, -60), Vector2(28, 50)), Color(0.15, 0.2, 0.3))
+			Art.draw_glow(ci, core.pos + Vector2(side * 70, -70), 26.0, Color(0.5, 0.8, 1.0, 0.7))
+
+
+static func _dune_maw(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var core := boss.part_named("core")
+	if core == null or core.dead:
+		return
+	if core.hidden:
+		# Underground: sand ripples where it's tunnelling.
+		for i in 3:
+			var r := 20.0 + fmod(time * 40.0 + i * 18.0, 54.0)
+			ci.draw_arc(boss.origin, r, 0, TAU, 20, Color(0.95, 0.8, 0.5, 0.6 - r / 110.0), 3.0, true)
+		return
+	var o := core.pos
+	for i in 4:
+		ci.draw_circle(o - Vector2.from_angle(core.facing) * (26.0 + i * 22.0), 34.0 - i * 5.0, Color(0.5, 0.38, 0.22).darkened(i * 0.1))
+	ci.draw_circle(o, 40.0, _flash(core, Color(0.6, 0.45, 0.25)))
+	ci.draw_circle(o, 26.0, Color(0.15, 0.05, 0.05))
+	for i in 12:
+		var a := TAU * i / 12.0 + time * 0.8
+		ci.draw_colored_polygon(PackedVector2Array([o + Vector2.from_angle(a - 0.12) * 26.0, o + Vector2.from_angle(a + 0.12) * 26.0, o + Vector2.from_angle(a) * 14.0]), Color(1, 0.95, 0.85))
+	ci.draw_arc(o, 40.0, 0, TAU, 24, Color(1, 0.8, 0.5), 3.0, true)
+
+
+static func _storm_colossus(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var core := boss.part_named("core")
+	if core == null or core.dead:
+		return
+	var o := boss.origin
+	var kneel := 0.0 if boss.phase == 0 else 1.0
+	# Torso: a broad armored mass, crackling with storm light.
+	var torso := Art.scaled(Art.ngon(8, 70.0, PI / 8.0), Vector2(1.3, 1.0 - 0.12 * kneel))
+	var placed := PackedVector2Array()
+	for point in torso:
+		placed.append(o + point + Vector2(0, 14 * kneel))
+	ci.draw_colored_polygon(placed, Color(0.12, 0.17, 0.26))
+	ci.draw_polyline(placed + PackedVector2Array([placed[0]]), Color(0.55, 0.8, 1.0), 3.0, true)
+	for i in 5:
+		var a := time * 2.0 + i * 1.7
+		var from := o + Vector2.from_angle(a) * 30.0
+		ci.draw_polyline(PackedVector2Array([from, from + Vector2.from_angle(a + 0.6) * 18.0, from + Vector2.from_angle(a - 0.4) * 34.0]), Color(0.75, 0.95, 1.0, 0.7), 2.0, true)
+	for arm: Enemy in boss.living_parts("arm"):
+		ci.draw_line(o, arm.pos, Color(0.3, 0.42, 0.6), 18.0)
+		Art.shape(ci, PackedVector2Array([arm.pos + Vector2(-28, -24), arm.pos + Vector2(28, -24), arm.pos + Vector2(34, 22), arm.pos + Vector2(-34, 22)]), _flash(arm, Color(0.2, 0.28, 0.4)), Color(0.6, 0.85, 1.0), 2.5)
+		ci.draw_circle(arm.pos, 9.0 + sin(time * 9.0 + arm.id) * 2.0, Color(0.8, 0.95, 1.0))
+	ci.draw_circle(core.pos, 34.0, _flash(core, Color(0.18, 0.25, 0.38)))
+	ci.draw_circle(core.pos + Vector2(0, -4), 12.0, Color(0.8, 0.95, 1.0) if not core.invulnerable else Color(0.4, 0.5, 0.65))
+	if core.invulnerable:
+		ci.draw_arc(core.pos, 42.0, 0, TAU, 24, Color(0.6, 0.85, 1.0, 0.55), 3.0, true)
+
+
+static func _gazer(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	for eye: Enemy in boss.living_parts("eye"):
+		var is_open := not eye.invulnerable
+		var lid := PackedVector2Array()
+		for i in 17:
+			var t := float(i) / 16.0 * TAU
+			lid.append(eye.pos + Vector2(cos(t) * 40.0, sin(t) * (24.0 if is_open else 4.0)))
+		ci.draw_colored_polygon(lid, _flash(eye, Color(0.95, 0.9, 0.85) if is_open else Color(0.35, 0.2, 0.25)))
+		ci.draw_polyline(lid, Color(1, 0.45, 0.6), 3.0, true)
+		if is_open:
+			var look := Vector2.from_angle(eye.facing) * 10.0
+			ci.draw_circle(eye.pos + look, 15.0, Color(0.85, 0.15, 0.3))
+			ci.draw_circle(eye.pos + look, 6.0, Color(0.05, 0.0, 0.02))
+		for side in [-1.0, 1.0]:
+			ci.draw_line(eye.pos + Vector2(40 * side, 0), eye.pos + Vector2(56 * side, -8), Color(1, 0.45, 0.6, 0.6), 2.0)
+
+
+static func _warden(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var core := boss.part_named("core")
+	if core == null or core.dead:
+		return
+	var o := core.pos
+	for shackle: Enemy in boss.living_parts("shackle"):
+		# A heavy chain from the wall shackle to the Warden.
+		var links := 10
+		for i in links:
+			var at := shackle.pos.lerp(o, (i + 0.5) / links) + Vector2(0, sin(time * 2.0 + i) * 3.0)
+			ci.draw_arc(at, 6.0, 0, TAU, 8, Color(0.6, 0.55, 0.45), 3.0, true)
+		ci.draw_circle(shackle.pos, 20.0, _flash(shackle, Color(0.3, 0.27, 0.22)))
+		ci.draw_arc(shackle.pos, 20.0, 0, TAU, 16, Color(0.9, 0.75, 0.5), 3.0, true)
+	var flail := boss.part_named("flail")
+	if flail != null and not flail.dead:
+		var segments := 8
+		for i in segments:
+			ci.draw_circle(o.lerp(flail.pos, (i + 0.5) / segments), 4.0, Color(0.55, 0.5, 0.42))
+		Art.shape(ci, Transform2D(time * 3.0, flail.pos) * Art.star(10, 30.0, 20.0), Color(0.3, 0.28, 0.25), Color(0.85, 0.8, 0.7), 2.0)
+	# The jailer: a hulking helmeted body with a glowing visor slit.
+	var body := PackedVector2Array([o + Vector2(-44, -30), o + Vector2(-30, -50), o + Vector2(30, -50), o + Vector2(44, -30), o + Vector2(40, 40), o + Vector2(-40, 40)])
+	ci.draw_colored_polygon(body, _flash(core, Color(0.25, 0.22, 0.2)))
+	ci.draw_polyline(body + PackedVector2Array([body[0]]), Color(0.9, 0.75, 0.5), 3.0, true)
+	ci.draw_rect(Rect2(o + Vector2(-26, -30), Vector2(52, 8)), Color(1, 0.55, 0.2) if not core.invulnerable else Color(0.5, 0.35, 0.2))
+	for i in 3:
+		ci.draw_line(o + Vector2(-30 + i * 30, -10), o + Vector2(-30 + i * 30, 36), Color(0.4, 0.36, 0.3), 3.0)

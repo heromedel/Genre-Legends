@@ -99,10 +99,10 @@ func step(dt: float) -> void:
 		roam_timer = world.rng.randf_range(4.0, 6.5) / world.spawn_scale
 		_spawn_roaming_pack()
 	if miniboss == null and objectives_left() <= 2:
-		start_miniboss(BroodQueen.new(world))
+		start_miniboss(BossRoster.make(BossRoster.for_node(mission.node, "miniboss"), world))
 	if boss == null and objectives_left() == 0 and not miniboss_active():
 		mission.note("All hive nests destroyed")
-		start_boss(SiegeCrawler.new(world))
+		start_boss(BossRoster.make(BossRoster.for_node(mission.node, "boss"), world))
 
 
 func _spawn_roaming_pack() -> void:

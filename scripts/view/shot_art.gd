@@ -87,6 +87,12 @@ static func draw_pickup(ci: CanvasItem, pickup: Pickup, time: float) -> void:
 	var bob := sin(time * 4.0 + pickup.pos.x) * 2.0
 	var at := pickup.pos + Vector2(0, bob)
 	match pickup.kind:
+		"projector":
+			# The Clone Projector's device: green like a pickup, with a bouncing arrow over it (GDD 11E).
+			Art.shape(ci, Transform2D(time * 1.5, at) * Art.ngon(6, 14.0), Color(0.2, 0.6, 0.3, fade), Color(0.6, 1.0, 0.6, fade), 2.0)
+			ci.draw_circle(at, 6.0, Color(0.8, 1.0, 0.8, fade))
+			var hop := absf(sin(time * 5.0)) * 10.0
+			ci.draw_colored_polygon(PackedVector2Array([at + Vector2(0, -26 - hop), at + Vector2(-11, -44 - hop), at + Vector2(11, -44 - hop)]), Color(0.5, 1.0, 0.5))
 		"shard":
 			var size := 5.0 if pickup.value < 2.0 else 8.0
 			ci.draw_set_transform(at, time * 2.0, Vector2.ONE)

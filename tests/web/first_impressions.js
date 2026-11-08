@@ -19,6 +19,11 @@ const scenarios = [
   { name: 'lesson_needles', query: '?test=star_cluster&god=1&lesson=needles', shots: [8000, 14000] },
   { name: 'lesson_mirror_gate', query: '?test=star_cluster&god=1&lesson=mirror&boss=1', shots: [6000, 12000] },
 ];
+const newBosses = { star_cluster: ['bounty_ace', 'clone_projector'], corridor: ['leviathan', 'crusher_gate'], planet: ['storm_colossus', 'dune_maw'], dungeon: ['warden', 'gazer'] };
+for (const [type, [bossId, minibossId]] of Object.entries(newBosses)) {
+  scenarios.push({ name: `new_boss_${bossId}`, query: `?test=${type}&god=1&power=a&mk=2&loadout=pulse_driver,arc_blade,swarm_pods,mirror_aegis,nova_bomb&boss=1&bossid=${bossId}`, shots: [6000, 13000, 20000] });
+  scenarios.push({ name: `new_miniboss_${minibossId}`, query: `?test=${type}&god=1&power=a&mk=2&loadout=pulse_driver,arc_blade,swarm_pods,mirror_aegis,nova_bomb&miniboss=1&minibossid=${minibossId}`, shots: [6000, 12000] });
+}
 for (const type of ['star_cluster', 'corridor', 'planet', 'dungeon']) {
   scenarios.push({ name: `${type}_start`, query: `?test=${type}&god=1`, shots: [3500, 9000] });
   scenarios.push({ name: `${type}_power_a`, query: `?test=${type}&god=1&power=a&mk=3&loadout=pulse_driver,arc_blade,swarm_pods,mirror_aegis,nova_bomb`, shots: [6000, 12000] });

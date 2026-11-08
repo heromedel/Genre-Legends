@@ -51,7 +51,7 @@ func _draw() -> void:
 	var frames := ["vanguard", "tempest", "bulwark"]
 	var frame_id: String = frames[int(time / 8.0) % 3]
 	Art.draw_glow(self, path, 150.0, Color(0.4, 0.8, 1.0, 0.35))
-	FrameArt.draw_frame(self, frame_id, form, path, heading, time, {"speed": 1.0, "scale": 3.2})
+	FrameArt.draw_frame(self, frame_id, form, path, heading, time, {"speed": 1.0, "scale": 3.2, "gear": GearArt.loadout_gear(TechData.STARTING_LOADOUT, 3)})
 	var since_shift := fmod(time, 4.0)
 	if since_shift < 0.6:
 		FrameArt.draw_transform(self, path, since_shift / 0.6, FrameData.get_frame(frame_id)["hull"])

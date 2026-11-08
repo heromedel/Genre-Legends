@@ -243,6 +243,8 @@ func _fill_info(node_id: String) -> void:
 		_info.add_child(UiKit.label("HAZARD ROUTE", 17, Color(1, 0.4, 0.4), "bold"))
 		_info.add_child(UiKit.wrapped("Much harder than its neighbours, and pays double blueprints. Optional.", 14, Color(1, 0.75, 0.7)))
 	_info.add_child(UiKit.label("You'll face", 14, Color(0.6, 0.7, 0.85)))
+	var boss_line := "Boss: %s   Mini-boss: %s" % [GuideData.BOSSES[BossRoster.for_node(node, "boss")][0], GuideData.BOSSES[BossRoster.for_node(node, "miniboss")][0]]
+	_info.add_child(UiKit.wrapped(boss_line, 14, Color(1, 0.6, 0.5)))
 	for enemy_trait in MissionData.traits_for(node, Save.data["enemies_unlocked"]):
 		_info.add_child(UiKit.wrapped("- " + enemy_trait, 14, Color(1, 0.8, 0.6)))
 	var danger_row := HBoxContainer.new()
@@ -751,11 +753,13 @@ class FramePreview:
 			modulate = Color(0.25, 0.27, 0.32)
 			FrameArt.draw_frame(self, frame_id, "ship", c + Vector2(-50, 0), -PI * 0.5, time, {"speed": 0.2, "scale": 1.7})
 			FrameArt.draw_frame(self, frame_id, "mech", c + Vector2(50, 0), -PI * 0.5, time, {"scale": 1.7})
-			IconPainter.draw(self, "lock", Rect2(c - Vector2(22, 22), Vector2(44, 44)), Color(1.6, 1.6, 1.8))
+			IconPainter.draw(self, "lock", Rect2(c + Vector2(-16, 26), Vector2(32, 32)), Color(1.6, 1.6, 1.8))
 			return
 		Art.draw_glow(self, c + Vector2(-50, 0), 40.0, Art.with_alpha(FrameData.get_frame(frame_id)["hull"], 0.25))
-		FrameArt.draw_frame(self, frame_id, "ship", c + Vector2(-50, 0), -PI * 0.5, time, {"speed": 0.4, "scale": 1.7})
-		FrameArt.draw_frame(self, frame_id, "mech", c + Vector2(50, 0), -PI * 0.5 + sin(time) * 0.4, time, {"speed": 0.6, "scale": 1.7})
+		# The selected frame wears your loadout, so the hangar shows what you'll fly.
+		var gear: Array = GearArt.loadout_gear(Save.data["loadout"], 3) if Save.data["frame"] == frame_id else []
+		FrameArt.draw_frame(self, frame_id, "ship", c + Vector2(-50, 0), -PI * 0.5, time, {"speed": 0.4, "scale": 1.7, "gear": gear})
+		FrameArt.draw_frame(self, frame_id, "mech", c + Vector2(50, 0), -PI * 0.5 + sin(time) * 0.4, time, {"speed": 0.6, "scale": 1.7, "gear": gear})
 
 
 ## A pulsing green dot in a control's corner: something new is waiting there (GDD 9C).
