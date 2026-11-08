@@ -457,7 +457,7 @@ func update_player_shots(dt: float) -> void:
 					continue
 				shot.dead = true
 				enemy_shot(shot.pos, (player.pos - shot.pos).angle() + rng.randf_range(-0.2, 0.2), 320.0,
-					{"damage": 6.0, "radius": 5.0, "color": Color(0.8, 0.95, 1.0)})
+					{"damage": 6.0, "radius": 5.0, "color": Color(1.0, 0.55, 0.85)})
 				emit("spark", {"pos": shot.pos, "color": Color(0.85, 0.95, 1.0), "blocked": true})
 				break
 			if enemy.front_shield and _hits_front(enemy, shot) and shot.splash <= 0.0:

@@ -28,7 +28,7 @@ static func draw_glow(ci: CanvasItem, boss: BossBase, time: float) -> void:
 
 
 static func _flash(part: Enemy, color: Color) -> Color:
-	return Color.WHITE if part != null and part.flash > 0.0 else color
+	return color.lerp(Color.WHITE, 0.45) if part != null and part.flash > 0.0 else color
 
 
 static func _hive_carrier(ci: CanvasItem, boss: BossBase, time: float) -> void:
@@ -225,12 +225,27 @@ static func _twin_aces(ci: CanvasItem, boss: BossBase, time: float) -> void:
 
 static func _turret_fortress(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	var o := boss.origin
-	var wall := Rect2(o + Vector2(-420, -50), Vector2(840, 90))
-	ci.draw_rect(wall, Color(0.2, 0.17, 0.14))
+	var wall := Rect2(o + Vector2(-440, -70), Vector2(880, 120))
+	ci.draw_rect(Rect2(wall.position + Vector2(0, 10), wall.size), Color(0, 0, 0, 0.4))
+	ci.draw_rect(wall, Color(0.22, 0.2, 0.18))
+	# Armor plates with rivets.
+	for i in 8:
+		var plate := Rect2(wall.position + Vector2(8 + i * 108, 8), Vector2(100, 54))
+		ci.draw_rect(plate, Color(0.3, 0.27, 0.23))
+		ci.draw_rect(plate, Color(0.45, 0.4, 0.33), false, 2.0)
+		for corner in [Vector2(6, 6), Vector2(94, 6), Vector2(6, 48), Vector2(94, 48)]:
+			ci.draw_circle(plate.position + corner, 2.5, Color(0.6, 0.55, 0.45))
+	# Hazard band along the bottom edge, and warning lights that blink.
+	var band := Rect2(wall.position + Vector2(0, 70), Vector2(wall.size.x, 30))
+	ci.draw_rect(band, Color(0.15, 0.12, 0.05))
+	for i in 20:
+		var x := band.position.x + i * 46
+		ci.draw_colored_polygon(PackedVector2Array([Vector2(x, band.end.y), Vector2(x + 18, band.position.y), Vector2(x + 36, band.position.y), Vector2(x + 18, band.end.y)]), Color(1, 0.75, 0.15, 0.85))
+	for i in 4:
+		var light := wall.position + Vector2(60 + i * 254, -4)
+		var on := int(time * 3.0 + i) % 2 == 0
+		ci.draw_circle(light, 6.0, Color(1, 0.3, 0.2) if on else Color(0.35, 0.1, 0.08))
 	ci.draw_rect(wall, Color(1, 0.65, 0.3), false, 3.0)
-	for i in 14:
-		var x := wall.position.x + 20 + i * 58
-		ci.draw_line(Vector2(x, wall.position.y + 6), Vector2(x + 20, wall.end.y - 6), Color(1, 0.75, 0.2, 0.55), 6.0)
 	for i in 3:
 		var turret := boss.part_named("turret%d" % i)
 		if turret == null or turret.dead:

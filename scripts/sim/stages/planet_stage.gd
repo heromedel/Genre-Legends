@@ -9,7 +9,7 @@ const MAX_ROAMERS := 26
 
 var camps: Array = []           # {pos, nest_id}
 var rocks: Array = []           # Rect2 cover; also the art's rock list
-var roam_timer := 4.0
+var roam_timer := 1.5
 var objective_ids: Array = []
 var roster: Dictionary
 

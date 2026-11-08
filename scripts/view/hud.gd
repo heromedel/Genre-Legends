@@ -48,7 +48,7 @@ func show_banner(text: String, style: String) -> void:
 ## One short line from the operations officer, shown for a few seconds (GDD 9E).
 func show_radio(text: String) -> void:
 	radio_text = text
-	radio_time = 5.0
+	radio_time = 3.8
 
 
 func show_warning(boss_name: String, title: String) -> void:
@@ -76,7 +76,7 @@ func tick(delta: float) -> void:
 		banner_time -= delta
 	elif not banners.is_empty():
 		current_banner = banners.pop_front()
-		banner_time = 1.5
+		banner_time = 1.2
 	else:
 		current_banner = {}
 	queue_redraw()
@@ -237,16 +237,16 @@ func _draw_banner(screen: Vector2) -> void:
 	if current_banner.is_empty():
 		return
 	var color: Color = STYLE_COLORS.get(current_banner["style"], Color.WHITE)
-	var t := 1.5 - banner_time
+	var t := 1.2 - banner_time
 	var slide := ease(clampf(t / 0.2, 0.0, 1.0), 0.3)
 	var fade := clampf(banner_time / 0.3, 0.0, 1.0)
-	var y := screen.y * 0.2
-	var band := Rect2(Vector2(0, y - 32), Vector2(screen.x, 46))
+	var y := 86.0
+	var band := Rect2(Vector2(0, y - 26), Vector2(screen.x, 36))
 	draw_rect(band, Color(0, 0, 0, 0.62 * fade))
 	draw_line(band.position, band.position + Vector2(screen.x * slide, 0), Art.with_alpha(color, fade), 2.0)
 	draw_line(band.end - Vector2(screen.x * slide, 0), band.end, Art.with_alpha(color, fade), 2.0)
-	draw_string_outline(font_title, Vector2(0, y + 4), current_banner["text"], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 24, 9, Color(0, 0, 0, fade))
-	draw_string(font_title, Vector2(0, y + 4), current_banner["text"], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 24, Art.with_alpha(color.lightened(0.35), fade))
+	draw_string_outline(font_title, Vector2(0, y), current_banner["text"], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 19, 8, Color(0, 0, 0, fade))
+	draw_string(font_title, Vector2(0, y), current_banner["text"], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 19, Art.with_alpha(color.lightened(0.35), fade))
 
 
 ## The shooter-genre boss intro: flashing red WARNING with hazard stripes and the boss's name.
@@ -272,13 +272,13 @@ func _draw_warning(screen: Vector2) -> void:
 func _draw_radio(screen: Vector2) -> void:
 	if radio_time <= 0.0:
 		return
-	var fade := clampf(radio_time / 0.4, 0.0, 1.0) * clampf((5.0 - radio_time) / 0.3, 0.0, 1.0)
-	var width := minf(screen.x * 0.6, 620.0)
-	var box := Rect2(Vector2((screen.x - width) * 0.5, 50), Vector2(width, 64))
+	var fade := clampf(radio_time / 0.4, 0.0, 1.0) * clampf((3.8 - radio_time) / 0.3, 0.0, 1.0)
+	var width := minf(screen.x * 0.42, 460.0)
+	var box := Rect2(Vector2(16, 112), Vector2(width, 58))
 	draw_rect(box, Color(0.02, 0.06, 0.1, 0.85 * fade))
 	draw_rect(box, Color(0.4, 0.85, 1.0, 0.8 * fade), false, 2.0)
 	draw_string(font_bold, box.position + Vector2(12, 20), "OPS  " + Radio.OFFICER.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.5, 0.9, 1.0, fade))
-	draw_string(font_body, box.position + Vector2(12, 46), radio_text, HORIZONTAL_ALIGNMENT_LEFT, width - 24, 16, Color(1, 1, 1, fade))
+	draw_string(font_body, box.position + Vector2(12, 42), radio_text, HORIZONTAL_ALIGNMENT_LEFT, width - 24, 14, Color(1, 1, 1, fade))
 
 
 func _draw_vignette(screen: Vector2) -> void:

@@ -84,7 +84,7 @@ class Card:
 		var element: String = card.get("element", "")
 		if element != "":
 			var chip_color: Color = BuildPanel.ELEMENT_COLORS[element]
-			draw_string(UiKit.font("bold"), Vector2(0, 24 + lift), element.to_upper(), HORIZONTAL_ALIGNMENT_RIGHT, size.x - 10, 11, Art.with_alpha(chip_color, appear))
+			draw_string(UiKit.font("bold"), Vector2(0, 26 + lift), element.to_upper(), HORIZONTAL_ALIGNMENT_RIGHT, size.x - 10, 14, Art.with_alpha(chip_color, appear))
 		draw_string(UiKit.font("bold"), Vector2(0, 130 + lift), kind_text, HORIZONTAL_ALIGNMENT_CENTER, size.x, 13, Art.with_alpha(rarity, appear))
 		_draw_wrapped(UiKit.font("bold"), card["title"], Vector2(14, 158 + lift), size.x - 28, 19, Art.with_alpha(Color(1, 1, 1), appear))
 		_draw_wrapped(UiKit.font("body"), card["text"], Vector2(14, 214 + lift), size.x - 28, 15, Art.with_alpha(Color(0.75, 0.85, 0.95), appear))

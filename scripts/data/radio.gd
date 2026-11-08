@@ -8,8 +8,6 @@ const OFFICER := "Lt. Arden, Operations"
 
 ## The one line (or none) shown as a mission starts.
 static func mission_start_line(node: Dictionary, missions_flown: int) -> String:
-	if missions_flown == 0:
-		return "Frame's warm, Commander. Weapons fire on their own. Just fly."
 	match node.get("lesson", ""):
 		"needles":
 			return "Needle swarms out there. Our shields can't stop them, so keep moving."
@@ -19,6 +17,8 @@ static func mission_start_line(node: Dictionary, missions_flown: int) -> String:
 		return "Hazard route. Bring your best build, Commander."
 	if node.get("is_gate", false):
 		return "Break the gate and the next region opens up."
+	if missions_flown == 0:
+		return "Frame's warm, Commander. Weapons fire on their own. Just fly."
 	return ""
 
 

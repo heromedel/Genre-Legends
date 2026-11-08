@@ -20,7 +20,7 @@ static func build(run: RunState) -> Control:
 	column.add_theme_constant_override("separation", 6)
 	scroll.add_child(column)
 	column.add_child(UiKit.label("YOUR BUILD", 22, Color(0.6, 0.9, 1.0), "title"))
-	column.add_child(UiKit.label("Level %d   •   Rerolls left: %d" % [run.level, run.rerolls], 14, Color(0.7, 0.8, 0.92)))
+	column.add_child(UiKit.label("Mission level %d   •   Rerolls left: %d" % [run.level, run.rerolls], 15, Color(0.7, 0.8, 0.92)))
 	_tech_section(column, run)
 	_resonance_section(column, run)
 	_fusion_section(column, run)
@@ -50,31 +50,35 @@ static func _tech_section(column: VBoxContainer, run: RunState) -> void:
 		if level == 0:
 			next = "Offline. A level-up or crate brings it online."
 		elif level >= cap:
-			next = "At its cap (Mk %d). Raise its Mk in R&D to go further." % int(run.tech_mk.get(tech_id, 1)) if cap < TechData.MAX_LEVEL else "Maxed."
+			next = "Capped by Mk %d (raise it in R&D)" % int(run.tech_mk.get(tech_id, 1)) if cap < TechData.MAX_LEVEL else "Maxed"
 		elif level + 1 == TechData.FORK_LEVEL and fork == "":
 			next = "Next: choose a path, %s or %s." % [tech["forks"]["a"]["name"], tech["forks"]["b"]["name"]]
 		else:
 			next = "Next: %s" % TechData.level_text(tech_id, level + 1)
-		text.add_child(UiKit.wrapped(next, 13, Color(0.7, 0.8, 0.9)))
+		text.add_child(UiKit.wrapped(next, 14, Color(0.7, 0.8, 0.9)))
 		row.add_child(text)
 		column.add_child(row)
 
 
 static func _resonance_section(column: VBoxContainer, run: RunState) -> void:
-	column.add_child(UiKit.label("RESONANCE", 15, Art.GOLD, "bold"))
+	column.add_child(UiKit.label("RESONANCE (levels of one element add up)", 15, Art.GOLD, "bold"))
 	for element in UpgradeData.ELEMENTS:
 		var info: Dictionary = UpgradeData.RESONANCE[element]
 		var points := run.resonance_points(element)
 		var tier := run.resonance_tier(element)
 		var color: Color = ELEMENT_COLORS[element]
 		var thresholds: Array = UpgradeData.RESONANCE_THRESHOLDS
-		var progress := "maxed" if tier >= thresholds.size() else "%d/%d to tier %d" % [points, thresholds[tier], tier + 1]
-		column.add_child(UiKit.label("%s  tier %d/%d   (%s)" % [info["name"], tier, thresholds.size(), progress], 15, color if points > 0 else Color(0.5, 0.55, 0.65), "bold"))
-		for i in thresholds.size():
+		if points <= 0:
+			continue
+		var progress := "all tiers unlocked" if tier >= thresholds.size() else "%d/%d to tier %s" % [points, thresholds[tier], UpgradeOffers.ROMAN[tier + 1]]
+		column.add_child(UiKit.label("%s   %s" % [info["name"], progress], 16, color, "bold"))
+		# Only what's active now, and the very next thing to aim for.
+		for i in tier:
 			var entry: Array = info["tiers"][i]
-			var unlocked := i < tier
-			var line := UiKit.wrapped("%s  %s: %s" % ["ON" if unlocked else "--", entry[0], entry[1]], 12, color if unlocked else Color(0.5, 0.55, 0.65))
-			column.add_child(line)
+			column.add_child(UiKit.wrapped("Active: %s, %s" % [entry[0], entry[1].to_lower()], 14, color))
+		if tier < thresholds.size():
+			var upcoming: Array = info["tiers"][tier]
+			column.add_child(UiKit.wrapped("Next: %s, %s" % [upcoming[0], upcoming[1].to_lower()], 14, Color(0.62, 0.68, 0.78)))
 
 
 static func _fusion_section(column: VBoxContainer, run: RunState) -> void:

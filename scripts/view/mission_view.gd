@@ -306,7 +306,7 @@ func _paint_background(ci: CanvasItem) -> void:
 			background.draw_space(ci, view, (stage as StarClusterStage).scroll * 4.0, time)
 		"corridor":
 			var corridor := stage as CorridorStage
-			background.draw_space(ci, view, corridor.distance, time, false)
+			background.draw_corridor_floor(ci, view, corridor, time)
 			background.draw_corridor_walls(ci, corridor, time)
 		"planet":
 			background.draw_planet(ci, view, mission.world, time)

@@ -129,13 +129,14 @@ func _describe_build_effect(card: Dictionary) -> void:
 			if after >= threshold:
 				tier_after += 1
 		var name: String = UpgradeData.RESONANCE[element]["name"]
+		# One format everywhere (cards, Build screen, HUD): "<points>/<next threshold> to tier <n>".
 		if tier_after > tier_before:
 			var tier: Array = UpgradeData.RESONANCE[element]["tiers"][tier_after - 1]
-			card["synergy"] = "Unlocks %s Resonance %s: %s" % [name, ROMAN[tier_after], tier[0]]
+			card["synergy"] = "Unlocks %s tier %s: %s" % [name, ROMAN[tier_after], tier[0]]
 		elif tier_after < UpgradeData.RESONANCE_THRESHOLDS.size():
-			card["synergy"] = "+%d %s  (%d/%d)" % [points, name, after, UpgradeData.RESONANCE_THRESHOLDS[tier_after]]
+			card["synergy"] = "+%d %s: %d/%d to tier %s" % [points, name, after, UpgradeData.RESONANCE_THRESHOLDS[tier_after], ROMAN[tier_after + 1]]
 		else:
-			card["synergy"] = "+%d %s (maxed)" % [points, name]
+			card["synergy"] = "+%d %s (all tiers unlocked)" % [points, name]
 	if card["tech"] != "":
 		for fusion_id in UpgradeData.FUSIONS:
 			var needs: Array = UpgradeData.FUSIONS[fusion_id]["needs"]

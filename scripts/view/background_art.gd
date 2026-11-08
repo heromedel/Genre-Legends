@@ -90,6 +90,25 @@ func draw_space(ci: CanvasItem, view: Rect2, scroll: float, time: float, far_pla
 
 # ---------------------------------------------------------------- corridor
 
+## The trench floor: dark plating rushing past, lane chevrons and glowing seams, so it reads as the
+## inside of something huge rather than open space.
+func draw_corridor_floor(ci: CanvasItem, view: Rect2, stage: CorridorStage, time: float) -> void:
+	ci.draw_rect(view, Color(0.06, 0.07, 0.1))
+	var accent: Color = palette["accent"]
+	var offset := fposmod(stage.distance, 80.0)
+	var y := view.position.y - 80.0 + offset
+	var row := int(stage.distance / 80.0)
+	while y < view.end.y:
+		ci.draw_line(Vector2(view.position.x, y), Vector2(view.end.x, y), Color(0.11, 0.13, 0.18), 2.0)
+		var center := (stage.left_edge(y) + stage.right_edge(y)) * 0.5
+		# Chevrons down the middle lane point the way.
+		ci.draw_polyline(PackedVector2Array([Vector2(center - 26, y + 52), Vector2(center, y + 30), Vector2(center + 26, y + 52)]), Color(0.16, 0.2, 0.28), 4.0)
+		# Every few rows, a glowing seam.
+		if (row - int((y - view.position.y) / 80.0)) % 4 == 0:
+			ci.draw_line(Vector2(stage.left_edge(y), y + 40), Vector2(stage.right_edge(y), y + 40), Art.with_alpha(accent, 0.18 + 0.08 * sin(time * 3.0)), 3.0)
+		y += 80.0
+
+
 func draw_corridor_walls(ci: CanvasItem, stage: CorridorStage, time: float) -> void:
 	var metal := Color(0.16, 0.18, 0.24)
 	var edge: Color = palette["accent"]

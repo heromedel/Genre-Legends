@@ -157,7 +157,16 @@ func _dungeon_goal(stage: DungeonStage) -> Vector2:
 		if target != null:
 			# No clear line of fire? Walk toward it; the wall-avoidance steers around the block.
 			if not _clear_line(player.pos, target.pos):
-				return target.pos
+				var best := target.pos
+				var best_distance := INF
+				for i in 8:
+					var spot := target.pos + Vector2.from_angle(TAU * i / 8.0) * 230.0
+					if mission.world.point_in_wall(spot) or not _clear_line(spot, target.pos):
+						continue
+					if spot.distance_to(player.pos) < best_distance:
+						best_distance = spot.distance_to(player.pos)
+						best = spot
+				return best
 			return target.pos + (player.pos - target.pos).normalized() * 230.0
 		for enemy: Enemy in mission.world.enemies:
 			if enemy.brain == "mimic" and enemy.state == 0:

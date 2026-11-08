@@ -15,6 +15,7 @@ var next_event := 500.0
 var gates: Array = []               # {y, zone, period, timer}
 var scrape_timer := 0.0
 var corridor_seed := 0.0
+var fortress_skipped := false
 
 
 func stage_name() -> String:
@@ -95,7 +96,7 @@ func step(dt: float) -> void:
 		return
 	if mission.state != "play":
 		return
-	if miniboss == null and distance >= FORTRESS_AT:
+	if miniboss == null and distance >= FORTRESS_AT and not fortress_skipped:
 		start_miniboss(TurretFortress.new(world))
 	if miniboss_active():
 		return
@@ -168,6 +169,7 @@ func _update_gates(dt: float, scroll: float) -> void:
 
 func debug_skip_to_boss() -> void:
 	distance = LENGTH + 480.0
+	fortress_skipped = true
 	for enemy: Enemy in world.enemies:
 		enemy.dead = true
 
