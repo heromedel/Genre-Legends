@@ -1,0 +1,748 @@
+class_name World
+extends RefCounted
+## Everything that exists inside a mission right now, and the shared rules for how it moves and collides:
+## shots, pickups, area effects, blade sweeps, walls, damage and death.
+## Enemy behaviour lives in EnemySystem, player tech in WeaponSystem, mission flow in Mission.
+##
+## The simulation is deterministic: it only uses `rng` (seeded per mission) and runs on a fixed step,
+## so a recorded input list replays a mission exactly. Presentation reads `events` and never writes back.
+
+const DT := 1.0 / 60.0
+const PICKUP_RADIUS := 105.0
+const GRAZE_MARGIN := 26.0
+const MIRROR_RADIUS := 66.0
+
+var rng := RandomNumberGenerator.new()
+var tick := 0
+var time := 0.0
+var player: PlayerFrame
+var run: RunState
+
+var enemies: Array = []
+var player_shots: Array = []
+var enemy_shots: Array = []
+var pickups: Array = []
+var zones: Array = []
+var blades: Array = []          # Arc Blade sweeps in progress
+var events: Array = []          # things that happened this tick, for art and sound
+
+var bounds := Rect2(0, 0, 1200, 800)        # where the player can go
+var shot_bounds := Rect2(-80, -80, 1360, 960)
+var walls: Array = []                       # solid Rect2s
+var next_enemy_id := 1
+
+# Difficulty and modifiers, set by Mission from the planet's danger and special condition.
+var enemy_hp_scale := 1.0
+var enemy_damage_scale := 1.0
+var bullet_speed_scale := 1.0
+var spawn_scale := 1.0
+var xp_scale := 1.0
+var crate_chance := 0.35
+var elite_blueprint_tech := ""
+var dark := false
+var gentle := false              # first planets: slower, sparser enemy fire
+
+# Hooks the Mission listens to.
+var on_player_hurt: Callable
+var on_collect: Callable
+
+
+func emit(type: String, data: Dictionary = {}) -> void:
+	data["type"] = type
+	events.append(data)
+
+
+func enemy_time_scale() -> float:
+	return 0.25 if player.time_brake > 0.0 else 1.0
+
+
+# ---------------------------------------------------------------- spawning
+
+func spawn_enemy(kind: String, at: Vector2, overrides: Dictionary = {}) -> Enemy:
+	var data := EnemyData.get_enemy(kind)
+	var enemy := Enemy.new()
+	enemy.id = next_enemy_id
+	next_enemy_id += 1
+	enemy.kind = kind
+	enemy.brain = data["brain"]
+	enemy.look = data["look"]
+	enemy.pos = at
+	enemy.max_hp = data["hp"] * enemy_hp_scale
+	enemy.hp = enemy.max_hp
+	enemy.radius = data["radius"]
+	enemy.contact = data["contact"] * enemy_damage_scale
+	enemy.xp = data["xp"]
+	enemy.color = data["color"]
+	enemy.elite = data.get("elite", false)
+	enemy.objective = data.get("objective", false)
+	enemy.drops_crate = data.get("drops_crate", false)
+	enemy.front_shield = data.get("front_shield", false)
+	enemy.ghost = data.get("ghost", false)
+	enemy.fire_timer = rng.randf_range(0.6, 1.8)
+	for key in overrides:
+		enemy.set(key, overrides[key])
+	enemies.append(enemy)
+	return enemy
+
+
+## Fires one enemy bullet. Damage and speed are scaled by the planet's danger.
+func enemy_shot(at: Vector2, angle: float, speed: float, options: Dictionary = {}) -> Shot:
+	var shot := Shot.new()
+	shot.pos = at
+	var speed_scale := bullet_speed_scale * (0.8 if gentle else 1.0)
+	shot.vel = Vector2.from_angle(angle) * speed * speed_scale
+	shot.radius = options.get("radius", 6.0)
+	shot.damage = options.get("damage", 10.0) * enemy_damage_scale
+	shot.look = options.get("look", "orb")
+	shot.color = options.get("color", Color(1.0, 0.4, 0.55))
+	shot.life = options.get("life", 6.0)
+	shot.accel = options.get("accel", 0.0)
+	shot.max_speed = options.get("max_speed", 0.0)
+	enemy_shots.append(shot)
+	return shot
+
+
+func enemy_aimed(at: Vector2, count: int, spread: float, speed: float, options: Dictionary = {}) -> void:
+	var base := (player.pos - at).angle()
+	for i in count:
+		var offset := 0.0 if count == 1 else lerpf(-spread * 0.5, spread * 0.5, float(i) / float(count - 1))
+		enemy_shot(at, base + offset, speed, options)
+
+
+func enemy_ring(at: Vector2, count: int, speed: float, offset: float = 0.0, options: Dictionary = {}) -> void:
+	for i in count:
+		enemy_shot(at, offset + TAU * float(i) / float(count), speed, options)
+
+
+func player_shot(at: Vector2, velocity: Vector2, damage: float, tech: String, look: String, color: Color) -> Shot:
+	var shot := Shot.new()
+	shot.pos = at
+	shot.vel = velocity
+	shot.damage = damage
+	shot.tech = tech
+	shot.look = look
+	shot.color = color
+	player_shots.append(shot)
+	return shot
+
+
+func add_zone(kind: String, at: Vector2, radius: float, life: float, damage: float, hostile: bool, options: Dictionary = {}) -> Zone:
+	var zone := Zone.new()
+	zone.kind = kind
+	zone.pos = at
+	zone.radius = radius
+	zone.life = life
+	zone.max_life = life
+	zone.damage = damage
+	zone.hostile = hostile
+	zone.warn = options.get("warn", 0.0)
+	zone.tick = options.get("tick", 0.5)
+	zone.angle = options.get("angle", 0.0)
+	zone.length = options.get("length", 0.0)
+	zone.width = options.get("width", 0.0)
+	zone.spin = options.get("spin", 0.0)
+	zone.color = options.get("color", Color(1, 0.5, 0.2))
+	zone.clears_bullets = options.get("clears_bullets", false)
+	zones.append(zone)
+	return zone
+
+
+func drop_pickup(kind: String, at: Vector2, value: float = 1.0, tech: String = "") -> Pickup:
+	var pickup := Pickup.new()
+	pickup.kind = kind
+	pickup.pos = at
+	pickup.value = value
+	pickup.tech = tech
+	pickup.vel = Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(40.0, 140.0)
+	pickup.life = 9.0 if kind == "shard" else 14.0
+	pickups.append(pickup)
+	return pickup
+
+
+# ---------------------------------------------------------------- queries
+
+func nearest_enemy(from: Vector2, max_range: float, exclude: Dictionary = {}) -> Enemy:
+	var best: Enemy = null
+	var best_distance := max_range * max_range
+	for enemy: Enemy in enemies:
+		if enemy.dead or enemy.hidden or enemy.invulnerable or enemy.untargetable or exclude.has(enemy.id):
+			continue
+		var d := from.distance_squared_to(enemy.pos)
+		if d < best_distance:
+			best_distance = d
+			best = enemy
+	return best
+
+
+func enemy_by_id(enemy_id: int) -> Enemy:
+	for enemy: Enemy in enemies:
+		if enemy.id == enemy_id and not enemy.dead:
+			return enemy
+	return null
+
+
+func random_enemy_near(from: Vector2, max_range: float) -> Enemy:
+	var candidates := []
+	for enemy: Enemy in enemies:
+		if not enemy.dead and not enemy.hidden and not enemy.invulnerable and not enemy.untargetable and from.distance_to(enemy.pos) < max_range:
+			candidates.append(enemy)
+	if candidates.is_empty():
+		return null
+	return candidates[rng.randi() % candidates.size()]
+
+
+func point_in_wall(point: Vector2) -> bool:
+	for wall: Rect2 in walls:
+		if wall.has_point(point):
+			return true
+	return false
+
+
+## Pushes a circle out of every wall it overlaps. Returns the corrected position.
+func push_out_of_walls(at: Vector2, radius: float) -> Vector2:
+	var result := at
+	for wall: Rect2 in walls:
+		var closest := result.clamp(wall.position, wall.end)
+		var offset := result - closest
+		var distance_squared := offset.length_squared()
+		if distance_squared >= radius * radius:
+			continue
+		if distance_squared < 0.0001:
+			# Centre is inside the wall: push out along the shortest axis.
+			var left := result.x - wall.position.x
+			var right := wall.end.x - result.x
+			var top := result.y - wall.position.y
+			var bottom := wall.end.y - result.y
+			var smallest := minf(minf(left, right), minf(top, bottom))
+			if smallest == left:
+				result.x = wall.position.x - radius
+			elif smallest == right:
+				result.x = wall.end.x + radius
+			elif smallest == top:
+				result.y = wall.position.y - radius
+			else:
+				result.y = wall.end.y + radius
+		else:
+			result = closest + offset.normalized() * radius
+	return result
+
+
+# ---------------------------------------------------------------- damage
+
+## Hurts an enemy. Returns true if it died.
+func hurt_enemy(enemy: Enemy, amount: float, tech: String = "") -> bool:
+	if enemy.dead or enemy.invulnerable or enemy.hidden or amount <= 0.0:
+		return false
+	enemy.hp -= amount
+	enemy.flash = 0.1
+	run.damage_dealt += amount
+	if enemy.state == 0 and enemy.brain == "mimic":
+		enemy.state = 1
+	if enemy.hp <= 0.0:
+		kill_enemy(enemy, tech)
+		return true
+	return false
+
+
+func kill_enemy(enemy: Enemy, tech: String = "") -> void:
+	if enemy.dead:
+		return
+	enemy.dead = true
+	run.kills += 1
+	var size := enemy.radius * (2.4 if enemy.elite else 1.6)
+	emit("explosion", {"pos": enemy.pos, "size": size, "color": enemy.color})
+	emit("sound", {"name": "explode_big" if enemy.radius > 22 or enemy.elite else "explode"})
+	if enemy.boss != null:
+		enemy.boss.on_part_destroyed(self, enemy)
+		return
+	# Data Shards: bigger enemies drop more.
+	var shard_total := enemy.xp * xp_scale
+	while shard_total > 0.0:
+		var value := 3.0 if shard_total >= 6.0 else 1.0
+		drop_pickup("shard", enemy.pos, minf(value, shard_total))
+		shard_total -= value
+	if enemy.drops_crate or (enemy.elite and rng.randf() < crate_chance * 2.0):
+		drop_pickup("crate", enemy.pos)
+	if enemy.elite and elite_blueprint_tech != "":
+		drop_pickup("blueprint", enemy.pos, 1.0, elite_blueprint_tech)
+	var data := EnemyData.get_enemy(enemy.kind)
+	if data.has("splits_into"):
+		for i in 2:
+			var child := spawn_enemy(data["splits_into"], enemy.pos + Vector2(-14 + 28 * i, 0))
+			child.memory["no_formation"] = true
+			child.vel = Vector2(-120 + 240 * i, -60)
+			child.room = enemy.room
+	if enemy.hex_marked and run.fork_of("hex_repeater") == "a":
+		explode(enemy.pos, 95.0, 34.0 * run.damage_multiplier("hex_repeater", player.armor_fraction()), "hex_repeater", Color(0.85, 0.45, 1.0), true)
+	var vampiric := run.field_count("vampiric_plating")
+	if vampiric > 0:
+		player.repair(0.7 * vampiric)
+
+
+## A player explosion that damages every enemy in range once.
+func explode(at: Vector2, radius: float, damage: float, tech: String, color: Color, spreads_hex: bool = false) -> void:
+	emit("explosion", {"pos": at, "size": radius, "color": color, "ring": true})
+	for enemy: Enemy in enemies.duplicate():
+		if enemy.dead or enemy.hidden:
+			continue
+		if at.distance_to(enemy.pos) < radius + enemy.radius:
+			if spreads_hex:
+				enemy.hex_marked = true
+			hurt_enemy(enemy, damage, tech)
+
+
+## Removes enemy bullets inside a circle; returns how many.
+func clear_bullets(at: Vector2, radius: float) -> int:
+	var cleared := 0
+	for shot: Shot in enemy_shots:
+		if not shot.dead and at.distance_to(shot.pos) < radius:
+			shot.dead = true
+			cleared += 1
+			if cleared % 3 == 0:
+				emit("spark", {"pos": shot.pos, "color": shot.color})
+	return cleared
+
+
+## Turns an enemy bullet into a player bullet heading back the way it came, or at the nearest enemy.
+func reflect_shot(shot: Shot, damage: float, homing: bool, splits: int) -> void:
+	shot.dead = true
+	var target := nearest_enemy(shot.pos, 700.0)
+	var direction := -shot.vel.normalized()
+	if target != null:
+		direction = (target.pos - shot.pos).normalized()
+	var speed := maxf(shot.vel.length() * 1.6, 520.0)
+	var count := maxi(1, splits)
+	for i in count:
+		var angle := direction.angle() + (0.0 if count == 1 else lerpf(-0.35, 0.35, float(i) / float(count - 1)))
+		var reflected := player_shot(shot.pos, Vector2.from_angle(angle) * speed, damage, "mirror_aegis", "reflect", Color(0.7, 1.0, 1.0))
+		reflected.radius = 6.0
+		reflected.life = 1.6
+		if homing:
+			reflected.homing = 6.0
+	emit("spark", {"pos": shot.pos, "color": Color(0.7, 1.0, 1.0)})
+
+
+## Every hit on the player goes through here: traits, field upgrades and the tally.
+func damage_player(amount: float, source: String) -> void:
+	if not player.alive or player.grace > 0.0:
+		return
+	var taken := player.take_hit(amount)
+	if taken <= 0.0:
+		return
+	run.damage_taken += taken
+	run.hits_taken += 1
+	emit("player_hit", {"pos": player.pos, "amount": taken, "source": source})
+	emit("sound", {"name": "player_hit"})
+	emit("shake", {"amount": 7.0 + taken * 0.25})
+	var shrapnel := run.field_count("shrapnel_skin")
+	if shrapnel > 0:
+		for i in 10 * shrapnel:
+			var shot := player_shot(player.pos, Vector2.from_angle(TAU * i / (10.0 * shrapnel)) * 620.0, 14.0, "shrapnel", "shard", Color(1, 0.8, 0.5))
+			shot.life = 0.7
+	if not player.alive and FrameData.get_frame(run.frame_id)["trait"] == "second_wind" and not player.second_wind_used:
+		player.second_wind_used = true
+		player.alive = true
+		player.armor = 1.0
+		player.grace = 1.5
+		clear_bullets(player.pos, 2000.0)
+		explode(player.pos, 380.0, 120.0, "second_wind", Color(1.0, 0.9, 0.5))
+		emit("banner", {"text": "SECOND WIND", "style": "gold"})
+		emit("flash", {"color": Color(1, 0.95, 0.7), "amount": 0.8})
+		emit("sound", {"name": "nova"})
+	if on_player_hurt.is_valid():
+		on_player_hurt.call(taken, source)
+
+
+# ---------------------------------------------------------------- per-tick updates
+
+func update_player_shots(dt: float) -> void:
+	for shot: Shot in player_shots:
+		if shot.dead:
+			continue
+		shot.age += dt
+		shot.life -= dt
+		if shot.life <= 0.0:
+			shot.dead = true
+			if shot.splash > 0.0:
+				_on_shot_impact(shot, null)
+			continue
+		if shot.homing > 0.0:
+			_steer_shot(shot, dt)
+		if shot.accel > 0.0:
+			shot.vel = shot.vel.normalized() * minf(shot.vel.length() + shot.accel * dt, shot.max_speed)
+		if shot.devours:
+			for enemy_bullet in enemy_shots:
+				if not enemy_bullet.dead and shot.pos.distance_to(enemy_bullet.pos) < 70.0:
+					enemy_bullet.vel = enemy_bullet.vel.lerp((shot.pos - enemy_bullet.pos) * 4.0, 0.2)
+					if shot.pos.distance_to(enemy_bullet.pos) < 16.0:
+						enemy_bullet.dead = true
+		shot.pos += shot.vel * dt
+		if shot.split_after > 0.0 and shot.age >= shot.split_after:
+			_split_shot(shot)
+			continue
+		if not walls.is_empty() and point_in_wall(shot.pos):
+			if shot.bounces > 0:
+				_bounce_off_wall(shot)
+			else:
+				shot.dead = true
+				if shot.splash > 0.0:
+					_on_shot_impact(shot, null)
+				else:
+					emit("spark", {"pos": shot.pos, "color": shot.color})
+				continue
+		if not shot_bounds.has_point(shot.pos):
+			shot.dead = true
+			continue
+		for enemy: Enemy in enemies:
+			if enemy.dead or enemy.hidden or shot.hit_ids.has(enemy.id):
+				continue
+			var reach := enemy.radius + shot.radius
+			if shot.pos.distance_squared_to(enemy.pos) > reach * reach:
+				continue
+			if enemy.front_shield and _hits_front(enemy, shot) and shot.splash <= 0.0:
+				shot.dead = true
+				emit("spark", {"pos": shot.pos, "color": Color(0.6, 0.8, 1.0), "blocked": true})
+				emit("sound", {"name": "block"})
+				break
+			if enemy.invulnerable:
+				shot.dead = true
+				emit("spark", {"pos": shot.pos, "color": Color(0.8, 0.8, 0.8), "blocked": true})
+				break
+			shot.hit_ids[enemy.id] = true
+			hurt_enemy(enemy, shot.damage, shot.tech)
+			_on_shot_impact(shot, enemy)
+			if shot.bounces > 0:
+				shot.bounces -= 1
+				shot.damage *= 1.0 + shot.bounce_bonus
+				var next := nearest_enemy(shot.pos, 340.0, shot.hit_ids)
+				if next == null:
+					shot.dead = true
+				else:
+					shot.vel = (next.pos - shot.pos).normalized() * shot.vel.length()
+					shot.life = maxf(shot.life, 0.6)
+					emit("ricochet", {"pos": shot.pos})
+			elif shot.pierce > 0:
+				shot.pierce -= 1
+			else:
+				shot.dead = true
+			break
+	player_shots = player_shots.filter(func(s): return not s.dead)
+
+
+func _hits_front(enemy: Enemy, shot: Shot) -> bool:
+	var incoming := (shot.pos - enemy.pos).angle()
+	return absf(angle_difference(enemy.facing, incoming)) < deg_to_rad(70.0)
+
+
+func _steer_shot(shot: Shot, dt: float) -> void:
+	var target := enemy_by_id(shot.target_id) if shot.target_id >= 0 else null
+	if target == null:
+		if shot.target_id >= 0 and not shot.retarget:
+			return
+		target = nearest_enemy(shot.pos, 650.0)
+		shot.target_id = target.id if target != null else -1
+	if target == null:
+		return
+	var desired := (target.pos - shot.pos).angle()
+	var current := shot.vel.angle()
+	var turn := clampf(angle_difference(current, desired), -shot.homing * dt, shot.homing * dt)
+	shot.vel = Vector2.from_angle(current + turn) * shot.vel.length()
+
+
+func _split_shot(shot: Shot) -> void:
+	shot.dead = true
+	var count := shot.split_count
+	var base := shot.vel.angle()
+	for i in count:
+		var angle := base + lerpf(-0.42, 0.42, float(i) / float(maxi(count - 1, 1)))
+		var child := player_shot(shot.pos, Vector2.from_angle(angle) * shot.vel.length(), shot.damage * 0.62, shot.tech, "bolt", shot.color)
+		child.radius = shot.radius * 0.8
+		child.life = 0.9
+	emit("spark", {"pos": shot.pos, "color": shot.color})
+
+
+func _bounce_off_wall(shot: Shot) -> void:
+	shot.bounces -= 1
+	var back := shot.pos - shot.vel * DT
+	var probe_x := Vector2(shot.pos.x, back.y)
+	if point_in_wall(probe_x):
+		shot.vel.x = -shot.vel.x
+	else:
+		shot.vel.y = -shot.vel.y
+	shot.pos = back
+	shot.damage *= 1.0 + shot.bounce_bonus
+	emit("ricochet", {"pos": shot.pos})
+
+
+## On-hit effects carried by the shot: splash, cluster bomblets, chain lightning, hexes, meteors.
+func _on_shot_impact(shot: Shot, enemy: Enemy) -> void:
+	if shot.splash > 0.0:
+		explode(shot.pos, shot.splash, shot.damage * 0.6, shot.tech, shot.color)
+		emit("sound", {"name": "explode"})
+		for i in shot.bomblets:
+			var bomblet := player_shot(shot.pos, Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(160, 260), shot.damage * 0.4, shot.tech, "bomblet", shot.color)
+			bomblet.life = rng.randf_range(0.25, 0.45)
+			bomblet.splash = shot.splash * 0.6
+			bomblet.radius = 4.0
+		if shot.calls_meteor and rng.randf() < 0.3:
+			call_meteor(shot.pos + Vector2(rng.randf_range(-40, 40), rng.randf_range(-40, 40)), 70.0, shot.damage * 1.5, false)
+	if enemy == null:
+		return
+	if shot.hex_mark:
+		enemy.hex_marked = true
+	if shot.hex_shatter:
+		shot.hex_shatter = false
+		for i in 3:
+			var hunter := player_shot(shot.pos, Vector2.from_angle(rng.randf() * TAU) * 420.0, shot.damage * 0.4, shot.tech, "orb_small", shot.color)
+			hunter.homing = 7.0
+			hunter.radius = 4.0
+			hunter.life = 1.4
+			hunter.hit_ids = shot.hit_ids.duplicate()
+	if shot.chain_arcs > 0:
+		var hit := {enemy.id: true}
+		var from := enemy.pos
+		for i in shot.chain_arcs:
+			var next := nearest_enemy(from, 220.0, hit)
+			if next == null:
+				break
+			hit[next.id] = true
+			emit("lightning", {"from": from, "to": next.pos})
+			hurt_enemy(next, shot.damage * 0.5, shot.tech)
+			from = next.pos
+
+
+## Starfall meteors and their relatives: a warning circle, then an impact.
+func call_meteor(at: Vector2, radius: float, damage: float, burning: bool) -> void:
+	var zone := add_zone("meteor", at, radius, 0.55, damage, false, {"warn": 0.5, "color": Color(0.85, 0.5, 1.0)})
+	zone.hit_ids = {"burning": burning}
+
+
+func update_enemy_shots(dt: float) -> void:
+	var slow := enemy_time_scale()
+	var graze_online := run.is_online("graze_engine")
+	var mirror_up := player.mirror_time > 0.0
+	var bastion := run.fork_of("mirror_aegis") == "b" and run.is_online("mirror_aegis")
+	for shot: Shot in enemy_shots:
+		if shot.dead:
+			continue
+		if slow < 1.0:
+			shot.slowed = true
+		shot.life -= dt * slow
+		if shot.life <= 0.0:
+			shot.dead = true
+			if shot.look == "mine":
+				enemy_ring(shot.pos, 8, 160.0, rng.randf() * TAU, {"color": Color(1, 0.55, 0.3)})
+				emit("explosion", {"pos": shot.pos, "size": 22.0, "color": Color(1, 0.55, 0.3)})
+			continue
+		if shot.accel != 0.0:
+			var speed := clampf(shot.vel.length() + shot.accel * dt * slow, 20.0, maxf(shot.max_speed, 20.0))
+			shot.vel = shot.vel.normalized() * speed
+		shot.pos += shot.vel * dt * slow
+		if not shot_bounds.has_point(shot.pos) or (not walls.is_empty() and point_in_wall(shot.pos)):
+			shot.dead = true
+			continue
+		if not player.alive:
+			continue
+		var distance := shot.pos.distance_to(player.pos)
+		if mirror_up and distance < MIRROR_RADIUS:
+			_mirror_reflect(shot)
+			continue
+		if bastion and distance < 60.0 and absf(angle_difference(player.facing, (shot.pos - player.pos).angle())) < deg_to_rad(62.0):
+			_mirror_reflect(shot)
+			continue
+		if distance < player.radius + shot.radius:
+			if FrameData.get_frame(run.frame_id)["trait"] == "fortress_field" and player.shield > 0.0 and rng.randf() < 0.25:
+				reflect_shot(shot, 18.0, false, 1)
+				continue
+			shot.dead = true
+			damage_player(shot.damage, "bullet")
+			continue
+		if graze_online and not shot.grazed and distance < player.radius + shot.radius + GRAZE_MARGIN:
+			shot.grazed = true
+			if on_collect.is_valid():
+				on_collect.call("graze", 1.0, "")
+	enemy_shots = enemy_shots.filter(func(s): return not s.dead)
+
+
+func _mirror_reflect(shot: Shot) -> void:
+	var level := run.level_of("mirror_aegis")
+	var damage := 16.0 * (1.0 + 0.2 * (level - 1)) * run.damage_multiplier("mirror_aegis", player.armor_fraction())
+	reflect_shot(shot, damage, run.has_fusion("reflex_blade"), 3 if run.fork_of("mirror_aegis") == "a" else 1)
+
+
+func update_pickups(dt: float) -> void:
+	var reach := PICKUP_RADIUS * (14.0 if run.field_count("tractor_beam") > 0 else 1.0) * (1.7 if player.form == "ship" else 1.0)
+	for pickup: Pickup in pickups:
+		if pickup.dead:
+			continue
+		pickup.age += dt
+		if not pickup.anchored:
+			pickup.life -= dt
+		if pickup.life <= 0.0:
+			pickup.dead = true
+			if pickup.kind == "shard":
+				run.shards_missed += 1
+			continue
+		var to_player := player.pos - pickup.pos
+		var distance := to_player.length()
+		if not pickup.anchored and pickup.age > 0.35 and (distance < reach or pickup.magnetized):
+			pickup.magnetized = true
+			pickup.vel = to_player.normalized() * maxf(pickup.vel.length() + 1600.0 * dt, 280.0)
+		else:
+			pickup.vel *= 0.92
+			# Shooter trope: drops drift down the screen toward the ship.
+			if player.form == "ship" and not pickup.anchored:
+				pickup.vel.y = maxf(pickup.vel.y, 110.0)
+		pickup.pos += pickup.vel * dt
+		if not walls.is_empty():
+			pickup.pos = push_out_of_walls(pickup.pos, 6.0) if not pickup.magnetized else pickup.pos
+		if distance < player.radius + 16.0:
+			pickup.dead = true
+			if on_collect.is_valid():
+				on_collect.call(pickup.kind, pickup.value, pickup.tech)
+	pickups = pickups.filter(func(p): return not p.dead)
+
+
+func update_zones(dt: float) -> void:
+	var slow := enemy_time_scale()
+	for zone: Zone in zones:
+		if zone.dead:
+			continue
+		var zone_dt := dt * (slow if zone.hostile else 1.0)
+		if zone.warn > 0.0:
+			zone.warn -= zone_dt
+			if zone.warn <= 0.0:
+				_zone_triggers(zone)
+			continue
+		zone.life -= zone_dt
+		if zone.life <= 0.0:
+			zone.dead = true
+			continue
+		zone.angle += zone.spin * zone_dt
+		match zone.kind:
+			"black_hole":
+				for enemy: Enemy in enemies:
+					if not enemy.dead and not enemy.hidden and enemy.boss == null and enemy.pos.distance_to(zone.pos) < zone.radius:
+						enemy.pos = enemy.pos.lerp(zone.pos, 0.06)
+				clear_bullets(zone.pos, zone.radius * 0.6)
+			"ring":
+				var current_radius := zone.radius * (1.0 - zone.life / zone.max_life)
+				for enemy: Enemy in enemies.duplicate():
+					if enemy.dead or zone.hit_ids.has(enemy.id):
+						continue
+					if absf(enemy.pos.distance_to(zone.pos) - current_radius) < 26.0 + enemy.radius:
+						zone.hit_ids[enemy.id] = true
+						hurt_enemy(enemy, zone.damage, "ring")
+				if zone.clears_bullets:
+					for shot: Shot in enemy_shots:
+						if absf(shot.pos.distance_to(zone.pos) - current_radius) < 22.0:
+							shot.dead = true
+			"enemy_ring":
+				var ring_radius := zone.radius * (1.0 - zone.life / zone.max_life)
+				if not zone.hit_ids.has("player") and absf(player.pos.distance_to(zone.pos) - ring_radius) < 18.0 + player.radius:
+					zone.hit_ids["player"] = true
+					damage_player(zone.damage, "shockwave")
+			"laser":
+				if zone.hostile and _point_near_beam(player.pos, zone, player.radius):
+					damage_player(zone.damage, "laser")
+			_:
+				zone.tick_timer -= zone_dt
+				if zone.tick_timer <= 0.0:
+					zone.tick_timer = zone.tick
+					if zone.hostile:
+						if player.pos.distance_to(zone.pos) < zone.radius + player.radius * 0.5:
+							damage_player(zone.damage, zone.kind)
+					else:
+						for enemy: Enemy in enemies.duplicate():
+							if not enemy.dead and enemy.pos.distance_to(zone.pos) < zone.radius + enemy.radius:
+								hurt_enemy(enemy, zone.damage, zone.kind)
+	zones = zones.filter(func(z): return not z.dead)
+
+
+func _point_near_beam(point: Vector2, zone: Zone, extra: float) -> bool:
+	var end := zone.pos + Vector2.from_angle(zone.angle) * zone.length
+	var closest := Geometry2D.get_closest_point_to_segment(point, zone.pos, end)
+	return point.distance_to(closest) < zone.width * 0.5 + extra
+
+
+## A telegraphed zone has finished warning and goes off.
+func _zone_triggers(zone: Zone) -> void:
+	match zone.kind:
+		"meteor":
+			zone.dead = true
+			explode(zone.pos, zone.radius, zone.damage, "starfall", Color(0.85, 0.5, 1.0))
+			emit("shake", {"amount": 5.0})
+			emit("sound", {"name": "meteor"})
+			if zone.hit_ids.get("burning", false):
+				add_zone("fire", zone.pos, zone.radius * 0.8, 2.5, zone.damage * 0.18, false, {"tick": 0.4, "color": Color(1, 0.5, 0.9)})
+			if run.has_fusion("armageddon_protocol"):
+				for i in 3:
+					var missile := player_shot(zone.pos, Vector2.from_angle(rng.randf() * TAU) * 260.0, zone.damage * 0.4, "swarm_pods", "missile", Color(1, 0.6, 0.3))
+					missile.homing = 6.0
+					missile.splash = 45.0
+					missile.accel = 500.0
+					missile.max_speed = 620.0
+					missile.life = 2.0
+		"bomb_warning":
+			zone.dead = true
+			emit("explosion", {"pos": zone.pos, "size": zone.radius, "color": Color(1, 0.45, 0.3), "ring": true})
+			emit("sound", {"name": "explode"})
+			if player.pos.distance_to(zone.pos) < zone.radius + player.radius * 0.6:
+				damage_player(zone.damage, "blast")
+		"acid_warning":
+			zone.dead = true
+			add_zone("acid", zone.pos, zone.radius, 3.5, zone.damage, true, {"tick": 0.45, "color": Color(0.5, 1.0, 0.4)})
+			emit("sound", {"name": "splat"})
+		"laser":
+			emit("sound", {"name": "laser"})
+		_:
+			pass
+
+
+## Arc Blade sweeps: damage enemies in the swept wedge and cut bullets out of the air.
+func update_blades(dt: float) -> void:
+	for blade in blades:
+		var previous: float = blade["angle"]
+		blade["time"] += dt
+		var progress := clampf(blade["time"] / blade["duration"], 0.0, 1.0)
+		blade["angle"] = lerpf(blade["start"], blade["end"], ease(progress, 0.6))
+		var low := minf(previous, blade["angle"]) - 0.05
+		var high := maxf(previous, blade["angle"]) + 0.05
+		var center := player.pos
+		for enemy: Enemy in enemies.duplicate():
+			if enemy.dead or enemy.hidden or blade["hit"].has(enemy.id):
+				continue
+			var offset := enemy.pos - center
+			if offset.length() > blade["radius"] + enemy.radius:
+				continue
+			if _angle_in_sweep(offset.angle(), low, high):
+				blade["hit"][enemy.id] = true
+				hurt_enemy(enemy, blade["damage"], "arc_blade")
+				emit("slash_hit", {"pos": enemy.pos})
+		for shot: Shot in enemy_shots:
+			if shot.dead:
+				continue
+			var offset := shot.pos - center
+			if offset.length() < blade["radius"] + 8.0 and _angle_in_sweep(offset.angle(), low, high):
+				if blade["reflect"]:
+					reflect_shot(shot, blade["damage"] * 0.4, true, 1)
+				else:
+					shot.dead = true
+					emit("spark", {"pos": shot.pos, "color": Color(0.6, 1.0, 1.0)})
+		if progress >= 1.0:
+			blade["done"] = true
+			if blade["phantom"]:
+				var wave := player_shot(center, Vector2.from_angle(player.facing) * 640.0, blade["damage"] * 0.7, "arc_blade", "crescent", Color(0.6, 1.0, 1.0))
+				wave.radius = 30.0
+				wave.pierce = 99
+				wave.life = 1.1
+	blades = blades.filter(func(b): return not b.get("done", false))
+
+
+func _angle_in_sweep(angle: float, low: float, high: float) -> bool:
+	# Shift the angle into the turn that starts at `low`, then check it's before `high`.
+	return low + fposmod(angle - low, TAU) <= high
+
+
+func cleanup() -> void:
+	enemies = enemies.filter(func(e): return not e.dead)

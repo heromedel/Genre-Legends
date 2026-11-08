@@ -1,0 +1,535 @@
+class_name Hub
+extends Control
+## The command center (GDD 5A): a console menu with text and icons. A rail on the left switches pages:
+## Star Map (pick where to go), Hangar (frame and loadout), R&D (spend blueprints) and Settings.
+
+signal launch_requested(node_id: String)
+
+var star_map: StarMap
+var page := "map"
+var content: Control
+var rail_buttons := {}
+var selected_node := ""
+var picker_slot := -1
+var admin: AdminConsole
+
+
+func _init(map: StarMap, start_page: String = "map") -> void:
+	star_map = map
+	page = start_page
+
+
+func _ready() -> void:
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	theme = UiKit.theme()
+	var backdrop := ColorRect.new()
+	backdrop.color = Color(0.025, 0.035, 0.07)
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(backdrop)
+	var root := HBoxContainer.new()
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	root.add_theme_constant_override("separation", 0)
+	add_child(root)
+	root.add_child(_build_rail())
+	var main := VBoxContainer.new()
+	main.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	main.add_theme_constant_override("separation", 0)
+	root.add_child(main)
+	main.add_child(_build_top_bar())
+	content = MarginContainer.new()
+	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	for side in ["left", "right", "top", "bottom"]:
+		content.add_theme_constant_override("margin_" + side, 14)
+	main.add_child(content)
+	show_page(page)
+	Sound.play_music("hub")
+
+
+func _build_rail() -> Control:
+	var rail := PanelContainer.new()
+	rail.add_theme_stylebox_override("panel", UiKit._box(Color(0.04, 0.06, 0.1), Color(0.15, 0.24, 0.35), 0, 0))
+	rail.custom_minimum_size = Vector2(112, 0)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 10)
+	rail.add_child(column)
+	var logo := UiKit.label("GL", 30, Art.GOLD, "title")
+	logo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(UiKit.spacer(6))
+	column.add_child(logo)
+	column.add_child(UiKit.spacer(8))
+	for entry in [["map", "map", "STAR MAP"], ["hangar", "hangar", "HANGAR"], ["rnd", "lab", "R&D"], ["settings", "settings", "SETTINGS"]]:
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(96, 84)
+		button.focus_mode = Control.FOCUS_NONE
+		var page_id: String = entry[0]
+		button.pressed.connect(func():
+			PlayLog.button("Rail: %s" % entry[2])
+			Sound.play("ui")
+			show_page(page_id))
+		var box := VBoxContainer.new()
+		box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		box.alignment = BoxContainer.ALIGNMENT_CENTER
+		var icon := IconView.make(entry[1], 34, Color(0.6, 0.9, 1.0))
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		box.add_child(icon)
+		var text := UiKit.label(entry[2], 12, Color(0.7, 0.85, 1.0), "bold")
+		text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(text)
+		button.add_child(box)
+		column.add_child(button)
+		rail_buttons[page_id] = button
+	return rail
+
+
+func _build_top_bar() -> Control:
+	var bar := PanelContainer.new()
+	bar.add_theme_stylebox_override("panel", UiKit._box(Color(0.04, 0.06, 0.1), Color(0.15, 0.24, 0.35), 0, 0))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 22)
+	bar.add_child(row)
+	row.add_child(UiKit.label("COMMAND CENTER", 22, Color(0.6, 0.9, 1.0), "title"))
+	var filler := Control.new()
+	filler.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(filler)
+	var frame := FrameData.get_frame(Save.data["frame"])
+	row.add_child(UiKit.label("Frame: %s" % frame["name"], 16, frame["hull"], "bold"))
+	row.add_child(UiKit.label("Planets cleared: %d" % Save.data["cleared"].size(), 16, Color(0.7, 0.85, 1.0)))
+	var total_blueprints := 0
+	for tech_id in Save.data["blueprints"]:
+		total_blueprints += int(Save.data["blueprints"][tech_id])
+	row.add_child(UiKit.label("Blueprints: %d" % total_blueprints, 16, Color(0.5, 0.8, 1.0)))
+	return bar
+
+
+func show_page(page_id: String) -> void:
+	page = page_id
+	picker_slot = -1
+	PlayLog.set_screen(page_id)
+	_rebuild()
+
+
+## Rebuilds the current page from Save, keeping in-page state such as the open slot picker.
+func _rebuild() -> void:
+	var page_id := page
+	for key in rail_buttons:
+		rail_buttons[key].add_theme_stylebox_override("normal", UiKit._box(Color(0.12, 0.2, 0.3) if key == page_id else Color(0.06, 0.09, 0.14), Color(0.5, 0.85, 1.0) if key == page_id else Color(0.2, 0.3, 0.42), 2))
+	for child in content.get_children():
+		child.queue_free()
+	match page_id:
+		"map": content.add_child(_build_map_page())
+		"hangar": content.add_child(_build_hangar_page())
+		"rnd": content.add_child(_build_rnd_page())
+		"settings": content.add_child(_build_settings_page())
+
+
+# ---------------------------------------------------------------- star map
+
+var _map_view: StarMapView
+var _info: VBoxContainer
+
+
+func _build_map_page() -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	var frame := UiKit.panel(Color(0.02, 0.03, 0.06), Color(0.2, 0.32, 0.46))
+	frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(frame)
+	_map_view = StarMapView.new()
+	_map_view.star_map = star_map
+	_map_view.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_map_view.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_map_view.node_selected.connect(_on_node_selected)
+	frame.add_child(_map_view)
+	var info_panel := UiKit.panel()
+	info_panel.custom_minimum_size = Vector2(340, 0)
+	row.add_child(info_panel)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	info_panel.add_child(scroll)
+	_info = VBoxContainer.new()
+	_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_info.add_theme_constant_override("separation", 8)
+	scroll.add_child(_info)
+	if selected_node == "" or star_map.get_node(selected_node).is_empty():
+		selected_node = _frontier_node()
+	_map_view.selected = selected_node
+	_fill_info(selected_node)
+
+	return row
+
+
+## The planet to suggest: the first reachable planet not yet cleared, preferring the main route.
+func _frontier_node() -> String:
+	var best := ""
+	var best_column := 9999
+	for node_id in star_map.all_node_ids():
+		var node := star_map.get_node(node_id)
+		if Save.is_cleared(node_id) or not star_map.is_available(node_id, Save.is_cleared):
+			continue
+		var column: int = node["column"] + (1 if node["branch"] != "" else 0)
+		if column < best_column:
+			best_column = column
+			best = node_id
+	return best if best != "" else "r0c0n0"
+
+
+func _on_node_selected(node_id: String) -> void:
+	selected_node = node_id
+	_fill_info(node_id)
+
+
+func _fill_info(node_id: String) -> void:
+	for child in _info.get_children():
+		child.queue_free()
+	var node := star_map.get_node(node_id)
+	if node.is_empty():
+		return
+	var mission_type: Dictionary = MissionData.TYPES[node["type"]]
+	var region_name: String = star_map.regions[node["region"]]["name"]
+	_info.add_child(UiKit.label(region_name.to_upper(), 13, Color(0.5, 0.65, 0.8), "bold"))
+	_info.add_child(UiKit.label(node["name"], 30, Color(1, 1, 1), "title"))
+	if node["branch"] != "":
+		_info.add_child(UiKit.label(node["branch_name"], 16, Art.GOLD, "bold"))
+	var type_row := HBoxContainer.new()
+	type_row.add_child(IconView.make(node["type"], 30, Color(0.6, 0.9, 1.0)))
+	var type_text := VBoxContainer.new()
+	type_text.add_theme_constant_override("separation", 0)
+	type_text.add_child(UiKit.label(mission_type["name"], 19, Color(0.6, 0.9, 1.0), "bold"))
+	type_text.add_child(UiKit.label("%s  •  %s form" % [mission_type["genre"], mission_type["form"].capitalize()], 13, Color(0.6, 0.7, 0.85)))
+	type_row.add_child(type_text)
+	_info.add_child(type_row)
+	_info.add_child(UiKit.wrapped(node["need"], 16, Color(0.85, 0.9, 1.0)))
+	var danger_row := HBoxContainer.new()
+	danger_row.add_child(UiKit.label("Danger", 15, Color(0.7, 0.8, 0.9)))
+	for i in 5:
+		danger_row.add_child(IconView.make("danger", 24, Color(1, 0.4, 0.35) if i < node["danger"] else Color(0.25, 0.28, 0.35)))
+	_info.add_child(danger_row)
+	if node["modifier"] != "":
+		var modifier: Dictionary = MissionData.MODIFIERS[node["modifier"]]
+		_info.add_child(UiKit.label("Special condition: " + modifier["name"], 17, Color(1, 0.75, 0.35), "bold"))
+		_info.add_child(UiKit.wrapped(modifier["text"], 14, Color(0.9, 0.8, 0.65)))
+	var reward_row := HBoxContainer.new()
+	reward_row.add_child(IconView.make(node["reward_tech"], 28, TechData.element_color(node["reward_tech"])))
+	var reward_text := VBoxContainer.new()
+	reward_text.add_theme_constant_override("separation", 0)
+	reward_text.add_child(UiKit.label("Blueprints", 13, Color(0.6, 0.7, 0.85)))
+	reward_text.add_child(UiKit.label(TechData.TECH[node["reward_tech"]]["name"], 17, TechData.element_color(node["reward_tech"]), "bold"))
+	reward_row.add_child(reward_text)
+	_info.add_child(reward_row)
+	if node["prize"] != "":
+		var claimed: bool = Save.data["prizes_claimed"].has(node_id)
+		_info.add_child(UiKit.label("PRIZE" + (" (claimed)" if claimed else ""), 16, Art.GOLD, "bold"))
+		_info.add_child(UiKit.wrapped(node["prize_text"], 15, Color(1, 0.9, 0.7)))
+	_info.add_child(UiKit.spacer(6))
+	var available := star_map.is_available(node_id, Save.is_cleared)
+	if Save.is_cleared(node_id):
+		_info.add_child(UiKit.label("Cleared — fly it again any time.", 14, Color(0.5, 1.0, 0.65)))
+	if available:
+		_info.add_child(UiKit.button("LAUNCH", func(): launch_requested.emit(node_id), "Launch %s" % node_id, true))
+	else:
+		_info.add_child(UiKit.wrapped("Out of reach. Clear a planet linked to this one first.", 14, Color(0.65, 0.7, 0.8)))
+
+
+# ---------------------------------------------------------------- hangar
+
+func _build_hangar_page() -> Control:
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 12)
+	scroll.add_child(column)
+	column.add_child(UiKit.label("FRAME", 20, Color(0.6, 0.9, 1.0), "title"))
+	var frames_row := HBoxContainer.new()
+	frames_row.add_theme_constant_override("separation", 12)
+	column.add_child(frames_row)
+	for frame_id in FrameData.FRAMES:
+		frames_row.add_child(_frame_card(frame_id))
+	column.add_child(UiKit.label("LOADOUT", 20, Color(0.6, 0.9, 1.0), "title"))
+	column.add_child(UiKit.wrapped("Only the main weapon is online when a mission starts. Level-ups and Salvage Crates bring the rest online.", 14, Color(0.65, 0.75, 0.88)))
+	var slots_row := HBoxContainer.new()
+	slots_row.add_theme_constant_override("separation", 10)
+	column.add_child(slots_row)
+	for slot_index in TechData.SLOTS.size():
+		slots_row.add_child(_slot_card(slot_index))
+	if picker_slot >= 0:
+		column.add_child(_tech_picker(picker_slot))
+	return scroll
+
+
+func _frame_card(frame_id: String) -> Control:
+	var data := FrameData.get_frame(frame_id)
+	var unlocked: bool = Save.data["frames_unlocked"].has(frame_id)
+	var selected: bool = Save.data["frame"] == frame_id
+	var card := UiKit.panel(Color(0.06, 0.1, 0.16) if selected else Color(0.04, 0.06, 0.1), data["hull"] if selected else Color(0.2, 0.3, 0.42))
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 4)
+	card.add_child(column)
+	var art := FramePreview.new()
+	art.frame_id = frame_id
+	art.locked = not unlocked
+	art.custom_minimum_size = Vector2(0, 130)
+	column.add_child(art)
+	column.add_child(UiKit.label(data["name"], 22, data["hull"] if unlocked else Color(0.5, 0.55, 0.65), "title"))
+	column.add_child(UiKit.wrapped(data["tagline"], 13, Color(0.7, 0.8, 0.9)))
+	column.add_child(UiKit.label("Armor %d   Shield %d   Speed %d" % [data["armor"], data["shield"], data["speed"]], 13, Color(0.6, 0.75, 0.9)))
+	column.add_child(UiKit.label(data["trait_name"], 15, Art.GOLD, "bold"))
+	column.add_child(UiKit.wrapped(data["trait_text"], 13, Color(0.85, 0.8, 0.65)))
+	if not unlocked:
+		column.add_child(UiKit.wrapped("Locked. " + data["unlock"], 13, Color(1, 0.6, 0.5)))
+	elif not selected:
+		column.add_child(UiKit.button("Fly this frame", func():
+			Save.select_frame(frame_id)
+			_rebuild(), "Hangar: select %s" % frame_id))
+	else:
+		column.add_child(UiKit.label("Selected", 15, Color(0.5, 1.0, 0.65), "bold"))
+	return card
+
+
+func _slot_card(slot_index: int) -> Control:
+	var slot: String = TechData.SLOTS[slot_index]
+	var tech_id: String = Save.data["loadout"][slot_index]
+	var button := Button.new()
+	button.focus_mode = Control.FOCUS_NONE
+	button.custom_minimum_size = Vector2(150, 150)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if picker_slot == slot_index:
+		button.add_theme_stylebox_override("normal", UiKit._box(Color(0.12, 0.2, 0.3), Color(0.6, 0.95, 1.0), 3))
+	button.pressed.connect(func():
+		PlayLog.button("Hangar: slot %d (%s)" % [slot_index, slot])
+		Sound.play("ui")
+		picker_slot = -1 if picker_slot == slot_index else slot_index
+		_rebuild())
+	var box := VBoxContainer.new()
+	box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(box)
+	var slot_label := UiKit.label(TechData.SLOT_NAMES[slot].to_upper(), 12, Color(0.55, 0.7, 0.85), "bold")
+	slot_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	slot_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(slot_label)
+	if tech_id == "":
+		var empty := UiKit.label("empty — tap", 14, Color(0.5, 0.55, 0.65))
+		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		empty.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(empty)
+	else:
+		var icon := IconView.make(tech_id, 54, TechData.element_color(tech_id))
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		box.add_child(icon)
+		var name := UiKit.label(TechData.TECH[tech_id]["name"], 15, Color(1, 1, 1), "bold")
+		name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(name)
+		var mk := UiKit.label("Mk %d" % Save.tech_mk(tech_id), 13, Art.GOLD)
+		mk.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		mk.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(mk)
+	return button
+
+
+func _tech_picker(slot_index: int) -> Control:
+	var slot: String = TechData.SLOTS[slot_index]
+	var panel := UiKit.panel()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 8)
+	panel.add_child(column)
+	column.add_child(UiKit.label("Choose %s" % TechData.SLOT_NAMES[slot], 18, Color(0.6, 0.9, 1.0), "bold"))
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 10)
+	column.add_child(grid)
+	if slot_index > 0:
+		grid.add_child(UiKit.button("Leave empty", func():
+			Save.equip(slot_index, "")
+			picker_slot = -1
+			_rebuild(), "Hangar: empty slot %d" % slot_index))
+	for tech_id in TechData.ids_for_slot(slot):
+		var mk := Save.tech_mk(tech_id)
+		var tech: Dictionary = TechData.TECH[tech_id]
+		var row := HBoxContainer.new()
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(IconView.make(tech_id, 40, TechData.element_color(tech_id) if mk > 0 else Color(0.35, 0.4, 0.5)))
+		var text := VBoxContainer.new()
+		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		text.add_child(UiKit.label("%s  %s" % [tech["name"], ("Mk %d" % mk) if mk > 0 else "(locked)"], 16, Color(1, 1, 1) if mk > 0 else Color(0.5, 0.55, 0.65), "bold"))
+		text.add_child(UiKit.wrapped(tech["text"], 13, Color(0.7, 0.8, 0.9)))
+		text.add_child(UiKit.wrapped("Forks: %s / %s" % [tech["forks"]["a"]["name"], tech["forks"]["b"]["name"]], 12, Color(0.8, 0.6, 1.0)))
+		row.add_child(text)
+		if mk > 0:
+			row.add_child(UiKit.button("Equip", func():
+				Save.equip(slot_index, tech_id)
+				picker_slot = -1
+				_rebuild(), "Hangar: equip %s in slot %d" % [tech_id, slot_index]))
+		grid.add_child(row)
+	return panel
+
+
+# ---------------------------------------------------------------- R&D
+
+func _build_rnd_page() -> Control:
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 10)
+	scroll.add_child(column)
+	column.add_child(UiKit.label("RESEARCH & DEVELOPMENT", 20, Color(0.6, 0.9, 1.0), "title"))
+	column.add_child(UiKit.wrapped("Missions pay out blueprints. Each planet's card on the Star Map shows which tech it rewards. Blueprints unlock tech, then raise its Mk so it levels higher in missions and hits harder.", 15, Color(0.65, 0.75, 0.88)))
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 12)
+	grid.add_theme_constant_override("v_separation", 12)
+	column.add_child(grid)
+	for tech_id in TechData.TECH:
+		grid.add_child(_rnd_card(tech_id))
+	return scroll
+
+
+func _rnd_card(tech_id: String) -> Control:
+	var tech: Dictionary = TechData.TECH[tech_id]
+	var mk := Save.tech_mk(tech_id)
+	var have := Save.blueprints(tech_id)
+	var need := TechData.blueprints_for_next_mk(mk)
+	var color := TechData.element_color(tech_id)
+	var card := UiKit.panel(Color(0.05, 0.08, 0.13), color.darkened(0.4) if mk > 0 else Color(0.18, 0.22, 0.3))
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 4)
+	card.add_child(column)
+	var head := HBoxContainer.new()
+	head.add_child(IconView.make(tech_id, 44, color if mk > 0 else Color(0.4, 0.45, 0.55)))
+	var title := VBoxContainer.new()
+	title.add_theme_constant_override("separation", 0)
+	title.add_child(UiKit.label(tech["name"], 17, Color(1, 1, 1) if mk > 0 else Color(0.6, 0.65, 0.75), "bold"))
+	title.add_child(UiKit.label("%s  •  %s" % [TechData.SLOT_NAMES[tech["slot"]], ("Mk %d" % mk) if mk > 0 else "Locked"], 12, Art.GOLD if mk > 0 else Color(0.55, 0.6, 0.7)))
+	head.add_child(title)
+	column.add_child(head)
+	column.add_child(UiKit.wrapped(tech["text"], 14, Color(0.72, 0.82, 0.92)))
+	var sources := []
+	for source in tech["blueprint_from"]:
+		sources.append(MissionData.TYPES[source]["name"])
+	column.add_child(UiKit.label("Found on: %s" % ", ".join(sources), 13, Color(0.55, 0.7, 0.85)))
+	if need > 0:
+		var progress := ProgressBar.new()
+		progress.max_value = need
+		progress.value = mini(have, need)
+		progress.show_percentage = false
+		progress.custom_minimum_size = Vector2(0, 10)
+		column.add_child(progress)
+		column.add_child(UiKit.label("%d / %d blueprints" % [have, need], 12, Color(0.6, 0.8, 1.0)))
+		var action := "Unlock" if mk == 0 else "Upgrade to Mk %d" % (mk + 1)
+		var button := UiKit.button(action, func():
+			if Save.upgrade_tech(tech_id):
+				Sound.play("upgrade")
+				_rebuild(), "R&D: %s %s" % [action, tech_id], have >= need)
+		button.disabled = have < need
+		column.add_child(button)
+	else:
+		column.add_child(UiKit.label("Maxed: Mk %d" % mk, 13, Art.GOLD, "bold"))
+	return card
+
+
+# ---------------------------------------------------------------- settings
+
+func _build_settings_page() -> Control:
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 12)
+	scroll.add_child(column)
+	column.add_child(UiKit.label("SETTINGS", 20, Color(0.6, 0.9, 1.0), "title"))
+	column.add_child(_slider("Music", "music"))
+	column.add_child(_slider("Sound effects", "sfx"))
+	column.add_child(_toggle("Screen shake", "screen_shake"))
+	column.add_child(_toggle("Play log", "play_log"))
+	column.add_child(UiKit.wrapped("The play log records what you tap and how missions go, so it can be sent and read like a replay. Nothing leaves this device unless you save the file and send it.", 13, Color(0.65, 0.75, 0.88)))
+	var log_row := HBoxContainer.new()
+	log_row.add_theme_constant_override("separation", 10)
+	var log_status := UiKit.label("", 13, Color(0.5, 1, 0.65))
+	log_row.add_child(UiKit.button("Save play log file", func():
+		var saved := PlayLog.save_file()
+		log_status.text = "Saved: %s" % saved, "Settings: save play log"))
+	log_row.add_child(log_status)
+	column.add_child(log_row)
+	column.add_child(UiKit.label("DEBUG CONSOLE", 18, Color(1, 0.75, 0.35), "title"))
+	admin = AdminConsole.new()
+	admin.star_map = star_map
+	admin.changed.connect(func(): _rebuild())
+	admin.launch_test.connect(func(mission_type): launch_requested.emit("test:" + mission_type))
+	column.add_child(admin.build())
+	column.add_child(UiKit.label("RESET", 18, Color(1, 0.4, 0.4), "title"))
+	var reset_button := UiKit.button("Reset all progress", func(): pass, "Settings: reset (first tap)")
+	reset_button.pressed.connect(func():
+		if reset_button.text.begins_with("Tap again"):
+			PlayLog.note("save", "Progress reset by player")
+			Save.reset()
+			get_tree().reload_current_scene()
+		else:
+			reset_button.text = "Tap again to really reset everything")
+	column.add_child(reset_button)
+	column.add_child(UiKit.label("Genre Legends v%s" % PlayLog.BUILD, 12, Color(0.45, 0.55, 0.65)))
+	return scroll
+
+
+func _slider(label: String, key: String) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	var name := UiKit.label(label, 17)
+	name.custom_minimum_size = Vector2(180, 0)
+	row.add_child(name)
+	var slider := HSlider.new()
+	slider.min_value = 0.0
+	slider.max_value = 1.0
+	slider.step = 0.05
+	slider.value = Save.setting(key)
+	slider.custom_minimum_size = Vector2(300, 40)
+	slider.value_changed.connect(func(value):
+		Save.data["settings"][key] = value
+		Sound.refresh_volume())
+	slider.drag_ended.connect(func(_changed):
+		Save.write()
+		PlayLog.note("tap", "%s volume set to %d%%" % [label, int(slider.value * 100)]))
+	row.add_child(slider)
+	return row
+
+
+func _toggle(label: String, key: String) -> Control:
+	var button := UiKit.button("", func(): pass, "Settings: %s" % label)
+	var refresh := func(): button.text = "%s: %s" % [label, "On" if Save.setting(key) else "Off"]
+	refresh.call()
+	button.pressed.connect(func():
+		Save.set_setting(key, not Save.setting(key))
+		refresh.call())
+	return button
+
+
+## A small drawing of a frame for the hangar cards: ship and mech side by side.
+class FramePreview:
+	extends Control
+	var frame_id := "vanguard"
+	var locked := false
+	var time := 0.0
+
+	func _process(delta: float) -> void:
+		time += delta
+		queue_redraw()
+
+	func _draw() -> void:
+		var c := size * 0.5
+		if locked:
+			# A dark silhouette to tease what's coming, with the lock on top.
+			modulate = Color(0.25, 0.27, 0.32)
+			FrameArt.draw_frame(self, frame_id, "ship", c + Vector2(-50, 0), -PI * 0.5, time, {"speed": 0.2, "scale": 1.7})
+			FrameArt.draw_frame(self, frame_id, "mech", c + Vector2(50, 0), -PI * 0.5, time, {"scale": 1.7})
+			IconPainter.draw(self, "lock", Rect2(c - Vector2(22, 22), Vector2(44, 44)), Color(1.6, 1.6, 1.8))
+			return
+		Art.draw_glow(self, c + Vector2(-50, 0), 40.0, Art.with_alpha(FrameData.get_frame(frame_id)["hull"], 0.25))
+		FrameArt.draw_frame(self, frame_id, "ship", c + Vector2(-50, 0), -PI * 0.5, time, {"speed": 0.4, "scale": 1.7})
+		FrameArt.draw_frame(self, frame_id, "mech", c + Vector2(50, 0), -PI * 0.5 + sin(time) * 0.4, time, {"speed": 0.6, "scale": 1.7})

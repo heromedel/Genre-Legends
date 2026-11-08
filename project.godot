@@ -1,0 +1,49 @@
+; Engine configuration file.
+; Edited by hand: keep keys in Godot's own format.
+
+config_version=5
+
+[application]
+
+config/name="Genre Legends"
+config/description="Pilot a frame that shifts between ship and mech, picking arcade-genre missions across an endless star map."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+config/icon="res://assets/icon.png"
+boot_splash/bg_color=Color(0.02, 0.03, 0.06, 1)
+boot_splash/show_image=false
+
+[autoload]
+
+PlayLog="*res://scripts/log/play_log.gd"
+Save="*res://scripts/save/save_data.gd"
+Sound="*res://scripts/audio/sound.gd"
+
+[display]
+
+window/size/viewport_width=1200
+window/size/viewport_height=800
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=6
+window/dpi/allow_hidpi=true
+
+[gui]
+
+common/drop_mouse_on_gui_input_disabled=true
+
+[input_devices]
+
+pointing/emulate_mouse_from_touch=true
+pointing/emulate_touch_from_mouse=false
+
+[physics]
+
+common/physics_ticks_per_second=60
+common/max_physics_steps_per_frame=4
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.02, 0.03, 0.06, 1)

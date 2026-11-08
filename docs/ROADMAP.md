@@ -17,6 +17,8 @@
 
 ## Plan A: Foundation and the first three
 
+(Note) First playable built 2026-11-08: all seven steps have a first version. Balance and polish continue from heromedel's play.
+
 1. Godot project, single-threaded web export, GitHub Pages deploy, iPad touch controls, tap to start (GDD 2A, 2B).
 2. Core systems: the frame and its forms, combat, a fixed-step simulation with seeded randomness, mission hand-off support (GDD 6G proposal), play log and replay (GDD 4C), admin console and debug log.
 3. Command center and star map with forking routes and planet info (GDD 5A–5D).

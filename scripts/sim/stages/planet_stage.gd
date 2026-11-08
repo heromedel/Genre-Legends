@@ -1,0 +1,150 @@
+class_name PlanetStage
+extends Stage
+## Planet Exploration (GDD 6C): a big open surface to roam, bullet-hell style. Hive nests sit in camps
+## guarded by the local wildlife; packs roam between them. Wreck every nest and the Siege Crawler lands.
+## Rock spires give cover. Repair cells and wreckage crates are scattered for those who explore.
+
+const WORLD_SIZE := Vector2(3400, 3400)
+const MAX_ROAMERS := 26
+
+var camps: Array = []           # {pos, nest_id}
+var rocks: Array = []           # Rect2 cover; also the art's rock list
+var roam_timer := 4.0
+var objective_ids: Array = []
+var roster: Dictionary
+
+
+func stage_name() -> String:
+	return "Planet Surface"
+
+
+func setup() -> void:
+	form = "mech"
+	camera_mode = "follow"
+	world.bounds = Rect2(Vector2.ZERO, WORLD_SIZE)
+	world.shot_bounds = world.bounds.grow(200)
+	var start := WORLD_SIZE * 0.5 + Vector2(0, 1150)
+	mission.player.pos = start
+	roster = EnemyData.ROSTERS["planet"].duplicate()
+	var need: String = mission.node.get("need", "")
+	if need.find("burrowed") >= 0:
+		roster["burrower"] = 8
+	elif need.find("war machine") >= 0:
+		roster["brute"] = 5
+	_place_camps(start)
+	_place_rocks(start)
+	_place_loot()
+
+
+func _place_camps(start: Vector2) -> void:
+	var camp_count := 4
+	for i in camp_count:
+		var angle := -PI * 0.5 + (i - 1.5) * 1.05 + world.rng.randf_range(-0.2, 0.2)
+		var at := WORLD_SIZE * 0.5 + Vector2.from_angle(angle) * world.rng.randf_range(1050.0, 1350.0)
+		at = at.clamp(Vector2(300, 300), WORLD_SIZE - Vector2(300, 300))
+		if at.distance_to(start) < 700.0:
+			at = WORLD_SIZE * 0.5 + Vector2.from_angle(angle) * 1250.0
+		var nest := world.spawn_enemy("hive_nest", at)
+		objective_ids.append(nest.id)
+		camps.append({"pos": at, "nest_id": nest.id})
+		for j in 3:
+			var guard_kind := "sentry" if j == 0 else "spitter"
+			world.spawn_enemy(guard_kind, at + Vector2.from_angle(TAU * j / 3.0 + 0.4) * 150.0)
+		for j in 4:
+			world.spawn_enemy("crawler", at + Vector2.from_angle(world.rng.randf() * TAU) * 110.0)
+	# One camp has a Warlord: the elite that guards the best loot.
+	var warlord_camp: Dictionary = camps[world.rng.randi() % camps.size()]
+	world.spawn_enemy("warlord", warlord_camp["pos"] + Vector2(0, -180))
+
+
+func _place_rocks(start: Vector2) -> void:
+	var tries := 0
+	while rocks.size() < 22 and tries < 200:
+		tries += 1
+		var size := Vector2(world.rng.randf_range(60, 150), world.rng.randf_range(60, 140))
+		var at := Vector2(world.rng.randf_range(150, WORLD_SIZE.x - 300), world.rng.randf_range(150, WORLD_SIZE.y - 300))
+		var rect := Rect2(at, size)
+		var clear := rect.grow(160).has_point(start) == false
+		for camp in camps:
+			if rect.grow(200).has_point(camp["pos"]):
+				clear = false
+		if clear:
+			rocks.append(rect)
+	world.walls = rocks.duplicate()
+
+
+func _place_loot() -> void:
+	for i in 3:
+		var repair := world.drop_pickup("repair", Vector2(world.rng.randf_range(300, WORLD_SIZE.x - 300), world.rng.randf_range(300, WORLD_SIZE.y - 300)))
+		repair.vel = Vector2.ZERO
+		repair.anchored = true
+	for i in 2:
+		var crate := world.drop_pickup("crate", Vector2(world.rng.randf_range(300, WORLD_SIZE.x - 300), world.rng.randf_range(300, WORLD_SIZE.y - 300)))
+		crate.vel = Vector2.ZERO
+		crate.anchored = true
+	for pickup: Pickup in world.pickups:
+		pickup.pos = world.push_out_of_walls(pickup.pos, 20.0)
+
+
+func step(dt: float) -> void:
+	if boss != null:
+		boss.update(dt)
+	if mission.state != "play":
+		return
+	roam_timer -= dt
+	if roam_timer <= 0.0 and boss == null:
+		roam_timer = world.rng.randf_range(4.0, 6.5) / world.spawn_scale
+		_spawn_roaming_pack()
+	if boss == null and objectives_left() == 0:
+		mission.note("All hive nests destroyed")
+		start_boss(SiegeCrawler.new(world))
+
+
+func _spawn_roaming_pack() -> void:
+	if world.enemies.size() > MAX_ROAMERS:
+		return
+	var angle := world.rng.randf() * TAU
+	var at := (mission.player.pos + Vector2.from_angle(angle) * world.rng.randf_range(720.0, 900.0)).clamp(Vector2(60, 60), WORLD_SIZE - Vector2(60, 60))
+	var kind := pick_from_roster(roster)
+	var count := 1 if kind == "brute" else world.rng.randi_range(3, 5)
+	for i in count:
+		var enemy := world.spawn_enemy(kind, at + Vector2(world.rng.randf_range(-60, 60), world.rng.randf_range(-60, 60)))
+		enemy.pos = world.push_out_of_walls(enemy.pos, enemy.radius)
+		enemy.memory["awake"] = true
+
+
+func debug_skip_to_boss() -> void:
+	for nest_id in objective_ids:
+		var nest := world.enemy_by_id(nest_id)
+		if nest != null:
+			nest.dead = true
+
+
+func objectives_left() -> int:
+	var left := 0
+	for nest_id in objective_ids:
+		if world.enemy_by_id(nest_id) != null:
+			left += 1
+	return left
+
+
+## Where the HUD's arrows point: living nests, or the boss.
+func objective_positions() -> Array:
+	if boss != null and not boss.defeated:
+		return [boss.origin]
+	var positions := []
+	for nest_id in objective_ids:
+		var nest := world.enemy_by_id(nest_id)
+		if nest != null:
+			positions.append(nest.pos)
+	return positions
+
+
+func is_cleared() -> bool:
+	return boss != null and boss.finished
+
+
+func objective_text() -> String:
+	if boss != null:
+		return "Destroy the %s" % boss.boss_name
+	return "Hive nests: %d left" % objectives_left()
