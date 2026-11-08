@@ -52,7 +52,9 @@ func _ready() -> void:
 		for fusion_id in result["fusions"]:
 			built.append(UpgradeData.FUSIONS[fusion_id]["name"])
 		column.add_child(UiKit.wrapped("Your build: " + ", ".join(built), 15, Color(0.8, 0.6, 1.0)))
-	column.add_child(UiKit.label("BLUEPRINTS" + ("" if result["won"] else " (half kept)"), 18, Color(0.6, 0.9, 1.0), "title"))
+	if not result["won"]:
+		column.add_child(UiKit.wrapped("You got %d%% of the way through, and kept that share of the planet's reward plus half of what you picked up. Losses are part of it: every run moves you forward." % int(result.get("progress", 0.0) * 100), 15, Color(0.85, 0.85, 0.95)))
+	column.add_child(UiKit.label("BLUEPRINTS", 18, Color(0.6, 0.9, 1.0), "title"))
 	var earned := HFlowContainer.new()
 	earned.add_theme_constant_override("h_separation", 16)
 	column.add_child(earned)

@@ -10,12 +10,18 @@ const scenarios = [
   { name: 'hub_map', query: '?page=map', shots: [5000] },
   { name: 'hub_hangar', query: '?page=hangar', shots: [5000] },
   { name: 'hub_rnd', query: '?page=rnd', shots: [5000] },
+  { name: 'hub_records', query: '?page=records', shots: [5000] },
+  { name: 'levelup_cards', query: '?test=star_cluster&god=1&offer=1', shots: [4000] },
+  { name: 'pause_build', query: '?test=planet&god=1&power=a&mk=2', shots: [5000], keys: [[3000, 'Escape']] },
+  { name: 'lesson_needles', query: '?test=star_cluster&god=1&lesson=needles', shots: [8000, 14000] },
+  { name: 'lesson_mirror_gate', query: '?test=star_cluster&god=1&lesson=mirror&boss=1', shots: [6000, 12000] },
 ];
 for (const type of ['star_cluster', 'corridor', 'planet', 'dungeon']) {
   scenarios.push({ name: `${type}_start`, query: `?test=${type}&god=1`, shots: [3500, 9000] });
-  scenarios.push({ name: `${type}_power_a`, query: `?test=${type}&god=1&power=a&mk=3`, shots: [6000, 12000] });
+  scenarios.push({ name: `${type}_power_a`, query: `?test=${type}&god=1&power=a&mk=3&loadout=pulse_driver,arc_blade,swarm_pods,mirror_aegis,nova_bomb`, shots: [6000, 12000] });
   scenarios.push({ name: `${type}_power_b`, query: `?test=${type}&god=1&power=b&mk=3&loadout=thunder_lance,orbital_halo,starfall,graze_engine,time_brake`, shots: [6000, 12000] });
-  scenarios.push({ name: `${type}_boss`, query: `?test=${type}&god=1&power=a&mk=2&boss=1`, shots: [4000, 9000, 16000] });
+  scenarios.push({ name: `${type}_miniboss`, query: `?test=${type}&god=1&power=a&mk=1&loadout=pulse_driver,arc_blade,swarm_pods,mirror_aegis,nova_bomb&miniboss=1`, shots: [5000, 10000] });
+  scenarios.push({ name: `${type}_boss`, query: `?test=${type}&god=1&power=a&mk=2&loadout=pulse_driver,arc_blade,swarm_pods,mirror_aegis,nova_bomb&boss=1`, shots: [4000, 9000, 16000] });
 }
 (async () => {
   const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
@@ -28,6 +34,7 @@ for (const type of ['star_cluster', 'corridor', 'planet', 'dungeon']) {
     await page.goto(BASE + scenario.query);
     await page.waitForFunction(() => document.querySelector('#status') == null || getComputedStyle(document.querySelector('#status')).display === 'none' || document.querySelector('#status').style.visibility === 'hidden', null, { timeout: 30000 }).catch(() => {});
     let elapsed = 0;
+    for (const [at, key] of scenario.keys || []) { await page.waitForTimeout(at - elapsed); elapsed = at; await page.keyboard.press(key); }
     for (const at of scenario.shots) {
       await page.waitForTimeout(at - elapsed);
       elapsed = at;

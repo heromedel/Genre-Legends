@@ -26,6 +26,28 @@ const TYPES := {
 }
 const PLAYABLE_TYPES := ["star_cluster", "corridor", "planet", "dungeon"]
 
+## Hand-set difficulty for the first region's six steps (GDD 9A): each was tuned with the average-player
+## bot to land in its target. Index = column in the first region (5 = the gate). After that, a formula
+## takes over from where the gate leaves off.
+const FIRST_REGION_BASELINE := [
+	{"enemy_hp": 0.85, "damage": 0.9, "fire": 0.85, "bullet_speed": 0.88},   # planet 1: learn to fly
+	{"enemy_hp": 0.95, "damage": 0.9, "fire": 0.9, "bullet_speed": 0.92},    # planet 2: first real fights
+	{"enemy_hp": 1.0, "damage": 0.95, "fire": 0.95, "bullet_speed": 0.95},   # planet 3: the needle lesson
+	{"enemy_hp": 1.1, "damage": 1.0, "fire": 1.0, "bullet_speed": 1.0},      # planet 4: builds start to matter
+	{"enemy_hp": 1.2, "damage": 1.05, "fire": 1.05, "bullet_speed": 1.0},    # planet 5
+	{"enemy_hp": 1.3, "damage": 1.1, "fire": 1.1, "bullet_speed": 1.03},     # planet 6: the gate
+]
+## Each genre's own weight, found with the average-player bot: the shooters' open field is easy to dodge in,
+## the corridor's walls and the planet's open swarm are not.
+const TYPE_DIFFICULTY := {
+	"star_cluster": {"damage": 1.2, "fire": 1.2},
+	"corridor": {"damage": 0.75, "fire": 0.85},
+	"planet": {"damage": 0.85, "fire": 0.85},
+	"dungeon": {"damage": 1.0, "fire": 1.0},
+}
+## Hazard routes on top of their column's difficulty.
+const HAZARD := {"enemy_hp": 1.4, "damage": 1.25, "fire": 1.25, "bullet_speed": 1.05}
+
 ## Threat setting: how hard every mission hits. Standard is the default.
 const THREAT := {
 	"standard": {"name": "Standard", "text": "The intended challenge. Enemies fight back hard enough that builds matter.",
@@ -105,3 +127,30 @@ const THEMED_BRANCHES := [
 ]
 ## The second region's gate unlocks Bulwark.
 const GATE_PRIZES := {1: "frame:bulwark"}
+
+
+## What you'll face on a planet (GDD 9F), so loadout choice matters before you launch.
+const TYPE_TRAITS := {
+	"star_cluster": ["Diving formations", "Shielded wings (hit them from the side)"],
+	"corridor": ["Wall turrets", "Laser gates", "Narrow walls"],
+	"planet": ["Hive nests", "Swarms of crawlers", "Acid spitters"],
+	"dungeon": ["Shielded knights (strike after they lunge)", "Mimics", "Locked doors"],
+}
+const LESSON_TRAITS := {
+	"needles": "Needle swarms (shields that reflect them help a lot)",
+	"mirror": "Mirrored hull (straight shots bounce back; homing gets around it)",
+}
+const ARRIVAL_TRAITS := {
+	"cluster_drone": ["star_cluster", "Cluster Drones (split when hit)"],
+	"centi_mech": ["planet", "Centi-Mechs"],
+}
+
+
+static func traits_for(node: Dictionary, arrivals: Array) -> Array:
+	var traits: Array = TYPE_TRAITS.get(node["type"], []).duplicate()
+	if node.get("lesson", "") != "":
+		traits.push_front(LESSON_TRAITS[node["lesson"]])
+	for kind in arrivals:
+		if ARRIVAL_TRAITS.has(kind) and ARRIVAL_TRAITS[kind][0] == node["type"]:
+			traits.append(ARRIVAL_TRAITS[kind][1])
+	return traits

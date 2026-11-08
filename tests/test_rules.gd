@@ -33,7 +33,13 @@ func _tech_data() -> void:
 		check(not tech["blueprint_from"].is_empty(), "%s drops from some mission type" % tech_id)
 	for slot_index in TechData.STARTING_LOADOUT.size():
 		var tech_id: String = TechData.STARTING_LOADOUT[slot_index]
-		check(TechData.TECH[tech_id]["slot"] == TechData.SLOTS[slot_index], "starting %s fits slot %d" % [tech_id, slot_index])
+		if tech_id != "":
+			check(TechData.TECH[tech_id]["slot"] == TechData.SLOTS[slot_index], "starting %s fits slot %d" % [tech_id, slot_index])
+	check(not TechData.STARTING_UNLOCKS.has("mirror_aegis") and not TechData.STARTING_UNLOCKS.has("swarm_pods"), "lesson tech is held back (GDD 9C)")
+	for element in UpgradeData.ELEMENTS:
+		check(UpgradeData.RESONANCE[element]["tiers"].size() == UpgradeData.RESONANCE_THRESHOLDS.size(), "%s resonance describes every tier" % element)
+	for tech_id in TechData.TECH:
+		check(UpgradeData.ELEMENTS.has(TechData.TECH[tech_id]["element"]), "%s has a resonance element" % tech_id)
 	for fusion_id in UpgradeData.FUSIONS:
 		for needed in UpgradeData.FUSIONS[fusion_id]["needs"]:
 			check(TechData.TECH.has(needed), "fusion %s needs real tech %s" % [fusion_id, needed])
@@ -73,6 +79,10 @@ func _star_map() -> void:
 		if map_a.get_node(node_id)["links"].size() >= 2:
 			forks += 1
 	check(forks >= 3, "the map has real forks, not a single line")
+	for node_id in map_a.columns[2]:
+		check(map_a.get_node(node_id)["lesson"] == "needles", "every planet 3 is the needle lesson")
+	var gate: Dictionary = map_a.get_node(map_a.columns[5][0])
+	check(gate["lesson"] == "mirror" and gate["type"] == "star_cluster", "the first gate is the mirror lesson")
 
 
 func _input_round_trip() -> void:
@@ -124,3 +134,13 @@ func _offers() -> void:
 			saw_pair = true
 		check(forks.size() != 1, "forks are never offered alone")
 	check(saw_pair, "fork pairs show up")
+	# Rerolls and resonance hints.
+	mission.state = "offer"
+	mission.offer_cards = mission.offers.build_cards(3)
+	var before_rerolls := mission.run.rerolls
+	var choice := InputFrame.new()
+	choice.choice = UpgradeOffers.REROLL_CHOICE
+	mission.step(choice)
+	check(mission.run.rerolls == before_rerolls - 1 and mission.state == "offer", "a reroll spends one and keeps the offer open")
+	var hinted := mission.offers.build_cards(3).filter(func(c): return c["synergy"] != "")
+	check(not hinted.is_empty(), "cards say what they build toward")

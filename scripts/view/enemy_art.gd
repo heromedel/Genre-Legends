@@ -140,6 +140,24 @@ static func draw(ci: CanvasItem, enemy: Enemy, time: float) -> void:
 				shield = Transform2D(1.4, Vector2(-4, 6)) * shield
 			ci.draw_polyline(shield, Color(0.75, 0.8, 1.0) if enemy.front_shield else Color(0.5, 0.5, 0.6), 6.0, true)
 			ci.draw_polyline(shield, Color(1, 1, 1), 2.0, true)
+		"cluster_drone":
+			for i in 4:
+				var pod := Vector2.from_angle(TAU * i / 4.0 + t) * 8.0
+				Art.shape(ci, Transform2D(0, pod) * Art.ngon(4, 7, PI / 4.0), body, line, 1.5)
+			ci.draw_circle(Vector2.ZERO, 6.0, Color(1, 0.8, 0.95))
+		"drone_shard":
+			Art.shape(ci, PackedVector2Array([Vector2(14, 0), Vector2(-8, -9), Vector2(-4, 0), Vector2(-8, 9)]), body, line, 1.5)
+		"centi_head":
+			Art.shape(ci, Art.scaled(Art.ngon(8, 15), Vector2(1.2, 1.0)), body, line, 2.0)
+			for side in [-1.0, 1.0]:
+				ci.draw_line(Vector2(10, 6 * side), Vector2(22, 12 * side), line, 3.0)
+			ci.draw_circle(Vector2(8, -5), 3.0, Color(1, 0.3, 0.2))
+			ci.draw_circle(Vector2(8, 5), 3.0, Color(1, 0.3, 0.2))
+		"centi_segment":
+			Art.shape(ci, Art.ngon(6, 14), body, line, 2.0)
+			for side in [-1.0, 1.0]:
+				var swing := sin(t * 14.0) * 3.0
+				ci.draw_line(Vector2(0, 12 * side), Vector2(swing, 22 * side), line.darkened(0.2), 2.5)
 		"cracked_wall":
 			ci.draw_set_transform(enemy.pos, 0.0, Vector2.ONE)
 			var damage := 1.0 - enemy.hp / enemy.max_hp

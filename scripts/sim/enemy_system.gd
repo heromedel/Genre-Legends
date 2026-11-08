@@ -55,6 +55,8 @@ func update(dt: float) -> void:
 			"spinner": _spinner(enemy, edt)
 			"mimic": _mimic(enemy, edt)
 			"knight": _knight(enemy, edt)
+			"homer": _homer(enemy, edt)
+			"centi": _centi(enemy, edt)
 		if world.player.form == "mech" and not enemy.ghost and not world.walls.is_empty():
 			enemy.pos = world.push_out_of_walls(enemy.pos, enemy.radius)
 		_contact(enemy, player)
@@ -78,11 +80,25 @@ func _aim_angle(enemy: Enemy) -> float:
 	return (world.player.pos - enemy.pos).angle()
 
 
+## Slides along walls instead of pushing into them: if the way ahead is blocked, turn to whichever side is open.
+func _around_walls(enemy: Enemy, direction: Vector2) -> Vector2:
+	if world.walls.is_empty() or enemy.ghost:
+		return direction
+	if not world.point_in_wall(enemy.pos + direction * (enemy.radius + 18.0)):
+		return direction
+	var side := 1.0 if enemy.id % 2 == 0 else -1.0
+	for turn in [PI * 0.5, -PI * 0.5, PI * 0.25, -PI * 0.25]:
+		var tried := direction.rotated(turn * side)
+		if not world.point_in_wall(enemy.pos + tried * (enemy.radius + 18.0)):
+			return tried
+	return -direction
+
+
 func _move_toward(enemy: Enemy, target: Vector2, speed: float, dt: float) -> void:
 	var offset := target - enemy.pos
 	if offset.length() < 1.0:
 		return
-	enemy.vel = offset.normalized() * speed
+	enemy.vel = _around_walls(enemy, offset.normalized()) * speed
 	enemy.pos += enemy.vel * dt
 
 
@@ -257,7 +273,7 @@ func _despawn_if_gone(enemy: Enemy) -> void:
 func _chaser(enemy: Enemy, dt: float) -> void:
 	var to_player := world.player.pos - enemy.pos
 	var wobble := Vector2.from_angle(enemy.timer * 3.0 + enemy.id) * 0.35
-	var direction := (to_player.normalized() + wobble).normalized()
+	var direction := _around_walls(enemy, (to_player.normalized() + wobble).normalized())
 	enemy.vel = enemy.vel.lerp(direction * _speed(enemy), dt * 5.0)
 	enemy.pos += enemy.vel * dt
 	enemy.facing = enemy.vel.angle()
@@ -480,3 +496,46 @@ func _knight(enemy: Enemy, dt: float) -> void:
 				enemy.state = 0
 				enemy.timer = 0.0
 				enemy.fire_timer = 2.0
+
+
+
+# ---------------------------------------------------------------- milestone arrivals
+
+## Drone shards: little kamikazes that curve in on you.
+func _homer(enemy: Enemy, dt: float) -> void:
+	var desired := (world.player.pos - enemy.pos).normalized() * _speed(enemy)
+	enemy.vel = enemy.vel.lerp(desired, clampf(dt * 2.5, 0.0, 1.0))
+	enemy.pos += enemy.vel * dt
+	enemy.facing = enemy.vel.angle()
+	if enemy.timer > 6.0:
+		enemy.dead = true
+
+
+## Centi-Mechs: a head that weaves toward you and a chain of segments that follow its trail. Kill the
+## head and the next segment takes over: the classic arcade centipede.
+func _centi(enemy: Enemy, dt: float) -> void:
+	var leader := world.enemy_by_id(int(enemy.memory.get("leader", -1)))
+	if leader == null:
+		# Head: weave toward the player, leaving a trail for the segments.
+		enemy.look = "centi_head"
+		var weave := Vector2.from_angle(enemy.timer * 2.4) * 0.6
+		var direction := ((world.player.pos - enemy.pos).normalized() + weave.orthogonal() * 0.8).normalized()
+		enemy.vel = enemy.vel.lerp(direction * _speed(enemy), clampf(dt * 3.0, 0.0, 1.0))
+		enemy.pos += enemy.vel * dt
+		enemy.facing = enemy.vel.angle()
+		if enemy.fire_timer <= 0.0:
+			enemy.fire_timer = 1.8
+			world.enemy_aimed(enemy.pos, 3, 0.4, 230.0, {"color": Color(1, 0.7, 0.35)})
+	else:
+		var trail: Array = leader.memory.get("trail", [])
+		var target: Vector2 = trail[mini(8, trail.size() - 1)] if not trail.is_empty() else leader.pos
+		enemy.pos = enemy.pos.move_toward(target, _speed(enemy) * 1.3 * dt)
+		enemy.facing = (leader.pos - enemy.pos).angle()
+		if enemy.fire_timer <= 0.0:
+			enemy.fire_timer = world.rng.randf_range(3.0, 5.0)
+			world.enemy_shot(enemy.pos, enemy.facing + PI * 0.5 * (1 if enemy.id % 2 == 0 else -1), 180.0, {"color": Color(1, 0.7, 0.35)})
+	var own_trail: Array = enemy.memory.get("trail", [])
+	own_trail.push_front(enemy.pos)
+	if own_trail.size() > 12:
+		own_trail.pop_back()
+	enemy.memory["trail"] = own_trail

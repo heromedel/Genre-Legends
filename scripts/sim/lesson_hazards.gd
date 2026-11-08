@@ -4,8 +4,8 @@ extends RefCounted
 ## gently homing needles from off screen, weak alone and deadly in numbers. Shields that reflect them
 ## (Mirror Aegis) turn the swarm around; a blade can cut them; dodging well survives them.
 
-const NEEDLE_EVERY := 4.2
-const NEEDLES_PER_VOLLEY := 10
+const NEEDLE_EVERY := 3.2
+const NEEDLES_PER_VOLLEY := 12
 
 var world: World
 var lesson := ""
@@ -30,7 +30,7 @@ func update(dt: float) -> void:
 	for i in NEEDLES_PER_VOLLEY:
 		var start := origin + Vector2.from_angle(toward + PI * 0.5) * (i - NEEDLES_PER_VOLLEY * 0.5) * 22.0
 		var needle := world.enemy_shot(start, toward + world.rng.randf_range(-0.12, 0.12), 300.0,
-			{"radius": 3.0, "damage": 3.0, "look": "needle", "color": Color(0.85, 1.0, 0.45), "life": 4.0})
-		needle.homing = 1.3
+			{"radius": 3.0, "damage": 6.0, "look": "needle", "color": Color(0.85, 1.0, 0.45), "life": 4.0})
+		needle.homing = 1.5
 	world.emit("needle_volley", {"from": origin})
 	world.emit("sound", {"name": "dive"})

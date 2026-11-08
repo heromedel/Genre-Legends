@@ -63,10 +63,22 @@ func _apply_difficulty() -> void:
 	var difficulty: float = node.get("difficulty", 1.0)
 	var modifier: Dictionary = MissionData.MODIFIERS.get(node.get("modifier", ""), {})
 	var threat: Dictionary = MissionData.THREAT.get(node.get("threat", "standard"), MissionData.THREAT["standard"])
-	world.enemy_hp_scale = (1.0 + 0.55 * (difficulty - 1.0)) * modifier.get("enemy_hp", 1.0) * threat["enemy_hp"]
-	world.enemy_damage_scale = (1.0 + 0.22 * (difficulty - 1.0)) * threat["damage"]
-	world.bullet_speed_scale = (0.95 + 0.08 * (difficulty - 1.0)) * modifier.get("bullet_speed", 1.0) * threat["bullet_speed"]
-	world.enemy_fire_scale = (1.0 + 0.1 * (difficulty - 1.0)) * threat["fire"]
+	# The first region is hand-set (GDD 9A); past it, a formula grows from the gate's level.
+	var base := {"enemy_hp": 1.0 + 0.55 * (difficulty - 1.0), "damage": 1.0 + 0.22 * (difficulty - 1.0),
+		"fire": 1.0 + 0.1 * (difficulty - 1.0), "bullet_speed": 0.95 + 0.08 * (difficulty - 1.0)}
+	var column: int = node.get("baseline", -1)
+	if column >= 0:
+		base = MissionData.FIRST_REGION_BASELINE[mini(column, MissionData.FIRST_REGION_BASELINE.size() - 1)].duplicate()
+	if node.get("hazard", false):
+		for key in base:
+			base[key] *= MissionData.HAZARD[key]
+	var genre: Dictionary = MissionData.TYPE_DIFFICULTY.get(node["type"], {})
+	base["damage"] *= genre.get("damage", 1.0)
+	base["fire"] *= genre.get("fire", 1.0)
+	world.enemy_hp_scale = base["enemy_hp"] * modifier.get("enemy_hp", 1.0) * threat["enemy_hp"]
+	world.enemy_damage_scale = base["damage"] * threat["damage"]
+	world.bullet_speed_scale = base["bullet_speed"] * modifier.get("bullet_speed", 1.0) * threat["bullet_speed"]
+	world.enemy_fire_scale = base["fire"] * threat["fire"]
 	world.spawn_scale = modifier.get("spawn", 1.0)
 	world.xp_scale = modifier.get("xp", 1.0)
 	world.crate_chance = 0.35 * modifier.get("crates", 1.0)
@@ -131,6 +143,8 @@ func step(input: InputFrame) -> void:
 ## One tick of play: move, fire, run the stage and enemies, then shots, blades, zones and pickups.
 func _update_world(input: InputFrame, player_active: bool) -> void:
 	world.refresh_resonance()
+	for element in world.resonance:
+		run.max_resonance = maxi(run.max_resonance, int(world.resonance[element]))
 	if player_active and player.alive:
 		player.move(input, DT, 1.0 + 0.15 * run.field_count("overclocked_servos"))
 		_keep_player_in_bounds()
@@ -274,6 +288,9 @@ func _on_collect(kind: String, value: float, tech: String) -> void:
 
 
 func _on_player_hurt(amount: float, source: String) -> void:
+	run.min_armor_fraction = minf(run.min_armor_fraction, player.armor_fraction())
+	if stage.active_boss() != null:
+		run.boss_hits += 1
 	if player.armor_fraction() < 0.25:
 		world.emit("low_armor", {})
 
@@ -310,14 +327,15 @@ func results(first_clear: bool) -> Dictionary:
 	var blueprints := {}
 	for tech_id in run.blueprints:
 		blueprints[tech_id] = run.blueprints[tech_id] if won else int(run.blueprints[tech_id] / 2)
-	if won:
-		var reward: String = node.get("reward_tech", "")
-		var amount := 2 + (2 if first_clear else 0)
-		var modifier: Dictionary = MissionData.MODIFIERS.get(node.get("modifier", ""), {})
-		var threat: Dictionary = MissionData.THREAT.get(node.get("threat", "standard"), MissionData.THREAT["standard"])
-		amount = int(amount * modifier.get("blueprints", 1.0) * threat["blueprints"])
-		if reward != "":
-			blueprints[reward] = int(blueprints.get(reward, 0)) + amount
+	# The planet's reward: all of it for a win, and a share by how far you got for a loss (GDD 9D).
+	var progress := 1.0 if won else stage.progress_fraction()
+	var reward: String = node.get("reward_tech", "")
+	var amount := 2 + (2 if first_clear else 0)
+	var modifier: Dictionary = MissionData.MODIFIERS.get(node.get("modifier", ""), {})
+	var threat: Dictionary = MissionData.THREAT.get(node.get("threat", "standard"), MissionData.THREAT["standard"])
+	amount = int(round(amount * progress * modifier.get("blueprints", 1.0) * threat["blueprints"] * float(node.get("reward_scale", 1.0))))
+	if reward != "" and amount > 0:
+		blueprints[reward] = int(blueprints.get(reward, 0)) + amount
 	return {
 		"won": won,
 		"seconds": world.time,
@@ -334,6 +352,17 @@ func results(first_clear: bool) -> Dictionary:
 		"stages": stages_played,
 		"forks": run.forks.duplicate(),
 		"fusions": run.fusions.duplicate(),
+		"progress": progress,
+		"kills_by_kind": run.kills_by_kind.duplicate(),
+		"max_resonance": run.max_resonance,
+		"is_gate": node.get("is_gate", false),
+		"armor_left": player.armor_fraction(),
+		"min_armor": run.min_armor_fraction,
+		"boss_untouched": stage.boss != null and stage.boss.defeated and run.boss_hits == 0,
+		"only_main": run.online_tech().size() <= 1,
+		"field": run.field.duplicate(),
+		"threat": node.get("threat", "standard"),
+		"secret_found": stage.get("secret_visited") == true,
 	}
 
 

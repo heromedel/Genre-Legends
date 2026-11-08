@@ -332,6 +332,8 @@ func _paint_bodies(ci: CanvasItem) -> void:
 			EnemyArt.draw(ci, enemy, time)
 	if mission.stage.boss != null and not mission.stage.boss.finished:
 		BossArt.draw(ci, mission.stage.boss, time)
+	if mission.stage.miniboss_active():
+		BossArt.draw(ci, mission.stage.miniboss, time)
 	_draw_halo_saws(ci)
 	var player := mission.player
 	if player.alive and mission.state != "lost":
@@ -371,6 +373,8 @@ func _paint_glow(ci: CanvasItem) -> void:
 			EnemyArt.draw_glow(ci, enemy)
 	if mission.stage.boss != null and not mission.stage.boss.finished:
 		BossArt.draw_glow(ci, mission.stage.boss, time)
+	if mission.stage.miniboss_active():
+		BossArt.draw_glow(ci, mission.stage.miniboss, time)
 	for pickup: Pickup in world.pickups:
 		if view.has_point(pickup.pos):
 			ShotArt.draw_pickup_glow(ci, pickup)

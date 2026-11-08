@@ -9,6 +9,7 @@ var form := "ship"              # the frame's form for this stage (GDD 5E)
 var camera_mode := "fixed"      # fixed: the whole field is on screen; follow: camera tracks the frame
 var boss: BossBase = null
 var boss_started := false
+var miniboss: BossBase = null       # a mid-stage fight (GDD 9B)
 
 
 func _init(owner: Mission) -> void:
@@ -54,6 +55,24 @@ func debug_skip_to_boss() -> void:
 	pass
 
 
+## How far through the stage the player got, 0..1, for partial rewards on a loss (GDD 9D).
+## Reaching the boss counts for most of it.
+func progress_fraction() -> float:
+	if boss != null:
+		return 0.8 + 0.2 * (1.0 - boss.hp_fraction())
+	return clampf(stage_progress(), 0.0, 1.0) * 0.75
+
+
+## Each stage's own measure of progress before its boss, 0..1.
+func stage_progress() -> float:
+	return 0.0
+
+
+## Debug: jump to just before the mini-boss.
+func debug_skip_to_miniboss() -> void:
+	pass
+
+
 ## Short text for the HUD: what to do right now.
 func objective_text() -> String:
 	return ""
@@ -67,6 +86,34 @@ func start_boss(new_boss: BossBase) -> void:
 	world.emit("boss_warning", {"name": boss.boss_name, "title": boss.title})
 	world.emit("sound", {"name": "warning"})
 	mission.note("Boss appeared: %s" % boss.boss_name)
+
+
+## Spawns a mid-stage mini-boss with a smaller warning.
+func start_miniboss(new_boss: BossBase) -> void:
+	miniboss = new_boss
+	miniboss.spawn()
+	world.emit("banner", {"text": "MINI-BOSS: %s" % miniboss.boss_name.to_upper(), "style": "red"})
+	world.emit("sound", {"name": "warning"})
+	mission.note("Mini-boss appeared: %s" % miniboss.boss_name)
+
+
+## True while a mini-boss is on the field.
+func miniboss_active() -> bool:
+	return miniboss != null and not miniboss.finished
+
+
+func update_miniboss(dt: float) -> void:
+	if miniboss != null and not miniboss.finished:
+		miniboss.update(dt)
+
+
+## The boss the HUD's health bar should show right now.
+func active_boss() -> BossBase:
+	if boss != null and not boss.finished:
+		return boss
+	if miniboss_active():
+		return miniboss
+	return null
 
 
 ## Picks an enemy kind from a weighted roster with the mission's rng.

@@ -23,6 +23,7 @@ var has_key := false
 var room_enemies: Array = []        # ids of enemies spawned for the current room
 var spawn_delay := 0.0
 var doors_closed := false
+var secret_visited := false
 
 const DIRECTIONS := {"n": Vector2i(0, -1), "s": Vector2i(0, 1), "w": Vector2i(-1, 0), "e": Vector2i(1, 0)}
 const OPPOSITE := {"n": "s", "s": "n", "w": "e", "e": "w"}
@@ -55,7 +56,7 @@ func room_rect(key: Vector2i) -> Rect2:
 # ---------------------------------------------------------------- generation
 
 func _generate() -> void:
-	var target := 9 + world.rng.randi_range(0, 2)
+	var target := 13 + world.rng.randi_range(0, 2)
 	rooms[Vector2i.ZERO] = _new_room(0)
 	var frontier := [Vector2i.ZERO]
 	var guard := 0
@@ -88,6 +89,10 @@ func _generate() -> void:
 	var plain := rooms.keys().filter(func(k): return rooms[k]["kind"] == "combat")
 	if plain.size() > 2:
 		rooms[plain[world.rng.randi() % plain.size()]]["kind"] = "shrine"
+	# The Mimic King's hall: a plain room about halfway down (GDD 9B mini-boss).
+	var halfway := rooms.keys().filter(func(k): return rooms[k]["kind"] == "combat" and rooms[k]["depth"] >= 2)
+	if not halfway.is_empty():
+		rooms[halfway[world.rng.randi() % halfway.size()]]["kind"] = "mimic_king"
 	_add_secret_room()
 
 
@@ -196,7 +201,7 @@ func _obstacles(rect: Rect2, room: Dictionary) -> Array:
 	if room["kind"] == "boss":
 		return [Rect2(c + Vector2(-380, -240) - block * 0.5, block), Rect2(c + Vector2(380, -240) - block * 0.5, block),
 			Rect2(c + Vector2(-380, 240) - block * 0.5, block), Rect2(c + Vector2(380, 240) - block * 0.5, block)]
-	if room["kind"] in ["treasure", "shrine", "key", "secret"] or room["depth"] == 0:
+	if room["kind"] in ["treasure", "shrine", "key", "secret", "mimic_king"] or room["depth"] == 0:
 		return []
 	match room["layout"]:
 		0:
@@ -235,6 +240,13 @@ func _enter_room() -> void:
 				_start_combat(room)
 			"boss":
 				_start_boss_room()
+			"mimic_king":
+				room["state"] = "active"
+				doors_closed = true
+				world.emit("doors", {"closed": true})
+				var king := MimicKing.new(world)
+				king.origin = room_rect(current).get_center() + Vector2(0, -120)
+				start_miniboss(king)
 			"treasure":
 				var pedestal := world.drop_pickup("pedestal", room_rect(current).get_center())
 				pedestal.vel = Vector2.ZERO
@@ -250,6 +262,8 @@ func _enter_room() -> void:
 				crate.anchored = true
 				room["state"] = "cleared"
 				world.emit("banner", {"text": "SHRINE", "style": "cyan"})
+	if current == secret_room:
+		secret_visited = true
 	if current == secret_room and first_visit:
 		world.emit("banner", {"text": "SECRET ROOM", "style": "gold"})
 	if room.has("secret_dir") and not secret_open and secret_wall_id < 0:
@@ -339,6 +353,7 @@ func step(dt: float) -> void:
 				if enemy != null and enemy.brain != "burrower":
 					enemy.hidden = false
 					world.emit("spawn_in", {"pos": enemy.pos})
+	update_miniboss(dt)
 	if boss != null:
 		boss.update(dt)
 	if secret_wall_id >= 0 and not secret_open and world.enemy_by_id(secret_wall_id) == null:
@@ -347,7 +362,9 @@ func step(dt: float) -> void:
 		world.emit("sound", {"name": "secret"})
 		_build_walls()
 	var room: Dictionary = rooms[current]
-	if room["state"] == "active" and boss == null and spawn_delay <= 0.0:
+	if room["kind"] == "mimic_king" and room["state"] == "active" and miniboss != null and miniboss.finished:
+		_room_cleared(room)
+	elif room["state"] == "active" and boss == null and room["kind"] != "mimic_king" and spawn_delay <= 0.0:
 		var alive := room_enemies.filter(func(id): return world.enemy_by_id(id) != null)
 		if alive.is_empty():
 			_room_cleared(room)
@@ -375,6 +392,21 @@ func debug_skip_to_boss() -> void:
 		enemy.dead = true
 	doors_closed = false
 	mission.player.pos = room_rect(boss_room).get_center() + Vector2(0, 260)
+
+
+func debug_skip_to_miniboss() -> void:
+	for key in rooms:
+		if rooms[key]["kind"] == "mimic_king":
+			mission.player.pos = room_rect(key).get_center() + Vector2(0, 250)
+			for enemy: Enemy in world.enemies:
+				enemy.dead = true
+			doors_closed = false
+			return
+
+
+func stage_progress() -> float:
+	var visited := rooms.values().filter(func(r): return r["visited"]).size()
+	return float(visited) / float(rooms.size())
 
 
 func on_key_collected() -> void:

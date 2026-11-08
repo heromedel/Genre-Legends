@@ -31,6 +31,8 @@ func setup() -> void:
 		roster["burrower"] = 8
 	elif need.find("war machine") >= 0:
 		roster["brute"] = 5
+	if mission.node.get("arrivals", []).has("centi_mech"):
+		roster["centi_mech"] = 3
 	_place_camps(start)
 	_place_rocks(start)
 	_place_loot()
@@ -87,6 +89,7 @@ func _place_loot() -> void:
 
 
 func step(dt: float) -> void:
+	update_miniboss(dt)
 	if boss != null:
 		boss.update(dt)
 	if mission.state != "play":
@@ -95,7 +98,9 @@ func step(dt: float) -> void:
 	if roam_timer <= 0.0 and boss == null:
 		roam_timer = world.rng.randf_range(4.0, 6.5) / world.spawn_scale
 		_spawn_roaming_pack()
-	if boss == null and objectives_left() == 0:
+	if miniboss == null and objectives_left() <= 2:
+		start_miniboss(BroodQueen.new(world))
+	if boss == null and objectives_left() == 0 and not miniboss_active():
 		mission.note("All hive nests destroyed")
 		start_boss(SiegeCrawler.new(world))
 
@@ -106,6 +111,9 @@ func _spawn_roaming_pack() -> void:
 	var angle := world.rng.randf() * TAU
 	var at := (mission.player.pos + Vector2.from_angle(angle) * world.rng.randf_range(720.0, 900.0)).clamp(Vector2(60, 60), WORLD_SIZE - Vector2(60, 60))
 	var kind := pick_from_roster(roster)
+	if kind == "centi_mech":
+		_spawn_centi_mech(at)
+		return
 	var count := 1 if kind == "brute" else world.rng.randi_range(3, 5)
 	for i in count:
 		var enemy := world.spawn_enemy(kind, at + Vector2(world.rng.randf_range(-60, 60), world.rng.randf_range(-60, 60)))
@@ -120,6 +128,27 @@ func debug_skip_to_boss() -> void:
 			nest.dead = true
 
 
+func debug_skip_to_miniboss() -> void:
+	for i in 2:
+		var nest := world.enemy_by_id(objective_ids[i])
+		if nest != null:
+			nest.dead = true
+
+
+func stage_progress() -> float:
+	return 1.0 - float(objectives_left()) / float(maxi(objective_ids.size(), 1))
+
+
+func _spawn_centi_mech(at: Vector2) -> void:
+	var leader := world.spawn_enemy("centi_mech", at)
+	leader.memory["awake"] = true
+	for i in 7:
+		var segment := world.spawn_enemy("centi_segment", at - Vector2(20.0 * (i + 1), 0))
+		segment.memory["leader"] = leader.id
+		segment.memory["awake"] = true
+		leader = segment
+
+
 func objectives_left() -> int:
 	var left := 0
 	for nest_id in objective_ids:
@@ -132,6 +161,8 @@ func objectives_left() -> int:
 func objective_positions() -> Array:
 	if boss != null and not boss.defeated:
 		return [boss.origin]
+	if miniboss_active():
+		return [miniboss.origin]
 	var positions := []
 	for nest_id in objective_ids:
 		var nest := world.enemy_by_id(nest_id)
@@ -147,4 +178,6 @@ func is_cleared() -> bool:
 func objective_text() -> String:
 	if boss != null:
 		return "Destroy the %s" % boss.boss_name
+	if miniboss_active():
+		return "Kill the %s" % miniboss.boss_name
 	return "Hive nests: %d left" % objectives_left()

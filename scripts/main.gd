@@ -3,6 +3,7 @@ extends Node
 ## results and bank the rewards; back to the command center. Everything else is a step this calls.
 
 var star_map: StarMap
+var _debug_options := {}
 var screen: Node = null
 var ui_layer: CanvasLayer
 
@@ -34,6 +35,7 @@ func show_hub(page: String) -> void:
 func launch_mission(node_id: String) -> void:
 	var node := _test_node(node_id.trim_prefix("test:")) if node_id.begins_with("test:") else star_map.get_node(node_id).duplicate(true)
 	node["threat"] = Save.setting("threat")
+	node["arrivals"] = Save.data["enemies_unlocked"].duplicate()
 	var first_clear := not Save.is_cleared(node_id)
 	var mission_seed := randi()
 	var mission := Mission.new(node, mission_seed, Save.data["frame"], Save.data["loadout"], Save.tech_mk)
@@ -72,6 +74,9 @@ func finish_mission(node_id: String, result: Dictionary) -> void:
 		var need := TechData.blueprints_for_next_mk(mk)
 		if need > 0 and Save.blueprints(tech_id) >= need:
 			hints.append("%s can be %s in R&D." % [TechData.TECH[tech_id]["name"], "unlocked" if mk == 0 else "upgraded to Mk %d" % (mk + 1)])
+	var earned := [] if is_test else Milestones.record_mission(result)
+	for milestone in earned:
+		hints.append("Milestone: %s. %s" % [milestone["name"], Milestones.reward_text(milestone)])
 	Save.write()
 	star_map.ensure_generated(Save.is_cleared)
 	var results := ResultsScreen.new(result, hints)
@@ -95,6 +100,7 @@ func _debug_launch() -> bool:
 	for pair in raw.split(" ", false):
 		var parts := pair.split("=")
 		options[parts[0]] = parts[1] if parts.size() > 1 else "1"
+	_debug_options = options
 	if options.is_empty():
 		return false
 	PlayLog.note("debug", "Debug launch: %s" % str(options))
@@ -116,6 +122,10 @@ func _debug_launch() -> bool:
 			view.mission.debug_power_up(options["power"])
 		if options.has("boss"):
 			view.mission.stage.debug_skip_to_boss()
+		if options.has("miniboss"):
+			view.mission.stage.debug_skip_to_miniboss()
+		if options.has("offer"):
+			view.mission.open_offer("level_up", 3)
 		return true
 	if options.has("page"):
 		show_hub(options["page"])
@@ -123,9 +133,10 @@ func _debug_launch() -> bool:
 	return false
 
 
-## A stand-in planet for the debug console's "test" command.
+## A stand-in planet for the debug console's "test" command. Debug launches can make it a lesson planet.
 func _test_node(mission_type: String) -> Dictionary:
-	return {"id": "test:" + mission_type, "name": "Test Range", "region": 0, "column": 2, "row": 0.0, "type": mission_type,
+	var lesson: String = _debug_options.get("lesson", "")
+	return {"lesson": lesson, "boss": "mirror_dreadnought" if lesson == "mirror" else "", "baseline": int(_debug_options.get("planet", "2")) - 1,"id": "test:" + mission_type, "name": "Test Range", "region": 0, "column": 2, "row": 0.0, "type": mission_type,
 		"need": MissionData.NEEDS[mission_type][0], "difficulty": 1.0, "danger": 1, "modifier": "", "reward_tech": "arc_blade",
 		"is_gate": false, "branch": "", "prize": "", "prize_text": "", "links": [], "incoming": [], "planet_look": 5}
 

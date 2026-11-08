@@ -53,6 +53,15 @@ const ENEMIES := {
 		"brain": "chaser", "look": "gloop", "color": Color(0.55, 1.0, 0.6)},
 	"knight": {"name": "Hollow Knight-Drone", "hp": 110, "radius": 19, "speed": 105, "contact": 18, "xp": 4,
 		"brain": "knight", "look": "knight", "color": Color(0.85, 0.75, 0.6), "front_shield": true},
+	# ---- Milestone arrivals (GDD 9D): they join the galaxy once announced.
+	"cluster_drone": {"name": "Cluster Drone", "hp": 44, "radius": 17, "speed": 110, "contact": 12, "xp": 3,
+		"brain": "drifter", "look": "cluster_drone", "color": Color(1.0, 0.55, 0.85), "splits_into": "drone_shard", "split_count": 4},
+	"drone_shard": {"name": "Drone Shard", "hp": 8, "radius": 8, "speed": 240, "contact": 8, "xp": 1,
+		"brain": "homer", "look": "drone_shard", "color": Color(1.0, 0.6, 0.9)},
+	"centi_mech": {"name": "Centi-Mech", "hp": 70, "radius": 18, "speed": 150, "contact": 14, "xp": 3,
+		"brain": "centi", "look": "centi_head", "color": Color(1.0, 0.7, 0.35)},
+	"centi_segment": {"name": "Centi-Mech Segment", "hp": 40, "radius": 15, "speed": 150, "contact": 12, "xp": 1,
+		"brain": "centi", "look": "centi_segment", "color": Color(0.95, 0.6, 0.3), "front_shield": false},
 	"cracked_wall": {"name": "Cracked Wall", "hp": 50, "radius": 30, "speed": 0, "contact": 0, "xp": 0,
 		"brain": "inert", "look": "cracked_wall", "color": Color(0.7, 0.65, 0.6)},
 	# ---- Boss parts are spawned by boss scripts, not rosters.

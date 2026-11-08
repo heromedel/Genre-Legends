@@ -10,6 +10,10 @@ static func draw(ci: CanvasItem, boss: BossBase, time: float) -> void:
 		"siege_crawler": _siege_crawler(ci, boss, time)
 		"hollow_king": _hollow_king(ci, boss, time)
 		"mirror_dreadnought": _mirror_dreadnought(ci, boss, time)
+		"twin_aces": _twin_aces(ci, boss, time)
+		"turret_fortress": _turret_fortress(ci, boss, time)
+		"brood_queen": _brood_queen(ci, boss, time)
+		"mimic_king": _mimic_king(ci, boss, time)
 
 
 static func draw_glow(ci: CanvasItem, boss: BossBase, time: float) -> void:
@@ -203,3 +207,87 @@ static func _mirror_dreadnought(ci: CanvasItem, boss: BossBase, time: float) -> 
 		var lit := Color(0.6, 0.9, 1.0) if not core.invulnerable else Color(0.3, 0.4, 0.5)
 		ci.draw_circle(core.pos, 24.0 + sin(time * 5.0) * 3.0, lit)
 		ci.draw_circle(core.pos, 10.0, Color(1, 1, 1))
+
+
+static func _twin_aces(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	for ace: Enemy in boss.living_parts("ace"):
+		var red := ace.part == "ace0"
+		var body := Color(1, 0.35, 0.45) if red else Color(0.45, 0.6, 1.0)
+		ci.draw_set_transform(ace.pos, PI * 0.5, Vector2(1.6, 1.6))
+		Art.shape(ci, PackedVector2Array([Vector2(24, 0), Vector2(0, -7), Vector2(-14, -24), Vector2(-8, 0), Vector2(-14, 24), Vector2(0, 7)]),
+			_flash(ace, body.darkened(0.5)), body, 2.0)
+		ci.draw_line(Vector2(-6, 0), Vector2(16, 0), Color(1, 1, 1), 2.0)
+		ci.draw_circle(Vector2(6, 0), 3.0, Color(1, 1, 0.9))
+		ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		for i in 4:
+			ci.draw_circle(ace.pos - Vector2(0, 14 + i * 9), 4.0 - i * 0.8, Art.with_alpha(body, 0.5 - i * 0.1))
+
+
+static func _turret_fortress(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var o := boss.origin
+	var wall := Rect2(o + Vector2(-420, -50), Vector2(840, 90))
+	ci.draw_rect(wall, Color(0.2, 0.17, 0.14))
+	ci.draw_rect(wall, Color(1, 0.65, 0.3), false, 3.0)
+	for i in 14:
+		var x := wall.position.x + 20 + i * 58
+		ci.draw_line(Vector2(x, wall.position.y + 6), Vector2(x + 20, wall.end.y - 6), Color(1, 0.75, 0.2, 0.55), 6.0)
+	for i in 3:
+		var turret := boss.part_named("turret%d" % i)
+		if turret == null or turret.dead:
+			continue
+		ci.draw_circle(turret.pos, 22.0, _flash(turret, Color(0.35, 0.25, 0.15)))
+		ci.draw_arc(turret.pos, 22.0, 0, TAU, 20, Color(1, 0.7, 0.35), 2.5, true)
+		ci.draw_line(turret.pos, turret.pos + Vector2.from_angle(turret.facing) * 32.0, Color(1, 0.8, 0.5), 8.0)
+	var core := boss.part_named("core")
+	if core != null and not core.dead:
+		var open := 0.0 if core.invulnerable else 1.0
+		ci.draw_circle(core.pos, 30.0, _flash(core, Color(0.3, 0.1, 0.05)))
+		ci.draw_circle(core.pos, 18.0 + sin(time * 6.0) * 2.0, Color(1, 0.5, 0.25) if open > 0.0 else Color(0.5, 0.35, 0.2))
+		for side in [-1.0, 1.0]:
+			ci.draw_rect(Rect2(core.pos + Vector2(side * (6 + 34 * open) - 16, -30), Vector2(32, 60)), Color(0.45, 0.35, 0.25))
+
+
+static func _brood_queen(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var o := boss.origin
+	var facing := (boss.world.player.pos - o).angle()
+	ci.draw_set_transform(o, facing, Vector2.ONE)
+	for leg in 4:
+		for side in [-1.0, 1.0]:
+			var swing := sin(time * 6.0 + leg) * 8.0
+			ci.draw_polyline(PackedVector2Array([Vector2(-30 + leg * 20, 20 * side), Vector2(-26 + leg * 22 + swing, 54 * side), Vector2(-40 + leg * 22, 76 * side)]), Color(0.45, 0.6, 0.25), 5.0, true)
+	Art.shape(ci, Art.scaled(Art.ngon(14, 46), Vector2(1.4, 0.9)), Color(0.18, 0.28, 0.1), Color(0.75, 1.0, 0.4), 3.0)
+	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	for sac: Enemy in boss.living_parts("sac"):
+		var pulse := 1.0 + sin(time * 4.0 + sac.id) * 0.08
+		ci.draw_circle(sac.pos, 26.0 * pulse, _flash(sac, Color(0.55, 0.85, 0.3, 0.9)))
+		for e in 5:
+			ci.draw_circle(sac.pos + Vector2.from_angle(e * 1.3) * 12.0, 4.0, Color(0.9, 1.0, 0.6))
+	var core := boss.part_named("core")
+	if core != null and not core.dead:
+		ci.draw_circle(core.pos, 28.0, _flash(core, Color(0.25, 0.35, 0.1)))
+		for side in [-1.0, 1.0]:
+			ci.draw_circle(core.pos + Vector2.from_angle(facing + side * 0.5) * 14.0, 5.0, Color(1, 0.25, 0.2) if not core.invulnerable else Color(0.5, 0.3, 0.3))
+		if core.invulnerable:
+			ci.draw_arc(core.pos, 34.0, 0, TAU, 24, Color(0.75, 1.0, 0.4, 0.6), 3.0, true)
+
+
+static func _mimic_king(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var core := boss.part_named("core")
+	if core == null or core.dead:
+		return
+	var hop: float = core.memory.get("hop", 0.0)
+	var lift := sin(clampf(hop / 0.55, 0.0, 1.0) * PI) * 24.0 if hop < 0.55 else 0.0
+	ci.draw_circle(core.pos + Vector2(0, 30), 46.0, Color(0, 0, 0, 0.3))
+	ci.draw_set_transform(core.pos - Vector2(0, lift), 0.0, Vector2(2.6, 2.6))
+	var wood := Color(0.55, 0.32, 0.14) if core.flash <= 0.0 else Color.WHITE
+	var open := 0.4 + absf(sin(time * 5.0)) * 0.6
+	Art.shape(ci, PackedVector2Array([Vector2(-16, 0), Vector2(16, 0), Vector2(16, 14), Vector2(-16, 14)]), wood, Art.GOLD, 1.5)
+	Art.shape(ci, PackedVector2Array([Vector2(-16, -2), Vector2(-13, -10 - 10 * open), Vector2(13, -10 - 10 * open), Vector2(16, -2)]), wood.lightened(0.1), Art.GOLD, 1.5)
+	ci.draw_rect(Rect2(Vector2(-14, -4 - 8 * open), Vector2(28, 6 + 6 * open)), Color(0.3, 0.02, 0.05))
+	for i in 6:
+		var x := -12.0 + i * 5.0
+		ci.draw_colored_polygon(PackedVector2Array([Vector2(x, -2), Vector2(x + 2, 3), Vector2(x + 4, -2)]), Color(1, 1, 0.95))
+	# The crown.
+	ci.draw_colored_polygon(PackedVector2Array([Vector2(-10, -12 - 10 * open), Vector2(-8, -20 - 10 * open), Vector2(-4, -15 - 10 * open), Vector2(0, -22 - 10 * open),
+		Vector2(4, -15 - 10 * open), Vector2(8, -20 - 10 * open), Vector2(10, -12 - 10 * open)]), Art.GOLD)
+	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

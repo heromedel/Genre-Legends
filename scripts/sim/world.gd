@@ -287,6 +287,8 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 		return
 	enemy.dead = true
 	run.kills += 1
+	if enemy.boss == null:
+		run.kills_by_kind[enemy.kind] = int(run.kills_by_kind.get(enemy.kind, 0)) + 1
 	var size := enemy.radius * (2.4 if enemy.elite else 1.6)
 	emit("explosion", {"pos": enemy.pos, "size": size, "color": enemy.color})
 	emit("sound", {"name": "explode_big" if enemy.radius > 22 or enemy.elite else "explode"})
@@ -305,10 +307,12 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 		drop_pickup("blueprint", enemy.pos, 1.0, elite_blueprint_tech)
 	var data := EnemyData.get_enemy(enemy.kind)
 	if data.has("splits_into"):
-		for i in 2:
-			var child := spawn_enemy(data["splits_into"], enemy.pos + Vector2(-14 + 28 * i, 0))
+		var pieces: int = data.get("split_count", 2)
+		for i in pieces:
+			var child := spawn_enemy(data["splits_into"], enemy.pos + Vector2.from_angle(TAU * i / pieces) * 16.0)
 			child.memory["no_formation"] = true
-			child.vel = Vector2(-120 + 240 * i, -60)
+			child.memory["awake"] = true
+			child.vel = Vector2.from_angle(TAU * i / pieces) * 160.0
 			child.room = enemy.room
 	if tech != "resonance" and resonance["explosive"] >= 1 and rng.randf() < 0.25:
 		explode(enemy.pos, 70.0, 22.0 + 6.0 * resonance["explosive"], "resonance", Color(1.0, 0.55, 0.25))

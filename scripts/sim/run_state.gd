@@ -27,6 +27,10 @@ var damage_taken := 0.0
 var blueprints := {}            # tech id -> blueprints picked up this mission
 var crates_opened := 0
 var shards_missed := 0
+var kills_by_kind := {}         # for milestones (GDD 9D)
+var boss_hits := 0              # hits taken while a boss is on the field
+var min_armor_fraction := 1.0
+var max_resonance := 0
 var hits_taken := 0
 
 

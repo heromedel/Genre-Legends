@@ -25,21 +25,30 @@ func setup() -> void:
 	world.bounds = FIELD
 	world.shot_bounds = FIELD.grow(120)
 	mission.player.pos = Vector2(FIELD.get_center().x, FIELD.end.y - 110)
-	wave_plan = ["formation", "wasps", "formation_splitters", "bulwarks", "minelayers", "formation", "formation_ace", "wasps", "bulwarks", "finale"]
+	# About five minutes (GDD 9B): sixteen waves with a mini-boss in the middle.
+	wave_plan = ["formation", "wasps", "formation_splitters", "bulwarks", "minelayers", "formation", "wasps", "formation_ace",
+		"miniboss", "formation_splitters", "bulwarks", "minelayers", "formation", "wasps", "formation_ace", "finale"]
 	if world.gentle:
-		wave_plan = ["formation", "wasps", "formation_splitters", "formation", "minelayers", "wasps", "formation_ace", "finale"]
+		wave_plan = ["formation", "wasps", "formation", "formation_splitters", "minelayers", "wasps", "formation",
+			"miniboss", "formation_splitters", "wasps", "formation_ace", "finale"]
+	# Cluster Drones, once they've arrived in the galaxy, take over some of the wasp waves.
+	if mission.node.get("arrivals", []).has("cluster_drone"):
+		for i in wave_plan.size():
+			if wave_plan[i] == "wasps" and i % 2 == 0:
+				wave_plan[i] = "cluster_drones"
 
 
 func step(dt: float) -> void:
 	scroll += dt * (60.0 if boss == null else 30.0)
 	_release_queue()
+	update_miniboss(dt)
 	if boss != null:
 		boss.update(dt)
 		return
 	if mission.state != "play":
 		return
 	var alive := world.enemies.filter(func(e): return e.brain != "barge").size()
-	var wave_done := spawn_queue.is_empty() and (alive <= 2 or world.time - wave_started_at > WAVE_TIMEOUT)
+	var wave_done := spawn_queue.is_empty() and not miniboss_active() and (alive <= 2 or world.time - wave_started_at > WAVE_TIMEOUT)
 	if wave_index < 0 or wave_done:
 		if wave_index + 1 < wave_plan.size():
 			wave_index += 1
@@ -61,6 +70,17 @@ func debug_skip_to_boss() -> void:
 	wave_index = wave_plan.size() - 1
 
 
+func debug_skip_to_miniboss() -> void:
+	spawn_queue.clear()
+	for enemy: Enemy in world.enemies:
+		enemy.dead = true
+	wave_index = wave_plan.find("miniboss") - 1
+
+
+func stage_progress() -> float:
+	return float(maxi(wave_index, 0)) / float(wave_plan.size())
+
+
 func is_cleared() -> bool:
 	return boss != null and boss.finished
 
@@ -68,6 +88,8 @@ func is_cleared() -> bool:
 func objective_text() -> String:
 	if boss != null:
 		return "Destroy the %s" % boss.boss_name
+	if miniboss_active():
+		return "Shoot down the %s" % miniboss.boss_name
 	return "Wave %d / %d" % [maxi(wave_index + 1, 1), wave_plan.size()]
 
 
@@ -92,6 +114,11 @@ func _start_wave(wave: String) -> void:
 	world.emit("wave", {"index": wave_index + 1, "total": wave_plan.size()})
 	var density := world.spawn_scale
 	match wave:
+		"miniboss":
+			start_miniboss(TwinAces.new(world))
+		"cluster_drones":
+			for i in int(5 * density):
+				_queue(i * 0.7, "cluster_drone", Vector2(world.rng.randf_range(200, 1000), -40))
 		"formation":
 			_formation(2, 7, "dart", density)
 		"wasps":

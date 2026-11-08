@@ -80,7 +80,7 @@ func _build_rail() -> Control:
 	column.add_child(UiKit.spacer(6))
 	column.add_child(logo)
 	column.add_child(UiKit.spacer(8))
-	for entry in [["map", "map", "STAR MAP"], ["hangar", "hangar", "HANGAR"], ["rnd", "lab", "R&D"], ["settings", "settings", "SETTINGS"]]:
+	for entry in [["map", "map", "STAR MAP"], ["hangar", "hangar", "HANGAR"], ["rnd", "lab", "R&D"], ["records", "prize", "RECORDS"], ["settings", "settings", "SETTINGS"]]:
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(96, 84)
 		button.focus_mode = Control.FOCUS_NONE
@@ -147,6 +147,7 @@ func _rebuild() -> void:
 		"hangar": content.add_child(_build_hangar_page())
 		"rnd": content.add_child(_build_rnd_page())
 		"settings": content.add_child(_build_settings_page())
+		"records": content.add_child(_build_records_page())
 
 
 # ---------------------------------------------------------------- star map
@@ -226,6 +227,12 @@ func _fill_info(node_id: String) -> void:
 	type_row.add_child(type_text)
 	_info.add_child(type_row)
 	_info.add_child(UiKit.wrapped(node["need"], 16, Color(0.85, 0.9, 1.0)))
+	if node.get("hazard", false):
+		_info.add_child(UiKit.label("HAZARD ROUTE", 17, Color(1, 0.4, 0.4), "bold"))
+		_info.add_child(UiKit.wrapped("Much harder than its neighbours, and pays double blueprints. Optional.", 14, Color(1, 0.75, 0.7)))
+	_info.add_child(UiKit.label("You'll face", 14, Color(0.6, 0.7, 0.85)))
+	for enemy_trait in MissionData.traits_for(node, Save.data["enemies_unlocked"]):
+		_info.add_child(UiKit.wrapped("- " + enemy_trait, 14, Color(1, 0.8, 0.6)))
 	var danger_row := HBoxContainer.new()
 	danger_row.add_child(UiKit.label("Danger", 15, Color(0.7, 0.8, 0.9)))
 	for i in 5:
@@ -487,6 +494,36 @@ func _rnd_card(tech_id: String) -> Control:
 	else:
 		column.add_child(UiKit.label("Maxed: Mk %d" % mk, 13, Art.GOLD, "bold"))
 	return card
+
+
+# ---------------------------------------------------------------- records
+
+## Milestones (GDD 9D): what's been earned, what's still out there. Hidden ones stay "???" until earned.
+func _build_records_page() -> Control:
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 8)
+	scroll.add_child(column)
+	var earned: Dictionary = Save.data["milestones"]
+	column.add_child(UiKit.label("RECORDS  %d / %d" % [earned.size(), MilestoneData.MILESTONES.size()], 20, Color(0.6, 0.9, 1.0), "title"))
+	column.add_child(UiKit.wrapped("Milestones pay out whether a mission was won or lost. Some bring new enemies into the galaxy.", 15, Color(0.65, 0.75, 0.88)))
+	var counters: Dictionary = Save.data["counters"]
+	for milestone in MilestoneData.MILESTONES:
+		var done := earned.has(milestone["id"])
+		var hidden: bool = milestone.get("hidden", false) and not done
+		var row := UiKit.panel(Color(0.05, 0.1, 0.08) if done else Color(0.04, 0.06, 0.1), Art.GOLD if done else Color(0.2, 0.28, 0.38))
+		var text := VBoxContainer.new()
+		row.add_child(text)
+		text.add_child(UiKit.label(("DONE  " if done else "") + ("???" if hidden else milestone["name"]), 17, Art.GOLD if done else Color(1, 1, 1), "bold"))
+		text.add_child(UiKit.wrapped("A rare feat. Keep playing differently and you might stumble on it." if hidden else milestone["text"], 14, Color(0.72, 0.82, 0.92)))
+		if milestone.has("counter") and not done:
+			text.add_child(UiKit.label("%d / %d" % [int(counters.get(milestone["counter"], 0)), milestone["goal"]], 13, Color(0.5, 0.85, 1.0)))
+		if not hidden:
+			text.add_child(UiKit.label("Reward: " + Milestones.reward_text(milestone), 13, Color(0.6, 1.0, 0.7)))
+		column.add_child(row)
+	return scroll
 
 
 # ---------------------------------------------------------------- settings

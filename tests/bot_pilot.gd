@@ -11,6 +11,8 @@ var fork_preference := "a"
 var stuck_timer := 0.0
 var last_pos := Vector2.ZERO
 var wander := Vector2.ZERO
+## "average" plays like an average player: notices bullets later, sometimes freezes, picks cards loosely.
+var average := false
 
 
 func _init(target: Mission, bot_seed: int, prefer_fork: String = "a") -> void:
@@ -51,7 +53,7 @@ func next_input() -> InputFrame:
 		var nearest := world.nearest_enemy(player.pos, 400.0)
 		if nearest != null and nearest.pos.distance_to(player.pos) < 170.0:
 			direction += (player.pos - nearest.pos).normalized() * 0.8
-		var boss := mission.stage.boss
+		var boss := mission.stage.active_boss()
 		if boss != null and not boss.defeated and boss.origin.distance_to(player.pos) < 300.0:
 			direction += (player.pos - boss.origin).normalized() * 1.5
 		direction += dodge * 1.6
@@ -81,10 +83,16 @@ func next_input() -> InputFrame:
 func _dodge_vector() -> Vector2:
 	var player := mission.player
 	var push := Vector2.ZERO
+	var notice := 150.0
+	if average:
+		# Average players react late and now and then don't react at all.
+		notice = 85.0
+		if int(mission.tick / 20) % 4 == 0:
+			return Vector2.ZERO
 	for shot: Shot in mission.world.enemy_shots:
 		var offset := player.pos - shot.pos
 		var distance := offset.length()
-		if distance > 150.0 or distance < 0.01:
+		if distance > notice or distance < 0.01:
 			continue
 		var heading := shot.vel.normalized()
 		var closing := -offset.normalized().dot(heading)
@@ -118,8 +126,9 @@ func _ground_goal() -> Vector2:
 	var stage := mission.stage
 	var player := mission.player
 	if stage is PlanetStage:
-		if stage.boss != null and not stage.boss.defeated:
-			return stage.boss.origin + (player.pos - stage.boss.origin).normalized() * 330.0
+		var fighting := stage.active_boss()
+		if fighting != null and not fighting.defeated:
+			return fighting.origin + (player.pos - fighting.origin).normalized() * 330.0
 		var targets: Array = stage.objective_positions()
 		var best := player.pos
 		var best_distance := INF
@@ -146,6 +155,9 @@ func _dungeon_goal(stage: DungeonStage) -> Vector2:
 	if room["state"] == "active":
 		var target := mission.world.nearest_enemy(player.pos, 1500.0)
 		if target != null:
+			# No clear line of fire? Walk toward it; the wall-avoidance steers around the block.
+			if not _clear_line(player.pos, target.pos):
+				return target.pos
 			return target.pos + (player.pos - target.pos).normalized() * 230.0
 		for enemy: Enemy in mission.world.enemies:
 			if enemy.brain == "mimic" and enemy.state == 0:
@@ -170,6 +182,14 @@ func _dungeon_goal(stage: DungeonStage) -> Vector2:
 	var horizontal := direction == "e" or direction == "w"
 	var aligned := absf((player.pos.y - rect.get_center().y) if horizontal else (player.pos.x - rect.get_center().x)) < 40.0
 	return door if aligned else lineup
+
+
+func _clear_line(from: Vector2, to: Vector2) -> bool:
+	var steps := int(from.distance_to(to) / 20.0)
+	for i in range(1, steps):
+		if mission.world.point_in_wall(from.lerp(to, float(i) / steps)):
+			return false
+	return true
 
 
 func _next_room(stage: DungeonStage) -> Vector2i:
@@ -223,7 +243,7 @@ func _choose_card() -> int:
 			"fork": score = 5.0 if card["fork"] == fork_preference else 4.0
 			"upgrade": score = 3.0
 			"field": score = 4.5 if card["field"] == "field_repair" and mission.player.armor_fraction() < 0.5 else 2.0
-		score += rng.randf() * 0.5
+		score += rng.randf() * (4.0 if average else 0.5)
 		if score > best_score:
 			best_score = score
 			best = i

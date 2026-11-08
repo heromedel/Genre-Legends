@@ -113,7 +113,8 @@ func _draw() -> void:
 		draw_string(font_body, Vector2(x + 158, meter_y + 8), "HEAT", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(1, 0.6, 0.4))
 	# Objective, top centre.
 	var objective := mission.stage.objective_text()
-	if mission.stage.boss == null or mission.stage.boss.entering:
+	var shown_boss := mission.stage.active_boss()
+	if shown_boss == null or shown_boss.entering:
 		draw_string_outline(font_bold, Vector2(0, 30), objective.to_upper(), HORIZONTAL_ALIGNMENT_CENTER, screen.x, 20, 5, Color(0, 0, 0, 0.7))
 		draw_string(font_bold, Vector2(0, 30), objective.to_upper(), HORIZONTAL_ALIGNMENT_CENTER, screen.x, 20, Color(0.9, 0.95, 1.0))
 	else:
@@ -138,7 +139,7 @@ func _bar(at: Vector2, size: Vector2, fraction: float, color: Color, text: Strin
 
 
 func _draw_boss_bar(screen: Vector2) -> void:
-	var boss := mission.stage.boss
+	var boss := mission.stage.active_boss()
 	var width := minf(screen.x * 0.5, 560.0)
 	var at := Vector2((screen.x - width) * 0.5, 14)
 	draw_string_outline(font_title, at + Vector2(0, 16), boss.boss_name.to_upper(), HORIZONTAL_ALIGNMENT_CENTER, width, 16, 5, Color(0, 0, 0, 0.8))

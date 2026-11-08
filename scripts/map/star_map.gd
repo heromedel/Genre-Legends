@@ -162,6 +162,7 @@ func _make_node(rng: RandomNumberGenerator, node_id: String, region: int, column
 		"type": mission_type,
 		"need": needs[rng.randi() % needs.size()] if not is_gate else "The region gate. Break through to open the next region.",
 		"difficulty": 1.0 + 0.3 * region + 0.06 * local_column + (0.15 if is_gate else 0.0),
+		"baseline": local_column if region == 0 else -1,
 		"danger": clampi(1 + region + int(local_column >= 3) + int(is_gate), 1, 5),
 		"modifier": modifier,
 		"reward_tech": reward_choices[rng.randi() % reward_choices.size()],

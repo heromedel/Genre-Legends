@@ -6,7 +6,8 @@ extends Stage
 
 const FIELD := Rect2(0, 0, 1200, 800)
 const SCROLL_SPEED := 170.0
-const LENGTH := 11000.0             # pixels of corridor before the boss
+const LENGTH := 20000.0             # pixels of corridor before the boss (about five minutes, GDD 9B)
+const FORTRESS_AT := 9500.0          # where the mini-boss bulkhead blocks the trench
 const SEGMENT := 40.0               # wall collision is built from strips this tall
 
 var distance := 0.0                 # how far the corridor has scrolled
@@ -75,7 +76,8 @@ func _rebuild_walls() -> void:
 
 
 func step(dt: float) -> void:
-	var scroll := SCROLL_SPEED * dt * (0.6 if boss != null else 1.0)
+	# The trench stops while the bulkhead fortress blocks it.
+	var scroll := SCROLL_SPEED * dt * (0.6 if boss != null else (0.0 if miniboss_active() else 1.0))
 	distance += scroll
 	_rebuild_walls()
 	# Everything attached to the corridor scrolls with it.
@@ -87,10 +89,15 @@ func step(dt: float) -> void:
 	for pickup: Pickup in world.pickups:
 		pickup.pos.y += scroll * 0.5
 	_update_gates(dt, scroll)
+	update_miniboss(dt)
 	if boss != null:
 		boss.update(dt)
 		return
 	if mission.state != "play":
+		return
+	if miniboss == null and distance >= FORTRESS_AT:
+		start_miniboss(TurretFortress.new(world))
+	if miniboss_active():
 		return
 	if distance >= next_event and distance < LENGTH:
 		_spawn_event()
@@ -107,7 +114,7 @@ func after_player_moved() -> void:
 	if player.pos.x - player.radius <= left + 2.0 or player.pos.x + player.radius >= right - 2.0:
 		if scrape_timer <= 0.0:
 			scrape_timer = 0.35
-			world.damage_player(4.0, "wall scrape")
+			world.damage_player(2.5, "wall scrape")
 			world.emit("spark", {"pos": player.pos, "color": Color(1, 0.8, 0.5)})
 
 
@@ -165,6 +172,14 @@ func debug_skip_to_boss() -> void:
 		enemy.dead = true
 
 
+func debug_skip_to_miniboss() -> void:
+	distance = FORTRESS_AT - 60.0
+
+
+func stage_progress() -> float:
+	return distance / LENGTH
+
+
 func is_cleared() -> bool:
 	return boss != null and boss.finished
 
@@ -172,4 +187,6 @@ func is_cleared() -> bool:
 func objective_text() -> String:
 	if boss != null:
 		return "Destroy the %s" % boss.boss_name
+	if miniboss_active():
+		return "Break the %s" % miniboss.boss_name
 	return "Corridor %d%%" % int(clampf(distance / LENGTH, 0.0, 1.0) * 100.0)
