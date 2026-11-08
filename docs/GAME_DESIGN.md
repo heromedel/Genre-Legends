@@ -99,8 +99,9 @@
 
 ## 10. Setting & Lore
 
-- **10A. Likely (2026-11-08):** The subtitle is "Guardian of the Realms".
-- **10B. Likely (2026-11-08):** Star systems sit in star clusters, in regions of a galaxy. A realm is something else: a dimension, plane, demi-plane, pocket dimension, magic dungeon or anything like that. "Realm" is kept for those and never used for regions or clusters.
+- **10A. Decided (2026-11-08):** The subtitle is "Guardian of the Realms".
+- **10B. Decided (2026-11-08):** Star systems sit in star clusters, in regions of a galaxy. A realm is something else: a dimension, plane, demi-plane, pocket dimension, magic dungeon or anything like that.
+  - **Likely (2026-11-08):** The word "realm" is kept for those only, never used for regions or clusters.
 - **10C. Likely (2026-11-08):** Infall is at most a different realm or galaxy, not the same place. Tie-ins and nods are fine, and things can occasionally be borrowed.
 - **10D. Likely (2026-11-08):** Mawjig (from Infall: Materials Worth of Jigawatts) is explained in game as "A measurement of matter and energy used in advanced or physics bending technology."
 - **10E. Proposed (2026-11-08):** A regular Jig Drive isn't built to jump dimensions; a temporal variant might be. In Infall, rumours said an ancient relic, the Orb of Chulak (a Stargate SG-1 nod), could open a wormhole to another dimension.
@@ -121,3 +122,4 @@
 | 2026-11-08 | 5A–8D | Concept, mission types, equipment and co-op recorded from the original idea message and this session's discussion. |
 | 2026-11-08 | 9A–9H | Build 0.2 plan approved: intentional difficulty, five-minute stages, lesson planets, losses that still pay, radio officer, enemy traits, hard branches, strategic upgrades. |
 | 2026-11-08 | 10A–10E | Subtitle; what realms are; Infall as a separate realm with nods; how Mawjig is explained; how dimensions might be reached. |
+| 2026-11-08 | 10A, 10B | Subtitle and the meaning of realms set to Decided; keeping the word for realms only is Likely. |
