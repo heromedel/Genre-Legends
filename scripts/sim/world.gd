@@ -28,6 +28,7 @@ var enemy_shots: Array = []
 var pickups: Array = []
 var zones: Array = []
 var blades: Array = []          # Arc Blade sweeps in progress
+var wisps := 0                  # Soul Lantern: wisps circling the frame, each good for one bullet
 var allies: Array = []          # {pos, fire_timer, look}: things fighting on your side, like a turned clone
 var events: Array = []          # things that happened this tick, for art and sound
 
@@ -44,6 +45,9 @@ var spawn_scale := 1.0
 var xp_scale := 1.0
 var crate_chance := 0.35
 var elite_blueprint_tech := ""
+var elite_chance := 0.0          # chance an ordinary enemy spawns as an elite with a twist
+var elite_mods: Array = []       # which twists elites can have on this planet
+var reward_tech := ""            # the planet's blueprint tech; elites with a twist sometimes carry one
 var dark := false
 var gentle := false              # the first planet: slower, sparser enemy fire
 var enemy_fire_scale := 1.0      # how fast enemies and bosses cycle their attacks (danger and Threat)
@@ -94,8 +98,37 @@ func spawn_enemy(kind: String, at: Vector2, overrides: Dictionary = {}) -> Enemy
 	enemy.fire_timer = rng.randf_range(0.6, 1.8)
 	for key in overrides:
 		enemy.set(key, overrides[key])
+	if not overrides.has("elite"):
+		_maybe_promote(enemy, data)
 	enemies.append(enemy)
 	return enemy
+
+
+## Elites with a twist: tougher, worth more, and each one asks something different of your build.
+## Shielded: a barrier soaks damage first. Splitting: it breaks into two when destroyed.
+## Mirrored: straight shots bounce off it; it takes homing shots, blades, blasts and meteors.
+const ELITE_MIN_HP := 20
+const ELITE_EXCLUDED := ["boss_part", "cracked_wall", "supply_barge", "mimic", "hive_nest"]
+
+
+func _maybe_promote(enemy: Enemy, data: Dictionary) -> void:
+	if elite_chance <= 0.0 or enemy.elite or enemy.objective or elite_mods.is_empty():
+		return
+	if int(data["hp"]) < ELITE_MIN_HP or ELITE_EXCLUDED.has(enemy.kind):
+		return
+	if rng.randf() >= elite_chance:
+		return
+	enemy.elite = true
+	enemy.elite_mod = elite_mods[rng.randi() % elite_mods.size()]
+	enemy.max_hp *= 2.2
+	enemy.hp = enemy.max_hp
+	enemy.radius *= 1.25
+	enemy.xp *= 3
+	match enemy.elite_mod:
+		"shielded":
+			enemy.shield_hp = enemy.max_hp * 0.6
+		"mirrored":
+			enemy.reflects = true
 
 
 ## Fires one enemy bullet. Damage and speed are scaled by the planet's danger.
@@ -256,6 +289,16 @@ func hurt_enemy(enemy: Enemy, amount: float, tech: String = "") -> bool:
 			amount *= 1.2
 		elif not from_resonance:
 			enemy.hex_marked = true
+	# A shielded elite's barrier soaks damage before its health does.
+	if enemy.shield_hp > 0.0:
+		var absorbed := minf(enemy.shield_hp, amount)
+		enemy.shield_hp -= absorbed
+		amount -= absorbed
+		enemy.flash = 0.1
+		if enemy.shield_hp <= 0.0:
+			emit("shield_break", {"pos": enemy.pos})
+		if amount <= 0.0:
+			return false
 	enemy.hp -= amount
 	enemy.flash = 0.1
 	run.damage_dealt += amount
@@ -310,6 +353,16 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 		drop_pickup("crate", enemy.pos)
 	if enemy.elite and elite_blueprint_tech != "":
 		drop_pickup("blueprint", enemy.pos, 1.0, elite_blueprint_tech)
+	elif enemy.elite_mod != "" and reward_tech != "" and rng.randf() < 0.3:
+		drop_pickup("blueprint", enemy.pos, 1.0, reward_tech)
+	if enemy.elite_mod == "splitting":
+		for side in [-1.0, 1.0]:
+			var half := spawn_enemy(enemy.kind, enemy.pos + Vector2(side * 18.0, 0), {"elite": false})
+			half.max_hp *= 0.6
+			half.hp = half.max_hp
+			half.memory["no_formation"] = true
+			half.memory["awake"] = true
+			half.vel = Vector2(side * 180.0, -40.0)
 	var data := EnemyData.get_enemy(enemy.kind)
 	if data.has("splits_into"):
 		var pieces: int = data.get("split_count", 2)
@@ -323,12 +376,28 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 		explode(enemy.pos, 70.0, 22.0 + 6.0 * resonance["explosive"], "resonance", Color(1.0, 0.55, 0.25))
 	if run.field_count("blood_pact") > 0:
 		player.repair(1.5)
+	if run.is_online("soul_lantern"):
+		wisps = mini(wisps + 1, max_wisps())
 	# Hexplosion fork, or Mawjig resonance II: hexed enemies burst and spread the hex.
 	if enemy.hex_marked and (run.fork_of("hex_repeater") == "a" or resonance["mawjig"] >= 2) and tech != "resonance":
 		explode(enemy.pos, 95.0, 34.0 * run.damage_multiplier("hex_repeater", player.armor_fraction()), "hex_repeater", Color(0.85, 0.45, 1.0), true)
 	var vampiric := run.field_count("vampiric_plating")
 	if vampiric > 0:
 		player.repair(0.7 * vampiric)
+
+
+## Soul Lantern's wisps: 1 + level of them (3 more with Lantern Ward), circling the frame.
+func max_wisps() -> int:
+	if not run.is_online("soul_lantern"):
+		return 0
+	return 1 + run.level_of("soul_lantern") + (3 if run.fork_of("soul_lantern") == "b" else 0)
+
+
+func wisp_positions() -> Array:
+	var positions := []
+	for i in wisps:
+		positions.append(player.pos + Vector2.from_angle(time * 2.6 + TAU * i / maxf(wisps, 1)) * 50.0)
+	return positions
 
 
 ## Allies fly in formation beside you and fire your main weapon's bolts forward (GDD 11E's turned clone).
@@ -479,8 +548,12 @@ func update_player_shots(dt: float) -> void:
 				if shot.homing > 0.0:
 					continue
 				shot.dead = true
-				enemy_shot(shot.pos, (player.pos - shot.pos).angle() + rng.randf_range(-0.2, 0.2), 320.0,
-					{"damage": 6.0, "radius": 5.0, "color": Color(1.0, 0.55, 0.85)})
+				# A mirrored elite throws back at most one shot every 0.4 s; the rest just glance off.
+				var ready := enemy.boss != null or time - float(enemy.memory.get("last_reflect", -9.0)) > 0.4
+				if ready:
+					enemy.memory["last_reflect"] = time
+					enemy_shot(shot.pos, (player.pos - shot.pos).angle() + rng.randf_range(-0.2, 0.2), 320.0,
+						{"damage": 6.0, "radius": 5.0, "color": Color(1.0, 0.55, 0.85)})
 				emit("spark", {"pos": shot.pos, "color": Color(0.85, 0.95, 1.0), "blocked": true})
 				break
 			if enemy.front_shield and _hits_front(enemy, shot) and shot.splash <= 0.0:
@@ -620,6 +693,8 @@ func update_enemy_shots(dt: float) -> void:
 	var graze_online := run.is_online("graze_engine") or run.field_count("adrenaline_junkie") > 0
 	var mirror_up := player.mirror_time > 0.0
 	var bastion := run.fork_of("mirror_aegis") == "b" and run.is_online("mirror_aegis")
+	var wisp_spots: Array = wisp_positions()
+	var ward := run.fork_of("soul_lantern") == "b"
 	for shot: Shot in enemy_shots:
 		if shot.dead:
 			continue
@@ -646,6 +721,21 @@ func update_enemy_shots(dt: float) -> void:
 		if not player.alive:
 			continue
 		var distance := shot.pos.distance_to(player.pos)
+		# Soul Lantern: a wisp swallows the bullet and is spent.
+		if wisps > 0 and distance < 80.0:
+			var swallowed := false
+			for spot: Vector2 in wisp_spots:
+				if shot.pos.distance_to(spot) < 14.0 + shot.radius:
+					swallowed = true
+					break
+			if swallowed:
+				shot.dead = true
+				wisps -= 1
+				wisp_spots = wisp_positions()
+				emit("spark", {"pos": shot.pos, "color": Color(0.85, 0.6, 1.0)})
+				if ward:
+					player.shield = minf(player.max_shield, player.shield + 3.0)
+				continue
 		if mirror_up and distance < MIRROR_RADIUS:
 			_mirror_reflect(shot)
 			continue

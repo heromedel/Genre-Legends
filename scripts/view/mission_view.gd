@@ -339,6 +339,7 @@ func _paint_bodies(ci: CanvasItem) -> void:
 	if mission.stage.miniboss_active():
 		BossArt.draw(ci, mission.stage.miniboss, time)
 	_draw_halo_saws(ci)
+	_draw_support_companions(ci)
 	for ally: Dictionary in world.allies:
 		BossArt.draw_hologram(ci, mission.run.frame_id, ally["pos"], mission.player.facing, time, false)
 	var player := mission.player
@@ -350,6 +351,25 @@ func _paint_bodies(ci: CanvasItem) -> void:
 			"resonance": _top_resonance()})
 	for shot: Shot in world.enemy_shots:
 		ShotArt.draw_enemy_shot(ci, shot, time)
+
+
+## Option Pods, Soul Lantern wisps and the Ion Cannon's beams: things that fly or fire beside the frame.
+func _draw_support_companions(ci: CanvasItem) -> void:
+	if mission.run.is_online("option_pods"):
+		for pod: Vector2 in mission.weapons.pod_positions:
+			ci.draw_circle(pod, 9.0, Color(1, 0.55, 0.2))
+			ci.draw_circle(pod, 5.0 + sin(time * 12.0), Color(1, 0.95, 0.7))
+	for wisp: Vector2 in mission.world.wisp_positions():
+		var lick := sin(time * 15.0 + wisp.x) * 2.0
+		ci.draw_colored_polygon(PackedVector2Array([wisp + Vector2(0, -12 + lick), wisp + Vector2(6, 2), wisp + Vector2(0, 7), wisp + Vector2(-6, 2)]), Color(0.8, 0.55, 1.0, 0.9))
+		ci.draw_circle(wisp + Vector2(0, 1), 3.0, Color(1, 0.9, 1.0))
+	for beam: Array in mission.weapons.ion_beams:
+		var from: Vector2 = beam[0]
+		var to := from + Vector2.from_angle(beam[1]) * 1500.0
+		var width: float = beam[2]
+		ci.draw_line(from, to, Color(0.4, 0.85, 1.0, 0.35), width * 1.6, true)
+		ci.draw_line(from, to, Color(0.6, 0.95, 1.0, 0.85), width * 0.8, true)
+		ci.draw_line(from, to, Color(1, 1, 1, 0.95), width * 0.3, true)
 
 
 func _draw_halo_saws(ci: CanvasItem) -> void:

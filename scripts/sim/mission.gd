@@ -88,6 +88,11 @@ func _apply_difficulty() -> void:
 	world.gentle = node.get("id", "") == "r0c0n0"
 	if modifier.get("elite_blueprints", false):
 		world.elite_blueprint_tech = node.get("reward_tech", "")
+	# Elites with a twist: none on the first planet, a few more each region, doubled by Bounty Hunters.
+	var region: int = node.get("region", 0)
+	world.elite_chance = 0.0 if world.gentle else (0.025 + 0.01 * region) * modifier.get("elites", 1.0)
+	world.elite_mods = ["shielded", "splitting"] + (["mirrored"] if region >= 1 else [])
+	world.reward_tech = node.get("reward_tech", "")
 
 
 ## Starts a stage. Also used for mid-mission hand-offs: the frame transforms to the new stage's form.

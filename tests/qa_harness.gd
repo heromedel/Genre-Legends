@@ -39,10 +39,10 @@ func _loadout_for(progress: String, run_index: int) -> Dictionary:
 				mk[tech_id] = 2 if progress == "mid" else 3
 			var mains := ["pulse_driver", "thunder_lance", "hex_repeater"]
 			var weapons := ["arc_blade", "swarm_pods", "orbital_halo", "starfall"]
-			var supports := ["mirror_aegis", "graze_engine", "overheat_core"]
-			var specials := ["nova_bomb", "time_brake"]
+			var supports := ["mirror_aegis", "graze_engine", "overheat_core", "option_pods", "soul_lantern"]
+			var specials := ["nova_bomb", "time_brake", "ion_cannon", "thruster_explosion"]
 			loadout = [mains[run_index % 3], weapons[run_index % 4], weapons[(run_index + 1) % 4],
-				supports[run_index % 3], specials[run_index % 2]]
+				supports[(run_index + (3 if progress == "max" else 0)) % 5], specials[(run_index + (2 if progress == "max" else 0)) % 4]]
 	return {"mk": mk, "loadout": loadout}
 
 

@@ -35,7 +35,15 @@ var special_cooldown := 0.0
 var special_charges := 1
 var time_brake := 0.0           # seconds of Time Brake left
 var echo_counter := 0
-var afterimages: Array = []     # recent positions, for the Tempest's afterimage and the trail art
+var afterimages: Array = []     # recent positions: the Tempest's afterimage, Option Pods' trail, the trail art
+var dash_time := 0.0            # Thruster Explosion: seconds of dash left
+var dash_dir := Vector2.ZERO
+var ion_time := 0.0             # Ion Cannon: seconds of beam left
+
+## Thruster Explosion's dash speed, in units per second.
+const DASH_SPEED := 1500.0
+## How many recent positions the trail keeps (Option Pods ride it, up to 36 ticks back).
+const TRAIL_LENGTH := 40
 
 
 func setup(frame: String, stage_form: String) -> void:
@@ -62,7 +70,12 @@ func armor_fraction() -> float:
 ## Moves the frame for one tick. Ship form follows finger drags; mech form walks with the stick.
 func move(input: InputFrame, dt: float, speed_multiplier: float) -> void:
 	var move_speed := speed * speed_multiplier
-	if form == "ship":
+	if dash_time > 0.0:
+		# Thruster Explosion: the dash carries you, whatever the stick says.
+		dash_time -= dt
+		vel = dash_dir * DASH_SPEED
+		pos += vel * dt
+	elif form == "ship":
 		var drag := input.drag.limit_length(SHIP_MAX_DRAG_PER_TICK * speed_multiplier)
 		vel = drag / dt + input.move * move_speed * 1.25
 		pos += drag + input.move * move_speed * 1.25 * dt
@@ -71,7 +84,7 @@ func move(input: InputFrame, dt: float, speed_multiplier: float) -> void:
 		vel = vel.lerp(target, clampf(dt * 14.0, 0.0, 1.0))
 		pos += vel * dt
 	afterimages.push_front(pos)
-	if afterimages.size() > 14:
+	if afterimages.size() > TRAIL_LENGTH:
 		afterimages.pop_back()
 
 
@@ -81,6 +94,7 @@ func tick_timers(dt: float, shield_regen_multiplier: float) -> void:
 	overdrive = maxf(overdrive - dt, 0.0)
 	mirror_time = maxf(mirror_time - dt, 0.0)
 	time_brake = maxf(time_brake - dt, 0.0)
+	ion_time = maxf(ion_time - dt, 0.0)
 	if shield_delay > 0.0:
 		shield_delay -= dt
 	elif shield < max_shield:

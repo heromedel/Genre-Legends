@@ -58,6 +58,26 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 			ci.draw_arc(c, s * 0.8, 0, TAU, 28, color, w, true)
 			ci.draw_line(c, p.call(0, -0.55), color, w * 1.2, true)
 			ci.draw_line(c, p.call(0.4, 0.15), color, w * 1.2, true)
+		"option_pods":
+			# A ship's nose with two glowing pods trailing it.
+			ci.draw_colored_polygon(PackedVector2Array([p.call(0, -0.85), p.call(0.3, -0.25), p.call(-0.3, -0.25)]), color)
+			ci.draw_circle(p.call(-0.45, 0.25), s * 0.22, color)
+			ci.draw_circle(p.call(0.45, 0.55), s * 0.22, color)
+		"soul_lantern":
+			# A lantern with a wisp flame inside.
+			ci.draw_rect(Rect2(p.call(-0.45, -0.45), Vector2(s * 0.9, s * 1.1)), Art.with_alpha(color, 0.25))
+			ci.draw_rect(Rect2(p.call(-0.45, -0.45), Vector2(s * 0.9, s * 1.1)), color, false, w)
+			ci.draw_line(p.call(0, -0.45), p.call(0, -0.8), color, w)
+			ci.draw_colored_polygon(PackedVector2Array([p.call(0, -0.25), p.call(0.22, 0.25), p.call(0, 0.45), p.call(-0.22, 0.25)]), color)
+		"ion_cannon":
+			# A cannon firing a wide beam.
+			ci.draw_rect(Rect2(p.call(-0.85, -0.25), Vector2(s * 0.6, s * 0.5)), color)
+			ci.draw_rect(Rect2(p.call(-0.2, -0.15), Vector2(s * 1.05, s * 0.3)), Art.with_alpha(color, 0.6))
+			ci.draw_line(p.call(-0.2, 0), p.call(0.85, 0), Color(1, 1, 1, 0.9), w)
+		"thruster_explosion":
+			# A blast behind a streaking arrowhead.
+			ci.draw_colored_polygon(PackedVector2Array([p.call(0.85, 0), p.call(0.1, -0.4), p.call(0.25, 0), p.call(0.1, 0.4)]), color)
+			Art.shape(ci, Transform2D(0.0, p.call(-0.45, 0)) * Art.star(7, s * 0.45, s * 0.2), Art.with_alpha(color, 0.5), color, w * 0.6)
 		# ---- mission types
 		"star_cluster":
 			for i in 3:

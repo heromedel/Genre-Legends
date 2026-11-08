@@ -151,5 +151,21 @@ static func _draw_shape(ci: CanvasItem, tech_id: String, fork: String, level: in
 			ci.draw_arc(Vector2.ZERO, 5.5, 0, TAU, 14, color, 1.4, true)
 			ci.draw_line(Vector2.ZERO, Vector2.from_angle(time * (0.5 if level > 0 else 0.0)) * 4.5, bright, 1.4, true)
 			ci.draw_line(Vector2.ZERO, Vector2(0, -3.5), bright, 1.2, true)
+		"option_pods":
+			# The pods' docking cradle: two empty sockets with a glow while they're out flying.
+			for y in [-3.5, 3.5]:
+				ci.draw_arc(Vector2(0, y), 3.0, 0, TAU, 8, color, 1.4, true)
+			ci.draw_line(Vector2(-5, 0), Vector2(4, 0), dark.lightened(0.3), 2.0, true)
+		"soul_lantern":
+			Art.shape(ci, PackedVector2Array([Vector2(-4, -4), Vector2(4, -4), Vector2(4, 4), Vector2(-4, 4)]), Art.with_alpha(color, 0.35), color, 1.2)
+			ci.draw_circle(Vector2.ZERO, 2.0 + 0.6 * sin(time * 7.0), bright)
+		"ion_cannon":
+			Art.shape(ci, PackedVector2Array([Vector2(-6, -3.5), Vector2(10, -2.5), Vector2(10, 2.5), Vector2(-6, 3.5)]), dark, color, 1.2)
+			ci.draw_circle(Vector2(10, 0), 2.2, bright)
+		"thruster_explosion":
+			# Twin booster bells that flare orange.
+			for y in [-3.0, 3.0]:
+				ci.draw_colored_polygon(PackedVector2Array([Vector2(-2, y - 1.5), Vector2(-8, y - 3.0), Vector2(-8, y + 3.0), Vector2(-2, y + 1.5)]), color)
+			ci.draw_circle(Vector2(-9, 0), 2.0 + sin(time * 20.0), Color(1, 0.7, 0.3))
 		_:
 			ci.draw_circle(Vector2.ZERO, 3.0, color)

@@ -18,6 +18,11 @@ var rage_timer := 0.0
 var railstorm_timer := 2.0
 var flare_cooldown := 0.0
 var doom_bell_timer := 8.0
+var pod_positions: Array = []   # Option Pods, where they are now (the view draws them here)
+var ion_beams: Array = []       # Ion Cannon beams this tick: [from, angle, width] (the view draws them)
+var wisp_dart_timer := 1.4      # Will-o'-Wisps: seconds until a wisp darts out
+var ion_tick := 0.0             # Ion Cannon damages in pulses, ten times a second
+var dash_blast_timer := 0.0     # Thruster Explosion: seconds until the next blast along the dash
 
 
 func _init(target_world: World) -> void:
@@ -36,6 +41,8 @@ func update(input: InputFrame, dt: float) -> void:
 		run.tech_timer[tech_id] = float(run.tech_timer.get(tech_id, 0.0)) - dt * (fire_rate if slot != "support" else 1.0)
 		_update_tech(tech_id, dt)
 	_update_special(input, dt)
+	_update_ion_beam(dt)
+	_update_dash(dt)
 	_update_overdrive(dt)
 	_update_resonance(dt)
 	if vent_echo > 0.0:
@@ -113,6 +120,8 @@ func _update_tech(tech_id: String, dt: float) -> void:
 		"mirror_aegis": _mirror_aegis()
 		"overheat_core": pass   # driven by main weapon volleys
 		"graze_engine": pass    # driven by World's graze callback
+		"option_pods": _option_pods(dt)
+		"soul_lantern": _soul_lantern()
 
 
 # ---------------------------------------------------------------- main weapons
@@ -120,6 +129,11 @@ func _update_tech(tech_id: String, dt: float) -> void:
 ## Called by every main weapon volley: heat, echoes and afterimages hang off the main weapon.
 func _main_volley(fire: Callable) -> void:
 	fire.call(player.pos, 1.0)
+	# Option Pods copy every volley from wherever they are.
+	if run.is_online("option_pods"):
+		var copy := (0.35 + 0.07 * run.level_of("option_pods")) * (1.3 if run.fork_of("option_pods") == "a" else 1.0)
+		for pod: Vector2 in pod_positions:
+			fire.call(pod, copy)
 	var echo := run.field_count("echo_chamber")
 	if echo > 0:
 		player.echo_counter += 1
@@ -438,6 +452,59 @@ func _update_resonance(dt: float) -> void:
 				world.emit("sound", {"name": "blink"})
 
 
+# ---------------------------------------------------------------- support: pods and wisps
+
+## Option Pods: two (three at level 4) ride your trail; Formation locks them beside you, Hunter Pods
+## break away to circle the nearest enemies.
+func _option_pods(dt: float) -> void:
+	var level := run.level_of("option_pods")
+	var count := 3 if level >= 4 else 2
+	var fork := run.fork_of("option_pods")
+	var targets := []
+	var taken := {}
+	for i in count:
+		var spot: Vector2 = player.afterimages[mini(12 * (i + 1), player.afterimages.size() - 1)] if not player.afterimages.is_empty() else player.pos
+		if fork == "a":
+			var side := Vector2.from_angle(player.facing + PI * 0.5)
+			spot = player.pos + side * (46.0 if i == 0 else -46.0) if i < 2 else player.pos - Vector2.from_angle(player.facing) * 40.0
+		elif fork == "b":
+			var prey := world.nearest_enemy(player.pos, 520.0, taken)
+			if prey != null:
+				taken[prey.id] = true
+				spot = prey.pos + Vector2.from_angle(world.time * 2.5 + i * PI) * 90.0
+		targets.append(spot)
+	while pod_positions.size() < count:
+		pod_positions.append(player.pos)
+	pod_positions.resize(count)
+	for i in count:
+		pod_positions[i] = (pod_positions[i] as Vector2).lerp(targets[i], minf(1.0, 10.0 * dt))
+
+
+## Soul Lantern: the wisps themselves live in World (they swallow bullets there); Will-o'-Wisps sends
+## one darting at an enemy every so often.
+func _soul_lantern() -> void:
+	if run.fork_of("soul_lantern") != "a" or world.wisps <= 0:
+		return
+	wisp_dart_timer -= World.DT
+	if wisp_dart_timer > 0.0:
+		return
+	wisp_dart_timer = 1.4
+	_launch_wisps(1)
+
+
+## Sends wisps out as homing spirits.
+func _launch_wisps(count: int) -> void:
+	var positions: Array = world.wisp_positions()
+	for i in mini(count, world.wisps):
+		var at: Vector2 = positions[i]
+		var spirit := world.player_shot(at, Vector2.from_angle(world.rng.randf() * TAU) * 260.0, _damage("soul_lantern", 30.0, 0.15), "soul_lantern", "orb", Color(0.85, 0.6, 1.0))
+		spirit.homing = 7.0
+		spirit.accel = 700.0
+		spirit.max_speed = 620.0
+		spirit.life = 2.0
+	world.wisps -= mini(count, world.wisps)
+
+
 # ---------------------------------------------------------------- special
 
 func special_ready() -> bool:
@@ -451,6 +518,8 @@ func special_cooldown_total() -> float:
 	match tech_id:
 		"nova_bomb": return 22.0 - 2.0 * level
 		"time_brake": return 20.0 - 1.5 * level
+		"ion_cannon": return 18.0 - 1.5 * level
+		"thruster_explosion": return 7.5 - 0.6 * level
 	return 20.0
 
 
@@ -476,7 +545,92 @@ func _update_special(input: InputFrame, dt: float) -> void:
 	match tech_id:
 		"nova_bomb": _nova_bomb()
 		"time_brake": _time_brake()
+		"ion_cannon": _ion_cannon()
+		"thruster_explosion": _thruster_explosion()
 	world.emit("special_used", {"tech": tech_id})
+
+
+func _ion_cannon() -> void:
+	player.ion_time = 1.6 + (0.4 if run.level_of("ion_cannon") >= 5 else 0.0)
+	ion_tick = 0.0
+	world.emit("banner", {"text": "ION CANNON", "style": "cyan"})
+	world.emit("shake", {"amount": 6.0})
+	world.emit("sound", {"name": "rail"})
+
+
+## While the Ion Cannon fires: beams from your frame (and your pods, with Starbreaker) burn every enemy
+## along them in pulses and erase enemy bullets they touch.
+func _update_ion_beam(dt: float) -> void:
+	ion_beams.clear()
+	if player.ion_time <= 0.0:
+		return
+	var level := run.level_of("ion_cannon")
+	var fork := run.fork_of("ion_cannon")
+	var width := 44.0 + (18.0 if level >= 4 else 0.0)
+	var angles: Array = [player.facing]
+	if fork == "a":
+		angles = [player.facing + sin((1.6 - player.ion_time) * 2.4) * 0.6]
+	elif fork == "b":
+		angles = [player.facing - 0.22, player.facing + 0.22]
+	var origins: Array = [player.pos]
+	if run.has_fusion("starbreaker"):
+		origins.append_array(pod_positions)
+	for origin: Vector2 in origins:
+		for angle: float in angles:
+			ion_beams.append([origin, angle, width if origin == player.pos else width * 0.6])
+	ion_tick -= dt
+	var pulse := ion_tick <= 0.0
+	if pulse:
+		ion_tick = 0.1
+	var damage := _damage("ion_cannon", 26.0, 0.2)
+	for beam: Array in ion_beams:
+		var from: Vector2 = beam[0]
+		var to := from + Vector2.from_angle(beam[1]) * 1500.0
+		var half: float = beam[2] * 0.5
+		for shot: Shot in world.enemy_shots:
+			if not shot.dead and shot.pos.distance_to(Geometry2D.get_closest_point_to_segment(shot.pos, from, to)) < half:
+				shot.dead = true
+		if pulse:
+			for enemy: Enemy in world.enemies.duplicate():
+				if enemy.dead or enemy.hidden:
+					continue
+				if enemy.pos.distance_to(Geometry2D.get_closest_point_to_segment(enemy.pos, from, to)) < half + enemy.radius:
+					world.hurt_enemy(enemy, damage, "ion_cannon")
+
+
+func _thruster_explosion() -> void:
+	var level := run.level_of("thruster_explosion")
+	var direction := player.vel.normalized() if player.vel.length() > 40.0 else Vector2.from_angle(player.facing)
+	player.dash_dir = direction
+	player.dash_time = 0.26 + (0.08 if level >= 4 else 0.0)
+	player.grace = maxf(player.grace, player.dash_time + 0.2)
+	dash_blast_timer = 0.0
+	if run.has_fusion("wraith_drive"):
+		_launch_wisps(world.wisps)
+		world.wisps = world.max_wisps()
+	world.emit("shake", {"amount": 8.0})
+	world.emit("sound", {"name": "explode_big"})
+
+
+## During the dash: a blast every few frames along the way, clearing bullets around you.
+func _update_dash(dt: float) -> void:
+	if player.dash_time <= 0.0:
+		if dash_blast_timer > 0.0:
+			# The dash just ended: Shockwave's ring.
+			dash_blast_timer = 0.0
+			if run.fork_of("thruster_explosion") == "b":
+				var ring := world.add_zone("ring", player.pos, 260.0, 0.4, _damage("thruster_explosion", 40.0, 0.2), false, {"color": Color(1, 0.85, 0.5), "clears_bullets": true})
+				ring.hit_ids = {}
+		return
+	dash_blast_timer -= dt
+	if dash_blast_timer > 0.0:
+		return
+	dash_blast_timer = 0.05
+	var radius := 70.0 + (20.0 if run.level_of("thruster_explosion") >= 5 else 0.0)
+	world.explode(player.pos, radius, _damage("thruster_explosion", 34.0, 0.2), "thruster_explosion", Color(1, 0.75, 0.35))
+	world.clear_bullets(player.pos, radius)
+	if run.fork_of("thruster_explosion") == "a":
+		world.add_zone("fire", player.pos, radius * 0.6, 2.2, 8.0, false, {"tick": 0.4, "color": Color(1, 0.55, 0.2)})
 
 
 func _nova_bomb() -> void:

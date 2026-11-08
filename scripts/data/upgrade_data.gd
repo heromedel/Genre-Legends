@@ -101,6 +101,14 @@ const FUSIONS := {
 		"name": "Storm Halo", "needs": ["orbital_halo", "thunder_lance"],
 		"text": "Halo saws crackle with lightning that leaps to nearby enemies.",
 	},
+	"starbreaker": {
+		"name": "Starbreaker", "needs": ["ion_cannon", "option_pods"],
+		"text": "Every option pod fires its own ion beam alongside yours.",
+	},
+	"wraith_drive": {
+		"name": "Wraith Drive", "needs": ["thruster_explosion", "soul_lantern"],
+		"text": "Each Thruster Explosion launches your wisps as homing spirits, then refills the lantern.",
+	},
 	"event_horizon": {
 		"name": "Event Horizon", "needs": ["hex_repeater", "time_brake"],
 		"text": "Hex orbs drag enemy bullets into themselves and devour them.",

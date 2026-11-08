@@ -19,6 +19,8 @@ const scenarios = [
   { name: 'lesson_needles', query: '?test=star_cluster&god=1&lesson=needles', shots: [8000, 14000] },
   { name: 'lesson_mirror_gate', query: '?test=star_cluster&god=1&lesson=mirror&boss=1', shots: [6000, 12000] },
 ];
+scenarios.push({ name: 'new_tech_pods_ion', query: '?test=star_cluster&god=1&power=b&mk=3&loadout=pulse_driver,swarm_pods,arc_blade,option_pods,ion_cannon', shots: [6000, 6600, 9000], keys: [[6100, 'Space']] });
+scenarios.push({ name: 'new_tech_lantern_thruster', query: '?test=planet&god=1&power=a&mk=3&loadout=pulse_driver,arc_blade,starfall,soul_lantern,thruster_explosion', shots: [9000, 9350, 12000], keys: [[9100, 'Space']] });
 const newBosses = { star_cluster: ['bounty_ace', 'clone_projector'], corridor: ['leviathan', 'crusher_gate'], planet: ['storm_colossus', 'dune_maw'], dungeon: ['warden', 'gazer'] };
 for (const [type, [bossId, minibossId]] of Object.entries(newBosses)) {
   scenarios.push({ name: `new_boss_${bossId}`, query: `?test=${type}&god=1&power=a&mk=2&loadout=pulse_driver,arc_blade,swarm_pods,mirror_aegis,nova_bomb&boss=1&bossid=${bossId}`, shots: [6000, 13000, 20000] });

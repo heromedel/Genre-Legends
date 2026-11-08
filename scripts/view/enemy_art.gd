@@ -172,8 +172,30 @@ static func draw(ci: CanvasItem, enemy: Enemy, time: float) -> void:
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if enemy.hex_marked:
 		Art.dashed_circle(ci, enemy.pos, enemy.radius + 8.0, Color(0.85, 0.45, 1.0, 0.8), 2.0, 6, time * 2.0)
+	_draw_elite_twist(ci, enemy, time)
 	if (enemy.elite or enemy.objective) and enemy.hp < enemy.max_hp:
 		_health_bar(ci, enemy)
+
+
+## What an elite's twist looks like, so you can read what it asks of your build at a glance.
+static func _draw_elite_twist(ci: CanvasItem, enemy: Enemy, time: float) -> void:
+	var r := enemy.radius + 9.0
+	match enemy.elite_mod:
+		"shielded":
+			if enemy.shield_hp > 0.0:
+				Art.shape(ci, Transform2D(time * 0.8, enemy.pos) * Art.ngon(6, r), Color(0.4, 0.85, 1.0, 0.12),
+					Color(0.5, 0.9, 1.0, 0.75 + 0.2 * sin(time * 6.0)), 2.5)
+		"splitting":
+			# A glowing fault line: it's going to come apart.
+			var a := Vector2.from_angle(0.8) * r
+			ci.draw_polyline(PackedVector2Array([enemy.pos - a, enemy.pos - a * 0.3 + a.orthogonal() * 0.15, enemy.pos + a * 0.3 - a.orthogonal() * 0.15, enemy.pos + a]),
+				Color(0.6, 1.0, 0.5, 0.85), 2.5, true)
+		"mirrored":
+			ci.draw_arc(enemy.pos, r, 0, TAU, 24, Color(0.85, 0.95, 1.0, 0.8), 2.5, true)
+			for i in 3:
+				var glint := enemy.pos + Vector2.from_angle(time * 2.5 + TAU * i / 3.0) * r
+				ci.draw_line(glint - Vector2(4, 0), glint + Vector2(4, 0), Color(1, 1, 1), 2.0)
+				ci.draw_line(glint - Vector2(0, 4), glint + Vector2(0, 4), Color(1, 1, 1), 2.0)
 
 
 static func _draw_mimic(ci: CanvasItem, enemy: Enemy, t: float, scale: float, flash: bool) -> void:

@@ -140,6 +140,26 @@ const TECH := {
 			"b": {"name": "Chain Vent", "text": "Each vent goes off twice, the second one bigger."},
 		},
 	},
+	"option_pods": {
+		"name": "Option Pods", "slot": "support", "element": "kinetic",
+		"text": "Glowing pods trail your path and fire copies of your main weapon.",
+		"levels": ["Two pods", "Stronger copies", "Fork", "Third pod", "Perfect copies"],
+		"blueprint_from": ["star_cluster", "corridor"],
+		"forks": {
+			"a": {"name": "Formation", "text": "Pods lock beside you in a firing line and hit harder."},
+			"b": {"name": "Hunter Pods", "text": "Pods break away to circle the nearest enemy and fire from there."},
+		},
+	},
+	"soul_lantern": {
+		"name": "Soul Lantern", "slot": "support", "element": "mawjig",
+		"text": "Enemies you destroy leave Mawjig wisps that circle you. Each wisp swallows one enemy bullet.",
+		"levels": ["Two wisps", "Three wisps", "Fork", "Four wisps", "Soul storm"],
+		"blueprint_from": ["planet", "dungeon"],
+		"forks": {
+			"a": {"name": "Will-o'-Wisps", "text": "Wisps dart out at enemies on their own."},
+			"b": {"name": "Lantern Ward", "text": "Three more wisps, and every swallowed bullet restores shield."},
+		},
+	},
 	# ---- Specials: fired with the special button, on a cooldown.
 	"nova_bomb": {
 		"name": "Nova Bomb", "slot": "special", "element": "explosive",
@@ -159,6 +179,26 @@ const TECH := {
 		"forks": {
 			"a": {"name": "Stasis Shatter", "text": "When time resumes, frozen bullets shatter into Data Shards."},
 			"b": {"name": "Overclock Brake", "text": "Longer, and your weapons fire faster while it lasts."},
+		},
+	},
+	"ion_cannon": {
+		"name": "Ion Cannon", "slot": "special", "element": "energy",
+		"text": "A beam the length of the battlefield that burns through everything and erases bullets in its path.",
+		"levels": ["Ion beam", "Faster recharge", "Fork", "Wider beam", "Planet-cutter"],
+		"blueprint_from": ["corridor", "planet"],
+		"forks": {
+			"a": {"name": "Sweeping Beam", "text": "The beam sweeps across the field as it fires."},
+			"b": {"name": "Twin Ion", "text": "Two beams fan out from your frame."},
+		},
+	},
+	"thruster_explosion": {
+		"name": "Thruster Explosion", "slot": "special", "element": "kinetic",
+		"text": "Your thrusters detonate and hurl you forward, untouchable, blowing up everything along the way.",
+		"levels": ["Blast dash", "Faster recharge", "Fork", "Longer dash", "Supernova burn"],
+		"blueprint_from": ["star_cluster", "planet"],
+		"forks": {
+			"a": {"name": "Afterburner", "text": "The dash leaves a trail of fire."},
+			"b": {"name": "Shockwave", "text": "The dash ends in a shockwave that wipes nearby bullets."},
 		},
 	},
 }
