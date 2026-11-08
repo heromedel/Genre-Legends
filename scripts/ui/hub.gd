@@ -552,6 +552,19 @@ func _build_settings_page() -> Control:
 		log_status.text = "Saved: %s" % saved, "Settings: save play log"))
 	log_row.add_child(log_status)
 	column.add_child(log_row)
+	column.add_child(UiKit.label("VERSION", 18, Color(0.6, 0.9, 1.0), "title"))
+	column.add_child(UiKit.label("You're on " + BuildInfo.label(), 14, Color(0.7, 0.8, 0.92)))
+	var update_row := HBoxContainer.new()
+	update_row.add_theme_constant_override("separation", 10)
+	var update_note := UiKit.wrapped("Clears the offline copy and reloads the newest build. Your save is kept.", 13, Color(0.6, 0.7, 0.85))
+	update_note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	update_row.add_child(UiKit.button("Get the latest version", func():
+		PlayLog.note("update", "Cleared the offline copy and reloaded (was %s)" % BuildInfo.label())
+		Save.write()
+		update_note.text = "Reloading..."
+		Browser.clear_cache_and_reload(), "Settings: get the latest version"))
+	update_row.add_child(update_note)
+	column.add_child(update_row)
 	column.add_child(UiKit.label("DEBUG CONSOLE", 18, Color(1, 0.75, 0.35), "title"))
 	admin = AdminConsole.new()
 	admin.star_map = star_map
