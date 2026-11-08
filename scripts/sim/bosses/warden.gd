@@ -19,7 +19,7 @@ func spawn() -> void:
 	if room.size == Vector2.ZERO:
 		room = Rect2(world.bounds.get_center() - Vector2(400, 260), Vector2(800, 520))
 	origin = room.get_center() + Vector2(0, -40)
-	add_part("core", Vector2.ZERO, 3200, 36, {"invulnerable": true})
+	add_part("core", Vector2.ZERO, 3200, 52, {"invulnerable": true})
 	add_part("shackle0", Vector2(-room.size.x * 0.4, 0), 440, 20)
 	add_part("shackle1", Vector2(room.size.x * 0.4, 0), 440, 20)
 	var flail := add_part("flail", Vector2(170, 0), 1, 26, {"invulnerable": true, "contact": 26.0 * world.enemy_damage_scale})

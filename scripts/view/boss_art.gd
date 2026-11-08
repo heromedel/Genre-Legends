@@ -355,7 +355,8 @@ static func _bounty_ace(ci: CanvasItem, boss: BossBase, time: float) -> void:
 		ci.draw_line(core.pos, drone.pos, Color(1, 0.8, 0.4, 0.35), 2.0)
 		Art.shape(ci, Transform2D(time * 3.0, drone.pos) * Art.ngon(4, 16.0), _flash(drone, Color(0.25, 0.18, 0.05)), Color(1, 0.8, 0.4), 2.0)
 		ci.draw_circle(drone.pos, 4.0, Color(1, 0.95, 0.7))
-	ci.draw_set_transform(core.pos, PI * 0.5, Vector2(1.9, 1.9))
+	# A rival hunter frame, far bigger than yours, with swept blade-wings.
+	ci.draw_set_transform(core.pos, PI * 0.5, Vector2(3.2, 3.2))
 	var half := PackedVector2Array([Vector2(26, 0), Vector2(8, -6), Vector2(-2, -26), Vector2(-10, -24), Vector2(-6, -8), Vector2(-18, -12), Vector2(-14, 0)])
 	var hull := Art.mirrored(half)
 	Art.shape(ci, hull, _flash(core, Color(0.12, 0.1, 0.08)), Color(1, 0.75, 0.3), 2.0)
@@ -364,7 +365,7 @@ static func _bounty_ace(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	ci.draw_colored_polygon(PackedVector2Array([Vector2(14, 0), Vector2(4, -4), Vector2(0, 0), Vector2(4, 4)]), Color(1, 0.4, 0.3))
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if core.invulnerable:
-		ci.draw_arc(core.pos, 46.0, 0, TAU, 28, Color(1, 0.8, 0.4, 0.5 + 0.2 * sin(time * 5.0)), 3.0, true)
+		ci.draw_arc(core.pos, 78.0, 0, TAU, 32, Color(1, 0.8, 0.4, 0.5 + 0.2 * sin(time * 5.0)), 3.0, true)
 
 
 static func _crusher_gate(ci: CanvasItem, boss: BossBase, time: float) -> void:
@@ -402,7 +403,12 @@ static func _leviathan(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	var tail := o + Vector2(0, -1320)
 	var hull := PackedVector2Array([nose, o + Vector2(90, -40), o + Vector2(150, -200), o + Vector2(150, -1150), o + Vector2(110, -1300),
 		tail, o + Vector2(-110, -1300), o + Vector2(-150, -1150), o + Vector2(-150, -200), o + Vector2(-90, -40)])
-	ci.draw_colored_polygon(hull, Color(0.13, 0.19, 0.3, 0.95))
+	# It flies overhead: a shadow on the trench floor, and a hull you can half see through.
+	var shadow := PackedVector2Array()
+	for point in hull:
+		shadow.append(point + Vector2(40, 30))
+	ci.draw_colored_polygon(shadow, Color(0, 0, 0, 0.3))
+	ci.draw_colored_polygon(hull, Color(0.13, 0.19, 0.3, 0.8))
 	ci.draw_polyline(hull + PackedVector2Array([nose]), Color(0.55, 0.8, 1.0), 3.0, true)
 	for i in 12:
 		var y := o.y - 120.0 - i * 95.0
@@ -433,10 +439,14 @@ static func _dune_maw(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	if core == null or core.dead:
 		return
 	if core.hidden:
-		# Underground: sand ripples where it's tunnelling.
+		# Underground: a churning mound of sand and ripples where it's tunnelling, plain to see.
+		ci.draw_circle(boss.origin, 44.0, Color(0.55, 0.42, 0.25, 0.55))
+		for i in 6:
+			var a := time * 3.0 + TAU * i / 6.0
+			ci.draw_circle(boss.origin + Vector2.from_angle(a) * 30.0, 9.0, Color(0.7, 0.55, 0.35, 0.8))
 		for i in 3:
-			var r := 20.0 + fmod(time * 40.0 + i * 18.0, 54.0)
-			ci.draw_arc(boss.origin, r, 0, TAU, 20, Color(0.95, 0.8, 0.5, 0.6 - r / 110.0), 3.0, true)
+			var r := 46.0 + fmod(time * 60.0 + i * 26.0, 78.0)
+			ci.draw_arc(boss.origin, r, 0, TAU, 24, Color(1, 0.85, 0.55, 0.85 - r / 150.0), 4.0, true)
 		return
 	var o := core.pos
 	for i in 4:
@@ -512,10 +522,20 @@ static func _warden(ci: CanvasItem, boss: BossBase, time: float) -> void:
 		for i in segments:
 			ci.draw_circle(o.lerp(flail.pos, (i + 0.5) / segments), 4.0, Color(0.55, 0.5, 0.42))
 		Art.shape(ci, Transform2D(time * 3.0, flail.pos) * Art.star(10, 30.0, 20.0), Color(0.3, 0.28, 0.25), Color(0.85, 0.8, 0.7), 2.0)
-	# The jailer: a hulking helmeted body with a glowing visor slit.
-	var body := PackedVector2Array([o + Vector2(-44, -30), o + Vector2(-30, -50), o + Vector2(30, -50), o + Vector2(44, -30), o + Vector2(40, 40), o + Vector2(-40, 40)])
-	ci.draw_colored_polygon(body, _flash(core, Color(0.25, 0.22, 0.2)))
+	# The jailer: huge pauldrons, a horned helm with burning eyes, and a barred chest like a cell door.
+	for side in [-1.0, 1.0]:
+		Art.shape(ci, PackedVector2Array([o + Vector2(36 * side, -40), o + Vector2(78 * side, -52), o + Vector2(86 * side, -10), o + Vector2(44 * side, 6)]),
+			_flash(core, Color(0.3, 0.26, 0.22)), Color(0.9, 0.75, 0.5), 3.0)
+		ci.draw_colored_polygon(PackedVector2Array([o + Vector2(20 * side, -66), o + Vector2(52 * side, -104), o + Vector2(34 * side, -60)]), Color(0.85, 0.8, 0.7))
+	var body := PackedVector2Array([o + Vector2(-46, -46), o + Vector2(46, -46), o + Vector2(54, 30), o + Vector2(30, 62), o + Vector2(-30, 62), o + Vector2(-54, 30)])
+	ci.draw_colored_polygon(body, _flash(core, Color(0.22, 0.19, 0.17)))
 	ci.draw_polyline(body + PackedVector2Array([body[0]]), Color(0.9, 0.75, 0.5), 3.0, true)
-	ci.draw_rect(Rect2(o + Vector2(-26, -30), Vector2(52, 8)), Color(1, 0.55, 0.2) if not core.invulnerable else Color(0.5, 0.35, 0.2))
-	for i in 3:
-		ci.draw_line(o + Vector2(-30 + i * 30, -10), o + Vector2(-30 + i * 30, 36), Color(0.4, 0.36, 0.3), 3.0)
+	for i in 4:
+		ci.draw_line(o + Vector2(-27 + i * 18, -10), o + Vector2(-27 + i * 18, 52), Color(0.5, 0.45, 0.38), 4.0)
+	var helm := Transform2D(0.0, o + Vector2(0, -60)) * Art.ngon(6, 26.0, PI / 6.0)
+	Art.shape(ci, helm, _flash(core, Color(0.28, 0.24, 0.2)), Color(0.9, 0.75, 0.5), 3.0)
+	var eyes := Color(1, 0.5, 0.15) if not core.invulnerable else Color(0.6, 0.35, 0.2)
+	for side in [-1.0, 1.0]:
+		ci.draw_circle(o + Vector2(10 * side, -60), 5.0, eyes)
+	if not core.invulnerable:
+		Art.draw_glow(ci, o + Vector2(0, -60), 40.0, Color(1, 0.5, 0.15, 0.5))

@@ -255,8 +255,8 @@ func _draw_banner(screen: Vector2) -> void:
 	draw_rect(band, Color(0, 0, 0, 0.62 * fade))
 	draw_line(band.position, band.position + Vector2(screen.x * slide, 0), Art.with_alpha(color, fade), 2.0)
 	draw_line(band.end - Vector2(screen.x * slide, 0), band.end, Art.with_alpha(color, fade), 2.0)
-	draw_string_outline(font_title, Vector2(0, y), current_banner["text"], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 19, 8, Color(0, 0, 0, fade))
-	draw_string(font_title, Vector2(0, y), current_banner["text"], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 19, Art.with_alpha(color.lightened(0.35), fade))
+	draw_string_outline(font_title, Vector2(0, y), current_banner["text"], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 22, 9, Color(0, 0, 0, fade))
+	draw_string(font_title, Vector2(0, y), current_banner["text"], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 22, Art.with_alpha(color.lightened(0.55), fade))
 
 
 ## The shooter-genre boss intro: flashing red WARNING with hazard stripes and the boss's name.

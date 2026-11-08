@@ -11,7 +11,7 @@ func spawn() -> void:
 	look = "bounty_ace"
 	color = Color(1.0, 0.75, 0.3)
 	origin = Vector2(world.bounds.get_center().x, -140)
-	add_part("core", Vector2.ZERO, 2400, 30, {"invulnerable": true})
+	add_part("core", Vector2.ZERO, 2400, 48, {"invulnerable": true})
 	add_part("drone0", Vector2(-80, 0), 420, 16)
 	add_part("drone1", Vector2(80, 0), 420, 16)
 	place_parts()
@@ -67,7 +67,7 @@ func _place_drones(drones: Array) -> void:
 	core.pos = origin
 	for drone: Enemy in drones:
 		var side := -1.0 if drone.part == "drone0" else 1.0
-		drone.pos = origin + Vector2.from_angle(time * 2.2 + (0.0 if side < 0 else PI)) * 80.0
+		drone.pos = origin + Vector2.from_angle(time * 2.2 + (0.0 if side < 0 else PI)) * 110.0
 
 
 ## A ring of bullets around you that closes in, with a gap to slip through.
