@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1794113398|3957143';
+const CACHE_VERSION = '1794115652|3842162';
 /** @type {string} */
 const CACHE_PREFIX = 'Genre Legends-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;

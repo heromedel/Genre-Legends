@@ -21,7 +21,7 @@ const playSeconds = Number(process.argv[3] || 150);
   await page.mouse.click(566, 400);            // "TAP TO START" - anywhere works
   await page.waitForTimeout(2500);
   await snap('hub');
-  await page.mouse.click(960, 333);            // the big LAUNCH button on the planet card
+  await page.mouse.click(960, 412);            // the big LAUNCH button on the planet card
   await page.waitForTimeout(3000);
   // Play: a thumb drags the ship around in loose sweeps, and taps the middle card whenever cards appear.
   let x = 566, y = 620;
@@ -41,13 +41,14 @@ const playSeconds = Number(process.argv[3] || 150);
   // If the mission is still going, pause and abandon it; then continue past the results.
   await page.keyboard.press('Escape'); await page.waitForTimeout(800);
   await snap('pause');
-  await page.mouse.click(566, 460); await page.waitForTimeout(2500);
+  await page.mouse.click(285, 331); await page.waitForTimeout(2500);   // "Abandon mission"
   await snap('results');
-  await page.mouse.click(566, 493); await page.waitForTimeout(2500);
+  for (const y of [530, 509, 493]) { await page.mouse.click(566, y); await page.waitForTimeout(800); }   // "Continue" (its height depends on the text above it)
+  await page.waitForTimeout(1500);
   await snap('back_to_hub');
-  await page.mouse.click(57, 380); await page.waitForTimeout(1500);
+  await page.mouse.click(57, 472); await page.waitForTimeout(1500);
   const download = page.waitForEvent('download', { timeout: 15000 }).catch(() => null);
-  await page.mouse.click(206, 357);
+  await page.mouse.click(206, 494);
   const file = await download;
   if (file) { await file.saveAs(`${out}/play_log.txt`); console.log('play log saved'); } else { console.log('no play log download'); }
   console.log(errors.length ? errors.slice(0, 10).join('\n') : 'no console errors');

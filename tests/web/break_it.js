@@ -24,7 +24,9 @@ const out = process.argv[2] || '/tmp/break_it';
     if (i % 10 === 0) await page.keyboard.press(['Escape', 'Space', 'p', 'Enter'][i % 4]);
   }
   await page.waitForTimeout(1500); await snap('2_after_mission_storm');
-  // 3. Rotate to portrait and back, mid-mission.
+  // 3. Rotate to portrait and back, mid-mission. (Leave full screen first; the test browser can't resize a full-screen window.)
+  await page.evaluate(() => { window.glFullscreen && (window.glFullscreen.want = false); if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); });
+  await page.waitForTimeout(500);
   await page.setViewportSize({ width: 744, height: 1133 }); await page.waitForTimeout(2000); await snap('3_portrait');
   await page.setViewportSize({ width: 1133, height: 744 }); await page.waitForTimeout(2000); await snap('4_landscape_again');
   // 4. Background the page (blur / hidden) and come back.

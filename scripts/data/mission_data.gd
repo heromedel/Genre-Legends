@@ -30,7 +30,7 @@ const PLAYABLE_TYPES := ["star_cluster", "corridor", "planet", "dungeon"]
 ## bot to land in its target. Index = column in the first region (5 = the gate). After that, a formula
 ## takes over from where the gate leaves off.
 const FIRST_REGION_BASELINE := [
-	{"enemy_hp": 0.85, "damage": 0.9, "fire": 0.85, "bullet_speed": 0.88},   # planet 1: learn to fly
+	{"enemy_hp": 0.85, "damage": 0.7, "fire": 0.72, "bullet_speed": 0.85},   # planet 1: learn to fly
 	{"enemy_hp": 0.95, "damage": 0.85, "fire": 0.88, "bullet_speed": 0.92},  # planet 2: first real fights
 	{"enemy_hp": 1.0, "damage": 0.95, "fire": 0.95, "bullet_speed": 0.95},   # planet 3: the needle lesson
 	{"enemy_hp": 1.1, "damage": 1.0, "fire": 1.0, "bullet_speed": 1.0},      # planet 4: builds start to matter
