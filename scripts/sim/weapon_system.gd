@@ -307,6 +307,9 @@ func _orbital_halo(dt: float) -> void:
 
 func _starfall() -> void:
 	var level := run.level_of("starfall")
+	# Meteors need something to fall on; hold fire until an enemy is near.
+	if world.random_enemy_near(player.pos, 640.0) == null:
+		return
 	if not _ready_to_fire("starfall", 2.7 - 0.12 * level):
 		return
 	var fork := run.fork_of("starfall")
