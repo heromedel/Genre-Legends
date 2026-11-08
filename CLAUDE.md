@@ -9,6 +9,7 @@ Follow these in every session:
 
 ## Project notes
 
+- heromedel's examples illustrate an idea; don't copy them literally or limit yourself to them (GDD 3D).
 - Never push to `playtest` (the branch GitHub Pages serves) without asking heromedel first (GDD 3C). Push to your own branch.
 - Godot 4.6, GL Compatibility renderer, single-threaded web export into `play/` (`tools/export_web.sh`).
   Rebuild `play/` in the same commit as script changes.

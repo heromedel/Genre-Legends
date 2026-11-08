@@ -26,6 +26,7 @@
 - **3A. Decided (2026-11-08):** Build freely means the design isn't held to minute details agreed in advance. It does not mean building whatever was just said. Every change of direction or new piece of work goes through the Game Project Standards workflow: discuss it, show a plan, get permission, then build. Ideas that would hurt the game are discussed, not built. Check-ins are playable builds.
 - **3B. Likely (2026-11-08):** Before a build reaches heromedel, Claude's own testers (section 4) play it, and the problems they find are fixed first.
 - **3C. Likely (2026-11-08):** Builds go to Claude's own branch first. Ask heromedel before pushing to the `playtest` branch: he may still be playing the build that's there.
+- **3D. Likely (2026-11-08):** When heromedel gives an example, or something clearly labelled as an example, it illustrates the idea. Claude doesn't have to copy or implement the example directly, and isn't limited to it.
 
 ## 4. Testing & Play Log
 
@@ -106,6 +107,7 @@
 | 2026-11-08 | 3A, 3B | Agree the basics, then Claude builds freely and checks in with playable builds tested by its own playtesters. |
 | 2026-11-08 | 3A | Clarified: building freely never skips discuss, plan and permission. |
 | 2026-11-08 | 3C | Push to Claude's own branch first; ask before pushing to `playtest`. |
+| 2026-11-08 | 3D | heromedel's examples illustrate ideas; they aren't specs to copy or limits. |
 | 2026-11-08 | 4A–4D | Five testers including a first-impressions visual tester; a play log as good as watching; player behaviour isn't automatically a problem. |
 | 2026-11-08 | 5A–8D | Concept, mission types, equipment and co-op recorded from the original idea message and this session's discussion. |
 | 2026-11-08 | 9A–9H | Build 0.2 plan approved: intentional difficulty, five-minute stages, lesson planets, losses that still pay, radio officer, enemy traits, hard branches, strategic upgrades. |
