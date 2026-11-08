@@ -195,8 +195,8 @@ func _draw_tech_chips(screen: Vector2) -> void:
 
 
 func _draw_minimap(screen: Vector2, stage: DungeonStage) -> void:
-	var cell := Vector2(22, 15)
-	var origin := Vector2(screen.x - 200, 70)
+	var cell := Vector2(30, 20)
+	var origin := Vector2(screen.x - 260, 70)
 	var min_key := Vector2i(999, 999)
 	for key: Vector2i in stage.rooms:
 		min_key = Vector2i(mini(min_key.x, key.x), mini(min_key.y, key.y))
@@ -249,7 +249,8 @@ func _draw_banner(screen: Vector2) -> void:
 	var t := 1.2 - banner_time
 	var slide := ease(clampf(t / 0.2, 0.0, 1.0), 0.3)
 	var fade := clampf(banner_time / 0.3, 0.0, 1.0)
-	var y := 86.0
+	# Banners sit below the HUD bars and the radio box, so nothing piles up at the top (0.2.2 cold review).
+	var y := maxf(screen.y * 0.3, 220.0)
 	var band := Rect2(Vector2(0, y - 26), Vector2(screen.x, 36))
 	draw_rect(band, Color(0, 0, 0, 0.62 * fade))
 	draw_line(band.position, band.position + Vector2(screen.x * slide, 0), Art.with_alpha(color, fade), 2.0)

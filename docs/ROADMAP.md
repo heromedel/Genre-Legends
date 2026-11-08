@@ -42,6 +42,8 @@
 
 ## Build 0.3: content (approved 2026-11-08)
 
+(Note) Built 2026-11-08: steps 1-7 and the readability pass's cheaper items (banners, needles, bullets in the dark, minimap, Arc Blade icon). Still open from step 8: Planet Exploration ground and dungeon rooms with more life, Thunder Lance as a real rail, the star map cut off at the right, boss warnings before the boss is in view, boss bar colours.
+
 1. Frames show their body and gear: parts fold away offline, deploy online, change with forks and merge in fusions (GDD 11F).
 2. A new boss and mini-boss for each mission type, named on the planet card, including the clone and projector (GDD 11E) and a Bounty Hunter Ace for the Tempest Run.
 3. Elite enemies with modifiers and better loot.

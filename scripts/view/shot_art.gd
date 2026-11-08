@@ -60,10 +60,12 @@ static func draw_player_shot(ci: CanvasItem, shot: Shot, time: float) -> void:
 ## Enemy bullets, drawn on the normal layer with a glow underneath.
 static func draw_enemy_shot(ci: CanvasItem, shot: Shot, time: float) -> void:
 	if shot.look == "needle":
-		var tail := shot.pos - shot.vel.normalized() * 20.0
-		ci.draw_line(tail, shot.pos, Art.with_alpha(shot.color, 0.5), 7.0, true)
-		ci.draw_line(tail, shot.pos, Color(1, 1, 0.75), 2.5, true)
-		ci.draw_circle(shot.pos, 3.0, Color(1, 1, 0.9))
+		# Long, thin and pointed: a needle, never mistaken for an ordinary round bullet.
+		var forward := shot.vel.normalized()
+		var tail := shot.pos - forward * 30.0
+		ci.draw_line(tail, shot.pos, Art.with_alpha(shot.color, 0.45), 6.0, true)
+		ci.draw_line(tail, shot.pos, Color(1, 1, 0.75), 2.0, true)
+		ci.draw_colored_polygon(PackedVector2Array([shot.pos + forward * 7.0, shot.pos + forward.orthogonal() * 2.5, shot.pos - forward.orthogonal() * 2.5]), Color(1, 1, 0.9))
 		return
 	if shot.look == "mine":
 		ci.draw_set_transform(shot.pos, time * 3.0, Vector2.ONE)

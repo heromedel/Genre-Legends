@@ -512,3 +512,8 @@ func _paint_dark(ci: CanvasItem) -> void:
 	ci.draw_rect(Rect2(Vector2(view.position.x, hole.end.y), Vector2(view.size.x, view.end.y - hole.end.y)), shade)
 	ci.draw_rect(Rect2(Vector2(view.position.x, hole.position.y), Vector2(hole.position.x - view.position.x, hole.size.y)), shade)
 	ci.draw_rect(Rect2(Vector2(hole.end.x, hole.position.y), Vector2(view.end.x - hole.end.x, hole.size.y)), shade)
+	# Enemy bullets glow through the dark, so a hit in the dark is never a hit you couldn't see coming.
+	for shot: Shot in mission.world.enemy_shots:
+		if not shot.dead and view.has_point(shot.pos) and shot.pos.distance_to(at) > lamp * 0.6:
+			ci.draw_circle(shot.pos, shot.radius * 0.9, shot.color.lightened(0.4))
+			ci.draw_arc(shot.pos, shot.radius + 3.0, 0, TAU, 10, Art.with_alpha(shot.color, 0.6), 1.5, true)

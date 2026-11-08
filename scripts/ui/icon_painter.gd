@@ -24,8 +24,11 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 			Art.shape(ci, Transform2D(0, c) * Art.ngon(6, s * 0.65), Art.with_alpha(color, 0.25), color, w)
 			ci.draw_circle(c, s * 0.2, color)
 		"arc_blade":
-			ci.draw_arc(c + Vector2(-s * 0.3, s * 0.3), s * 0.95, -PI * 0.5, 0.0, 16, color, w * 1.6, true)
-			ci.draw_line(p.call(-0.6, 0.6), p.call(-0.3, 0.3), color, w * 2.0, true)
+			# A sword: blade, crossguard and hilt, with a sweep arc behind it.
+			ci.draw_arc(c + Vector2(-s * 0.3, s * 0.3), s * 0.95, -PI * 0.5, 0.0, 16, Art.with_alpha(color, 0.45), w, true)
+			ci.draw_line(p.call(-0.35, 0.35), p.call(0.75, -0.75), color, w * 1.8, true)
+			ci.draw_line(p.call(-0.55, 0.15), p.call(-0.15, 0.55), color, w * 1.4, true)
+			ci.draw_line(p.call(-0.35, 0.35), p.call(-0.7, 0.7), color.darkened(0.2), w * 2.2, true)
 		"swarm_pods":
 			for i in 3:
 				var base: Vector2 = p.call(-0.6 + i * 0.6, 0.6)

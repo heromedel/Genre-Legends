@@ -21,6 +21,7 @@ func _init() -> void:
 	_replay_determinism()
 	_offers()
 	_build_022()
+	_build_03()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -215,3 +216,36 @@ func _build_022() -> void:
 	# The guide only describes real enemies.
 	for kind in GuideData.ENEMIES:
 		check(EnemyData.ENEMIES.has(kind), "guide entry %s is a real enemy" % kind)
+
+
+## Build 0.3: every boss the roster names exists and matches its guide entry; route events add up;
+## elites only promote ordinary enemies; the new tech are wired into the data.
+func _build_03() -> void:
+	var mission := _test_mission("star_cluster")
+	for mission_type in BossRoster.POOLS:
+		for kind in ["boss", "miniboss"]:
+			for boss_id in BossRoster.POOLS[mission_type][kind]:
+				var boss := BossRoster.make(boss_id, mission.world)
+				boss.setup_room(Rect2(200, 140, 800, 520))
+				boss.spawn()
+				check(boss.look == boss_id, "%s builds a boss with the same look" % boss_id)
+				check(GuideData.BOSSES.has(boss_id), "%s has a guide entry" % boss_id)
+				check(not boss.parts.is_empty(), "%s has parts" % boss_id)
+	check(BossRoster.pick("star_cluster", "boss", "r0c0n0", 5) == "hive_carrier", "the first planet keeps the classic boss")
+	for event_id in RouteEvents.EVENTS:
+		for choice: Dictionary in RouteEvents.EVENTS[event_id]["choices"]:
+			var total := 0.0
+			for outcome: Array in choice["outcomes"]:
+				total += float(outcome[0])
+			check(is_equal_approx(total, 1.0), "%s / %s outcomes add up to 1" % [event_id, choice["label"]])
+	var world := mission.world
+	world.elite_chance = 1.0
+	world.elite_mods = ["shielded"]
+	var tough := world.spawn_enemy("splitter", Vector2(100, 100))
+	check(tough.elite and tough.shield_hp > 0.0, "a tough enemy can be promoted to a shielded elite")
+	var shard := world.spawn_enemy("drone_shard", Vector2(100, 100))
+	check(not shard.elite, "tiny enemies are never promoted")
+	world.hurt_enemy(tough, tough.shield_hp * 0.5)
+	check(tough.hp == tough.max_hp, "a shielded elite's barrier soaks damage first")
+	for tech_id in ["option_pods", "soul_lantern", "ion_cannon", "thruster_explosion"]:
+		check(TechData.TECH.has(tech_id), "%s exists" % tech_id)

@@ -6,6 +6,16 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
+## What's new in 0.3
+
+- **Frames show their gear:** every equipped tech has a part on the ship and the mech. Parts unfold as tech comes online, change with forks, and fusions link them in gold. Each frame's mech has its own look.
+- **Eight new bosses and mini-bosses**, two of each per mission type, named on the planet card: the Clone Projector (turn your clone to your side), the Bounty Hunter Ace (the Tempest Run's prize fight), the Crusher Gate, the Leviathan, the Dune Maw, the Storm Colossus, the Gazer and the Warden.
+- **Elite enemies** with a twist: shielded, splitting or mirrored.
+- **Four new tech:** Option Pods, Soul Lantern, Ion Cannon and Thruster Explosion, plus the Starbreaker and Wraith Drive fusions.
+- **Route events** on the way to planets, each a choice with a risk.
+- **Bigger moments** on boss kills, elite kills, Resonance tiers and fusions; **each genre has its own sound**.
+- **Readability:** banners clear of the HUD, needles that look like needles, bullets visible in the dark, a bigger dungeon minimap, a sword-shaped Arc Blade icon.
+
 ## What's new in 0.2.2
 
 - **Salvage Crates** spin three reels that add up to 1-6 upgrades, and list what every upgrade does. Lucky Salvage improves the odds.

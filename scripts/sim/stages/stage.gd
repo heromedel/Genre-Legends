@@ -94,7 +94,7 @@ func start_boss(new_boss: BossBase) -> void:
 func start_miniboss(new_boss: BossBase) -> void:
 	miniboss = new_boss
 	miniboss.spawn()
-	world.emit("banner", {"text": "MINI-BOSS: %s" % miniboss.boss_name.to_upper(), "style": "red"})
+	world.emit("banner", {"text": "MINI-BOSS INCOMING", "style": "red"})
 	world.emit("sound", {"name": "warning"})
 	mission.note("Mini-boss appeared: %s" % miniboss.boss_name)
 

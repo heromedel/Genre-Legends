@@ -17,6 +17,8 @@ const HOW_IT_WORKS := [
 	["Salvage Crates", "Three reels add up to how many upgrades you get, from 1 to 6. Most crates give 1 to 3; a 6 is a true jackpot. Lucky Salvage improves the odds."],
 	["Blueprints and Mk", "Missions pay blueprints, even when you lose. About 3 unlock a tech; more raise its Mk, which lets it level higher in missions and hit harder."],
 	["Risky cards", "Big power with a real cost, like losing your shield. Taking one is a bet on how you play."],
+	["Elites", "Some enemies arrive as elites with a twist. Shielded ones have a barrier to break first; splitting ones break in two; mirrored ones throw straight shots back, so hit them with homing shots, blades, blasts or meteors. Elites are worth more and sometimes carry blueprints."],
+	["Route events", "Things happen on the way to a planet: derelicts, distress calls, traders, ambushes, Mawjig beacons. Each is a choice, and some choices change the mission you're flying into."],
 ]
 
 ## One line per enemy, shown once you've destroyed one. Kinds without a line here never get an entry.

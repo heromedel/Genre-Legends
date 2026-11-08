@@ -121,6 +121,14 @@
 - **11G. Ai-Generated-Proposal (2026-11-08):** Themed branches play harder than the route beside them and their prize planet is a Hazard, so the optional path is the riskier one (supports 9G).
 - **11H. Ai-Generated-Proposal (2026-11-08):** Explosive Resonance III is renamed Wildfire, and burning effects never mention the ground, since many fights are in space.
 
+## 12. Build 0.3 Content
+
+- **12A. Ai-Generated-Proposal (2026-11-08):** Each mission type has two bosses and two mini-bosses; a planet's pair is fixed by the map and shown on its card. The first planet always has the classic pair, and the Tempest Run ends on the Bounty Hunter Ace.
+- **12B. Ai-Generated-Proposal (2026-11-08):** Elites with a twist (shielded, splitting, mirrored) appear from planet 2, more each region, doubled by Bounty Hunters. Mirrored elites appear from region 2 on.
+- **12C. Ai-Generated-Proposal (2026-11-08):** New tech: Option Pods and Soul Lantern (support), Ion Cannon and Thruster Explosion (special), with the Starbreaker and Wraith Drive fusions. Thruster Explosion is built from heromedel's Rule of Cool example (1A).
+- **12D. Ai-Generated-Proposal (2026-11-08):** Route events on the way to a planet: a choice with a risk, paying out at once or shaping the mission.
+- **12E. Ai-Generated-Proposal (2026-11-08):** Big moments freeze the action for a heartbeat (boss kills, elites, Resonance tiers, fusions), and each genre has its own instruments.
+
 ## Decision Log
 
 | Date | Points | Decision |
@@ -138,3 +146,4 @@
 | 2026-11-08 | 10A–10E | Subtitle; what realms are; Infall as a separate realm with nods; how Mawjig is explained; how dimensions might be reached. |
 | 2026-11-08 | 10A, 10B | Subtitle and the meaning of realms set to Decided; keeping the word for realms only is Likely. |
 | 2026-11-08 | 10D, 11A–11H | Playtest refinements: three-reel crates, Lucky Salvage odds, the Guide to Guardians with Mawjig's full name, a visible Tractor Beam, the clone-and-projector capture idea, frames that show their gear, harder themed branches, Wildfire. |
+| 2026-11-08 | 12A–12E | Build 0.3 content built from the approved list: frame gear, new bosses, elites, new tech, route events, big moments, genre music. |
