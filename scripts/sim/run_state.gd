@@ -28,6 +28,7 @@ var blueprints := {}            # tech id -> blueprints picked up this mission
 var crates_opened := 0
 var shards_missed := 0
 var kills_by_kind := {}         # for milestones (GDD 9D)
+var banked_levels := 0           # levels and crates after the last boss fell, paid as blueprints
 var bosses_defeated: Array = []  # boss look ids, for the Guide to Guardians
 var boss_hits := 0              # hits taken while a boss is on the field
 var min_armor_fraction := 1.0

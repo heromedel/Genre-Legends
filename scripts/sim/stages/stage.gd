@@ -85,6 +85,8 @@ func start_boss(new_boss: BossBase) -> void:
 	boss_started = true
 	boss.spawn()
 	boss.memory["debug_phase"] = debug_boss_phase
+	# The stage's last boss drops the mission's prize instead of a crate (see BossBase.defeat).
+	boss.memory["final"] = not has_next_stage()
 	world.emit("boss_warning", {"name": boss.boss_name, "title": boss.title})
 	world.emit("sound", {"name": "warning"})
 	mission.note("Boss appeared: %s" % boss.boss_name)

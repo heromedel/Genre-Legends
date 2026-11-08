@@ -247,5 +247,29 @@ func _build_03() -> void:
 	check(not shard.elite, "tiny enemies are never promoted")
 	world.hurt_enemy(tough, tough.shield_hp * 0.5)
 	check(tough.hp == tough.max_hp, "a shielded elite's barrier soaks damage first")
+	# The clone is a surprise: about one Star Cluster planet in four, and the first planet never.
+	var clones := 0
+	for i in 400:
+		if BossRoster.pick("star_cluster", "miniboss", "r1c%dn%d" % [i % 7, i], 11) == "clone_projector":
+			clones += 1
+	check(clones > 60 and clones < 140, "the Clone Projector shows up on about a quarter of Star Cluster planets (%d / 400)" % clones)
+	# The last boss drops the prize; levels after it are banked as blueprints.
+	var fight := _test_mission("star_cluster")
+	fight.stage.debug_skip_to_boss()
+	var bot := BotPilot.new(fight, 2)
+	for i in 60 * 240:
+		fight.step(bot.next_input())
+		fight.drain_events()
+		fight.player.armor = fight.player.max_armor
+		if fight.stage.boss != null and fight.stage.boss.defeated:
+			break
+	check(fight.world.prize_waiting, "the last boss leaves its prize on the field")
+	check(fight.state == "play", "the mission waits for the prize")
+	for i in 60 * 10:
+		fight.step(bot.next_input())
+		fight.drain_events()
+		if fight.is_finished() or fight.state == "won":
+			break
+	check(not fight.world.prize_waiting and fight.state == "won", "the prize drifts to you and the mission ends")
 	for tech_id in ["option_pods", "soul_lantern", "ion_cannon", "thruster_explosion"]:
 		check(TechData.TECH.has(tech_id), "%s exists" % tech_id)

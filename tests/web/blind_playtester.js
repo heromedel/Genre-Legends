@@ -48,7 +48,7 @@ const playSeconds = Number(process.argv[3] || 150);
   await snap('back_to_hub');
   await page.mouse.click(57, 560); await page.waitForTimeout(1500);   // rail: SETTINGS
   const download = page.waitForEvent('download', { timeout: 15000 }).catch(() => null);
-  await page.mouse.click(206, 494);
+  await page.mouse.click(206, 614);   // Settings: "Save play log file"
   const file = await download;
   if (file) { await file.saveAs(`${out}/play_log.txt`); console.log('play log saved'); } else { console.log('no play log download'); }
   console.log(errors.length ? errors.slice(0, 10).join('\n') : 'no console errors');

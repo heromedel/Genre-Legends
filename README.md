@@ -6,6 +6,12 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
+## What's new in 0.3.1
+
+- **The boss's prize:** the last boss drops the planet's blueprints as a big golden cache; grab it (it drifts to you) to end the mission. Levels and crates after the boss falls are banked as extra blueprints instead of offering upgrades you can't use.
+- **The Clone Projector** is a rare surprise: about one Star Cluster planet in four.
+- **Settings, Accessibility:** "Bullets glow in the dark" (off by default).
+
 ## What's new in 0.3
 
 - **Frames show their gear:** every equipped tech has a part on the ship and the mech. Parts unfold as tech comes online, change with forks, and fusions link them in gold. Each frame's mech has its own look.

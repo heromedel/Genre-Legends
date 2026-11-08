@@ -136,7 +136,14 @@ func defeat() -> void:
 			part.dead = true
 	for i in 10:
 		world.drop_pickup("shard", origin + Vector2.from_angle(TAU * i / 10.0) * 30.0, 3.0)
-	world.drop_pickup("crate", origin)
+	if memory.get("final", false):
+		# The mission's prize: the planet's blueprints in one big pickup. The mission ends once it's taken.
+		var prize := world.drop_pickup("prize", origin)
+		prize.vel = Vector2.ZERO
+		prize.anchored = true
+		world.prize_waiting = true
+	else:
+		world.drop_pickup("crate", origin)
 	var reward_tech: String = world.elite_blueprint_tech
 	if reward_tech == "":
 		var ids := TechData.TECH.keys()

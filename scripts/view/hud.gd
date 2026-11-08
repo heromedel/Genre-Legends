@@ -119,7 +119,9 @@ func _draw() -> void:
 		_bar(Vector2(x, meter_y), Vector2(150, 7), player.heat / heat_max, Color(1, 0.45, 0.25), "")
 		draw_string(font_body, Vector2(x + 158, meter_y + 8), "HEAT", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(1, 0.6, 0.4))
 	# Objective, top centre.
-	var objective := mission.stage.objective_text()
+	var objective := "COLLECT THE SALVAGE" if mission.world.prize_waiting else mission.stage.objective_text()
+	if mission.state in ["won", "lost"]:
+		objective = ""
 	var shown_boss := mission.stage.active_boss()
 	if shown_boss == null or shown_boss.entering:
 		draw_string_outline(font_bold, Vector2(0, 30), objective.to_upper(), HORIZONTAL_ALIGNMENT_CENTER, screen.x, 20, 5, Color(0, 0, 0, 0.7))
@@ -228,7 +230,7 @@ func _draw_minimap(screen: Vector2, stage: DungeonStage) -> void:
 func _draw_objective_arrows(screen: Vector2) -> void:
 	var targets: Array = mission.stage.objective_positions() if mission.stage.has_method("objective_positions") else []
 	# A dropped projector gets a green arrow, like a pickup (GDD 11E).
-	var projectors: Array = mission.world.pickups.filter(func(p): return p.kind == "projector").map(func(p): return p.pos)
+	var projectors: Array = mission.world.pickups.filter(func(p): return p.kind in ["projector", "prize"]).map(func(p): return p.pos)
 	var center := screen * 0.5
 	for target: Vector2 in targets + projectors:
 		var on_screen := world_to_screen * target

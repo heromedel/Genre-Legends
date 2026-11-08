@@ -67,6 +67,8 @@ func _ready() -> void:
 		chip.add_child(IconView.make(tech_id, 30, TechData.element_color(tech_id)))
 		chip.add_child(UiKit.label("%s +%d" % [TechData.TECH[tech_id]["name"], result["blueprints"][tech_id]], 16, Color(1, 1, 1)))
 		earned.add_child(chip)
+	if int(result.get("banked_levels", 0)) > 0 and result["won"]:
+		column.add_child(UiKit.wrapped("Includes +%d for levels and crates picked up after the boss fell." % int(result["banked_levels"]), 14, Color(1, 0.85, 0.5)))
 	if result["prize_text"] != "":
 		column.add_child(UiKit.label("PRIZE: " + result["prize_text"], 20, Art.GOLD, "bold"))
 	for hint in unlock_hints:

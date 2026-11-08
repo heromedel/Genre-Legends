@@ -218,7 +218,7 @@ func _check_end() -> void:
 		world.emit("explosion", {"pos": player.pos, "size": 80.0, "color": Color(1, 0.7, 0.4)})
 		world.emit("sound", {"name": "explode_big"})
 		note("Frame wrecked")
-	elif stage.is_cleared():
+	elif stage.is_cleared() and not world.prize_waiting:
 		if stage.has_next_stage():
 			start_stage(stage.next_stage())
 		else:
@@ -283,15 +283,27 @@ func _on_collect(kind: String, value: float, tech: String) -> void:
 	match kind:
 		"shard":
 			var gained := run.add_xp(value)
-			if gained > 0:
+			if gained > 0 and _boss_down():
+				# The fight is over: a level now would offer upgrades you can't use, so it's banked as a blueprint.
+				run.banked_levels += gained
+				world.emit("floating_text", {"pos": player.pos, "text": "+%d banked" % gained, "color": Color(1, 0.85, 0.4)})
+			elif gained > 0:
 				pending_level_ups += gained
 				world.emit("level_up", {"level": run.level})
 				world.emit("sound", {"name": "level_up"})
 			else:
 				world.emit("sound", {"name": "pickup"})
 		"crate":
-			pending_crates += 1
+			if _boss_down():
+				run.banked_levels += 1
+			else:
+				pending_crates += 1
 			world.emit("sound", {"name": "crate"})
+		"prize":
+			world.prize_waiting = false
+			world.emit("power_moment", {"color": Color(1.0, 0.82, 0.35), "size": 2.0})
+			world.emit("banner", {"text": "SALVAGE SECURED", "style": "gold"})
+			note("Boss prize collected")
 		"blueprint":
 			run.blueprints[tech] = int(run.blueprints.get(tech, 0)) + 1
 			world.emit("floating_text", {"pos": player.pos, "text": "+1 %s blueprint" % TechData.TECH[tech]["name"], "color": Color(0.5, 0.9, 1.0)})
@@ -317,6 +329,11 @@ func _on_collect(kind: String, value: float, tech: String) -> void:
 				weapons.on_graze()
 			if run.field_count("adrenaline_junkie") > 0:
 				_on_collect("shard", 0.35, "")
+
+
+## True once the mission's last boss is down: from then on, levels and crates are banked as blueprints.
+func _boss_down() -> bool:
+	return stage.boss != null and stage.boss.defeated and not stage.has_next_stage()
 
 
 func _on_player_hurt(amount: float, source: String) -> void:
@@ -366,6 +383,9 @@ func results(first_clear: bool) -> Dictionary:
 	var modifier: Dictionary = MissionData.MODIFIERS.get(node.get("modifier", ""), {})
 	var threat: Dictionary = MissionData.THREAT.get(node.get("threat", "standard"), MissionData.THREAT["standard"])
 	amount = int(round(amount * progress * modifier.get("blueprints", 1.0) * threat["blueprints"] * float(node.get("reward_scale", 1.0))))
+	# Levels and crates picked up after the last boss fell come home as extra blueprints of the planet's tech.
+	if won:
+		amount += run.banked_levels
 	if reward != "" and amount > 0:
 		blueprints[reward] = int(blueprints.get(reward, 0)) + amount
 	return {
@@ -387,6 +407,7 @@ func results(first_clear: bool) -> Dictionary:
 		"progress": progress,
 		"kills_by_kind": run.kills_by_kind.duplicate(),
 		"bosses_defeated": run.bosses_defeated.duplicate(),
+		"banked_levels": run.banked_levels,
 		"max_resonance": run.max_resonance,
 		"is_gate": node.get("is_gate", false),
 		"armor_left": player.armor_fraction(),

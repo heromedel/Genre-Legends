@@ -9,6 +9,8 @@ extends RefCounted
 
 const DT := 1.0 / 60.0
 const PICKUP_RADIUS := 105.0
+## Seconds before the boss's prize starts drifting toward you.
+const PRIZE_DRIFT_DELAY := 3.0
 ## How far a ricocheting shot looks for its next target.
 const RICOCHET_RANGE := 420.0
 ## Meteors (Starfall, Doom Bell) streak in from the upper left; Comet Trail fires lie along that path.
@@ -28,6 +30,7 @@ var enemy_shots: Array = []
 var pickups: Array = []
 var zones: Array = []
 var blades: Array = []          # Arc Blade sweeps in progress
+var prize_waiting := false      # the last boss's prize is on the field; the mission ends once it's taken
 var wisps := 0                  # Soul Lantern: wisps circling the frame, each good for one bullet
 var allies: Array = []          # {pos, fire_timer, look}: things fighting on your side, like a turned clone
 var events: Array = []          # things that happened this tick, for art and sound
@@ -785,6 +788,10 @@ func update_pickups(dt: float) -> void:
 			continue
 		var to_player := player.pos - pickup.pos
 		var distance := to_player.length()
+		# The boss's prize waits a moment to be admired, then drifts to you so you never have to hunt for it.
+		if pickup.kind == "prize" and pickup.age > PRIZE_DRIFT_DELAY:
+			pickup.anchored = false
+			pickup.magnetized = true
 		if not pickup.anchored and pickup.age > 0.35 and (distance < reach or pickup.magnetized):
 			pickup.magnetized = true
 			pickup.vel = to_player.normalized() * maxf(pickup.vel.length() + 1600.0 * dt, 280.0)

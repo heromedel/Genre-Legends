@@ -37,7 +37,7 @@ func fresh_data() -> Dictionary:
 		"frame": FrameData.STARTING_FRAME,
 		"frames_unlocked": [FrameData.STARTING_FRAME],
 		"prizes_claimed": [],
-		"settings": {"music": 0.6, "sfx": 0.8, "play_log": true, "screen_shake": true, "fullscreen": true, "threat": "standard"},
+		"settings": {"music": 0.6, "sfx": 0.8, "play_log": true, "screen_shake": true, "fullscreen": true, "threat": "standard", "bullet_glow": false},
 		"stats": {"missions": 0, "wins": 0, "kills": 0, "play_seconds": 0.0},
 		"new_unlocks": [],
 		"radio_queue": [],

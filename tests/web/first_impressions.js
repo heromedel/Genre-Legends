@@ -11,6 +11,8 @@ const scenarios = [
   { name: 'hub_hangar', query: '?page=hangar', shots: [5000] },
   { name: 'hub_rnd', query: '?page=rnd', shots: [5000] },
   { name: 'hub_records', query: '?page=records', shots: [5000] },
+  { name: 'hub_settings', query: '?page=settings', shots: [5000] },
+  { name: 'boss_prize', query: '?test=star_cluster&god=1&power=a&mk=3&loadout=pulse_driver,arc_blade,swarm_pods,mirror_aegis,ion_cannon&boss=1', shots: [12000, 16000, 20000, 24000, 28000] },
   { name: 'hub_guide', query: '?page=guide&mk=1', shots: [5000] },
   { name: 'salvage_crate', query: '?test=star_cluster&god=1&crate=3', shots: [5500, 8000] },
   { name: 'hive_carrier_lasers', query: '?test=star_cluster&god=1&boss=1&phase=2', shots: [9000, 11500, 14000] },

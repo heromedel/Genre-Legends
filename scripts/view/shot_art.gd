@@ -89,6 +89,13 @@ static func draw_pickup(ci: CanvasItem, pickup: Pickup, time: float) -> void:
 	var bob := sin(time * 4.0 + pickup.pos.x) * 2.0
 	var at := pickup.pos + Vector2(0, bob)
 	match pickup.kind:
+		"prize":
+			# The boss's prize: a big golden blueprint cache, glowing and slowly turning.
+			Art.draw_glow(ci, at, 60.0, Color(1, 0.8, 0.35, 0.5))
+			Art.shape(ci, Transform2D(time * 0.8, at) * Art.ngon(6, 24.0), Color(0.35, 0.25, 0.05), Art.GOLD, 3.0)
+			Art.shape(ci, Transform2D(-time * 1.2, at) * Art.star(4, 16.0, 6.0), Color(1, 0.9, 0.5), Color(1, 1, 0.85), 1.5)
+			var hop := absf(sin(time * 4.0)) * 10.0
+			ci.draw_colored_polygon(PackedVector2Array([at + Vector2(0, -36 - hop), at + Vector2(-12, -56 - hop), at + Vector2(12, -56 - hop)]), Art.GOLD)
 		"projector":
 			# The Clone Projector's device: green like a pickup, with a bouncing arrow over it (GDD 11E).
 			Art.shape(ci, Transform2D(time * 1.5, at) * Art.ngon(6, 14.0), Color(0.2, 0.6, 0.3, fade), Color(0.6, 1.0, 0.6, fade), 2.0)
