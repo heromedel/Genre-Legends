@@ -6,6 +6,11 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
+## What's new in 0.2.1
+
+- **Settings → Get the latest version:** shows which build you're on and clears the offline copy so the newest build loads. Your save is kept.
+- **Guardian of the Realms** subtitle, and Mawjig explained in R&D and on the Build screen.
+
 ## What's new in 0.2
 
 - **Upgrades with strategy:** fewer, bigger level-ups; Resonance tiers by element; cards that show what they build toward; risky cards; two rerolls; a Build screen in the pause menu and on level-ups.
