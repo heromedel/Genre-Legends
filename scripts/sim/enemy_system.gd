@@ -17,7 +17,7 @@ func update(dt: float) -> void:
 	var time_scale := world.enemy_time_scale()
 	var edt := dt * time_scale
 	var player := world.player
-	var fire_scale := 0.7 if world.gentle else 1.0
+	var fire_scale := world.enemy_fire_scale * (0.75 if world.gentle else 1.0)
 	for enemy: Enemy in world.enemies:
 		if enemy.dead:
 			continue
@@ -116,8 +116,13 @@ func _formation(enemy: Enemy, dt: float) -> void:
 				enemy.timer = world.rng.randf_range(0.0, 3.0)
 		1:  # holding formation
 			enemy.pos = enemy.pos.lerp(slot + sway, dt * 4.0)
+			# Formation potshots: the odd bullet from the ranks keeps you moving.
+			if enemy.fire_timer <= 0.0:
+				enemy.fire_timer = world.rng.randf_range(4.0, 8.0)
+				if world.rng.randf() < 0.5:
+					world.enemy_aimed(enemy.pos, 1, 0.0, 210.0)
 			enemy.facing = lerp_angle(enemy.facing, PI * 0.5, dt * 6.0)
-			var dive_wait: float = memory.get("dive_wait", world.rng.randf_range(5.0, 11.0))
+			var dive_wait: float = memory.get("dive_wait", world.rng.randf_range(3.5, 8.0) / world.enemy_fire_scale)
 			memory["dive_wait"] = dive_wait
 			if enemy.timer > dive_wait:
 				enemy.state = 2
@@ -134,7 +139,7 @@ func _formation(enemy: Enemy, dt: float) -> void:
 			enemy.pos += turned * _speed(enemy) * 1.25 * dt
 			if enemy.timer > 0.35 and not memory.get("dive_shot", false):
 				memory["dive_shot"] = true
-				world.enemy_aimed(enemy.pos, 1, 0.0, 230.0)
+				world.enemy_aimed(enemy.pos, 3, 0.35, 240.0)
 			if enemy.pos.y > world.bounds.end.y + 40.0 or enemy.pos.x < -60.0 or enemy.pos.x > world.bounds.end.x + 60.0:
 				enemy.pos = Vector2(slot.x, -40.0)
 				enemy.state = 3
@@ -155,7 +160,7 @@ func _weaver(enemy: Enemy, dt: float) -> void:
 	enemy.facing = PI * 0.5
 	if enemy.fire_timer <= 0.0 and enemy.pos.y > 20.0:
 		enemy.fire_timer = world.rng.randf_range(1.5, 2.4)
-		world.enemy_aimed(enemy.pos, 2, 0.25, 250.0)
+		world.enemy_aimed(enemy.pos, 3, 0.3, 255.0)
 		world.emit("sound", {"name": "enemy_shot"})
 	_despawn_if_gone(enemy)
 

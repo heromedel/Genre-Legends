@@ -26,6 +26,16 @@ const TYPES := {
 }
 const PLAYABLE_TYPES := ["star_cluster", "corridor", "planet", "dungeon"]
 
+## Threat setting: how hard every mission hits. Standard is the default.
+const THREAT := {
+	"standard": {"name": "Standard", "text": "The intended challenge. Enemies fight back hard enough that builds matter.",
+		"damage": 1.0, "fire": 1.0, "bullet_speed": 1.0, "enemy_hp": 1.0, "blueprints": 1.0},
+	"veteran": {"name": "Veteran", "text": "For players who know these genres: denser fire, harder hits, tougher enemies, and 50% more blueprints.",
+		"damage": 1.3, "fire": 1.35, "bullet_speed": 1.12, "enemy_hp": 1.25, "blueprints": 1.5},
+	"casual": {"name": "Casual", "text": "A relaxed ride: slower, sparser fire and softer hits.",
+		"damage": 0.65, "fire": 0.7, "bullet_speed": 0.85, "enemy_hp": 0.8, "blueprints": 1.0},
+}
+
 ## Special conditions shown on a planet before you commit (GDD 5C proposal: the info is the choice).
 ## Each one changes play and pays for it.
 const MODIFIERS := {

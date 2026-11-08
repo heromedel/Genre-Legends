@@ -10,7 +10,6 @@ extends Node
 
 const MAX_LINES := 6000
 const IDLE_HINT_SECONDS := 25.0
-const BUILD := "0.1.0"
 
 var lines: Array = []
 var screen := "boot"
@@ -36,7 +35,7 @@ func _ready() -> void:
 	_start_msec = Time.get_ticks_msec()
 	_last_input_msec = _start_msec
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	note("boot", "Genre Legends %s on %s, screen %s" % [BUILD, OS.get_name(), str(DisplayServer.screen_get_size())])
+	note("boot", "Genre Legends %s on %s, window %s" % [BuildInfo.label(), OS.get_name(), str(DisplayServer.window_get_size())])
 
 
 func enabled() -> bool:
@@ -110,7 +109,7 @@ func begin_mission(mission: Mission, loadout: Array, mk: Dictionary) -> void:
 	_stuck_hinted = false
 	_stuck_anchor = mission.player.pos
 	record = {
-		"build": BUILD,
+		"build": BuildInfo.VERSION,
 		"seed": mission.seed_value,
 		"node": mission.node.duplicate(true),
 		"frame": mission.run.frame_id,
@@ -238,7 +237,8 @@ func _encode_runs() -> String:
 func export_text() -> String:
 	var out := []
 	out.append("GENRE LEGENDS PLAY LOG")
-	out.append("build %s, %s, exported %s" % [BUILD, OS.get_name(), Time.get_datetime_string_from_system()])
+	out.append("Version %s" % BuildInfo.label())
+	out.append("%s, window %s, exported %s" % [OS.get_name(), str(DisplayServer.window_get_size()), Time.get_datetime_string_from_system()])
 	var save := get_node_or_null("/root/Save")
 	if save != null:
 		var data: Dictionary = save.data

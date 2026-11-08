@@ -40,7 +40,8 @@ var xp_scale := 1.0
 var crate_chance := 0.35
 var elite_blueprint_tech := ""
 var dark := false
-var gentle := false              # first planets: slower, sparser enemy fire
+var gentle := false              # the first planet: slower, sparser enemy fire
+var enemy_fire_scale := 1.0      # how fast enemies and bosses cycle their attacks (danger and Threat)
 
 # Hooks the Mission listens to.
 var on_player_hurt: Callable

@@ -447,6 +447,8 @@ func _build_settings_page() -> Control:
 	column.add_child(UiKit.label("SETTINGS", 20, Color(0.6, 0.9, 1.0), "title"))
 	column.add_child(_slider("Music", "music"))
 	column.add_child(_slider("Sound effects", "sfx"))
+	column.add_child(_toggle("Full screen (iPad Safari: applies on your next tap)", "fullscreen"))
+	column.add_child(_threat_picker())
 	column.add_child(_toggle("Screen shake", "screen_shake"))
 	column.add_child(_toggle("Play log", "play_log"))
 	column.add_child(UiKit.wrapped("The play log records what you tap and how missions go, so it can be sent and read like a replay. Nothing leaves this device unless you save the file and send it.", 13, Color(0.65, 0.75, 0.88)))
@@ -474,7 +476,7 @@ func _build_settings_page() -> Control:
 		else:
 			reset_button.text = "Tap again to really reset everything")
 	column.add_child(reset_button)
-	column.add_child(UiKit.label("Genre Legends v%s" % PlayLog.BUILD, 12, Color(0.45, 0.55, 0.65)))
+	column.add_child(UiKit.label("Genre Legends " + BuildInfo.label(), 12, Color(0.45, 0.55, 0.65)))
 	return scroll
 
 
@@ -506,8 +508,34 @@ func _toggle(label: String, key: String) -> Control:
 	refresh.call()
 	button.pressed.connect(func():
 		Save.set_setting(key, not Save.setting(key))
+		if key == "fullscreen":
+			Browser.set_fullscreen_wanted(Save.setting(key))
+			if not Save.setting(key):
+				Browser.leave_fullscreen()
 		refresh.call())
 	return button
+
+
+## Threat: how hard missions hit. Shown as "Name: Default > Other" options (labelling guide 5).
+func _threat_picker() -> Control:
+	var column := VBoxContainer.new()
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	row.add_child(UiKit.label("Threat", 17))
+	var note := UiKit.wrapped("", 14, Color(0.7, 0.8, 0.92))
+	for level in ["standard", "veteran", "casual"]:
+		var info: Dictionary = MissionData.THREAT[level]
+		var chosen: bool = Save.setting("threat") == level
+		var button := UiKit.button(info["name"], func():
+			Save.set_setting("threat", level)
+			_rebuild(), "Settings: threat %s" % level, chosen)
+		button.custom_minimum_size = Vector2(150, 48)
+		row.add_child(button)
+		if chosen:
+			note.text = info["text"]
+	column.add_child(row)
+	column.add_child(note)
+	return column
 
 
 ## A small drawing of a frame for the hangar cards: ship and mech side by side.

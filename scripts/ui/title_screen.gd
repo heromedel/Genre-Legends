@@ -68,4 +68,4 @@ func _draw() -> void:
 	draw_string(UiKit.font("body"), Vector2(0, title_y + title_size * 1.45), "One frame. Ship or mech. Every arcade genre.", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 20, Color(0.75, 0.85, 0.95))
 	var blink := 0.45 + 0.55 * absf(sin(time * 2.2))
 	draw_string(UiKit.font("bold"), Vector2(0, screen.y - 60), "TAP TO START", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 26, Color(1, 1, 1, blink))
-	draw_string(UiKit.font("body"), Vector2(0, screen.y - 22), "v%s" % PlayLog.BUILD, HORIZONTAL_ALIGNMENT_RIGHT, screen.x - 16, 13, Color(0.5, 0.6, 0.7))
+	draw_string(UiKit.font("body"), Vector2(0, screen.y - 22), BuildInfo.label(), HORIZONTAL_ALIGNMENT_RIGHT, screen.x - 16, 13, Color(0.5, 0.6, 0.7))

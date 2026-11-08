@@ -23,7 +23,7 @@
 
 ## 3. How This Game Is Built
 
-- **3A. Likely (2026-11-08):** Agree only the basics (this document), then Claude builds freely. Check-ins are playable builds heromedel can play, not lists of questions. A few clarifying questions are fine, without nitpicking or problem-finding. For this project this replaces "ask before writing" in the Game Project Standards.
+- **3A. Decided (2026-11-08):** Build freely means the design isn't held to minute details agreed in advance. It does not mean building whatever was just said. Every change of direction or new piece of work goes through the Game Project Standards workflow: discuss it, show a plan, get permission, then build. Ideas that would hurt the game are discussed, not built. Check-ins are playable builds.
 - **3B. Likely (2026-11-08):** Before a build reaches heromedel, Claude's own testers (section 4) play it, and the problems they find are fixed first.
 
 ## 4. Testing & Play Log
@@ -88,5 +88,6 @@
 | 2026-11-08 | 1B, 1C | Lean into the tropes; power-ups must be interesting, not plain dash/energy upgrades. |
 | 2026-11-08 | 2A–2C | Rebuild in Godot for web, hosted on GitHub Pages and playable on iPad mini; earlier prototype is reference only. |
 | 2026-11-08 | 3A, 3B | Agree the basics, then Claude builds freely and checks in with playable builds tested by its own playtesters. |
+| 2026-11-08 | 3A | Clarified: building freely never skips discuss, plan and permission. |
 | 2026-11-08 | 4A–4D | Five testers including a first-impressions visual tester; a play log as good as watching; player behaviour isn't automatically a problem. |
 | 2026-11-08 | 5A–8D | Concept, mission types, equipment and co-op recorded from the original idea message and this session's discussion. |

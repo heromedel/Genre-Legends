@@ -11,6 +11,7 @@ func _ready() -> void:
 	get_tree().root.theme = UiKit.theme()
 	ui_layer = CanvasLayer.new()
 	add_child(ui_layer)
+	Browser.set_fullscreen_wanted(Save.setting("fullscreen"))
 	star_map = StarMap.new(int(Save.data["map_seed"]))
 	star_map.ensure_generated(Save.is_cleared)
 	if not _debug_launch():
@@ -31,7 +32,8 @@ func show_hub(page: String) -> void:
 
 
 func launch_mission(node_id: String) -> void:
-	var node := _test_node(node_id.trim_prefix("test:")) if node_id.begins_with("test:") else star_map.get_node(node_id)
+	var node := _test_node(node_id.trim_prefix("test:")) if node_id.begins_with("test:") else star_map.get_node(node_id).duplicate(true)
+	node["threat"] = Save.setting("threat")
 	var first_clear := not Save.is_cleared(node_id)
 	var mission_seed := randi()
 	var mission := Mission.new(node, mission_seed, Save.data["frame"], Save.data["loadout"], Save.tech_mk)

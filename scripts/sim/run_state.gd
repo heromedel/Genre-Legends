@@ -16,7 +16,9 @@ var tech_timer := {}            # tech id -> seconds until it fires again
 
 var level := 1
 var xp := 0.0
-var xp_to_next := 6.0
+var xp_to_next := 10.0
+var rerolls := UpgradeData.REROLLS
+var hit_counter := 0            # Energy resonance counts hits to know when to arc
 
 # Tally
 var kills := 0
@@ -84,7 +86,37 @@ func damage_multiplier(tech_id: String, armor_fraction: float) -> float:
 	var mult := 1.0 + TechData.MK_DAMAGE_BONUS * (int(tech_mk.get(tech_id, 1)) - 1)
 	if field_count("last_stand") > 0 and armor_fraction < 0.34:
 		mult *= 1.6
+	if field_count("glass_reactor") > 0:
+		mult *= 1.5
 	return mult
+
+
+## Resonance points for an element: levels of its online tech, plus 2 per field upgrade of it.
+func resonance_points(element: String) -> int:
+	var points := 0
+	for tech_id in loadout:
+		if tech_id != "" and TechData.TECH[tech_id]["element"] == element:
+			points += level_of(tech_id)
+	for upgrade_id in field:
+		if UpgradeData.field_upgrade(upgrade_id).get("element", "") == element:
+			points += UpgradeData.FIELD_RESONANCE_POINTS * int(field[upgrade_id])
+	return points
+
+
+func resonance_tier(element: String) -> int:
+	var points := resonance_points(element)
+	var tier := 0
+	for threshold in UpgradeData.RESONANCE_THRESHOLDS:
+		if points >= threshold:
+			tier += 1
+	return tier
+
+
+func resonance_tiers() -> Dictionary:
+	var tiers := {}
+	for element in UpgradeData.ELEMENTS:
+		tiers[element] = resonance_tier(element)
+	return tiers
 
 
 ## Adds XP and returns how many levels were gained.
@@ -95,5 +127,6 @@ func add_xp(amount: float) -> int:
 		xp -= xp_to_next
 		level += 1
 		gained += 1
-		xp_to_next = 6.0 + level * 4.0 + pow(level, 1.6)
+		# Fewer, bigger level-ups: each one should be a decision, not a reflex.
+		xp_to_next = 8.0 + level * 6.0 + pow(level, 1.8)
 	return gained

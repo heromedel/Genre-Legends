@@ -35,7 +35,8 @@ func update(dt: float) -> void:
 	if defeated:
 		_death_sequence(dt)
 		return
-	var boss_dt := dt * world.enemy_time_scale()
+	# Danger and Threat make bosses cycle their attacks (and move) faster.
+	var boss_dt := dt * world.enemy_time_scale() * world.enemy_fire_scale
 	time += boss_dt
 	behave(boss_dt)
 
@@ -49,7 +50,7 @@ func add_part(part_name: String, offset: Vector2, hp: float, radius: float, opti
 	var part := world.spawn_enemy("boss_part", origin + offset)
 	part.boss = self
 	part.part = part_name
-	part.max_hp = hp * world.enemy_hp_scale
+	part.max_hp = hp * 1.3 * world.enemy_hp_scale
 	part.hp = part.max_hp
 	part.radius = radius
 	part.look = look

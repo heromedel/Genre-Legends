@@ -59,14 +59,17 @@ func _init(map_node: Dictionary, mission_seed: int, frame_id: String, loadout: A
 func _apply_difficulty() -> void:
 	var difficulty: float = node.get("difficulty", 1.0)
 	var modifier: Dictionary = MissionData.MODIFIERS.get(node.get("modifier", ""), {})
-	world.enemy_hp_scale = (1.0 + 0.55 * (difficulty - 1.0)) * modifier.get("enemy_hp", 1.0)
-	world.enemy_damage_scale = 0.8 + 0.22 * (difficulty - 1.0)
-	world.bullet_speed_scale = (0.92 + 0.08 * (difficulty - 1.0)) * modifier.get("bullet_speed", 1.0)
+	var threat: Dictionary = MissionData.THREAT.get(node.get("threat", "standard"), MissionData.THREAT["standard"])
+	world.enemy_hp_scale = (1.0 + 0.55 * (difficulty - 1.0)) * modifier.get("enemy_hp", 1.0) * threat["enemy_hp"]
+	world.enemy_damage_scale = (1.0 + 0.22 * (difficulty - 1.0)) * threat["damage"]
+	world.bullet_speed_scale = (0.95 + 0.08 * (difficulty - 1.0)) * modifier.get("bullet_speed", 1.0) * threat["bullet_speed"]
+	world.enemy_fire_scale = (1.0 + 0.1 * (difficulty - 1.0)) * threat["fire"]
 	world.spawn_scale = modifier.get("spawn", 1.0)
 	world.xp_scale = modifier.get("xp", 1.0)
 	world.crate_chance = 0.35 * modifier.get("crates", 1.0)
 	world.dark = modifier.get("dark", false)
-	world.gentle = int(node.get("region", 0)) == 0 and difficulty < 1.15
+	# Only the very first planet eases you in.
+	world.gentle = node.get("id", "") == "r0c0n0"
 	if modifier.get("elite_blueprints", false):
 		world.elite_blueprint_tech = node.get("reward_tech", "")
 
@@ -288,7 +291,8 @@ func results(first_clear: bool) -> Dictionary:
 		var reward: String = node.get("reward_tech", "")
 		var amount := 2 + (2 if first_clear else 0)
 		var modifier: Dictionary = MissionData.MODIFIERS.get(node.get("modifier", ""), {})
-		amount = int(amount * modifier.get("blueprints", 1.0))
+		var threat: Dictionary = MissionData.THREAT.get(node.get("threat", "standard"), MissionData.THREAT["standard"])
+		amount = int(amount * modifier.get("blueprints", 1.0) * threat["blueprints"])
 		if reward != "":
 			blueprints[reward] = int(blueprints.get(reward, 0)) + amount
 	return {
