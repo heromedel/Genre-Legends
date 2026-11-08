@@ -441,6 +441,7 @@ func _build_rnd_page() -> Control:
 	column.add_theme_constant_override("separation", 10)
 	scroll.add_child(column)
 	column.add_child(UiKit.label("RESEARCH & DEVELOPMENT", 20, Color(0.6, 0.9, 1.0), "title"))
+	column.add_child(UiKit.wrapped("Mawjig: " + UpgradeData.RESONANCE["mawjig"]["about"], 14, Color(0.85, 0.6, 1.0)))
 	column.add_child(UiKit.wrapped("Missions pay out blueprints. Each planet's card on the Star Map shows which tech it rewards. Blueprints unlock tech, then raise its Mk so it levels higher in missions and hits harder.", 15, Color(0.65, 0.75, 0.88)))
 	var grid := GridContainer.new()
 	grid.columns = 3

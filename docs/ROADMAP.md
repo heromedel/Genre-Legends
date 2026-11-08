@@ -46,6 +46,10 @@
 1. Horde Siege.
 2. Titan Hunt and the combined super-robot form.
 
+## Plan G: Realms (later)
+
+1. The first realm: a dimension reached through a rare event, with its own galaxy, look and rules (GDD 10B, 10E).
+
 ## Plan E: Co-op and trading
 
 1. Controller support (GDD 2D).

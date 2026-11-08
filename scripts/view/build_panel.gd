@@ -72,6 +72,8 @@ static func _resonance_section(column: VBoxContainer, run: RunState) -> void:
 			continue
 		var progress := "all tiers unlocked" if tier >= thresholds.size() else "%d/%d to tier %s" % [points, thresholds[tier], UpgradeOffers.ROMAN[tier + 1]]
 		column.add_child(UiKit.label("%s   %s" % [info["name"], progress], 16, color, "bold"))
+		if info.has("about"):
+			column.add_child(UiKit.wrapped(info["about"], 13, Color(0.6, 0.66, 0.76)))
 		# Only what's active now, and the very next thing to aim for.
 		for i in tier:
 			var entry: Array = info["tiers"][i]

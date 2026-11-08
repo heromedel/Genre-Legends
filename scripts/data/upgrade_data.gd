@@ -72,7 +72,7 @@ const RESONANCE := {
 		["Penetrator", "Shots punch through one extra enemy."],
 		["Momentum", "Shots that have flown a while hit 40% harder."],
 		["Railstorm", "Every 2 s a slug tears through the nearest enemy and everything behind it."]]},
-	"mawjig": {"name": "Mawjig", "tiers": [
+	"mawjig": {"name": "Mawjig", "about": "A measurement of matter and energy used in advanced or physics bending technology.", "tiers": [
 		["Hex Touch", "Hits hex enemies. Hexed enemies take 20% more damage."],
 		["Contagion", "Hexed enemies burst when they die and hex everything nearby."],
 		["Doom Bell", "Every 8 s, meteors fall on up to three hexed enemies."]]},
