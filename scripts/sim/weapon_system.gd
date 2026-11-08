@@ -161,7 +161,8 @@ func _pulse_driver() -> void:
 					shot.pierce = 3
 					shot.radius = 8.0
 				if fork == "a":
-					shot.bounces = level - 1
+					# Now that misses bounce off the field's edges, every bounce lands; 1 at the fork, 2 at level 5.
+					shot.bounces = 1 + (level - 3) / 2
 					shot.bounce_bonus = 0.18
 				elif fork == "b":
 					shot.split_after = 0.2

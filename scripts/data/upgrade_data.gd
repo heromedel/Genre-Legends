@@ -24,8 +24,8 @@ const FIELD := {
 		"text": "Move 15% faster, and ramming enemies hurts them more than you.",
 	},
 	"tractor_beam": {
-		"name": "Tractor Beam", "limit": 1, "icon": "magnet", "element": "kinetic",
-		"text": "Data Shards and drops fly to you from across the field.",
+		"name": "Tractor Beam", "limit": 2, "icon": "magnet", "element": "kinetic",
+		"text": "Beams of light reel in Data Shards and drops from three times as far. Taking it again reaches further.",
 	},
 	"field_repair": {
 		"name": "Field Repair", "limit": 2, "icon": "repair", "element": "",
@@ -33,7 +33,7 @@ const FIELD := {
 	},
 	"lucky_salvage": {
 		"name": "Lucky Salvage", "limit": 1, "icon": "crate", "element": "",
-		"text": "Salvage Crate reels always land on at least 3 upgrades.",
+		"text": "Crates have improved odds: the first reel loses its zeros.",
 	},
 }
 
@@ -67,12 +67,12 @@ const RESONANCE := {
 	"explosive": {"name": "Explosive", "tiers": [
 		["Volatile", "Kills have a 1 in 4 chance to explode."],
 		["Big Bang", "Every explosion is a third bigger."],
-		["Scorched Earth", "Explosions leave the ground burning."]]},
+		["Wildfire", "Explosions leave flames that keep burning."]]},
 	"kinetic": {"name": "Kinetic", "tiers": [
 		["Penetrator", "Shots punch through one extra enemy."],
 		["Momentum", "Shots that have flown a while hit 40% harder."],
 		["Railstorm", "Every 2 s a slug tears through the nearest enemy and everything behind it."]]},
-	"mawjig": {"name": "Mawjig", "about": "A measurement of matter and energy used in advanced or physics bending technology.", "tiers": [
+	"mawjig": {"name": "Mawjig", "tiers": [
 		["Hex Touch", "Hits hex enemies. Hexed enemies take 20% more damage."],
 		["Contagion", "Hexed enemies burst when they die and hex everything nearby."],
 		["Doom Bell", "Every 8 s, meteors fall on up to three hexed enemies."]]},
@@ -107,8 +107,14 @@ const FUSIONS := {
 	},
 }
 
-## Salvage Crate reel: how many upgrades it lands on, and how often (weights).
-const CRATE_REEL := [[1, 60], [3, 30], [5, 10]]
+## Salvage Crate: three reels, and the crate gives the sum of the faces they land on, 1 to 6 upgrades.
+## Zeros outnumber ones, which outnumber twos; the last reel has no zeros, so every crate gives at least 1.
+## Odds: 1 = 28.8%, 2 = 36%, 3 = 24%, 4 = 9%, 5 = 2%, 6 = 0.2% (average 2.2).
+const CRATE_REELS := [
+	[0, 0, 0, 0, 0, 0, 1, 1, 1, 2],
+	[0, 0, 0, 0, 0, 0, 1, 1, 1, 2],
+	[1, 1, 1, 1, 1, 1, 1, 1, 2, 2],
+]
 ## Rerolls per mission on the level-up screen.
 const REROLLS := 2
 

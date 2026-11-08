@@ -12,6 +12,7 @@ const ROMAN := ["", "I", "II", "III"]
 
 var world: World
 var run: RunState
+var last_reel_faces: Array = []       # what the last Salvage Crate's reels landed on, for the reel screen
 
 
 func _init(target_world: World) -> void:
@@ -220,12 +221,13 @@ func reroll(count: int) -> Array:
 	return build_cards(count)
 
 
-## Spins a Salvage Crate: lands on 1, 3 or 5 upgrades and applies them. Returns the cards it landed on.
+## Spins a Salvage Crate: three reels land on faces that add up to 1-6 upgrades, applied at once.
 ## Crates never pick forks, fusions or risky cards for you; those are always your choice.
 func open_crate() -> Array:
-	var count := _roll_reel()
-	if run.field_count("lucky_salvage") > 0:
-		count = maxi(count, 3)
+	last_reel_faces = spin_reels()
+	var count := 0
+	for face: int in last_reel_faces:
+		count += face
 	var results := []
 	for i in count:
 		var pool := _card_pool(false, false).filter(func(c): return c["field"] != "field_repair" and c["kind"] != "fusion")
@@ -237,13 +239,16 @@ func open_crate() -> Array:
 	return results
 
 
-func _roll_reel() -> int:
-	var total := 0
-	for entry in UpgradeData.CRATE_REEL:
-		total += entry[1]
-	var roll := world.rng.randi() % total
-	for entry in UpgradeData.CRATE_REEL:
-		roll -= entry[1]
-		if roll < 0:
-			return entry[0]
-	return 1
+## The faces each reel can land on. Lucky Salvage turns the first reel's zeros into ones (average 2.8).
+func crate_reels() -> Array:
+	var reels: Array = UpgradeData.CRATE_REELS.duplicate(true)
+	if run.field_count("lucky_salvage") > 0:
+		reels[0] = reels[0].map(func(face): return maxi(face, 1))
+	return reels
+
+
+func spin_reels() -> Array:
+	var faces := []
+	for reel: Array in crate_reels():
+		faces.append(reel[world.rng.randi() % reel.size()])
+	return faces

@@ -62,8 +62,22 @@ func behave(dt: float) -> void:
 			if fmod(time, 3.2) < dt:
 				world.enemy_ring(core.pos, 18, 150.0, time, {"radius": 7.0, "color": Color(1, 0.35, 0.5)})
 	if phase == 2 and fmod(time, 6.0) < dt:
-		for side: float in [-1.0, 1.0]:
-			var start_angle := PI * 0.5 + side * 0.9
-			world.add_zone("laser", core.pos, 0.0, 2.0, 22.0 * world.enemy_damage_scale, true,
-				{"warn": 1.0, "angle": start_angle, "length": 1100.0, "width": 26.0, "spin": -side * 0.8, "color": Color(1, 0.3, 0.4)})
-		world.emit("sound", {"name": "charge"})
+		_laser_sweep()
+
+
+## Twin lasers that always leave a way out. The warning shows the whole area each beam will sweep, and
+## the safe lane alternates: first the middle under the carrier, then the two outer edges.
+func _laser_sweep() -> void:
+	var core := part_named("core")
+	var sweeps := int(memory.get("sweeps", 0))
+	memory["sweeps"] = sweeps + 1
+	var outward := sweeps % 2 == 1
+	for side: float in [-1.0, 1.0]:
+		# Angles measured from straight down: the beams cover 0.35 to 1.2 radians out, or 0.08 to 0.6.
+		var from := 1.2 if not outward else 0.08
+		var to := 0.35 if not outward else 0.6
+		var duration := 2.0
+		world.add_zone("laser", core.pos, 0.0, duration, 22.0 * world.enemy_damage_scale, true,
+			{"warn": 1.0, "angle": PI * 0.5 + side * from, "length": 1100.0, "width": 26.0,
+			"spin": side * (to - from) / duration, "color": Color(1, 0.3, 0.4)})
+	world.emit("sound", {"name": "charge"})

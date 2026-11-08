@@ -10,6 +10,7 @@ var camera_mode := "fixed"      # fixed: the whole field is on screen; follow: c
 var boss: BossBase = null
 var boss_started := false
 var miniboss: BossBase = null       # a mid-stage fight (GDD 9B)
+var debug_boss_phase := 0           # debug launches: the boss starts its fight in this phase
 
 
 func _init(owner: Mission) -> void:
@@ -83,6 +84,7 @@ func start_boss(new_boss: BossBase) -> void:
 	boss = new_boss
 	boss_started = true
 	boss.spawn()
+	boss.memory["debug_phase"] = debug_boss_phase
 	world.emit("boss_warning", {"name": boss.boss_name, "title": boss.title})
 	world.emit("sound", {"name": "warning"})
 	mission.note("Boss appeared: %s" % boss.boss_name)

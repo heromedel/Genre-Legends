@@ -103,9 +103,23 @@
 - **10B. Decided (2026-11-08):** Star systems sit in star clusters, in regions of a galaxy. A realm is something else: a dimension, plane, demi-plane, pocket dimension, magic dungeon or anything like that.
   - **Likely (2026-11-08):** The word "realm" is kept for those only, never used for regions or clusters.
 - **10C. Likely (2026-11-08):** Infall is at most a different realm or galaxy, not the same place. Tie-ins and nods are fine, and things can occasionally be borrowed.
-- **10D. Likely (2026-11-08):** Mawjig (from Infall: Materials Worth of Jigawatts) is explained in game as "A measurement of matter and energy used in advanced or physics bending technology."
+- **10D. Likely (2026-11-08):** Mawjig (from Infall: Materials Worth of Jigawatts) is explained in game as "A measurement of matter and energy used in advanced or physics bending technology." The game also gives the full name, Materials Worth of Jigawatts.
 - **10E. Proposed (2026-11-08):** A regular Jig Drive isn't built to jump dimensions; a temporal variant might be. In Infall, rumours said an ancient relic, the Orb of Chulak (a Stargate SG-1 nod), could open a wormhole to another dimension.
   - **Ai-Generated-Proposal (2026-11-08):** Reaching a realm is a big, rare event (a relic, a temporal drive), and each realm plays by its own rules, so the late game can feel like a different game.
+
+## 11. Playtest Refinements (builds 0.2.2 and 0.3)
+
+- **11A. Likely (2026-11-08):** A Salvage Crate is three reels whose faces add up to the number of upgrades. Zeros outnumber ones, which outnumber twos, and the last reel has no zeros, so every crate gives 1 to 6 with no jumps. (heromedel's design.)
+  - **Ai-Generated-Proposal (2026-11-08):** Reels of six 0s, three 1s and one 2, then eight 1s and two 2s: 1 = 28.8%, 2 = 36%, 3 = 24%, 4 = 9%, 5 = 2%, 6 = 0.2%, average 2.2. The crate screen lists what every upgrade does.
+- **11B. Likely (2026-11-08):** Lucky Salvage reads "Crates have improved odds": the first reel loses its zeros (at least 2, average 2.8).
+- **11C. Likely (2026-11-08):** The in-game encyclopedia is called the Guide to Guardians. Explanations such as Mawjig live there rather than on working screens.
+  - **Ai-Generated-Proposal (2026-11-08):** Lore, how-it-works, Resonance and special conditions are always there; enemies, bosses, tech and fusions fill in as you meet, beat or unlock them.
+- **11D. Proposed (2026-11-08):** Tractor Beam is a visible beam that reels in semi-nearby drops, as long as it doesn't clutter the battlefield.
+- **11E. Proposed (2026-11-08):** Star Cluster's capture trope works without lives: a clone enemy scans you and projects a hologram. Kill the clone, or break the projector's shell and pick up the projector, which turns the clone to your side. An arrow points at the projector, green like a pickup. (heromedel's idea.)
+  - **Ai-Generated-Proposal (2026-11-08):** The clone copies a weaker version of your current build (your main weapon and one other tech).
+- **11F. Likely (2026-11-08):** The ship and mech look different depending on the frame and what's equipped.
+- **11G. Ai-Generated-Proposal (2026-11-08):** Themed branches play harder than the route beside them and their prize planet is a Hazard, so the optional path is the riskier one (supports 9G).
+- **11H. Ai-Generated-Proposal (2026-11-08):** Explosive Resonance III is renamed Wildfire, and burning effects never mention the ground, since many fights are in space.
 
 ## Decision Log
 
@@ -123,3 +137,4 @@
 | 2026-11-08 | 9A–9H | Build 0.2 plan approved: intentional difficulty, five-minute stages, lesson planets, losses that still pay, radio officer, enemy traits, hard branches, strategic upgrades. |
 | 2026-11-08 | 10A–10E | Subtitle; what realms are; Infall as a separate realm with nods; how Mawjig is explained; how dimensions might be reached. |
 | 2026-11-08 | 10A, 10B | Subtitle and the meaning of realms set to Decided; keeping the word for realms only is Likely. |
+| 2026-11-08 | 10D, 11A–11H | Playtest refinements: three-reel crates, Lucky Salvage odds, the Guide to Guardians with Mawjig's full name, a visible Tractor Beam, the clone-and-projector capture idea, frames that show their gear, harder themed branches, Wildfire. |

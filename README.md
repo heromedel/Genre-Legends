@@ -6,6 +6,14 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
+## What's new in 0.2.2
+
+- **Salvage Crates** spin three reels that add up to 1-6 upgrades, and list what every upgrade does. Lucky Salvage improves the odds.
+- **Guide to Guardians** (new rail page): lore, how things work, and entries for every enemy, boss, tech and fusion you find.
+- **Fixes from play:** Twin Aces health bar, Hive Carrier lasers that always leave a lane (shown in advance, one hit per pass), Hangar dot clears, R&D dot when an upgrade is ready, Starfall and Wildfire text.
+- **Tractor Beam** is a visible beam with a sensible reach; **Ricochet Rounds** bounce off the field's edges and keep hunting.
+- **Themed branches** are now the riskier path, and their prize planet is a Hazard. Radio lines are louder and cover special conditions.
+
 ## What's new in 0.2.1
 
 - **Settings → Get the latest version:** shows which build you're on and clears the offline copy so the newest build loads. Your save is kept.

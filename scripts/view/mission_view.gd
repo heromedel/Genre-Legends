@@ -220,6 +220,8 @@ func _open_offer() -> void:
 func _open_crate() -> void:
 	var reel := Overlays.CrateReel.new()
 	reel.cards = mission.crate_cards
+	reel.faces = mission.crate_faces
+	reel.reels = mission.offers.crate_reels()
 	reel.on_done = func(): input.queue_choice(0)
 	_show_overlay("crate", reel)
 	Sound.play("reel")
@@ -378,6 +380,11 @@ func _paint_glow(ci: CanvasItem) -> void:
 	for pickup: Pickup in world.pickups:
 		if view.has_point(pickup.pos):
 			ShotArt.draw_pickup_glow(ci, pickup)
+	# Tractor Beam: a ribbon of light to every drop it is reeling in.
+	if mission.run.field_count("tractor_beam") > 0:
+		for pickup: Pickup in world.pickups:
+			if pickup.magnetized and view.has_point(pickup.pos):
+				ShotArt.draw_tractor_beam(ci, world.player.pos, pickup.pos, time)
 	for shot: Shot in world.enemy_shots:
 		ShotArt.draw_enemy_shot_glow(ci, shot)
 	var player := mission.player

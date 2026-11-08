@@ -2,6 +2,9 @@ extends Node
 ## The game's flow, top to bottom: title, then the command center; launch a planet's mission; show the
 ## results and bank the rewards; back to the command center. Everything else is a step this calls.
 
+## A lesson planet whose tech you already own pays this many of its blueprints instead (GDD 9C).
+const LESSON_BLUEPRINTS_IF_OWNED := 4
+
 var star_map: StarMap
 var _debug_options := {}
 var screen: Node = null
@@ -62,6 +65,12 @@ func finish_mission(node_id: String, result: Dictionary) -> void:
 		Save.queue_radio(Radio.lesson_line(lesson_tech, result["won"]))
 		hints.append("New tech: %s. Equip it in the Hangar." % TechData.TECH[lesson_tech]["name"])
 		PlayLog.note("unlock", "Lesson tech %s unlocked (%s)" % [lesson_tech, "won" if result["won"] else "lost"])
+	elif lesson_tech != "":
+		# Found it early: the lesson planet pays toward its next Mk instead.
+		Save.add_blueprints(lesson_tech, LESSON_BLUEPRINTS_IF_OWNED)
+		Save.queue_radio(Radio.came_prepared_line(lesson_tech))
+		hints.append("+%d %s blueprints." % [LESSON_BLUEPRINTS_IF_OWNED, TechData.TECH[lesson_tech]["name"]])
+		PlayLog.note("unlock", "Lesson tech %s already owned: +%d blueprints" % [lesson_tech, LESSON_BLUEPRINTS_IF_OWNED])
 	if result["won"] and not is_test:
 		Save.mark_cleared(node_id)
 		Save.data["stats"]["wins"] += 1
@@ -87,8 +96,9 @@ func finish_mission(node_id: String, result: Dictionary) -> void:
 ## Debug launches for the playtesters and capture harness, from the page URL (?test=planet&boss=1)
 ## or command-line user args (-- test=planet boss=1). Options:
 ##   test=<type>  launch a test mission    boss=1   skip to its boss    power=a|b  everything online
-##   god=1        invulnerable             page=<map|hangar|rnd|settings>  open the hub on a page
+##   god=1        invulnerable             page=<map|hangar|rnd|guide|records|settings>  open the hub on a page
 ##   frame=<id>   fly a frame              mk=3     all tech unlocked at that Mk
+##   crate=<n>    open n Salvage Crates as soon as play starts      phase=<n>  with boss=1, the boss starts in phase n
 func _debug_launch() -> bool:
 	var options := {}
 	var raw := ""
@@ -122,10 +132,13 @@ func _debug_launch() -> bool:
 			view.mission.debug_power_up(options["power"])
 		if options.has("boss"):
 			view.mission.stage.debug_skip_to_boss()
+			view.mission.stage.debug_boss_phase = int(options.get("phase", "0"))
 		if options.has("miniboss"):
 			view.mission.stage.debug_skip_to_miniboss()
 		if options.has("offer"):
 			view.mission.open_offer("level_up", 3)
+		if options.has("crate"):
+			view.mission.pending_crates += int(options["crate"])
 		return true
 	if options.has("page"):
 		show_hub(options["page"])

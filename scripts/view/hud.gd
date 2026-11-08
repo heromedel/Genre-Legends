@@ -5,6 +5,9 @@ extends Control
 ## banners, the boss WARNING, screen flashes and the low-armor vignette.
 ## Readable at a glance (Information & Feedback): numbers where they matter, colour everywhere else.
 
+## How long a radio line stays up (GDD 9E): long enough to read during the transformation.
+const RADIO_SECONDS := 6.0
+
 var mission: Mission
 var view_rect_world := Rect2()
 var world_to_screen: Transform2D
@@ -48,7 +51,8 @@ func show_banner(text: String, style: String) -> void:
 ## One short line from the operations officer, shown for a few seconds (GDD 9E).
 func show_radio(text: String) -> void:
 	radio_text = text
-	radio_time = 3.8
+	radio_time = RADIO_SECONDS
+	Sound.play("radio")
 
 
 func show_warning(boss_name: String, title: String) -> void:
@@ -178,7 +182,7 @@ func _draw_tech_chips(screen: Vector2) -> void:
 		var tier := run.resonance_tier(element)
 		if tier <= 0:
 			continue
-		var color: Color = BuildPanel.ELEMENT_COLORS[element]
+		var color: Color = TechData.ELEMENT_COLORS[element]
 		var center := at + Vector2(16, size * 0.5)
 		var diamond := PackedVector2Array([center + Vector2(0, -15), center + Vector2(15, 0), center + Vector2(0, 15), center + Vector2(-15, 0)])
 		draw_colored_polygon(diamond, Art.with_alpha(color, 0.25 + 0.2 * tier))
@@ -272,13 +276,16 @@ func _draw_warning(screen: Vector2) -> void:
 func _draw_radio(screen: Vector2) -> void:
 	if radio_time <= 0.0:
 		return
-	var fade := clampf(radio_time / 0.4, 0.0, 1.0) * clampf((3.8 - radio_time) / 0.3, 0.0, 1.0)
-	var width := minf(screen.x * 0.42, 460.0)
-	var box := Rect2(Vector2(16, 112), Vector2(width, 58))
-	draw_rect(box, Color(0.02, 0.06, 0.1, 0.85 * fade))
-	draw_rect(box, Color(0.4, 0.85, 1.0, 0.8 * fade), false, 2.0)
-	draw_string(font_bold, box.position + Vector2(12, 20), "OPS  " + Radio.OFFICER.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.5, 0.9, 1.0, fade))
-	draw_string(font_body, box.position + Vector2(12, 42), radio_text, HORIZONTAL_ALIGNMENT_LEFT, width - 24, 14, Color(1, 1, 1, fade))
+	var fade := clampf(radio_time / 0.4, 0.0, 1.0) * clampf((RADIO_SECONDS - radio_time) / 0.3, 0.0, 1.0)
+	var width := minf(screen.x * 0.5, 540.0)
+	var box := Rect2(Vector2(16, 112), Vector2(width, 78))
+	draw_rect(box, Color(0.02, 0.06, 0.1, 0.9 * fade))
+	draw_rect(box, Color(0.4, 0.85, 1.0, 0.9 * fade), false, 2.5)
+	# A blinking "on air" light and the officer's name.
+	var blink := 0.5 + 0.5 * float(int(radio_time * 3.0) % 2)
+	draw_circle(box.position + Vector2(18, 20), 5.0, Color(0.3, 1.0, 0.6, fade * blink))
+	draw_string(font_bold, box.position + Vector2(30, 25), "OPS  " + Radio.OFFICER.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.5, 0.9, 1.0, fade))
+	draw_multiline_string(font_body, box.position + Vector2(12, 48), radio_text, HORIZONTAL_ALIGNMENT_LEFT, width - 24, 16, 2, Color(1, 1, 1, fade))
 
 
 func _draw_vignette(screen: Vector2) -> void:

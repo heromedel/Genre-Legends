@@ -169,6 +169,10 @@ func make_effect(effect: String) -> AudioStreamWAV:
 			b = blank(0.08); voice(b, 0, 0.08, 2200, 1800, "square", 0.08, 0.001, 0.15)
 		"lob", "splat", "burrow", "mortar", "bounce", "blink", "curtain", "laser":
 			b = blank(0.3); voice(b, 0, 0.3, 400, 120, "noise", 0.22); voice(b, 0, 0.2, 300, 150, "triangle", 0.12)
+		"radio":
+			# Static, then the two-tone chirp of an open channel.
+			b = blank(0.55); voice(b, 0, 0.3, 3000, 1500, "noise", 0.12, 0.005, 0.2)
+			voice(b, 0.28, 0.09, 1250, 1250, "square", 0.1, 0.002, 0.3); voice(b, 0.39, 0.12, 1660, 1660, "square", 0.1, 0.002, 0.3)
 		"ui":
 			b = blank(0.06); voice(b, 0, 0.06, 1500, 1500, "square", 0.08, 0.001, 0.3)
 		_:

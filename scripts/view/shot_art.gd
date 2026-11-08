@@ -165,11 +165,34 @@ static func _draw_warning(ci: CanvasItem, zone: Zone, time: float) -> void:
 		"laser":
 			var end := zone.pos + Vector2.from_angle(zone.angle) * zone.length
 			var blink := 0.35 + 0.35 * float(int(time * 14.0) % 2)
+			# A sweeping beam shades everything it will cross, so the safe lane is plain to see.
+			if zone.spin != 0.0:
+				var fan := PackedVector2Array([zone.pos])
+				var sweep := zone.spin * zone.life
+				for i in 13:
+					fan.append(zone.pos + Vector2.from_angle(zone.angle + sweep * i / 12.0) * zone.length)
+				ci.draw_colored_polygon(fan, Art.with_alpha(color, 0.16 + 0.06 * blink))
 			ci.draw_line(zone.pos, end, Art.with_alpha(color, blink), 2.0, true)
 		"ring":
 			Art.dashed_circle(ci, zone.pos, zone.radius * 0.25, Art.with_alpha(color, 0.6), 2.0, 10, time * 3.0)
+		"meteor":
+			# The target circle, plus the meteor itself streaking in toward it.
+			Art.dashed_circle(ci, zone.pos, zone.radius, Art.with_alpha(color, 0.85), 2.5, 12, time * 2.0)
+			var rock := zone.pos + World.METEOR_FROM * 520.0 * clampf(zone.warn / 0.5, 0.0, 1.0)
+			ci.draw_line(rock, rock + World.METEOR_FROM * 90.0, Art.with_alpha(color, 0.5), 10.0, true)
+			ci.draw_line(rock, rock + World.METEOR_FROM * 50.0, Color(1, 0.9, 1.0, 0.8), 4.0, true)
+			ci.draw_circle(rock, 9.0, Color(1, 0.85, 1.0))
 		_:
 			var total := 1.1
 			var fill := clampf(1.0 - zone.warn / total, 0.0, 1.0)
 			ci.draw_circle(zone.pos, zone.radius * fill, Art.with_alpha(color, 0.18))
 			Art.dashed_circle(ci, zone.pos, zone.radius, Art.with_alpha(color, 0.85), 2.5, 12, time * 2.0)
+
+
+## Tractor Beam's pull: a thin shimmering ribbon from the frame to a drop, drawn on the additive layer.
+static func draw_tractor_beam(ci: CanvasItem, from: Vector2, to: Vector2, time: float) -> void:
+	var color := Color(0.5, 1.0, 0.85)
+	var shimmer := 0.18 + 0.1 * sin(time * 12.0 + to.x * 0.05)
+	ci.draw_line(from, to, Art.with_alpha(color, shimmer), 7.0, true)
+	ci.draw_line(from, to, Art.with_alpha(color, shimmer + 0.15), 1.5, true)
+	ci.draw_arc(to, 11.0, 0, TAU, 12, Art.with_alpha(color, 0.5), 1.5, true)

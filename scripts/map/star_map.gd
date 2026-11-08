@@ -245,11 +245,16 @@ func _add_themed_branch(rng: RandomNumberGenerator, region: int) -> void:
 			node["branch"] = branch["id"]
 			node["branch_name"] = branch["name"]
 			node["modifier"] = branch["modifier"]
-			node["difficulty"] += 0.15
+			# The riskier path (GDD 9G): two planets tougher than the route beside it, and the prize
+			# planet plays as a Hazard. In the hand-set first region that means a later column's numbers.
+			node["difficulty"] += 0.3
 			node["danger"] = mini(node["danger"] + 1, 5)
+			if node["baseline"] >= 0:
+				node["baseline"] = mini(node["baseline"] + 2, MissionData.FIRST_REGION_BASELINE.size() - 1)
 			if k == branch["length"] - 1:
 				node["prize"] = branch["prize"]
 				node["prize_text"] = branch["prize_text"]
+				_make_hazard(node)
 			nodes[node_id] = node
 			_link(previous_id, node_id)
 			previous_id = node_id

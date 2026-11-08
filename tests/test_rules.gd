@@ -20,6 +20,7 @@ func _init() -> void:
 	_input_round_trip()
 	_replay_determinism()
 	_offers()
+	_build_022()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -144,3 +145,73 @@ func _offers() -> void:
 	check(mission.run.rerolls == before_rerolls - 1 and mission.state == "offer", "a reroll spends one and keeps the offer open")
 	var hinted := mission.offers.build_cards(3).filter(func(c): return c["synergy"] != "")
 	check(not hinted.is_empty(), "cards say what they build toward")
+
+
+func _test_mission(mission_type: String) -> Mission:
+	var node := {"id": "t", "name": "T", "region": 0, "column": 1, "row": 0.0, "type": mission_type, "need": "x",
+		"difficulty": 1.0, "danger": 1, "modifier": "", "reward_tech": "arc_blade", "prize": "", "prize_text": ""}
+	return Mission.new(node, 7, "vanguard", TechData.STARTING_LOADOUT, func(t): return 3)
+
+
+## Build 0.2.2: crate reels, once-per-pass lasers, ricochet edges, tractor reach, branches, the guide.
+func _build_022() -> void:
+	# Crate reels: every result from 1 to 6 is possible, and the odds match what the data promises.
+	var mission := _test_mission("star_cluster")
+	var lowest := 99
+	var highest := 0
+	var total := 0
+	for i in 6000:
+		var sum: int = mission.offers.spin_reels().reduce(func(a, b): return a + b, 0)
+		lowest = mini(lowest, sum)
+		highest = maxi(highest, sum)
+		total += sum
+	check(lowest == 1, "a crate always gives at least 1 upgrade")
+	check(highest >= 5, "crates can land on 5 or more")
+	check(absf(total / 6000.0 - 2.2) < 0.1, "crates average about 2.2 upgrades (got %.2f)" % (total / 6000.0))
+	mission.run.field["lucky_salvage"] = 1
+	var lucky_low := 99
+	var lucky_total := 0
+	for i in 6000:
+		var sum: int = mission.offers.spin_reels().reduce(func(a, b): return a + b, 0)
+		lucky_low = mini(lucky_low, sum)
+		lucky_total += sum
+	check(lucky_low == 2, "Lucky Salvage: every crate gives at least 2")
+	check(absf(lucky_total / 6000.0 - 2.8) < 0.1, "Lucky Salvage averages about 2.8 (got %.2f)" % (lucky_total / 6000.0))
+	# A laser beam hits once per pass, however long you sit in it.
+	mission = _test_mission("star_cluster")
+	var world := mission.world
+	world.add_zone("laser", world.player.pos + Vector2(-300, 0), 0.0, 2.0, 10.0, true, {"angle": 0.0, "length": 600.0, "width": 30.0})
+	for i in 90:
+		world.update_zones(World.DT)
+		world.player.grace = maxf(world.player.grace - World.DT, 0.0)
+	check(mission.run.hits_taken == 1, "a laser hits once per pass (took %d)" % mission.run.hits_taken)
+	# Ricochet shots glance off the field's edge instead of vanishing.
+	var shot := world.player_shot(Vector2(world.bounds.end.x - 2.0, 300.0), Vector2(900, 0), 5.0, "pulse_driver", "bolt", Color.WHITE)
+	shot.bounces = 2
+	world.update_player_shots(World.DT * 2.0)
+	check(not shot.dead and shot.bounces == 1 and shot.vel.x < 0.0, "ricochet bounces off the field edge")
+	# Tractor Beam pulls from three times as far, not across the whole field.
+	var base_reach := world.pickup_reach()
+	mission.run.field["tractor_beam"] = 1
+	check(is_equal_approx(world.pickup_reach(), base_reach * 3.0), "Tractor Beam reaches 3x")
+	# Themed branches play harder than the main route beside them, and the prize planet is a Hazard.
+	var map := StarMap.new(777)
+	map.ensure_generated(func(_id): return false)
+	for node_id in map.all_node_ids():
+		var node: Dictionary = map.get_node(node_id)
+		if node.get("branch", "") != "" and node["region"] == 0:
+			check(node["baseline"] > node["column"] - 1 or node["baseline"] == MissionData.FIRST_REGION_BASELINE.size() - 1,
+				"%s plays above its column" % node_id)
+			if node.get("prize", "") != "":
+				check(node.get("hazard", false), "%s, the branch's prize planet, is a Hazard" % node_id)
+	# Twin Aces show their health bar once they've flown in.
+	mission = _test_mission("star_cluster")
+	mission.stage.debug_skip_to_miniboss()
+	var bot := BotPilot.new(mission, 1)
+	for i in 60 * 12:
+		mission.step(bot.next_input())
+		mission.drain_events()
+	check(mission.stage.miniboss != null and not mission.stage.miniboss.entering, "the Twin Aces finish their entrance")
+	# The guide only describes real enemies.
+	for kind in GuideData.ENEMIES:
+		check(EnemyData.ENEMIES.has(kind), "guide entry %s is a real enemy" % kind)

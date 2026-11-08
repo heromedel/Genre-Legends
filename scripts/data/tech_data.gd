@@ -44,7 +44,7 @@ const TECH := {
 		"levels": ["Rapid bolts", "Twin bolts", "Fork", "Triple fan", "Overcharged bolts"],
 		"blueprint_from": ["star_cluster", "corridor"],
 		"forks": {
-			"a": {"name": "Ricochet Rounds", "text": "Bolts bounce from enemy to enemy, hitting harder with every bounce."},
+			"a": {"name": "Ricochet Rounds", "text": "Bolts bounce from enemy to enemy, hitting harder each time, and glance off the edges of the field instead of flying away."},
 			"b": {"name": "Splitfire", "text": "Every bolt bursts into a fan of smaller bolts mid-flight."},
 		},
 	},
@@ -101,11 +101,11 @@ const TECH := {
 	},
 	"starfall": {
 		"name": "Starfall", "slot": "weapon", "element": "mawjig",
-		"text": "Calls Mawjig meteors down on enemies. Sound in space? Absolutely.",
+		"text": "Calls Mawjig meteors down where nearby enemies are heading. Each one blasts everything it lands on.",
 		"levels": ["One meteor", "Two meteors", "Fork", "Three meteors", "Cataclysm"],
 		"blueprint_from": ["planet", "corridor"],
 		"forks": {
-			"a": {"name": "Comet Trail", "text": "Impacts leave the ground burning."},
+			"a": {"name": "Comet Trail", "text": "Meteors leave a flaming trail that burns anything in it."},
 			"b": {"name": "Meteor Shower", "text": "Many smaller meteors rain across the field."},
 		},
 	},

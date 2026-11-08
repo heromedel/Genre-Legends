@@ -19,7 +19,22 @@ static func mission_start_line(node: Dictionary, missions_flown: int) -> String:
 		return "Break the gate and the next region opens up."
 	if missions_flown == 0:
 		return "Frame's warm, Commander. Weapons fire on their own. Just fly."
-	return ""
+	# A special condition is worth a heads-up; a plain planet gets silence.
+	return CONDITION_LINES.get(node.get("modifier", ""), "")
+
+
+const CONDITION_LINES := {
+	"ion_storm": "Ion storm overhead. Their shots will come in fast, but the shards are rich.",
+	"swarm_season": "Swarm season. Twice the bodies, half the armor. Keep your guns busy.",
+	"derelict_field": "Derelict field. Plenty of salvage, and whatever's out there is armored up.",
+	"bounty_hunters": "Bounty hunters on your trail. Bring one down and its blueprints are yours.",
+	"blackout": "We've lost the lights down there. Trust your lamp, Commander.",
+}
+
+
+## What the officer says when you reach a lesson planet already owning its tech.
+static func came_prepared_line(tech_id: String) -> String:
+	return "You came prepared, Commander. Engineering stripped the wreck for %s parts. They're in R&D." % TechData.TECH[tech_id]["name"]
 
 
 ## What the officer says after a lesson planet hands over its tech (win or lose).

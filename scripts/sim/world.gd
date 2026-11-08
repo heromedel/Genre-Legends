@@ -9,6 +9,10 @@ extends RefCounted
 
 const DT := 1.0 / 60.0
 const PICKUP_RADIUS := 105.0
+## How far a ricocheting shot looks for its next target.
+const RICOCHET_RANGE := 420.0
+## Meteors (Starfall, Doom Bell) streak in from the upper left; Comet Trail fires lie along that path.
+const METEOR_FROM := Vector2(-0.5, -0.866)
 const GRAZE_MARGIN := 26.0
 const MIRROR_RADIUS := 66.0
 
@@ -328,7 +332,7 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 
 ## A player explosion that damages every enemy in range once.
 func explode(at: Vector2, radius: float, damage: float, tech: String, color: Color, spreads_hex: bool = false) -> void:
-	# Explosive resonance: bigger blasts, then blasts that leave the ground burning.
+	# Explosive resonance: bigger blasts, then blasts that leave flames burning (Wildfire).
 	if resonance["explosive"] >= 2:
 		radius *= 1.33
 	if resonance["explosive"] >= 3 and radius >= 40.0 and zones.size() < 40:
@@ -442,6 +446,9 @@ func update_player_shots(dt: float) -> void:
 				else:
 					emit("spark", {"pos": shot.pos, "color": shot.color})
 				continue
+		# Ricochet: a shot with bounces left glances off the edge of the field instead of leaving it.
+		if shot.bounces > 0 and not bounds.has_point(shot.pos):
+			_bounce_off_edge(shot)
 		if not shot_bounds.has_point(shot.pos):
 			shot.dead = true
 			continue
@@ -477,10 +484,9 @@ func update_player_shots(dt: float) -> void:
 			if shot.bounces > 0:
 				shot.bounces -= 1
 				shot.damage *= 1.0 + shot.bounce_bonus
-				var next := nearest_enemy(shot.pos, 340.0, shot.hit_ids)
-				if next == null:
-					shot.dead = true
-				else:
+				# With nobody close enough to bounce to, the shot flies on and can still find someone.
+				var next := nearest_enemy(shot.pos, RICOCHET_RANGE, shot.hit_ids)
+				if next != null:
 					shot.vel = (next.pos - shot.pos).normalized() * shot.vel.length()
 					shot.life = maxf(shot.life, 0.6)
 					emit("ricochet", {"pos": shot.pos})
@@ -522,6 +528,19 @@ func _split_shot(shot: Shot) -> void:
 		child.radius = shot.radius * 0.8
 		child.life = 0.9
 	emit("spark", {"pos": shot.pos, "color": shot.color})
+
+
+func _bounce_off_edge(shot: Shot) -> void:
+	shot.bounces -= 1
+	if shot.pos.x < bounds.position.x or shot.pos.x > bounds.end.x:
+		shot.vel.x = -shot.vel.x
+	if shot.pos.y < bounds.position.y or shot.pos.y > bounds.end.y:
+		shot.vel.y = -shot.vel.y
+	shot.pos = shot.pos.clamp(bounds.position, bounds.end)
+	# A glancing bounce: a plain reflection that loses some punch, so a miss isn't free, just not wasted.
+	shot.damage *= 0.7
+	shot.life = maxf(shot.life, 0.8)
+	emit("ricochet", {"pos": shot.pos})
 
 
 func _bounce_off_wall(shot: Shot) -> void:
@@ -637,8 +656,14 @@ func _mirror_reflect(shot: Shot) -> void:
 	reflect_shot(shot, damage, run.has_fusion("reflex_blade"), 3 if run.fork_of("mirror_aegis") == "a" else 1)
 
 
+## How far away drops start flying to you. Tractor Beam reaches 3 times as far, 4.5 times when taken twice.
+func pickup_reach() -> float:
+	var tractor: float = [1.0, 3.0, 4.5][mini(run.field_count("tractor_beam"), 2)]
+	return PICKUP_RADIUS * tractor * (1.7 if player.form == "ship" else 1.0)
+
+
 func update_pickups(dt: float) -> void:
-	var reach := PICKUP_RADIUS * (14.0 if run.field_count("tractor_beam") > 0 else 1.0) * (1.7 if player.form == "ship" else 1.0)
+	var reach := pickup_reach()
 	for pickup: Pickup in pickups:
 		if pickup.dead:
 			continue
@@ -710,7 +735,9 @@ func update_zones(dt: float) -> void:
 					zone.hit_ids["player"] = true
 					damage_player(zone.damage, "shockwave")
 			"laser":
-				if zone.hostile and _point_near_beam(player.pos, zone, player.radius):
+				# A beam hits once per pass: you pay for being caught, not for every frame inside it.
+				if zone.hostile and not zone.hit_ids.has("player") and _point_near_beam(player.pos, zone, player.radius):
+					zone.hit_ids["player"] = true
 					damage_player(zone.damage, "laser")
 			_:
 				zone.tick_timer -= zone_dt
@@ -741,7 +768,10 @@ func _zone_triggers(zone: Zone) -> void:
 			emit("shake", {"amount": 5.0})
 			emit("sound", {"name": "meteor"})
 			if zone.hit_ids.get("burning", false):
-				add_zone("fire", zone.pos, zone.radius * 0.8, 2.5, zone.damage * 0.18, false, {"tick": 0.4, "color": Color(1, 0.5, 0.9)})
+				# Comet Trail: the meteor leaves a flaming streak along the path it came in on.
+				for i in 4:
+					var along := zone.pos + METEOR_FROM * zone.radius * 0.7 * i
+					add_zone("fire", along, zone.radius * (0.55 - 0.08 * i), 2.5, zone.damage * 0.14, false, {"tick": 0.4, "color": Color(1, 0.5, 0.9)})
 			if run.has_fusion("armageddon_protocol"):
 				for i in 3:
 					var missile := player_shot(zone.pos, Vector2.from_angle(rng.randf() * TAU) * 260.0, zone.damage * 0.4, "swarm_pods", "missile", Color(1, 0.6, 0.3))

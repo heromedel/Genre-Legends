@@ -32,6 +32,7 @@ var offer_cards: Array = []
 var offer_source := ""          # level_up or pedestal
 var offer_serial := 0           # changes whenever a new set of cards is shown (new offer or reroll)
 var crate_cards: Array = []
+var crate_faces: Array = []     # the reel faces behind the last crate, for the reel screen
 var stages_played: Array = []
 var time_brake_active := false
 var log_lines: Array = []       # notable moments, for the play log
@@ -211,12 +212,13 @@ func _open_pending() -> void:
 	if pending_crates > 0:
 		pending_crates -= 1
 		crate_cards = offers.open_crate()
+		crate_faces = offers.last_reel_faces
 		state = "crate"
 		world.emit("crate_opened", {"cards": crate_cards})
 		var titles := []
 		for card in crate_cards:
 			titles.append(card["title"])
-		note("Salvage Crate landed on %d: %s" % [crate_cards.size(), ", ".join(titles)])
+		note("Salvage Crate reels %s landed on %d: %s" % [" + ".join(crate_faces.map(func(f): return str(f))), crate_cards.size(), ", ".join(titles)])
 	elif pending_pedestals > 0:
 		pending_pedestals -= 1
 		open_offer("pedestal", 3)
@@ -354,6 +356,7 @@ func results(first_clear: bool) -> Dictionary:
 		"fusions": run.fusions.duplicate(),
 		"progress": progress,
 		"kills_by_kind": run.kills_by_kind.duplicate(),
+		"bosses_defeated": run.bosses_defeated.duplicate(),
 		"max_resonance": run.max_resonance,
 		"is_gate": node.get("is_gate", false),
 		"armor_left": player.armor_fraction(),

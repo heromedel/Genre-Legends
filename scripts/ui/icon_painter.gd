@@ -85,6 +85,12 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 		"hangar":
 			ci.draw_colored_polygon(PackedVector2Array([p.call(0.9, 0), p.call(-0.5, -0.7), p.call(-0.2, 0), p.call(-0.5, 0.7)]), Art.with_alpha(color, 0.35))
 			ci.draw_polyline(PackedVector2Array([p.call(0.9, 0), p.call(-0.5, -0.7), p.call(-0.2, 0), p.call(-0.5, 0.7), p.call(0.9, 0)]), color, w, true)
+		"guide":
+			# An open book.
+			for side in [-1.0, 1.0]:
+				ci.draw_polyline(PackedVector2Array([p.call(0, -0.55), p.call(0.85 * side, -0.75), p.call(0.85 * side, 0.6), p.call(0, 0.8), p.call(0, -0.55)]), color, w, true)
+				for i in 3:
+					ci.draw_line(p.call(0.2 * side, -0.35 + i * 0.3), p.call(0.65 * side, -0.45 + i * 0.3), Art.with_alpha(color, 0.6), w * 0.7)
 		"lab":
 			ci.draw_polyline(PackedVector2Array([p.call(-0.25, -0.8), p.call(-0.25, -0.1), p.call(-0.7, 0.8), p.call(0.7, 0.8), p.call(0.25, -0.1), p.call(0.25, -0.8)]), color, w, true)
 			ci.draw_line(p.call(-0.45, 0.35), p.call(0.45, 0.35), color, w)

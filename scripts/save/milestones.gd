@@ -12,6 +12,8 @@ static func record_mission(result: Dictionary) -> Array:
 	_add(counters, "crates", result["crates"])
 	for kind in result.get("kills_by_kind", {}):
 		_add(counters, "kill_" + kind, int(result["kills_by_kind"][kind]))
+	for boss_look in result.get("bosses_defeated", []):
+		_add(counters, "boss_" + boss_look, 1)
 	var earned := []
 	for milestone in MilestoneData.MILESTONES:
 		var milestone_id: String = milestone["id"]

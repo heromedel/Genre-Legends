@@ -19,6 +19,9 @@ func spawn() -> void:
 func behave(dt: float) -> void:
 	var speed := 1.6 if angry else 1.1
 	var aces := living_parts("ace")
+	# The aces dive in from off screen; once both are on the field the fight (and its health bar) starts.
+	if entering and aces.all(func(ace): return ace.pos.y > 40.0):
+		entering = false
 	for ace: Enemy in aces:
 		var side := -1.0 if ace.part == "ace0" else 1.0
 		var target := origin + Vector2(side * cos(time * speed) * 360.0, sin(time * speed * 2.0) * 90.0)

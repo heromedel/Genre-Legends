@@ -172,12 +172,18 @@ func add_blueprints(tech_id: String, amount: int) -> void:
 	data["blueprints"][tech_id] = blueprints(tech_id) + amount
 
 
+## True when there are enough blueprints to unlock this tech or raise its Mk.
+func can_upgrade(tech_id: String) -> bool:
+	var cost := TechData.blueprints_for_next_mk(tech_mk(tech_id))
+	return cost > 0 and blueprints(tech_id) >= cost
+
+
 ## Spend blueprints to raise a tech's Mk. Returns true if it happened.
 func upgrade_tech(tech_id: String) -> bool:
+	if not can_upgrade(tech_id):
+		return false
 	var mk := tech_mk(tech_id)
 	var cost := TechData.blueprints_for_next_mk(mk)
-	if cost <= 0 or blueprints(tech_id) < cost:
-		return false
 	data["blueprints"][tech_id] = blueprints(tech_id) - cost
 	data["tech_mk"][tech_id] = mk + 1
 	if mk == 0:

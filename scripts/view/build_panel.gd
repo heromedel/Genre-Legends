@@ -3,11 +3,6 @@ class_name BuildPanel
 ## Each tech's level, fork and next step; Resonance progress and what each tier does; fusion progress;
 ## field upgrades taken; rerolls left. Shown from the pause menu and from the level-up screen.
 
-const ELEMENT_COLORS := {
-	"energy": Color(0.45, 0.9, 1.0), "explosive": Color(1.0, 0.6, 0.3),
-	"kinetic": Color(1.0, 0.85, 0.45), "mawjig": Color(0.85, 0.55, 1.0),
-}
-
 
 static func build(run: RunState) -> Control:
 	var panel := UiKit.panel(Color(0.03, 0.05, 0.09, 0.97), Color(0.3, 0.5, 0.7))
@@ -39,7 +34,7 @@ static func _tech_section(column: VBoxContainer, run: RunState) -> void:
 		var fork := run.fork_of(tech_id)
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
-		var color: Color = ELEMENT_COLORS.get(tech["element"], Color.WHITE)
+		var color: Color = TechData.ELEMENT_COLORS.get(tech["element"], Color.WHITE)
 		row.add_child(IconView.make(tech_id, 30, color if level > 0 else Color(0.4, 0.45, 0.55)))
 		var text := VBoxContainer.new()
 		text.add_theme_constant_override("separation", 0)
@@ -66,14 +61,12 @@ static func _resonance_section(column: VBoxContainer, run: RunState) -> void:
 		var info: Dictionary = UpgradeData.RESONANCE[element]
 		var points := run.resonance_points(element)
 		var tier := run.resonance_tier(element)
-		var color: Color = ELEMENT_COLORS[element]
+		var color: Color = TechData.ELEMENT_COLORS[element]
 		var thresholds: Array = UpgradeData.RESONANCE_THRESHOLDS
 		if points <= 0:
 			continue
 		var progress := "all tiers unlocked" if tier >= thresholds.size() else "%d/%d to tier %s" % [points, thresholds[tier], UpgradeOffers.ROMAN[tier + 1]]
 		column.add_child(UiKit.label("%s   %s" % [info["name"], progress], 16, color, "bold"))
-		if info.has("about"):
-			column.add_child(UiKit.wrapped(info["about"], 13, Color(0.6, 0.66, 0.76)))
 		# Only what's active now, and the very next thing to aim for.
 		for i in tier:
 			var entry: Array = info["tiers"][i]

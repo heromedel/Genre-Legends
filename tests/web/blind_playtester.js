@@ -46,7 +46,7 @@ const playSeconds = Number(process.argv[3] || 150);
   for (const y of [530, 509, 493]) { await page.mouse.click(566, y); await page.waitForTimeout(800); }   // "Continue" (its height depends on the text above it)
   await page.waitForTimeout(1500);
   await snap('back_to_hub');
-  await page.mouse.click(57, 472); await page.waitForTimeout(1500);
+  await page.mouse.click(57, 560); await page.waitForTimeout(1500);   // rail: SETTINGS
   const download = page.waitForEvent('download', { timeout: 15000 }).catch(() => null);
   await page.mouse.click(206, 494);
   const file = await download;

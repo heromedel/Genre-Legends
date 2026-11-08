@@ -36,6 +36,21 @@
 
 (Note) Done: strategic upgrades, intentional first-region difficulty, five-minute stages and mini-bosses, lesson planets, losses that pay and milestones, radio officer, enemy traits, Hazard routes, full screen, version stamp, hangar pop-up.
 
+## Build 0.2.2 (2026-11-08, from heromedel's playtest)
+
+(Note) Done: Twin Aces health bar, dodgeable Hive Carrier lasers, Hangar and R&D dots, three-reel crates with effect text, visible Tractor Beam, Ricochet that bounces off edges, a louder radio with special-condition lines, the Guide to Guardians, harder themed branches, text that never mentions the ground in space (GDD 11A–11H).
+
+## Build 0.3: content (approved 2026-11-08)
+
+1. Frames show their body and gear: parts fold away offline, deploy online, change with forks and merge in fusions (GDD 11F).
+2. A new boss and mini-boss for each mission type, named on the planet card, including the clone and projector (GDD 11E) and a Bounty Hunter Ace for the Tempest Run.
+3. Elite enemies with modifiers and better loot.
+4. Two new support and two new special tech, with fusions.
+5. Map events between planets: derelicts, distress calls, traders, ambushes.
+6. Bigger moments: hit-stop on big kills, screen-filling boss deaths, a show for Resonance tiers and fusions.
+7. Music and sound that fit each genre.
+8. Later: the Daily Signal and portals into pocket dungeons (with Plan G).
+
 ## Plan C: Defense and tanks
 
 1. Planetary Defense and Tank Assault, sharing the tank form.

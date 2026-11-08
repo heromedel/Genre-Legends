@@ -9,6 +9,7 @@ var star_map: StarMap
 var page := "map"
 var content: Control
 var rail_buttons := {}
+var rail_dots := {}             # page id -> its green dot, refreshed on every rebuild
 var selected_node := ""
 var picker_slot := -1
 var admin: AdminConsole
@@ -80,7 +81,7 @@ func _build_rail() -> Control:
 	column.add_child(UiKit.spacer(6))
 	column.add_child(logo)
 	column.add_child(UiKit.spacer(8))
-	for entry in [["map", "map", "STAR MAP"], ["hangar", "hangar", "HANGAR"], ["rnd", "lab", "R&D"], ["records", "prize", "RECORDS"], ["settings", "settings", "SETTINGS"]]:
+	for entry in [["map", "map", "STAR MAP"], ["hangar", "hangar", "HANGAR"], ["rnd", "lab", "R&D"], ["guide", "guide", "GUIDE"], ["records", "prize", "RECORDS"], ["settings", "settings", "SETTINGS"]]:
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(96, 84)
 		button.focus_mode = Control.FOCUS_NONE
@@ -103,9 +104,18 @@ func _build_rail() -> Control:
 		button.add_child(box)
 		column.add_child(button)
 		rail_buttons[page_id] = button
-		if page_id == "hangar" and not Save.data["new_unlocks"].is_empty():
-			button.add_child(NewDot.new())
+		if page_id in ["hangar", "rnd"]:
+			var dot := NewDot.new()
+			button.add_child(dot)
+			rail_dots[page_id] = dot
 	return rail
+
+
+## Green dots (GDD 9C): Hangar while new tech waits to be equipped, R&D while something can be unlocked
+## or upgraded. Refreshed on every rebuild so they clear the moment you act on them.
+func _refresh_rail_dots() -> void:
+	rail_dots["hangar"].visible = not Save.data["new_unlocks"].is_empty()
+	rail_dots["rnd"].visible = TechData.TECH.keys().any(func(tech_id): return Save.can_upgrade(tech_id))
 
 
 func _build_top_bar() -> Control:
@@ -140,6 +150,7 @@ func _rebuild() -> void:
 	var page_id := page
 	for key in rail_buttons:
 		rail_buttons[key].add_theme_stylebox_override("normal", UiKit._box(Color(0.12, 0.2, 0.3) if key == page_id else Color(0.06, 0.09, 0.14), Color(0.5, 0.85, 1.0) if key == page_id else Color(0.2, 0.3, 0.42), 2))
+	_refresh_rail_dots()
 	for child in content.get_children():
 		child.queue_free()
 	match page_id:
@@ -147,6 +158,7 @@ func _rebuild() -> void:
 		"hangar": content.add_child(_build_hangar_page())
 		"rnd": content.add_child(_build_rnd_page())
 		"settings": content.add_child(_build_settings_page())
+		"guide": content.add_child(_build_guide_page())
 		"records": content.add_child(_build_records_page())
 
 
@@ -441,8 +453,7 @@ func _build_rnd_page() -> Control:
 	column.add_theme_constant_override("separation", 10)
 	scroll.add_child(column)
 	column.add_child(UiKit.label("RESEARCH & DEVELOPMENT", 20, Color(0.6, 0.9, 1.0), "title"))
-	column.add_child(UiKit.wrapped("Mawjig: " + UpgradeData.RESONANCE["mawjig"]["about"], 14, Color(0.85, 0.6, 1.0)))
-	column.add_child(UiKit.wrapped("Missions pay out blueprints. Each planet's card on the Star Map shows which tech it rewards. Blueprints unlock tech, then raise its Mk so it levels higher in missions and hits harder.", 15, Color(0.65, 0.75, 0.88)))
+	column.add_child(UiKit.wrapped("Each planet's card on the Star Map shows which tech it rewards. More in the Guide to Guardians.", 14, Color(0.6, 0.7, 0.84)))
 	var grid := GridContainer.new()
 	grid.columns = 3
 	grid.add_theme_constant_override("h_separation", 12)
@@ -525,6 +536,85 @@ func _build_records_page() -> Control:
 			text.add_child(UiKit.label("Reward: " + Milestones.reward_text(milestone), 13, Color(0.6, 1.0, 0.7)))
 		column.add_child(row)
 	return scroll
+
+
+# ---------------------------------------------------------------- guide
+
+## The Guide to Guardians: lore and how things work are always there; enemies, bosses, tech and fusions
+## fill in as you meet, beat or unlock them, so the guide is also a record of how far you've come.
+func _build_guide_page() -> Control:
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 8)
+	scroll.add_child(column)
+	column.add_child(UiKit.label("GUIDE TO GUARDIANS", 20, Color(0.6, 0.9, 1.0), "title"))
+	column.add_child(UiKit.wrapped("Enemies, bosses, tech and fusions fill in as you meet, beat or unlock them.", 14, Color(0.6, 0.7, 0.84)))
+	var counters: Dictionary = Save.data["counters"]
+	var lore_color := TechData.ELEMENT_COLORS["mawjig"]
+	_guide_section(column, "LORE", GuideData.LORE.map(func(entry): return [entry[0], entry[1], lore_color]), 0)
+	_guide_section(column, "HOW IT WORKS", GuideData.HOW_IT_WORKS.map(func(entry): return [entry[0], entry[1], Color(0.6, 0.9, 1.0)]), 0)
+	var resonance := []
+	for element in UpgradeData.ELEMENTS:
+		var info: Dictionary = UpgradeData.RESONANCE[element]
+		var lines := []
+		for i in info["tiers"].size():
+			lines.append("%s  %s: %s" % [UpgradeOffers.ROMAN[i + 1], info["tiers"][i][0], info["tiers"][i][1]])
+		resonance.append([info["name"], "\n".join(lines), TechData.ELEMENT_COLORS[element]])
+	_guide_section(column, "RESONANCE", resonance, 0)
+	var tech := []
+	for tech_id in TechData.TECH:
+		if Save.tech_mk(tech_id) > 0:
+			var data: Dictionary = TechData.TECH[tech_id]
+			var forks: Dictionary = data["forks"]
+			tech.append([data["name"], "%s\nFork %s: %s\nFork %s: %s" % [data["text"], forks["a"]["name"], forks["a"]["text"],
+				forks["b"]["name"], forks["b"]["text"]], TechData.element_color(tech_id)])
+	_guide_section(column, "TECH", tech, TechData.TECH.size() - tech.size())
+	var fusions := []
+	for fusion_id in UpgradeData.FUSIONS:
+		var fusion: Dictionary = UpgradeData.FUSIONS[fusion_id]
+		if fusion["needs"].all(func(needed): return Save.tech_mk(needed) > 0):
+			fusions.append([fusion["name"], "%s + %s: %s" % [TechData.TECH[fusion["needs"][0]]["name"], TechData.TECH[fusion["needs"][1]]["name"], fusion["text"]], Art.GOLD])
+	_guide_section(column, "FUSIONS", fusions, UpgradeData.FUSIONS.size() - fusions.size())
+	var enemies := []
+	for kind in GuideData.ENEMIES:
+		if int(counters.get("kill_" + kind, 0)) > 0:
+			enemies.append([EnemyData.ENEMIES[kind]["name"], GuideData.ENEMIES[kind], EnemyData.ENEMIES[kind]["color"]])
+	_guide_section(column, "ENEMIES", enemies, GuideData.ENEMIES.size() - enemies.size())
+	var bosses := []
+	for boss_look in GuideData.BOSSES:
+		if int(counters.get("boss_" + boss_look, 0)) > 0:
+			bosses.append([GuideData.BOSSES[boss_look][0], GuideData.BOSSES[boss_look][1], Color(1, 0.55, 0.45)])
+	_guide_section(column, "BOSSES", bosses, GuideData.BOSSES.size() - bosses.size())
+	var conditions := []
+	for modifier_id in MissionData.MODIFIERS:
+		if modifier_id != "":
+			conditions.append([MissionData.MODIFIERS[modifier_id]["name"], MissionData.MODIFIERS[modifier_id]["text"], Color(1, 0.8, 0.45)])
+	_guide_section(column, "SPECIAL CONDITIONS", conditions, 0)
+	return scroll
+
+
+## One guide section: a heading, its entries two to a row, and how many are still undiscovered.
+func _guide_section(column: VBoxContainer, heading: String, entries: Array, undiscovered: int) -> void:
+	column.add_child(UiKit.spacer(4))
+	column.add_child(UiKit.label(heading, 16, Art.GOLD, "bold"))
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 10)
+	column.add_child(grid)
+	for entry in entries:
+		var box := UiKit.panel(Color(0.04, 0.07, 0.11), Color(entry[2]).darkened(0.45))
+		box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var text := VBoxContainer.new()
+		text.add_theme_constant_override("separation", 2)
+		box.add_child(text)
+		text.add_child(UiKit.label(entry[0], 16, entry[2], "bold"))
+		text.add_child(UiKit.wrapped(entry[1], 13, Color(0.75, 0.83, 0.92)))
+		grid.add_child(box)
+	if undiscovered > 0:
+		column.add_child(UiKit.label("%d still to discover" % undiscovered, 13, Color(0.5, 0.58, 0.7)))
 
 
 # ---------------------------------------------------------------- settings

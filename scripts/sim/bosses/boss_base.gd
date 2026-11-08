@@ -38,6 +38,9 @@ func update(dt: float) -> void:
 	# Danger and Threat make bosses cycle their attacks (and move) faster.
 	var boss_dt := dt * world.enemy_time_scale() * world.enemy_fire_scale
 	time += boss_dt
+	# Debug launches can start the fight in a later phase, once the entrance is over.
+	if not entering and int(memory.get("debug_phase", 0)) > phase:
+		set_phase(int(memory["debug_phase"]), "")
 	behave(boss_dt)
 
 
@@ -115,6 +118,7 @@ func defeat() -> void:
 		return
 	defeated = true
 	death_timer = 2.4
+	world.run.bosses_defeated.append(look)
 	world.clear_bullets(origin, 4000.0)
 	world.zones = world.zones.filter(func(z): return not z.hostile)
 	for part: Enemy in parts:

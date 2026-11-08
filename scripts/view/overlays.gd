@@ -83,7 +83,7 @@ class Card:
 		# Element chip in the corner.
 		var element: String = card.get("element", "")
 		if element != "":
-			var chip_color: Color = BuildPanel.ELEMENT_COLORS[element]
+			var chip_color: Color = TechData.ELEMENT_COLORS[element]
 			draw_string(UiKit.font("bold"), Vector2(0, 26 + lift), element.to_upper(), HORIZONTAL_ALIGNMENT_RIGHT, size.x - 10, 14, Art.with_alpha(chip_color, appear))
 		draw_string(UiKit.font("bold"), Vector2(0, 130 + lift), kind_text, HORIZONTAL_ALIGNMENT_CENTER, size.x, 13, Art.with_alpha(rarity, appear))
 		_draw_wrapped(UiKit.font("bold"), card["title"], Vector2(14, 158 + lift), size.x - 28, 19, Art.with_alpha(Color(1, 1, 1), appear))
@@ -94,7 +94,7 @@ class Card:
 			_draw_wrapped(UiKit.font("bold"), card["fusion_hint"], Vector2(10, y - 22), size.x - 20, 12, Art.with_alpha(Color(0.85, 0.6, 1.0), appear))
 		if card.get("synergy", "") != "":
 			var unlocks: bool = card["synergy"].begins_with("Unlocks")
-			var synergy_color: Color = Art.GOLD if unlocks else BuildPanel.ELEMENT_COLORS.get(element, Color(0.7, 0.8, 0.9))
+			var synergy_color: Color = Art.GOLD if unlocks else TechData.ELEMENT_COLORS.get(element, Color(0.7, 0.8, 0.9))
 			_draw_wrapped(UiKit.font("bold"), card["synergy"], Vector2(10, y), size.x - 20, 12 if unlocks else 13, Art.with_alpha(synergy_color, appear))
 
 	func _draw_wrapped(font: Font, text: String, at: Vector2, width: float, font_size: int, color: Color) -> void:
@@ -185,24 +185,29 @@ static func _floating(panel: Control) -> Control:
 	return holder
 
 
-## The Salvage Crate: three slot-machine reels spin, then land on how many upgrades you got.
+## The Salvage Crate: three slot-machine reels spin and stop one by one; the crate gives the sum of their
+## faces. Then every upgrade it landed on is listed with what it does.
 class CrateReel:
 	extends Control
 	var cards: Array = []
+	var faces: Array = []          # what each reel landed on
+	var reels: Array = []          # every face each reel can show while spinning
 	var on_done: Callable
 	var time := 0.0
-	var spin_seconds := 1.6
+	var spin_seconds := 1.8
 
 	func _ready() -> void:
 		set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		mouse_filter = Control.MOUSE_FILTER_STOP
 
+	func _stop_time(reel_index: int) -> float:
+		return spin_seconds * (0.45 + 0.27 * reel_index)
+
 	func _process(delta: float) -> void:
 		var before := time
 		time += delta
 		for i in 3:
-			var stop_at := spin_seconds * (0.55 + 0.22 * i)
-			if before < stop_at and time >= stop_at:
+			if before < _stop_time(i) and time >= _stop_time(i):
 				Sound.play("reel_stop")
 		if before < spin_seconds and time >= spin_seconds:
 			Sound.play("jackpot" if cards.size() >= 5 else "crate")
@@ -217,32 +222,56 @@ class CrateReel:
 
 	func _draw() -> void:
 		var screen := size
-		draw_rect(Rect2(Vector2.ZERO, screen), Color(0.02, 0.01, 0.0, 0.75))
+		draw_rect(Rect2(Vector2.ZERO, screen), Color(0.02, 0.01, 0.0, 0.8))
 		var title_font := UiKit.font("title")
-		draw_string(title_font, Vector2(0, screen.y * 0.2), "SALVAGE CRATE", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 36, Art.GOLD)
-		var reel_size := Vector2(120, 140)
-		var start := Vector2(screen.x * 0.5 - reel_size.x * 1.5 - 20, screen.y * 0.27)
-		var faces := ["1", "3", "5"]
-		var result := str(cards.size())
-		for i in 3:
-			var rect := Rect2(start + Vector2(i * (reel_size.x + 20), 0), reel_size)
-			draw_rect(rect, Color(0.12, 0.08, 0.02))
-			draw_rect(rect, Art.GOLD, false, 3.0)
-			var stop_at := spin_seconds * (0.55 + 0.22 * i)
-			var face: String = result if time >= stop_at else faces[int(time * 18.0 + i) % 3]
-			draw_string(title_font, rect.position + Vector2(0, reel_size.y * 0.68), face, HORIZONTAL_ALIGNMENT_CENTER, reel_size.x, 64, Color(1, 0.9, 0.55))
+		draw_string(title_font, Vector2(0, screen.y * 0.13), "SALVAGE CRATE", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 34, Art.GOLD)
+		# Reel + reel + reel = total.
+		var box := Vector2(100, 116)
+		var gap := 44.0
+		var row_width := box.x * 4 + gap * 3
+		var x := screen.x * 0.5 - row_width * 0.5
+		var top := screen.y * 0.17
+		var jackpot := cards.size() >= 5
+		for i in 4:
+			var rect := Rect2(Vector2(x + i * (box.x + gap), top), box)
+			var is_total := i == 3
+			draw_rect(rect, Color(0.18, 0.12, 0.02) if is_total else Color(0.12, 0.08, 0.02))
+			draw_rect(rect, Art.GOLD.lightened(0.3) if is_total else Art.GOLD, false, 4.0 if is_total else 3.0)
+			var face := ""
+			if is_total:
+				face = str(cards.size()) if time >= spin_seconds else "?"
+			elif time >= _stop_time(i):
+				face = str(faces[i])
+			else:
+				var options: Array = reels[i]
+				face = str(options[int(time * 20.0 + i * 3) % options.size()])
+			var face_color := Color(1, 0.9, 0.55)
+			if is_total and jackpot and time >= spin_seconds:
+				face_color = Color(1, 1, 1).lerp(Art.GOLD, 0.5 + 0.5 * sin(time * 10.0))
+			draw_string(title_font, rect.position + Vector2(0, box.y * 0.7), face, HORIZONTAL_ALIGNMENT_CENTER, box.x, 60, face_color)
+			if i < 3:
+				var sign_at := Vector2(rect.end.x, top + box.y * 0.62)
+				draw_string(title_font, sign_at, "=" if i == 2 else "+", HORIZONTAL_ALIGNMENT_CENTER, gap, 34, Color(1, 0.85, 0.5))
 		if time < spin_seconds:
 			return
-		var y := start.y + reel_size.y + 46.0
-		draw_string(UiKit.font("bold"), Vector2(0, y), "%d UPGRADE%s" % [cards.size(), "S" if cards.size() > 1 else ""], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 22, Color(1, 0.9, 0.6))
+		var y := top + box.y + 44.0
+		draw_string(UiKit.font("bold"), Vector2(0, y), ("JACKPOT!  " if jackpot else "") + "%d UPGRADE%s" % [cards.size(), "S" if cards.size() > 1 else ""],
+			HORIZONTAL_ALIGNMENT_CENTER, screen.x, 22, Color(1, 0.9, 0.6))
+		# Each upgrade with what it does, so a crate is never a mystery.
+		var width := minf(screen.x * 0.8, 820.0)
+		var left := screen.x * 0.5 - width * 0.5
+		var step := minf(60.0, (screen.y - y - 70.0) / maxf(cards.size(), 1.0))
 		for i in cards.size():
 			var reveal := clampf((time - spin_seconds - i * 0.12) / 0.2, 0.0, 1.0)
 			var card: Dictionary = cards[i]
 			var color: Color = Art.RARITY.get(card["rarity"], Color.WHITE)
-			draw_string(UiKit.font("body"), Vector2(0, y + 34 + i * 28), card["title"], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 19, Art.with_alpha(color, reveal))
+			var line_y := y + 34.0 + i * step
+			draw_string(UiKit.font("bold"), Vector2(left, line_y), card["title"], HORIZONTAL_ALIGNMENT_CENTER, width, 18, Art.with_alpha(color, reveal))
+			draw_multiline_string(UiKit.font("body"), Vector2(left, line_y + 20.0), card["text"], HORIZONTAL_ALIGNMENT_CENTER, width, 14, 2,
+				Color(0.85, 0.85, 0.9, reveal))
 		if time > spin_seconds + 0.4:
 			var blink := 0.5 + 0.5 * sin(time * 5.0)
-			draw_string(UiKit.font("body"), Vector2(0, screen.y - 40), "Tap to continue", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 18, Color(1, 1, 1, blink))
+			draw_string(UiKit.font("body"), Vector2(0, screen.y - 28), "Tap to continue", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 18, Color(1, 1, 1, blink))
 
 
 static func build_pause(on_resume: Callable, on_abandon: Callable, run: RunState) -> Control:
