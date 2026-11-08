@@ -256,6 +256,7 @@ func _process(delta: float) -> void:
 		layer.queue_redraw()
 	hud.view_rect_world = _view_rect()
 	hud.world_to_screen = world_root.transform
+	hud.covered = overlay_kind != ""
 	hud.tick(delta)
 	var weapons := mission.weapons
 	special_button.visible = mission.run.special_tech() != ""

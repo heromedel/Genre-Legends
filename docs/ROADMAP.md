@@ -49,7 +49,8 @@
 5. Map events between planets: derelicts, distress calls, traders, ambushes.
 6. Bigger moments: hit-stop on big kills, screen-filling boss deaths, a show for Resonance tiers and fusions.
 7. Music and sound that fit each genre.
-8. Later: the Daily Signal and portals into pocket dungeons (with Plan G).
+8. Readability pass from the 0.2.2 cold review: no pile-up of banners, boss names and bars at the top of the screen; Planet Exploration ground and dungeon rooms with more life; needles that look like needles; Thunder Lance as a real rail; a clearer Arc Blade icon; star map not cut off at the right; boss warnings before the boss is in view; boss bars coloured unlike the player's bars; a readable dungeon minimap; bullets visible in the Hollow King's darkness.
+9. Later: the Daily Signal and portals into pocket dungeons (with Plan G).
 
 ## Plan C: Defense and tanks
 

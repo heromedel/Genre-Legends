@@ -155,7 +155,8 @@ static func draw_zone(ci: CanvasItem, zone: Zone, time: float) -> void:
 			ci.draw_arc(zone.pos, radius, 0, TAU, 48, Art.with_alpha(zone.color, fade), 10.0 * fade + 2.0, true)
 		"laser":
 			var end := zone.pos + Vector2.from_angle(zone.angle) * zone.length
-			ci.draw_line(zone.pos, end, Art.with_alpha(zone.color, 0.55), zone.width * 1.6, true)
+			ci.draw_line(zone.pos, end, Art.with_alpha(zone.color, 0.3), zone.width * 2.6, true)
+			ci.draw_line(zone.pos, end, Art.with_alpha(zone.color, 0.85), zone.width * 1.3, true)
 			ci.draw_line(zone.pos, end, Color(1, 1, 1, 0.95), zone.width * 0.45, true)
 
 
@@ -171,7 +172,13 @@ static func _draw_warning(ci: CanvasItem, zone: Zone, time: float) -> void:
 				var sweep := zone.spin * zone.life
 				for i in 13:
 					fan.append(zone.pos + Vector2.from_angle(zone.angle + sweep * i / 12.0) * zone.length)
-				ci.draw_colored_polygon(fan, Art.with_alpha(color, 0.16 + 0.06 * blink))
+				ci.draw_colored_polygon(fan, Art.with_alpha(color, 0.07))
+				# Laser-path stripes across the swept area and bright edges, so it reads as danger, not scenery.
+				for i in 9:
+					var stripe := zone.angle + sweep * (i + 0.5) / 9.0
+					ci.draw_line(zone.pos, zone.pos + Vector2.from_angle(stripe) * zone.length, Art.with_alpha(color, 0.25 + 0.2 * blink), 3.0, true)
+				for edge in [zone.angle, zone.angle + sweep]:
+					ci.draw_line(zone.pos, zone.pos + Vector2.from_angle(edge) * zone.length, Art.with_alpha(Color(1, 0.85, 0.85), 0.6 + 0.3 * blink), 3.0, true)
 			ci.draw_line(zone.pos, end, Art.with_alpha(color, blink), 2.0, true)
 		"ring":
 			Art.dashed_circle(ci, zone.pos, zone.radius * 0.25, Art.with_alpha(color, 0.6), 2.0, 10, time * 3.0)

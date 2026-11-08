@@ -6,7 +6,7 @@ extends Control
 ## Readable at a glance (Information & Feedback): numbers where they matter, colour everywhere else.
 
 ## How long a radio line stays up (GDD 9E): long enough to read during the transformation.
-const RADIO_SECONDS := 6.0
+const RADIO_SECONDS := 5.0
 
 var mission: Mission
 var view_rect_world := Rect2()
@@ -21,6 +21,7 @@ var current_banner: Dictionary = {}
 var warning_time := 0.0
 var radio_text := ""
 var radio_time := 0.0
+var covered := false            # a card or crate screen is open: the radio waits underneath, unseen
 var warning_name := ""
 var warning_title := ""
 var flash_color := Color.WHITE
@@ -56,6 +57,7 @@ func show_radio(text: String) -> void:
 
 
 func show_warning(boss_name: String, title: String) -> void:
+	radio_time = minf(radio_time, 0.4)
 	warning_time = 2.4
 	warning_name = boss_name
 	warning_title = title
@@ -75,7 +77,8 @@ func tick(delta: float) -> void:
 	flash_amount = maxf(flash_amount - delta * 2.5, 0.0)
 	damage_vignette = maxf(damage_vignette - delta * 2.0, 0.0)
 	warning_time = maxf(warning_time - delta, 0.0)
-	radio_time = maxf(radio_time - delta, 0.0)
+	if not covered:
+		radio_time = maxf(radio_time - delta, 0.0)
 	if banner_time > 0.0:
 		banner_time -= delta
 	elif not banners.is_empty():
@@ -274,12 +277,12 @@ func _draw_warning(screen: Vector2) -> void:
 
 
 func _draw_radio(screen: Vector2) -> void:
-	if radio_time <= 0.0:
+	if radio_time <= 0.0 or covered:
 		return
 	var fade := clampf(radio_time / 0.4, 0.0, 1.0) * clampf((RADIO_SECONDS - radio_time) / 0.3, 0.0, 1.0)
-	var width := minf(screen.x * 0.5, 540.0)
+	var width := minf(screen.x * 0.42, 480.0)
 	var box := Rect2(Vector2(16, 112), Vector2(width, 78))
-	draw_rect(box, Color(0.02, 0.06, 0.1, 0.9 * fade))
+	draw_rect(box, Color(0.02, 0.06, 0.1, 0.7 * fade))
 	draw_rect(box, Color(0.4, 0.85, 1.0, 0.9 * fade), false, 2.5)
 	# A blinking "on air" light and the officer's name.
 	var blink := 0.5 + 0.5 * float(int(radio_time * 3.0) % 2)

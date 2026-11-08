@@ -185,8 +185,8 @@ static func _floating(panel: Control) -> Control:
 	return holder
 
 
-## The Salvage Crate: three slot-machine reels spin and stop one by one; the crate gives the sum of their
-## faces. Then every upgrade it landed on is listed with what it does.
+## The Salvage Crate: three slot-machine reels of gems spin and stop one by one; the crate gives one upgrade
+## per gem. Then every upgrade it landed on is listed with what it does.
 class CrateReel:
 	extends Control
 	var cards: Array = []
@@ -220,6 +220,19 @@ class CrateReel:
 			on_done.call()
 			accept_event()
 
+	## A reel face is gems, not digits: none, one or two, so it reads at a glance like a slot machine.
+	func _draw_reel_face(rect: Rect2, face: int, landed: bool) -> void:
+		var center := rect.get_center()
+		var alpha := 1.0 if landed else 0.55
+		if face == 0:
+			draw_line(center + Vector2(-18, 0), center + Vector2(18, 0), Color(0.55, 0.45, 0.3, alpha), 4.0)
+			return
+		for g in face:
+			var at := center + Vector2((g - (face - 1) * 0.5) * 34.0, 0)
+			var gem := PackedVector2Array([at + Vector2(0, -20), at + Vector2(14, 0), at + Vector2(0, 20), at + Vector2(-14, 0)])
+			draw_colored_polygon(gem, Color(1, 0.82, 0.35, alpha))
+			draw_polyline(PackedVector2Array([gem[0], gem[1], gem[2], gem[3], gem[0]]), Color(1, 1, 0.85, alpha), 2.0, true)
+
 	func _draw() -> void:
 		var screen := size
 		draw_rect(Rect2(Vector2.ZERO, screen), Color(0.02, 0.01, 0.0, 0.8))
@@ -237,18 +250,17 @@ class CrateReel:
 			var is_total := i == 3
 			draw_rect(rect, Color(0.18, 0.12, 0.02) if is_total else Color(0.12, 0.08, 0.02))
 			draw_rect(rect, Art.GOLD.lightened(0.3) if is_total else Art.GOLD, false, 4.0 if is_total else 3.0)
-			var face := ""
 			if is_total:
-				face = str(cards.size()) if time >= spin_seconds else "?"
-			elif time >= _stop_time(i):
-				face = str(faces[i])
+				var total := str(cards.size()) if time >= spin_seconds else "?"
+				var total_color := Color(1, 0.9, 0.55)
+				if jackpot and time >= spin_seconds:
+					total_color = Color(1, 1, 1).lerp(Art.GOLD, 0.5 + 0.5 * sin(time * 10.0))
+				draw_string(title_font, rect.position + Vector2(0, box.y * 0.7), total, HORIZONTAL_ALIGNMENT_CENTER, box.x, 60, total_color)
 			else:
 				var options: Array = reels[i]
-				face = str(options[int(time * 20.0 + i * 3) % options.size()])
-			var face_color := Color(1, 0.9, 0.55)
-			if is_total and jackpot and time >= spin_seconds:
-				face_color = Color(1, 1, 1).lerp(Art.GOLD, 0.5 + 0.5 * sin(time * 10.0))
-			draw_string(title_font, rect.position + Vector2(0, box.y * 0.7), face, HORIZONTAL_ALIGNMENT_CENTER, box.x, 60, face_color)
+				var landed := time >= _stop_time(i)
+				var face: int = faces[i] if landed else options[int(time * 20.0 + i * 3) % options.size()]
+				_draw_reel_face(rect, face, landed)
 			if i < 3:
 				var sign_at := Vector2(rect.end.x, top + box.y * 0.62)
 				draw_string(title_font, sign_at, "=" if i == 2 else "+", HORIZONTAL_ALIGNMENT_CENTER, gap, 34, Color(1, 0.85, 0.5))
