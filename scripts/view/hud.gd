@@ -175,16 +175,15 @@ func _draw_tech_chips(screen: Vector2) -> void:
 	# Resonance: one chip per element you've put points into, with its tier.
 	at.x += 6
 	for element in UpgradeData.ELEMENTS:
-		var points := run.resonance_points(element)
-		if points <= 0:
-			continue
 		var tier := run.resonance_tier(element)
+		if tier <= 0:
+			continue
 		var color: Color = BuildPanel.ELEMENT_COLORS[element]
 		var center := at + Vector2(16, size * 0.5)
 		var diamond := PackedVector2Array([center + Vector2(0, -15), center + Vector2(15, 0), center + Vector2(0, 15), center + Vector2(-15, 0)])
 		draw_colored_polygon(diamond, Art.with_alpha(color, 0.25 + 0.2 * tier))
 		draw_polyline(diamond + PackedVector2Array([diamond[0]]), color, 2.0, true)
-		draw_string(font_bold, center + Vector2(-16, 6), str(tier), HORIZONTAL_ALIGNMENT_CENTER, 32, 16, Color(1, 1, 1))
+		draw_string(font_bold, center + Vector2(-16, 6), UpgradeOffers.ROMAN[tier], HORIZONTAL_ALIGNMENT_CENTER, 32, 14, Color(1, 1, 1))
 		at.x += 38
 
 
