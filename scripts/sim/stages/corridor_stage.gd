@@ -97,7 +97,16 @@ func step(dt: float) -> void:
 	if mission.state != "play":
 		return
 	if miniboss == null and distance >= FORTRESS_AT and not fortress_skipped:
-		start_miniboss(TurretFortress.new(world))
+		# The bulkhead fits the trench where it lands, so every turret is in reach.
+		var fortress := TurretFortress.new(world)
+		var y := corridor_y_at(140.0)
+		fortress.origin.x = center_at(y)
+		fortress.memory["half_width"] = half_width_at(y)
+		# Anything still waiting above the screen would sit frozen there while the trench stops.
+		for enemy: Enemy in world.enemies:
+			if enemy.pos.y < 20.0:
+				enemy.dead = true
+		start_miniboss(fortress)
 	if miniboss_active():
 		return
 	if distance >= next_event and distance < LENGTH:

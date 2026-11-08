@@ -11,6 +11,12 @@ var fork_preference := "a"
 var stuck_timer := 0.0
 var last_pos := Vector2.ZERO
 var wander := Vector2.ZERO
+var grid := AStarGrid2D.new()
+var grid_key := ""
+var cached_path: PackedVector2Array = PackedVector2Array()
+var cached_goal := Vector2.INF
+var path_age := 0
+const CELL := 40.0
 ## "average" plays like an average player: notices bullets later, sometimes freezes, picks cards loosely.
 var average := false
 
@@ -35,7 +41,7 @@ func next_input() -> InputFrame:
 	if player.form == "ship":
 		var target_x := world.bounds.get_center().x
 		var nearest := world.nearest_enemy(player.pos, 2000.0)
-		if nearest != null:
+		if nearest != null and nearest.pos.y > 0.0:
 			target_x = nearest.pos.x
 		var desired := Vector2(target_x, world.bounds.end.y - 120.0) - player.pos
 		if mission.stage is CorridorStage:
@@ -47,7 +53,7 @@ func next_input() -> InputFrame:
 		var move := desired.limit_length(14.0) + dodge * 22.0
 		frame.drag = move.limit_length(26.0)
 	else:
-		var goal := _ground_goal()
+		var goal := _waypoint(_ground_goal())
 		var to_goal := goal - player.pos
 		var direction := to_goal.normalized() if to_goal.length() > 30.0 else Vector2.ZERO
 		var nearest := world.nearest_enemy(player.pos, 400.0)
@@ -264,3 +270,50 @@ func _choose_card() -> int:
 			best_score = score
 			best = i
 	return best
+
+
+
+## Grid pathfinding round walls and rocks (Godot's AStarGrid2D), rebuilt whenever the walls change.
+## Returns the next point to walk toward on the way to the goal.
+func _waypoint(goal: Vector2) -> Vector2:
+	var world := mission.world
+	if world.walls.is_empty():
+		return goal
+	var key := "%d|%s|%s" % [world.walls.size(), str(world.walls[0]), str(world.walls[world.walls.size() - 1])]
+	if key != grid_key:
+		grid_key = key
+		var bounds := world.bounds
+		grid = AStarGrid2D.new()
+		grid.region = Rect2i(Vector2i(floori(bounds.position.x / CELL), floori(bounds.position.y / CELL)), Vector2i(ceili(bounds.size.x / CELL) + 1, ceili(bounds.size.y / CELL) + 1))
+		grid.cell_size = Vector2(CELL, CELL)
+		grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
+		grid.update()
+		for wall: Rect2 in world.walls:
+			var grown := wall.grow(20.0)
+			for x in range(floori(grown.position.x / CELL), ceili(grown.end.x / CELL) + 1):
+				for y in range(floori(grown.position.y / CELL), ceili(grown.end.y / CELL) + 1):
+					var cell := Vector2i(x, y)
+					if grid.is_in_boundsv(cell) and grown.has_point(Vector2(cell) * CELL + Vector2(CELL, CELL) * 0.5):
+						grid.set_point_solid(cell, true)
+		cached_path = PackedVector2Array()
+	path_age += 1
+	if cached_path.is_empty() or path_age > 15 or cached_goal.distance_to(goal) > 60.0:
+		path_age = 0
+		cached_goal = goal
+		var from := _cell(mission.player.pos)
+		var to := _cell(goal)
+		if not grid.is_in_boundsv(from) or not grid.is_in_boundsv(to) or grid.is_point_solid(to):
+			return goal
+		grid.set_point_solid(from, false)
+		cached_path = grid.get_point_path(from, to)
+	if cached_path.size() < 2:
+		return goal
+	for point in cached_path:
+		var center := point + Vector2(CELL, CELL) * 0.5
+		if center.distance_to(mission.player.pos) > CELL * 1.2:
+			return center
+	return goal
+
+
+func _cell(at: Vector2) -> Vector2i:
+	return Vector2i(floori(at.x / CELL), floori(at.y / CELL))

@@ -31,7 +31,7 @@ const PLAYABLE_TYPES := ["star_cluster", "corridor", "planet", "dungeon"]
 ## takes over from where the gate leaves off.
 const FIRST_REGION_BASELINE := [
 	{"enemy_hp": 0.85, "damage": 0.9, "fire": 0.85, "bullet_speed": 0.88},   # planet 1: learn to fly
-	{"enemy_hp": 0.95, "damage": 0.9, "fire": 0.9, "bullet_speed": 0.92},    # planet 2: first real fights
+	{"enemy_hp": 0.95, "damage": 0.85, "fire": 0.88, "bullet_speed": 0.92},  # planet 2: first real fights
 	{"enemy_hp": 1.0, "damage": 0.95, "fire": 0.95, "bullet_speed": 0.95},   # planet 3: the needle lesson
 	{"enemy_hp": 1.1, "damage": 1.0, "fire": 1.0, "bullet_speed": 1.0},      # planet 4: builds start to matter
 	{"enemy_hp": 1.2, "damage": 1.05, "fire": 1.05, "bullet_speed": 1.0},    # planet 5
@@ -42,8 +42,8 @@ const FIRST_REGION_BASELINE := [
 const TYPE_DIFFICULTY := {
 	"star_cluster": {"damage": 1.08, "fire": 1.08},
 	"corridor": {"damage": 0.75, "fire": 0.85},
-	"planet": {"damage": 0.85, "fire": 0.85},
-	"dungeon": {"damage": 1.0, "fire": 1.0},
+	"planet": {"damage": 0.75, "fire": 0.78},
+	"dungeon": {"damage": 1.3, "fire": 1.25},
 }
 ## Hazard routes on top of their column's difficulty.
 const HAZARD := {"enemy_hp": 1.4, "damage": 1.25, "fire": 1.25, "bullet_speed": 1.05}

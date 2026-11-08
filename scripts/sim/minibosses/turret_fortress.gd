@@ -11,10 +11,12 @@ func spawn() -> void:
 	title = "None Shall Pass"
 	look = "turret_fortress"
 	color = Color(1.0, 0.65, 0.3)
-	origin = Vector2(world.bounds.get_center().x, -90)
+	origin = Vector2(origin.x if origin.x != 0.0 else world.bounds.get_center().x, -90)
+	var spread := minf(170.0, float(memory.get("half_width", 300.0)) - 50.0) / 170.0
 	add_part("core", Vector2(0, -24), 900, 34, {"invulnerable": true})
 	for i in TURRET_OFFSETS.size():
-		add_part("turret%d" % i, TURRET_OFFSETS[i], 300, 22)
+		var offset: Vector2 = TURRET_OFFSETS[i]
+		add_part("turret%d" % i, Vector2(offset.x * spread, offset.y), 300, 22)
 	place_parts()
 
 
