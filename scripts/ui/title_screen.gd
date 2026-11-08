@@ -65,7 +65,17 @@ func _draw() -> void:
 	draw_string(title_font, Vector2(0, title_y), "GENRE", HORIZONTAL_ALIGNMENT_CENTER, screen.x, title_size, Color(0.55, 0.9, 1.0))
 	draw_string_outline(title_font, Vector2(0, title_y + title_size * 0.95), "LEGENDS", HORIZONTAL_ALIGNMENT_CENTER, screen.x, int(title_size * 0.8), 10, Color(0.1, 0.04, 0.0))
 	draw_string(title_font, Vector2(0, title_y + title_size * 0.95), "LEGENDS", HORIZONTAL_ALIGNMENT_CENTER, screen.x, int(title_size * 0.8), Color(1.0, 0.78, 0.35))
-	draw_string(UiKit.font("body"), Vector2(0, title_y + title_size * 1.45), "One frame. Ship or mech. Every arcade genre.", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 20, Color(0.75, 0.85, 0.95))
+	# Subtitle: the player's role, framed by rules that grow out from the centre.
+	var subtitle_y := title_y + title_size * 1.5
+	var subtitle_size := int(clampf(screen.x / 42.0, 18.0, 30.0))
+	var subtitle := "GUARDIAN  OF  THE  REALMS"
+	var subtitle_width := title_font.get_string_size(subtitle, HORIZONTAL_ALIGNMENT_LEFT, -1, subtitle_size).x
+	var reach := minf(time * 0.6, 1.0) * 120.0
+	var rule_color := Color(1.0, 0.8, 0.4, 0.7)
+	draw_line(Vector2(screen.x * 0.5 - subtitle_width * 0.5 - 20.0 - reach, subtitle_y - subtitle_size * 0.35), Vector2(screen.x * 0.5 - subtitle_width * 0.5 - 20.0, subtitle_y - subtitle_size * 0.35), rule_color, 2.0)
+	draw_line(Vector2(screen.x * 0.5 + subtitle_width * 0.5 + 20.0, subtitle_y - subtitle_size * 0.35), Vector2(screen.x * 0.5 + subtitle_width * 0.5 + 20.0 + reach, subtitle_y - subtitle_size * 0.35), rule_color, 2.0)
+	draw_string_outline(title_font, Vector2(0, subtitle_y), subtitle, HORIZONTAL_ALIGNMENT_CENTER, screen.x, subtitle_size, 6, Color(0.05, 0.03, 0.0))
+	draw_string(title_font, Vector2(0, subtitle_y), subtitle, HORIZONTAL_ALIGNMENT_CENTER, screen.x, subtitle_size, Color(1.0, 0.88, 0.6))
 	var blink := 0.45 + 0.55 * absf(sin(time * 2.2))
 	draw_string(UiKit.font("bold"), Vector2(0, screen.y - 60), "TAP TO START", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 26, Color(1, 1, 1, blink))
 	draw_string(UiKit.font("body"), Vector2(0, screen.y - 22), BuildInfo.label(), HORIZONTAL_ALIGNMENT_RIGHT, screen.x - 16, 13, Color(0.5, 0.6, 0.7))
