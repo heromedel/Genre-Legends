@@ -31,11 +31,9 @@ var transform_time := 0.0
 var hit_flash := 0.0
 var tech_online_since := {}      # tech id -> view time it came online, for GearArt's unfold
 var _accumulator := 0.0
-var hitstop := 0.0               # seconds the action freezes on a big moment (view only; no ticks run)
+var hitstop := 0.0
 var cutscene: Cutscene = null   # while a transition plays, the mission waits (no ticks run)
-var skip_cutscenes := false     # debug test launches skip them unless asked (cutscene=1)
-var splash: ResonanceSplash = null   # while a Resonance tier is announced, the mission waits too
-var pending_splashes: Array = []     # tiers unlocked behind the cards, shown as soon as the cards close
+var skip_cutscenes := false     # debug test launches skip them unless asked (cutscene=1)              # seconds the action freezes on a big moment (view only; no ticks run)
 
 
 class DrawLayer:
@@ -173,11 +171,7 @@ func _notification(what: int) -> void:
 func _physics_process(delta: float) -> void:
 	if paused or done or mission == null:
 		return
-	if cutscene != null or splash != null:
-		return
-	# A Resonance tier unlocked by the card just picked: announce it before anything else opens.
-	if not pending_splashes.is_empty():
-		_show_resonance_splash(pending_splashes.pop_front())
+	if cutscene != null:
 		return
 	# Hit-stop: the world holds still for a heartbeat on big kills. No tick runs, so replays are unaffected.
 	if hitstop > 0.0:
@@ -249,8 +243,6 @@ func _handle_events(events: Array) -> void:
 				_big_moment(event["pos"], event["color"], 0.6, 0.06)
 			"power_moment":
 				_big_moment(mission.player.pos, event["color"], float(event["size"]), 0.12 * float(event["size"]))
-			"resonance":
-				pending_splashes.append(event)
 			"wave":
 				if event["index"] > 1:
 					hud.show_banner("WAVE %d" % event["index"], "cyan")
@@ -265,19 +257,6 @@ func _open_offer() -> void:
 		Sound.play("pick"), mission.run, func(): input.queue_choice(UpgradeOffers.REROLL_CHOICE)))
 	if first_showing:
 		Sound.play("level_up")
-
-
-## A Resonance tier unlocked: the cards close, the action holds, and the splash says what the tier does.
-func _show_resonance_splash(event: Dictionary) -> void:
-	_close_overlay()
-	var color: Color = TechData.ELEMENT_COLORS[event["element"]]
-	_big_moment(mission.player.pos, color, 1.0, 0.0)
-	Sound.play("overdrive")
-	splash = ResonanceSplash.new()
-	splash.element = event["element"]
-	splash.tier = event["tier"]
-	splash.on_done = func(): splash = null
-	hud.get_parent().add_child(splash)
 
 
 ## A big moment: the action freezes for a heartbeat, the screen flashes, and rings burst out.
@@ -330,7 +309,7 @@ func _process(delta: float) -> void:
 		layer.queue_redraw()
 	hud.view_rect_world = _view_rect()
 	hud.world_to_screen = world_root.transform
-	hud.covered = overlay_kind != "" or cutscene != null or splash != null
+	hud.covered = overlay_kind != "" or cutscene != null
 	hud.tick(delta)
 	var weapons := mission.weapons
 	special_button.visible = mission.run.special_tech() != ""

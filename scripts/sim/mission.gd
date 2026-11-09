@@ -187,6 +187,8 @@ func _update_world(input: InputFrame, player_active: bool) -> void:
 		player.move(input, DT, 1.0 + 0.15 * run.field_count("overclocked_servos"))
 		_keep_player_in_bounds()
 		var shield_regen := 1.6 if FrameData.get_frame(run.frame_id)["trait"] == "fortress_field" else 1.0
+		if run.resonance_tier("energy") >= 2:
+			shield_regen *= 1.6
 		if run.field_count("blood_pact") > 0:
 			shield_regen = 0.0
 		player.tick_timers(DT, shield_regen)
@@ -201,7 +203,6 @@ func _update_world(input: InputFrame, player_active: bool) -> void:
 	world.update_blades(DT)
 	world.update_enemy_shots(DT)
 	world.update_zones(DT)
-	world.update_chain_blasts(DT)
 	world.update_pickups(DT)
 	world.update_allies(DT)
 	world.cleanup()

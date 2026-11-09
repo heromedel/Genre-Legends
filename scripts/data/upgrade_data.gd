@@ -61,19 +61,19 @@ const FIELD_RESONANCE_POINTS := 2
 const ELEMENTS := ["energy", "explosive", "kinetic", "mawjig"]
 const RESONANCE := {
 	"energy": {"name": "Energy", "tiers": [
-		["Static Charge", "Every 4th hit arcs lightning to another enemy."],
-		["Capacitor Discharge", "When your shield breaks, it lets go in a lightning nova that strikes up to six enemies and erases nearby bullets."],
-		["Storm Front", "Every 2nd hit arcs, and the lightning chains twice."]]},
+		["Static Charge", "Every 6th hit arcs lightning to another enemy."],
+		["Capacitor Shields", "Your shield recharges 60% faster."],
+		["Storm Front", "Every 3rd hit arcs, and the lightning chains twice."]]},
 	"explosive": {"name": "Explosive", "tiers": [
-		["Volatile", "Kills have a 1 in 3 chance to explode."],
-		["Chain Reaction", "Anything an explosion kills explodes too, a beat later, so blasts ripple through a crowd."],
+		["Volatile", "Kills have a 1 in 4 chance to explode."],
+		["Big Bang", "Every explosion is a third bigger."],
 		["Wildfire", "Explosions leave flames that keep burning."]]},
 	"kinetic": {"name": "Kinetic", "tiers": [
 		["Penetrator", "Shots punch through one extra enemy."],
-		["Splinter Rounds", "Shots that have flown a while burst into two fragments when they hit."],
+		["Momentum", "Shots that have flown a while hit 40% harder."],
 		["Railstorm", "Every 2 s a slug tears through the nearest enemy and everything behind it."]]},
 	"mawjig": {"name": "Mawjig", "tiers": [
-		["Hex Touch", "Hits hex enemies. Hexed enemies take 30% more damage."],
+		["Hex Touch", "Hits hex enemies. Hexed enemies take 20% more damage."],
 		["Contagion", "Hexed enemies burst when they die and hex everything nearby."],
 		["Doom Bell", "Every 8 s, meteors fall on up to three hexed enemies."]]},
 }

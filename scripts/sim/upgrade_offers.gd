@@ -142,7 +142,6 @@ func _describe_build_effect(card: Dictionary) -> void:
 		if tier_after > tier_before:
 			var tier: Array = UpgradeData.RESONANCE[element]["tiers"][tier_after - 1]
 			card["synergy"] = "Unlocks %s tier %s: %s" % [name, ROMAN[tier_after], tier[0]]
-			card["unlocks_tier"] = tier_after
 		elif tier_after < UpgradeData.RESONANCE_THRESHOLDS.size():
 			card["synergy"] = "+%d %s: %d/%d to tier %s" % [points, name, after, UpgradeData.RESONANCE_THRESHOLDS[tier_after], ROMAN[tier_after + 1]]
 		else:
@@ -217,8 +216,11 @@ func _announce_resonance(tiers_before: Dictionary) -> void:
 	for element in UpgradeData.ELEMENTS:
 		var tier := run.resonance_tier(element)
 		if tier > int(tiers_before.get(element, 0)):
-			# The view shows it as a splash the moment the cards close (ResonanceSplash).
+			var info: Dictionary = UpgradeData.RESONANCE[element]
+			world.emit("banner", {"text": "%s RESONANCE %s" % [info["name"].to_upper(), ROMAN[tier]], "style": element})
+			world.emit("power_moment", {"color": TechData.ELEMENT_COLORS[element], "size": 1.0})
 			world.emit("resonance", {"element": element, "tier": tier})
+			world.emit("sound", {"name": "overdrive"})
 
 
 ## Rerolls the current offer. Returns the new cards, or an empty array when no rerolls are left.

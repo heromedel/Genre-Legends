@@ -68,17 +68,6 @@ class Card:
 		draw_rect(rect, Color(0.04, 0.06, 0.1, 0.96 * appear))
 		draw_rect(Rect2(rect.position, Vector2(size.x, 6)), Art.with_alpha(rarity, appear))
 		draw_rect(rect, Art.with_alpha(rarity, 0.9 * appear), false, 3.0)
-		# A card that unlocks a Resonance tier wears the element's colour and a badge, so it stands out while you choose.
-		var unlocks_tier: int = card.get("unlocks_tier", 0)
-		if unlocks_tier > 0:
-			var tier_color: Color = TechData.ELEMENT_COLORS[card["element"]]
-			var pulse := 0.6 + 0.4 * sin(Time.get_ticks_msec() / 160.0)
-			draw_rect(rect.grow(4), Art.with_alpha(tier_color, pulse * appear), false, 4.0)
-			var badge := Rect2(Vector2(size.x * 0.5 - 78, lift - 14), Vector2(156, 26))
-			draw_rect(badge, Art.with_alpha(tier_color.darkened(0.35), appear))
-			draw_rect(badge, Art.with_alpha(tier_color.lightened(0.3), appear), false, 2.0)
-			draw_string(UiKit.font("bold"), badge.position + Vector2(0, 19), "RESONANCE %s" % UpgradeOffers.ROMAN[unlocks_tier],
-				HORIZONTAL_ALIGNMENT_CENTER, badge.size.x, 14, Art.with_alpha(Color.WHITE, appear))
 		var icon_id: String = card["tech"] if card["tech"] != "" else card.get("field", "")
 		if card["kind"] == "fusion":
 			icon_id = "fusion"
@@ -105,7 +94,7 @@ class Card:
 			_draw_wrapped(UiKit.font("bold"), card["fusion_hint"], Vector2(10, y - 22), size.x - 20, 12, Art.with_alpha(Color(0.85, 0.6, 1.0), appear))
 		if card.get("synergy", "") != "":
 			var unlocks: bool = card["synergy"].begins_with("Unlocks")
-			var synergy_color: Color = TechData.ELEMENT_COLORS[element] if unlocks else TechData.ELEMENT_COLORS.get(element, Color(0.7, 0.8, 0.9))
+			var synergy_color: Color = Art.GOLD if unlocks else TechData.ELEMENT_COLORS.get(element, Color(0.7, 0.8, 0.9))
 			_draw_wrapped(UiKit.font("bold"), card["synergy"], Vector2(10, y), size.x - 20, 12 if unlocks else 13, Art.with_alpha(synergy_color, appear))
 
 	func _draw_wrapped(font: Font, text: String, at: Vector2, width: float, font_size: int, color: Color) -> void:
