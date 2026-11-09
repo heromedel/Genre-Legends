@@ -256,18 +256,29 @@ func _wall_turret(enemy: Enemy, dt: float) -> void:
 	_despawn_if_gone(enemy)
 
 
+## Drills drift in, lock on, show the line they'll charge along for a moment, then ram down it. With hits that
+## matter, a ram you can see coming is a ram you can step out of.
 func _rammer(enemy: Enemy, dt: float) -> void:
 	match enemy.state:
 		0:
 			enemy.pos.y += 90.0 * dt
-			enemy.facing = _aim_angle(enemy)
-			if enemy.timer > 0.7:
+			if enemy.timer < RAM_LOCK_AT:
+				enemy.facing = _aim_angle(enemy)
+			elif not enemy.memory.get("warned", false):
+				enemy.memory["warned"] = true
+				world.emit("telegraph", {"pos": enemy.pos, "angle": enemy.facing, "length": 900.0, "time": RAM_CHARGE_AT - RAM_LOCK_AT})
+			if enemy.timer > RAM_CHARGE_AT:
 				enemy.state = 1
 				enemy.vel = Vector2.from_angle(enemy.facing) * _speed(enemy) * 1.6
 				world.emit("sound", {"name": "dive"})
 		1:
 			enemy.pos += enemy.vel * dt
 	_despawn_if_gone(enemy)
+
+
+## A drill stops turning to follow you at RAM_LOCK_AT seconds and charges at RAM_CHARGE_AT.
+const RAM_LOCK_AT := 0.5
+const RAM_CHARGE_AT := 0.85
 
 
 func _despawn_if_gone(enemy: Enemy) -> void:

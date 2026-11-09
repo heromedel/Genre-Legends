@@ -1014,7 +1014,8 @@ func _zone_triggers(zone: Zone) -> void:
 				damage_player(zone.damage, "blast")
 		"acid_warning":
 			zone.dead = true
-			add_zone("acid", zone.pos, zone.radius, 3.5, zone.damage, true, {"tick": 0.45, "color": Color(0.5, 1.0, 0.4)})
+			# A short-lived puddle: it denies ground for a moment rather than draining you (GDD 13C).
+			add_zone("acid", zone.pos, zone.radius, 2.0, zone.damage, true, {"tick": 0.45, "color": Color(0.5, 1.0, 0.4)})
 			emit("sound", {"name": "splat"})
 		"laser":
 			emit("sound", {"name": "laser"})
