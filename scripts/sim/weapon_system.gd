@@ -58,12 +58,23 @@ func update(input: InputFrame, dt: float) -> void:
 			_vent(1.5)
 
 
+## How long the mech keeps its aim after the aim stick is let go.
+const AIM_HOLD_SECONDS := 0.8
+var aim_hold := 0.0
+
+
 func _update_facing(input: InputFrame) -> void:
 	if player.form == "ship":
 		player.facing = -PI * 0.5
 		return
 	if input.aim.length() > 0.25:
 		player.facing = input.aim.angle()
+		aim_hold = AIM_HOLD_SECONDS
+		return
+	# Let go of the aim stick and the mech keeps looking where it was aimed for a moment, so the thumb can
+	# move to the special button and the Ion Cannon still fires where you aimed (heromedel).
+	if aim_hold > 0.0:
+		aim_hold -= World.DT
 		return
 	# Auto-aim is an accessibility option (Settings, off by default): without it the mech faces where
 	# you're moving once you let go of the aim stick.

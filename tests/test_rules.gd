@@ -27,6 +27,7 @@ func _init() -> void:
 	_fusions()
 	_resume()
 	_dungeon_needles()
+	_aim_hold()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -462,3 +463,20 @@ func _dungeon_needles() -> void:
 	var room := stage.room_rect(stage.current).grow(20.0)
 	var needles := mission.world.enemy_shots.filter(func(s): return s.look == "needle")
 	check(warned and not needles.is_empty() and needles.all(func(s): return room.has_point(s.pos)), "a dungeon room's needles come from its own walls, after a warning")
+
+
+## Let go of the aim stick and the mech keeps its aim for a moment, so a special still fires where you aimed.
+func _aim_hold() -> void:
+	var mission := _test_mission("planet")
+	var weapons := mission.weapons
+	var aim := InputFrame.new()
+	aim.aim = Vector2.RIGHT
+	weapons._update_facing(aim)
+	var walking := InputFrame.new()
+	walking.move = Vector2.UP
+	for i in 30:
+		weapons._update_facing(walking)
+	check(is_equal_approx(mission.player.facing, 0.0), "the mech keeps its aim just after the aim stick is let go")
+	for i in 40:
+		weapons._update_facing(walking)
+	check(is_equal_approx(mission.player.facing, -PI * 0.5), "then it turns back to where it's walking")
