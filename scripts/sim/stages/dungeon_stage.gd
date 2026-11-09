@@ -14,7 +14,8 @@ var current := Vector2i.ZERO
 var previous := Vector2i.ZERO
 var start_room := Vector2i.ZERO
 var boss_room := Vector2i.ZERO
-var breached := false            # chained missions: the boss door led up to the surface
+var breached := false
+var trap_timer := 2.0            # rune traps in the current room flare on this rhythm            # chained missions: the boss door led up to the surface
 var key_room := Vector2i.ZERO
 var secret_room := Vector2i(999, 999)
 var secret_from := Vector2i.ZERO
@@ -284,6 +285,11 @@ func _start_combat(room: Dictionary) -> void:
 	var rect := room_rect(current)
 	var depth: int = room["depth"]
 	var count := clampi(int((3 + depth + rng.randi_range(0, 2)) * world.spawn_scale), 3, 12)
+	# Deeper rooms are sometimes rigged: rune traps that flare on a rhythm, shown before they go off.
+	if depth >= 2 and int(room["seed"]) % 10 < 4:
+		room["traps"] = [Vector2(rng.randf_range(rect.position.x + 220, rect.end.x - 220), rng.randf_range(rect.position.y + 180, rect.end.y - 180)),
+			Vector2(rng.randf_range(rect.position.x + 220, rect.end.x - 220), rng.randf_range(rect.position.y + 180, rect.end.y - 180))]
+		trap_timer = 2.0
 	var roster: Dictionary = EnemyData.ROSTERS["dungeon"]
 	var entry := mission.player.pos
 	for i in count:
@@ -370,6 +376,12 @@ func step(dt: float) -> void:
 		world.emit("sound", {"name": "secret"})
 		_build_walls()
 	var room: Dictionary = rooms[current]
+	if room["state"] == "active" and room.has("traps"):
+		trap_timer -= dt
+		if trap_timer <= 0.0:
+			trap_timer = 3.5
+			for trap: Vector2 in room["traps"]:
+				world.add_zone("bomb_warning", trap, 80.0, 0.1, 14.0 * world.enemy_damage_scale, true, {"warn": 1.0, "color": Color(0.85, 0.45, 1.0)})
 	if room["kind"] == "miniboss" and room["state"] == "active" and miniboss != null and miniboss.finished:
 		_room_cleared(room)
 	elif room["state"] == "active" and boss == null and room["kind"] != "miniboss" and spawn_delay <= 0.0:
@@ -428,9 +440,21 @@ func is_cleared() -> bool:
 	return breached or (boss != null and boss.finished)
 
 
+## The enemies still standing in a locked room, so the HUD can count them and point at the last few.
+func room_enemies_left() -> Array:
+	var left := []
+	for enemy_id in room_enemies:
+		var enemy := world.enemy_by_id(enemy_id)
+		if enemy != null and not enemy.dead and enemy.kind != "cracked_wall":
+			left.append(enemy)
+	return left
+
+
 func objective_text() -> String:
 	if boss != null:
 		return "Defeat %s" % boss.boss_name
+	if rooms[current]["state"] == "active" and rooms[current]["kind"] != "miniboss":
+		return "Enemies left: %d" % room_enemies_left().size()
 	if not has_key:
 		return "Find the boss key"
 	return "Open the boss door"

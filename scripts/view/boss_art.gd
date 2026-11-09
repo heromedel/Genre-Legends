@@ -331,7 +331,7 @@ static func _clone_projector(ci: CanvasItem, boss: BossBase, time: float) -> voi
 		var beam := PackedVector2Array([shell.pos, clone.pos + Vector2(-26, 0), clone.pos + Vector2(26, 0)])
 		ci.draw_colored_polygon(beam, Color(0.7, 0.5, 1.0, 0.12 + 0.05 * sin(time * 8.0)))
 	if clone != null and not clone.dead:
-		draw_hologram(ci, boss.world.run.frame_id, clone.pos, PI * 0.5, time, clone.flash > 0.0)
+		draw_hologram(ci, boss.world.run.frame_id, clone.pos, PI * 0.5, time, clone.flash > 0.0, boss.world.run.loadout)
 	if shell != null and not shell.dead:
 		Art.shape(ci, Transform2D(time * 0.4, shell.pos) * Art.ngon(6, 30.0), _flash(shell, Color(0.12, 0.2, 0.16)), Color(0.6, 1.0, 0.7), 3.0)
 		for i in 6:
@@ -341,9 +341,10 @@ static func _clone_projector(ci: CanvasItem, boss: BossBase, time: float) -> voi
 
 
 ## Your frame as a flickering violet hologram (also used for a turned clone fighting beside you).
-static func draw_hologram(ci: CanvasItem, frame_id: String, at: Vector2, facing: float, time: float, hit: bool) -> void:
+static func draw_hologram(ci: CanvasItem, frame_id: String, at: Vector2, facing: float, time: float, hit: bool, loadout: Array = []) -> void:
 	var flicker := 0.75 + 0.25 * sin(time * 23.0)
-	FrameArt.draw_frame(ci, frame_id, "ship", at, facing, time, {"speed": 0.5, "scale": 1.4, "flash": 1.0 if hit else 0.0})
+	FrameArt.draw_frame(ci, frame_id, "ship", at, facing, time, {"speed": 0.5, "scale": 1.4, "flash": 1.0 if hit else 0.0,
+		"gear": GearArt.loadout_gear(loadout, 3) if not loadout.is_empty() else []})
 	# Scanlines and a violet sheen over it, so it reads as a projection, not the real thing.
 	for i in 7:
 		var y := -24.0 + i * 8.0 + fmod(time * 30.0, 8.0)

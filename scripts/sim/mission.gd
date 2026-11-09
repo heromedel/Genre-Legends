@@ -117,6 +117,8 @@ func _apply_difficulty() -> void:
 	world.elite_chance = 0.0 if world.gentle else (0.025 + 0.01 * region) * modifier.get("elites", 1.0)
 	world.elite_mods = ["shielded", "splitting"] + (["mirrored"] if region >= 1 else [])
 	world.reward_tech = node.get("reward_tech", "")
+	# Missions launched from the game carry the player's setting; tests and old logs keep auto-aim.
+	world.auto_aim = node.get("auto_aim", true)
 
 
 ## Starts a stage. Also used for mid-mission hand-offs: the frame transforms to the new stage's form.
@@ -189,6 +191,7 @@ func _update_world(input: InputFrame, player_active: bool) -> void:
 		player.tick_timers(DT, shield_regen)
 		weapons.update(input, DT)
 		_track_time_brake()
+	stage.tick_pending_boss(DT)
 	stage.step(DT)
 	if player_active:
 		lesson_hazards.update(DT)

@@ -63,6 +63,7 @@
   - Roaming a planet bullet-hell style, finding a corridor and diving in, shape-shifting into a ship for a corridor level.
   - Defending a Missile Command level until ships show up and it becomes Space Invaders; when the boss attacks, the player drops the turret and launches off the planet to fight it Galaga style.
   - **Ai-Generated-Proposal (2026-11-08):** Every mission type is built from the start so it can hand off mid-mission, carrying health, in-mission upgrades and the form change.
+  - **Ai-Generated-Proposal (2026-11-09):** Built in 0.4: about a third of eligible Planet Exploration planets open a fissure when the last nest falls and dive into a short Corridor Run with its boss; some dungeons' boss doors break out to the surface for a short planet run and its boss. The planet card says so.
 - **6H. Proposed (2026-11-08):** Every boss is a set piece: its own body, a warning intro, phases that change the arena, and its own mechanic. (Claude's idea; heromedel: "sounds cool".)
 
 ## 7. Equipment & Upgrades
@@ -116,12 +117,14 @@
   - **Ai-Generated-Proposal (2026-11-08):** Lore, how-it-works, Resonance and special conditions are always there; enemies, bosses, tech and fusions fill in as you meet, beat or unlock them.
 - **11D. Proposed (2026-11-08):** Tractor Beam is a visible beam that reels in semi-nearby drops, as long as it doesn't clutter the battlefield.
 - **11E. Proposed (2026-11-08):** Star Cluster's capture trope works without lives: a clone enemy scans you and projects a hologram. Kill the clone, or break the projector's shell and pick up the projector, which turns the clone to your side. An arrow points at the projector, green like a pickup. (heromedel's idea.)
-  - **Ai-Generated-Proposal (2026-11-08):** The clone copies a weaker version of your current build (your main weapon and one other tech).
+  - **Ai-Generated-Proposal (2026-11-08):** The clone copies a weaker version of your current build (your main weapon and one other tech). Built in 0.4: it wears your gear, fires a hologram copy of your main weapon, and turns your Swarm Pods on you if they're online.
   - **Likely (2026-11-08):** It's a rare surprise, not a regular: about 1 in 4 Star Cluster planets. It's still named on the planet card. More mini-bosses join each mission type's pool.
 - **11F. Likely (2026-11-08):** The ship and mech look different depending on the frame and what's equipped.
 - **11G. Ai-Generated-Proposal (2026-11-08):** Themed branches play harder than the route beside them and their prize planet is a Hazard, so the optional path is the riskier one (supports 9G).
 - **11I. Likely (2026-11-08):** The last boss drops the mission's loot (the planet's blueprints) as a prize; the stage continues until you grab it, then ends with the usual results. (heromedel's idea.)
   - **Ai-Generated-Proposal (2026-11-08):** The prize drifts to you after 3 seconds. After the boss falls, levels and crates no longer offer upgrades; each is banked as an extra blueprint of the planet's tech.
+- **11K. Likely (2026-11-09):** Auto-aim for the mech is an accessibility option, off by default: Settings, "Auto-aim (mech): Off > On". Without it the mech faces where you aim, or where you move.
+- **11L. Likely (2026-11-09):** When a mission opens with a radio line, the enemies hold back until it's read. (heromedel's idea: a delay before enemies rush in.)
 - **11J. Likely (2026-11-08):** Bullets that glow in the dark are an accessibility option, not a rule: Settings, "Bullets glow in the dark: Off > On".
 - **11H. Ai-Generated-Proposal (2026-11-08):** Explosive Resonance III is renamed Wildfire, and burning effects never mention the ground, since many fights are in space.
 
@@ -152,3 +155,4 @@
 | 2026-11-08 | 10D, 11A–11H | Playtest refinements: three-reel crates, Lucky Salvage odds, the Guide to Guardians with Mawjig's full name, a visible Tractor Beam, the clone-and-projector capture idea, frames that show their gear, harder themed branches, Wildfire. |
 | 2026-11-08 | 12A–12E | Build 0.3 content built from the approved list: frame gear, new bosses, elites, new tech, route events, big moments, genre music. |
 | 2026-11-08 | 11E, 11I, 11J | The Clone Projector becomes a rare surprise; the last boss drops a prize you collect before the mission ends; glowing bullets become an accessibility option. |
+| 2026-11-09 | 6G, 11K, 11L | First chained missions built; mech auto-aim becomes an accessibility option; enemies hold back while the opening radio line is read. |

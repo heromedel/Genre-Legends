@@ -32,6 +32,7 @@ var enemy_shots: Array = []
 var pickups: Array = []
 var zones: Array = []
 var blades: Array = []          # Arc Blade sweeps in progress
+var auto_aim := true             # the mech turns to the nearest enemy when you aren't aiming (Settings)
 var prize_waiting := false      # the last boss's prize is on the field; the mission ends once it's taken
 var wisps := 0                  # Soul Lantern: wisps circling the frame, each good for one bullet
 var allies: Array = []          # {pos, fire_timer, look}: things fighting on your side, like a turned clone

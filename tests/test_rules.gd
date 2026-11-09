@@ -271,5 +271,21 @@ func _build_03() -> void:
 		if fight.is_finished() or fight.state == "won":
 			break
 	check(not fight.world.prize_waiting and fight.state == "won", "the prize drifts to you and the mission ends")
+	# Chained missions: the map chains some planets and dungeons, never lessons or gates, and a chained
+	# planet's boss comes from the mission type it ends in.
+	var chain_map := StarMap.new(4242)
+	chain_map.ensure_generated(func(id): return id.begins_with("r0") or id.begins_with("br_"))
+	var chained := 0
+	for node_id in chain_map.all_node_ids():
+		var node: Dictionary = chain_map.get_node(node_id)
+		if node.get("chain", "") != "":
+			chained += 1
+			check(node["lesson"] == "" and not node["is_gate"], "%s: lessons and gates never chain" % node_id)
+			check(BossRoster.POOLS[node["chain"]]["boss"].has(node["boss"]), "%s: its boss belongs to %s" % [node_id, node["chain"]])
+	check(chained > 0, "the map has chained missions (%d)" % chained)
+	var dive := _test_mission("planet")
+	dive.stage.chain_to = "corridor"
+	var next := dive.stage.next_stage()
+	check(next is CorridorStage and next.short_stage, "a planet dives into a short Corridor Run")
 	for tech_id in ["option_pods", "soul_lantern", "ion_cannon", "thruster_explosion"]:
 		check(TechData.TECH.has(tech_id), "%s exists" % tech_id)

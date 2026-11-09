@@ -58,7 +58,9 @@ func _update_facing(input: InputFrame) -> void:
 	if input.aim.length() > 0.25:
 		player.facing = input.aim.angle()
 		return
-	var target := auto_aim_target()
+	# Auto-aim is an accessibility option (Settings, off by default): without it the mech faces where
+	# you're moving once you let go of the aim stick.
+	var target := auto_aim_target() if world.auto_aim else null
 	if target != null:
 		player.facing = (target.pos - player.pos).angle()
 	elif input.move.length() > 0.2:

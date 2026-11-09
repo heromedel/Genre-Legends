@@ -4,7 +4,8 @@ extends Control
 ## Touch controls match the frame's form (GDD 2B):
 ##   ship  - drag anywhere: the ship follows your finger, offset so your thumb never hides it.
 ##   mech  - left half of the screen is a floating move stick, right half a floating aim stick.
-##           Weapons always fire on their own; aiming is optional (auto-aim when you let go).
+##           Weapons always fire on their own. With auto-aim on (Settings) the mech turns to the nearest
+##           enemy when you let go; otherwise it faces where you move.
 ## Keyboard: WASD / arrows move, Space special. Mouse: hold to aim (mech) or drag (ship).
 ## Controller (GDD 2D): left stick moves, right stick aims, A or a shoulder button fires the special.
 ## It also draws the stick rings while thumbs are down.

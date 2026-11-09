@@ -6,6 +6,14 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
+## What's new in 0.4
+
+- **Chained missions:** some planets crack open a fissure when the last hive nest falls; dive in and your mech becomes a ship for a Corridor Run. Some dungeons break out to the surface instead. The planet card tells you.
+- **Livelier planets and dungeons:** planet biomes (verdant, desert, ice, volcanic) with ruins, wrecks, crystal fields and lava cracks; supply pods that land near you (with company); dungeon rooms with rugs, rune circles, rubble and rune traps.
+- **The clone mirrors you:** it wears your gear and fires your own main weapon back, plus your Swarm Pods if they're online.
+- **Boss warnings come first**, then the boss. Thunder Lance fires a real rail. Enemies hold back while the opening radio line is read. Mirrored elites crack eventually.
+- **Settings, Accessibility:** Auto-aim (mech), off by default.
+
 ## What's new in 0.3.2
 
 - **Four new mini-bosses**, a third for every mission type: the Swarm Marshal (a command ship drilling its escort into formations), the Salvo Barge (salvos of homing drones you shoot down), the Ring Obelisk (bullet-hell spirals and gapped rings) and the Blade Wraith (three flying swords; the ghost is solid only while they're thrown).

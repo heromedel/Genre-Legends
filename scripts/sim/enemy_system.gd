@@ -415,6 +415,12 @@ func _bouncer(enemy: Enemy, dt: float) -> void:
 		enemy.vel.y = -enemy.vel.y
 		bounced = true
 	enemy.pos += enemy.vel * dt
+	# Never wedged in a corner: knocked outside the room's inner area (walls push things around), it
+	# turns back toward the middle on a fresh diagonal.
+	if not area.has_point(enemy.pos):
+		var home := area.get_center() - enemy.pos
+		enemy.vel = Vector2(signf(home.x) if home.x != 0.0 else 1.0, signf(home.y) if home.y != 0.0 else 1.0).normalized() * _speed(enemy)
+		enemy.pos = enemy.pos.move_toward(area.get_center(), _speed(enemy) * dt)
 	enemy.facing = enemy.vel.angle()
 	if bounced and enemy.fire_timer <= 0.0:
 		enemy.fire_timer = 0.6

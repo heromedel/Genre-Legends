@@ -36,9 +36,13 @@ func behave(dt: float) -> void:
 	clone.pos.x = move_toward(clone.pos.x, mirror_x, (260.0 if phase == 0 else 340.0) * dt)
 	clone.pos.y = CLONE_Y + sin(time * 1.7) * 30.0
 	clone.facing = PI * 0.5
-	if fmod(time, 0.5 if phase == 0 else 0.38) < dt:
-		for offset in [-9.0, 9.0]:
-			world.enemy_shot(clone.pos + Vector2(offset, 14), PI * 0.5, 330.0, {"radius": 5.0, "color": Color(0.7, 0.6, 1.0), "look": "bolt"})
+	_mirror_main_weapon(clone, dt)
+	# And one of your other tricks, if you've brought it online: Swarm Pods come back at you as missiles.
+	if world.run.is_online("swarm_pods") and fmod(time, 3.6) < dt:
+		for i in 4:
+			var missile := world.enemy_shot(clone.pos, PI * 0.5 + (i - 1.5) * 0.5, 160.0, {"color": Color(0.85, 0.6, 1.0), "look": "needle", "life": 3.0})
+			missile.homing = 1.6
+		world.emit("sound", {"name": "missiles"})
 	# Every few seconds it copies one of your tricks: a ring, like your Nova, or a fan.
 	if fmod(time, 4.2) < dt:
 		if int(time / 4.2) % 2 == 0:
@@ -51,6 +55,23 @@ func behave(dt: float) -> void:
 		shell.pos = Vector2(world.bounds.get_center().x + float(memory["shell_side"]) * 380.0, 110.0 + sin(time * 1.2) * 40.0)
 		if fmod(time, 2.0) < dt:
 			world.enemy_ring(shell.pos, 8, 140.0, time * 2.0, {"color": Color(0.6, 1.0, 0.7)})
+
+
+## The clone fires a hologram copy of your own main weapon back down at you (GDD 11E).
+func _mirror_main_weapon(clone: Enemy, dt: float) -> void:
+	var hologram := Color(0.75, 0.6, 1.0)
+	match world.run.main_weapon():
+		"thunder_lance":
+			if fmod(time, 1.1 if phase == 0 else 0.85) < dt:
+				world.enemy_shot(clone.pos + Vector2(0, 16), PI * 0.5, 620.0, {"radius": 6.0, "color": hologram, "look": "needle", "damage": 14.0})
+		"hex_repeater":
+			if fmod(time, 0.9 if phase == 0 else 0.7) < dt:
+				var orb := world.enemy_shot(clone.pos + Vector2(0, 16), PI * 0.5, 150.0, {"radius": 8.0, "color": hologram})
+				orb.homing = 1.2
+		_:
+			if fmod(time, 0.5 if phase == 0 else 0.38) < dt:
+				for offset in [-9.0, 9.0]:
+					world.enemy_shot(clone.pos + Vector2(offset, 14), PI * 0.5, 330.0, {"radius": 5.0, "color": hologram, "look": "bolt"})
 
 
 func part_lost(part: Enemy) -> void:

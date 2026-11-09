@@ -361,10 +361,16 @@ func _paint_bodies(ci: CanvasItem) -> void:
 		BossArt.draw(ci, mission.stage.miniboss, time)
 	_draw_halo_saws(ci)
 	_draw_support_companions(ci)
+	# The last few enemies in a locked dungeon room pulse red, so you can always find them.
+	if mission.stage is DungeonStage:
+		var last_ones: Array = (mission.stage as DungeonStage).room_enemies_left()
+		if not last_ones.is_empty() and last_ones.size() <= 3:
+			for enemy: Enemy in last_ones:
+				ci.draw_arc(enemy.pos, enemy.radius + 14.0 + 4.0 * sin(time * 6.0), 0, TAU, 20, Color(1, 0.3, 0.3, 0.75), 3.0, true)
 	if mission.stage is PlanetStage and mission.stage.fissure_open:
 		BackgroundArt.draw_fissure(ci, mission.stage.fissure_pos, time)
 	for ally: Dictionary in world.allies:
-		BossArt.draw_hologram(ci, mission.run.frame_id, ally["pos"], mission.player.facing, time, false)
+		BossArt.draw_hologram(ci, mission.run.frame_id, ally["pos"], mission.player.facing, time, false, mission.run.loadout)
 	var player := mission.player
 	if player.alive and mission.state != "lost":
 		var speed := clampf(player.vel.length() / 300.0, 0.0, 1.0)

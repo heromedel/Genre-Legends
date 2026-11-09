@@ -9,7 +9,10 @@ static func draw_player_shot(ci: CanvasItem, shot: Shot, time: float) -> void:
 	var angle := direction.angle()
 	match shot.look:
 		"rail":
-			var tail := shot.pos - direction * 120.0
+			# A real rail: a long straight streak of light with lightning crawling along it.
+			var tail := shot.pos - direction * 380.0
+			ci.draw_line(tail, shot.pos, Art.with_alpha(shot.color, 0.35), 14.0, true)
+			ci.draw_line(tail.lerp(shot.pos, 0.3), shot.pos, Color(1, 1, 1, 0.85), 3.0, true)
 			var side := direction.orthogonal()
 			var bolt := PackedVector2Array([tail])
 			for i in range(1, 7):

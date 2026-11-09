@@ -233,12 +233,18 @@ func _draw_minimap(screen: Vector2, stage: DungeonStage) -> void:
 ## Arrows at the screen edge pointing to objectives that are off screen.
 func _draw_objective_arrows(screen: Vector2) -> void:
 	var targets: Array = mission.stage.objective_positions() if mission.stage.has_method("objective_positions") else []
+	# The last few enemies in a locked dungeon room get arrows too, so none hides under the HUD.
+	if mission.stage is DungeonStage:
+		var last_ones: Array = (mission.stage as DungeonStage).room_enemies_left()
+		if last_ones.size() <= 3:
+			targets = targets + last_ones.map(func(e): return e.pos)
 	# A dropped projector gets a green arrow, like a pickup (GDD 11E).
 	var projectors: Array = mission.world.pickups.filter(func(p): return p.kind in ["projector", "prize"]).map(func(p): return p.pos)
 	var center := screen * 0.5
 	for target: Vector2 in targets + projectors:
 		var on_screen := world_to_screen * target
-		if Rect2(Vector2(40, 40), screen - Vector2(80, 80)).has_point(on_screen):
+		# On screen and clear of the HUD's corners? No arrow needed.
+		if Rect2(Vector2(150, 110), screen - Vector2(300, 220)).has_point(on_screen):
 			continue
 		var direction := (on_screen - center).normalized()
 		var edge := center + direction * minf(absf((screen.x * 0.5 - 50) / maxf(absf(direction.x), 0.01)), absf((screen.y * 0.5 - 50) / maxf(absf(direction.y), 0.01)))

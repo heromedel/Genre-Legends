@@ -64,6 +64,10 @@
 
 1. A third mini-boss for each mission type, so the rare Clone Projector and every other pool have variety.
 
+## Build 0.4 (approved 2026-11-09)
+
+(Note) Built 2026-11-09: chained missions (Plan B step 1), planet biomes and landmarks, supply pods, dungeon room dressing and rune traps, a real rail for Thunder Lance, boss warnings before the boss arrives, a clone that mirrors your build, Nova Bomb on the mech's back, the radio hold, auto-aim as an option, cracking mirrored elites. Difficulty calibration waits for heromedel's next logs.
+
 ## Plan C: Defense and tanks
 
 1. Planetary Defense and Tank Assault, sharing the tank form.

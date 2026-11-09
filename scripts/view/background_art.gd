@@ -30,13 +30,32 @@ func _init(region_palette: Dictionary, background_seed: int) -> void:
 	nebula_b = Art.nebula_texture("nebula_b_%d" % (background_seed % 5), 99 + background_seed % 5, nebula.lerp(Color(0.6, 0.3, 0.8), 0.4))
 
 
+## Planet biomes: each tints the ground and brings its own landmarks, so no two surfaces look alike.
+const BIOMES := {
+	"verdant": {"tint": Color(0.3, 0.55, 0.3), "decor": ["grass", "grass", "crystal", "pebbles", "crater"], "landmarks": ["ruin", "crystal_field", "wreck"]},
+	"desert": {"tint": Color(0.7, 0.55, 0.3), "decor": ["pebbles", "crater", "crater", "dune"], "landmarks": ["ruin", "wreck", "bones"]},
+	"ice": {"tint": Color(0.6, 0.75, 0.85), "decor": ["crystal", "crystal", "crater", "pebbles"], "landmarks": ["crystal_field", "wreck", "ruin"]},
+	"volcanic": {"tint": Color(0.35, 0.18, 0.15), "decor": ["crater", "pebbles", "lava"], "landmarks": ["lava_crack", "wreck", "ruin"]},
+}
+var biome := "verdant"
+var landmarks: Array = []       # big set pieces on the surface {pos, kind, size, rot}
+
+
 func prepare_planet(world_size: Vector2) -> void:
-	var g: Color = palette["ground"]
+	biome = BIOMES.keys()[seed_value % BIOMES.size()]
+	var info: Dictionary = BIOMES[biome]
+	var g: Color = (palette["ground"] as Color).lerp(info["tint"], 0.55)
+	palette = palette.duplicate()
+	palette["ground"] = g
 	ground = Art.noise_texture("ground_%d_%s" % [seed_value % 9, g.to_html()], seed_value % 9, 256, 0.025, g.darkened(0.45), g.lightened(0.28), 5)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value + 7
+	for i in 48:
+		var landmark_kinds: Array = info["landmarks"]
+		landmarks.append({"pos": Vector2(rng.randf_range(250, world_size.x - 250), rng.randf_range(250, world_size.y - 250)),
+			"kind": landmark_kinds[rng.randi() % landmark_kinds.size()], "size": rng.randf_range(70, 140), "rot": rng.randf() * TAU})
 	for i in 260:
-		var kinds := ["crater", "crater", "pebbles", "crystal", "grass", "grass"]
+		var kinds: Array = info["decor"]
 		decor.append({"pos": Vector2(rng.randf() * world_size.x, rng.randf() * world_size.y),
 			"kind": kinds[rng.randi() % kinds.size()], "size": rng.randf_range(10, 46), "rot": rng.randf() * TAU})
 
@@ -173,15 +192,68 @@ func draw_planet(ci: CanvasItem, view: Rect2, world: World, time: float) -> void
 				for i in 3:
 					var tip := at + Vector2.from_angle(item["rot"] + i * 0.5 - 0.5) * size * 0.8
 					ci.draw_colored_polygon(PackedVector2Array([at + Vector2(-5, 0).rotated(i), tip, at + Vector2(5, 0).rotated(i)]), Art.with_alpha(accent, 0.75))
+			"dune":
+				ci.draw_arc(at, size, PI * 1.1, PI * 1.9, 10, palette["ground"].lightened(0.25), 3.0, true)
+			"lava":
+				ci.draw_circle(at, size * 0.4, Color(1, 0.4, 0.1, 0.35 + 0.15 * sin(time * 2.0 + at.x)))
 			"grass":
 				for i in 5:
 					var sway := sin(time * 1.5 + at.x * 0.01 + i) * 3.0
 					ci.draw_line(at + Vector2(i * 4 - 8, 0), at + Vector2(i * 4 - 8 + sway, -size * 0.35), palette["ground"].lightened(0.3), 2.0)
+	for landmark in landmarks:
+		if view.grow(200).has_point(landmark["pos"]):
+			_draw_landmark(ci, landmark, time)
 	for rock: Rect2 in world.walls:
 		if view.grow(100).intersects(rock):
 			draw_rock(ci, rock)
 	# Cliff edge around the playable area.
 	ci.draw_rect(bounds, Art.with_alpha(palette["accent"], 0.35), false, 6.0)
+
+
+## The surface's set pieces: ruins, crashed wrecks, crystal fields, glowing lava cracks, giant bones.
+func _draw_landmark(ci: CanvasItem, landmark: Dictionary, time: float) -> void:
+	var at: Vector2 = landmark["pos"]
+	var size: float = landmark["size"]
+	var rot: float = landmark["rot"]
+	var ground: Color = palette["ground"]
+	match landmark["kind"]:
+		"ruin":
+			# A broken ring of pillars around a cracked plaza.
+			ci.draw_circle(at, size, Art.with_alpha(ground.lightened(0.12), 0.35))
+			ci.draw_arc(at, size, 0, TAU, 28, Art.with_alpha(ground.lightened(0.3), 0.4), 3.0, true)
+			for i in 7:
+				if i == 2 or i == 5:
+					continue
+				var pillar := at + Vector2.from_angle(rot + TAU * i / 7.0) * size * 0.85
+				ci.draw_rect(Rect2(pillar - Vector2(9, 9), Vector2(18, 18)), ground.lightened(0.25))
+				ci.draw_rect(Rect2(pillar - Vector2(9, 9), Vector2(18, 18)), ground.darkened(0.3), false, 2.0)
+		"wreck":
+			# A crashed hull with a scorched trail and a curl of smoke.
+			var forward := Vector2.from_angle(rot)
+			ci.draw_line(at - forward * size * 1.4, at, Color(0, 0, 0, 0.3), size * 0.5)
+			var hull := PackedVector2Array([at + forward * size * 0.6, at + forward.orthogonal() * size * 0.3, at - forward * size * 0.5, at - forward.orthogonal() * size * 0.3])
+			Art.shape(ci, hull, Color(0.22, 0.24, 0.28), Color(0.5, 0.55, 0.6), 2.0)
+			for i in 3:
+				var puff := at + Vector2(sin(time + i) * 6.0, -fmod(time * 20.0 + i * 25.0, 70.0))
+				ci.draw_circle(puff, 8.0 + i * 3.0, Color(0.3, 0.3, 0.3, 0.25))
+		"crystal_field":
+			var accent: Color = palette["accent"]
+			for i in 7:
+				var spot := at + Vector2.from_angle(rot + i * 0.9) * size * (0.3 + 0.1 * i)
+				var height := 16.0 + float(i % 3) * 10.0
+				ci.draw_colored_polygon(PackedVector2Array([spot + Vector2(-7, 0), spot + Vector2(0, -height), spot + Vector2(7, 0)]), Art.with_alpha(accent, 0.8))
+			Art.draw_glow(ci, at, size * 0.8, Art.with_alpha(accent, 0.15))
+		"lava_crack":
+			var points := PackedVector2Array()
+			for i in 7:
+				points.append(at + Vector2.from_angle(rot).rotated(sin(i * 1.7) * 0.4) * (i - 3) * size * 0.35)
+			ci.draw_polyline(points, Color(0.2, 0.05, 0.0), 12.0, true)
+			ci.draw_polyline(points, Color(1, 0.45, 0.1, 0.75 + 0.2 * sin(time * 3.0)), 4.0, true)
+		"bones":
+			# The ribcage of something enormous.
+			for i in 6:
+				var base := at + Vector2.from_angle(rot) * (i - 2.5) * size * 0.25
+				ci.draw_arc(base, size * 0.5, rot + PI * 0.5 - 1.0, rot + PI * 0.5 + 1.0, 10, Color(0.9, 0.85, 0.75, 0.75), 4.0, true)
 
 
 func draw_rock(ci: CanvasItem, rock: Rect2) -> void:
@@ -211,6 +283,7 @@ func draw_dungeon(ci: CanvasItem, view: Rect2, stage: DungeonStage, time: float)
 			_draw_wall(ci, wall)
 		_draw_doors(ci, stage, key, time)
 		_draw_torches(ci, rect, time)
+		_draw_room_dressing(ci, stage.rooms[key], rect, time)
 
 
 func _draw_wall(ci: CanvasItem, wall: Rect2) -> void:
@@ -254,6 +327,32 @@ func _draw_doors(ci: CanvasItem, stage: DungeonStage, key: Vector2i, time: float
 				var t := (i + 0.5) / 5.0
 				var p := at - across + across * 2.0 * t
 				ci.draw_line(p - dir * 22.0, p + dir * 22.0, Color(0.85, 0.4, 1.0, 0.75 + 0.25 * sin(time * 10.0 + i)), 4.0)
+
+
+## Each room gets its own clutter from its seed (rubble, bones, a rug, a rune circle), and rigged rooms
+## show their rune traps.
+func _draw_room_dressing(ci: CanvasItem, room: Dictionary, rect: Rect2, time: float) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(room["seed"])
+	var center := rect.get_center()
+	match rng.randi() % 4:
+		0:
+			ci.draw_rect(Rect2(center - Vector2(150, 90), Vector2(300, 180)), Color(0.35, 0.08, 0.1, 0.45))
+			ci.draw_rect(Rect2(center - Vector2(150, 90), Vector2(300, 180)), Color(0.75, 0.55, 0.25, 0.4), false, 4.0)
+		1:
+			Art.dashed_circle(ci, center, 120.0, Color(0.5, 0.4, 0.8, 0.25), 3.0, 16, time * 0.2)
+			ci.draw_arc(center, 90.0, 0, TAU, 24, Color(0.5, 0.4, 0.8, 0.18), 2.0, true)
+	for i in 6:
+		var spot := Vector2(rng.randf_range(rect.position.x + 90, rect.end.x - 90), rng.randf_range(rect.position.y + 80, rect.end.y - 80))
+		if rng.randf() < 0.5:
+			for j in 4:
+				ci.draw_circle(spot + Vector2.from_angle(j * 1.9) * 9.0, 5.0 + j, Color(0.22, 0.2, 0.22))
+		else:
+			ci.draw_line(spot - Vector2(10, 4), spot + Vector2(10, 4), Color(0.8, 0.78, 0.7, 0.6), 3.0)
+			ci.draw_circle(spot + Vector2(12, 5), 4.0, Color(0.8, 0.78, 0.7, 0.6))
+	for trap: Vector2 in room.get("traps", []):
+		Art.dashed_circle(ci, trap, 80.0, Color(0.85, 0.45, 1.0, 0.55), 3.0, 12, -time * 0.8)
+		ci.draw_circle(trap, 10.0, Color(0.85, 0.45, 1.0, 0.4 + 0.3 * sin(time * 4.0)))
 
 
 func _draw_torches(ci: CanvasItem, rect: Rect2, time: float) -> void:

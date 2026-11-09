@@ -87,16 +87,36 @@ func objective_text() -> String:
 	return ""
 
 
-## Spawns the stage's boss with its warning intro.
+## The boss's WARNING plays first; the boss itself arrives this many seconds later (GDD 6H).
+const BOSS_WARNING_SECONDS := 1.6
+var pending_boss: BossBase = null
+var pending_boss_delay := 0.0
+
+
+## Sounds the warning now; the boss arrives once it has played (see tick_pending_boss).
 func start_boss(new_boss: BossBase) -> void:
-	boss = new_boss
+	if pending_boss != null or boss != null:
+		return
 	boss_started = true
+	pending_boss = new_boss
+	pending_boss_delay = BOSS_WARNING_SECONDS
+	world.emit("boss_warning", {"name": new_boss.boss_name, "title": new_boss.title})
+	world.emit("sound", {"name": "warning"})
+
+
+## Brings the boss in once its warning has played. Mission calls this every tick before the stage steps.
+func tick_pending_boss(dt: float) -> void:
+	if pending_boss == null:
+		return
+	pending_boss_delay -= dt
+	if pending_boss_delay > 0.0:
+		return
+	boss = pending_boss
+	pending_boss = null
 	boss.spawn()
 	boss.memory["debug_phase"] = debug_boss_phase
 	# The stage's last boss drops the mission's prize instead of a crate (see BossBase.defeat).
 	boss.memory["final"] = not has_next_stage()
-	world.emit("boss_warning", {"name": boss.boss_name, "title": boss.title})
-	world.emit("sound", {"name": "warning"})
 	mission.note("Boss appeared: %s" % boss.boss_name)
 
 

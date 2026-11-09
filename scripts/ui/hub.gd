@@ -711,6 +711,8 @@ func _build_settings_page() -> Control:
 	column.add_child(_toggle("Screen shake", "screen_shake"))
 	column.add_child(_toggle("Bullets glow in the dark", "bullet_glow"))
 	column.add_child(UiKit.wrapped("On Blackout planets and in dark boss phases, enemy bullets glow so you can always see them coming.", 13, Color(0.65, 0.75, 0.88)))
+	column.add_child(_toggle("Auto-aim (mech)", "auto_aim"))
+	column.add_child(UiKit.wrapped("On planets and in dungeons, your mech turns to the nearest enemy whenever you aren't aiming.", 13, Color(0.65, 0.75, 0.88)))
 	column.add_child(_toggle("Play log", "play_log"))
 	column.add_child(UiKit.wrapped("The play log records what you tap and how missions go, so it can be sent and read like a replay. Nothing leaves this device unless you save the file and send it.", 13, Color(0.65, 0.75, 0.88)))
 	var log_row := HBoxContainer.new()
