@@ -2,3 +2,6 @@
 *.import
 /build/
 node_modules/
+
+# Vector art ships as-is (read by VectorArt), so its import settings are kept.
+!art/**/*.import

@@ -123,4 +123,10 @@ node tests/web/first_impressions.js out/              # screenshots for the cold
 node tests/web/blind_playtester.js out/ 120           # fresh-save playthrough that saves a play log
 ```
 
+Two testers are agents rather than scripts: the cold first-impressions reviewer (screenshots only, one subject per
+review, GDD 4E) and the wording checker (player-facing text against the code, GDD 4F). Their findings go into
+`docs/REVIEW_LOG.md`.
+
 Debug launches: add `?test=planet&boss=1&power=a&god=1` to the page URL (or use Settings → Debug Console).
+Art: `?gallery=ship&zoom=4` draws one piece of art alone (`mech`, `dart`, a boss id, or an SVG path such as
+`art/frames/vanguard_ship.svg`, with `&rim=1` for the rim light).

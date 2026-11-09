@@ -156,6 +156,7 @@ func _debug_launch() -> bool:
 		var gallery := ArtGallery.new()
 		gallery.subject = options["gallery"]
 		gallery.zoom = float(options.get("zoom", "3"))
+		gallery.rim = options.has("rim")
 		_set_screen(gallery)
 		return true
 	return false

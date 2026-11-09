@@ -18,5 +18,7 @@ Follow these in every session:
 - Autoloads: `PlayLog` (play log, loads first), `Save` (single owner of persistent state), `Sound` (synthesized audio).
 - All art and audio are generated in code (`scripts/view/*_art.gd`, `scripts/audio/synth.gd`).
 - Testers: see README. Run the ones a change touches; the first-impressions review is done cold by a separate agent from screenshots only.
+- Wording checker (GDD 4F): when player-facing text changes (tech, upgrades, radio, guide, banners, UI), a separate
+  agent checks it against the code for accuracy, readability, AI-sounding phrasing and abruptness.
 - Cold reviews (GDD 4E): one subject per review (`first_impressions.js <out> <filter>`), several small ones rather than
   one sweep; long playtests and full sweeps only for major overhauls, not every build. Triage every finding into `docs/REVIEW_LOG.md`: acted on, saved for later, or discarded with why.

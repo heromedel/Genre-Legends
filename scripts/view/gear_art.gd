@@ -10,7 +10,7 @@ const SHIP_MOUNTS := [
 	[Vector2(-6, -17), 0.0],        # weapon: left wing pylon
 	[Vector2(-6, 17), 0.0],         # weapon: right wing pylon
 	[Vector2(-15, 0), PI],          # support: on the spine, facing back
-	[Vector2(4, 0), 0.0],           # special: the core under the canopy
+	[Vector2(-4, 0), 0.0],          # special: the core on the spine, just behind the canopy (not over it)
 ]
 const MECH_MOUNTS := [
 	[Vector2(6, 17), 0.0],          # main: the right arm
@@ -19,6 +19,8 @@ const MECH_MOUNTS := [
 	[Vector2(-19, 0), PI],          # support: the backpack
 	[Vector2(-11, 0), 0.0],         # special: on the back, between cockpit and backpack (not over the face)
 ]
+## The outline colour behind every part, matching the frames' vector art.
+const OUTLINE := Color(0.04, 0.07, 0.12)
 ## Seconds a part takes to unfold when its tech comes online.
 const DEPLOY_SECONDS := 0.45
 
@@ -67,6 +69,9 @@ static func _draw_part(ci: CanvasItem, frame: Transform2D, part: Dictionary, at:
 	var flash := clampf(1.0 - since / DEPLOY_SECONDS, 0.0, 1.0) if online else 0.0
 	# The right-hand weapon pylon is the mirror image of the left.
 	var mirror := -1.0 if slot == 2 else 1.0
+	# A dark silhouette a size up, behind the part: the same outline the frame's vector art has.
+	ci.draw_set_transform_matrix(frame * Transform2D(rotation, Vector2(size, size * mirror) * 1.22, 0.0, at))
+	_draw_shape(ci, tech_id, part.get("fork", ""), level, OUTLINE, form, time)
 	ci.draw_set_transform_matrix(frame * Transform2D(rotation, Vector2(size, size * mirror), 0.0, at))
 	_draw_shape(ci, tech_id, part.get("fork", ""), level, color, form, time)
 	if flash > 0.0:

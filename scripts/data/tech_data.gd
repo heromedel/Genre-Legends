@@ -173,7 +173,7 @@ const TECH := {
 	},
 	"time_brake": {
 		"name": "Time Brake", "slot": "special", "element": "mawjig",
-		"text": "Slams the brakes on time for everything except you.",
+		"text": "Hits the brakes on time: for a few seconds everything but you crawls at a quarter speed.",
 		"levels": ["Slow time", "Faster recharge", "Fork", "Longer brake", "Frozen moment"],
 		"blueprint_from": ["corridor", "dungeon"],
 		"forks": {

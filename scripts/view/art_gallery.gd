@@ -2,13 +2,15 @@ class_name ArtGallery
 extends Control
 ## Debug page for art tests: draws one piece of the game's art alone, centred, on a plain background,
 ## at a chosen zoom, so old and new art can be compared at the same size (main.gd: gallery=<subject>&zoom=N).
-## Subjects: ship, mech, dart, or any boss id (hive_carrier, warden, ...).
+## Subjects: ship, mech, dart, any boss id (hive_carrier, warden, ...), or an SVG drawn through VectorArt
+## (gallery=docs/art_test/ship.svg; add rim=1 for the rim light).
 
 const SPACE := Color(0.04, 0.05, 0.12)
 const GROUND := Color(0.42, 0.39, 0.29)
 
 var subject := "ship"
 var zoom := 3.0
+var rim := false
 var _stage: Stand
 
 
@@ -20,6 +22,7 @@ class Stand:
 	var time := 0.0
 	var boss: BossBase
 	var enemy: Enemy
+	var rim := false
 
 	func _process(delta: float) -> void:
 		time += delta
@@ -31,6 +34,8 @@ class Stand:
 				FrameArt.draw_frame(self, "vanguard", subject, Vector2.ZERO, -PI * 0.5, time, {})
 			"dart":
 				EnemyArt.draw(self, enemy, time)
+			_ when subject.ends_with(".svg"):
+				VectorArt.draw(self, "res://" + subject, Transform2D.IDENTITY, {"rim": Color(0.5, 0.9, 1.0) if rim else Color(0, 0, 0, 0)})
 			_:
 				BossArt.draw(self, boss, time)
 
@@ -42,10 +47,11 @@ func _ready() -> void:
 	var mission := Mission.new(node, 1, "vanguard", ["pulse_driver"], func(_t): return 1)
 	_stage = Stand.new()
 	_stage.subject = subject
+	_stage.rim = rim
 	if subject == "dart":
 		_stage.enemy = mission.world.spawn_enemy("dart", Vector2.ZERO)
 		_stage.enemy.facing = PI * 0.5
-	elif subject not in ["ship", "mech"]:
+	elif subject not in ["ship", "mech"] and not subject.ends_with(".svg"):
 		_stage.boss = BossRoster.make(subject, mission.world)
 		_stage.boss.spawn()
 		_stage.boss.entering = false
