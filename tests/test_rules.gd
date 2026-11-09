@@ -22,6 +22,7 @@ func _init() -> void:
 	_offers()
 	_build_022()
 	_build_03()
+	_resonance_tiers()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -317,3 +318,37 @@ func _build_03() -> void:
 	check(next is CorridorStage and next.short_stage, "a planet dives into a short Corridor Run")
 	for tech_id in ["option_pods", "soul_lantern", "ion_cannon", "thruster_explosion"]:
 		check(TechData.TECH.has(tech_id), "%s exists" % tech_id)
+
+
+## Build 0.4.1: the reworked Resonance tiers do what their cards say.
+func _resonance_tiers() -> void:
+	# Chain Reaction (Explosive II): what a blast kills goes off a beat later and catches the next in line.
+	var world := _test_mission("star_cluster").world
+	world.enemies.clear()
+	world.resonance["explosive"] = 2
+	var first := world.spawn_enemy("dart", Vector2(400, 300))
+	var second := world.spawn_enemy("dart", Vector2(460, 300))
+	world.explode(Vector2(370, 300), 40.0, 999.0, "test", Color.WHITE)
+	check(first.dead and not second.dead and world.chain_blasts.size() == 1, "Chain Reaction queues a blast where the kill was")
+	world.update_chain_blasts(0.2)
+	check(second.dead, "Chain Reaction's blast catches the next enemy")
+	# Splinter Rounds (Kinetic II): a shot that has flown a while bursts into two fragments on its first hit.
+	world = _test_mission("star_cluster").world
+	world.enemies.clear()
+	world.resonance["kinetic"] = 2
+	var target := world.spawn_enemy("splitter", Vector2(600, 300))
+	target.hp = 9999.0
+	var shot := world.player_shot(Vector2(590, 300), Vector2(600, 0), 5.0, "pulse_driver", "bolt", Color.WHITE)
+	shot.age = 0.5
+	var before := world.player_shots.size()
+	world.update_player_shots(World.DT)
+	check(world.player_shots.size() == before + 2, "Splinter Rounds burst into two fragments")
+	# Capacitor Discharge (Energy II): a breaking shield strikes nearby enemies.
+	world = _test_mission("star_cluster").world
+	world.enemies.clear()
+	world.resonance["energy"] = 2
+	var near := world.spawn_enemy("splitter", world.player.pos + Vector2(120, 0))
+	var near_hp := near.hp
+	world.player.shield = 5.0
+	world.damage_player(20.0, "test")
+	check(near.hp < near_hp, "Capacitor Discharge strikes when the shield breaks")

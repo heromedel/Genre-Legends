@@ -68,6 +68,10 @@
 
 (Note) Built 2026-11-09: chained missions (Plan B step 1), planet biomes and landmarks, supply pods, dungeon room dressing and rune traps, a real rail for Thunder Lance, boss warnings before the boss arrives, a clone that mirrors your build, Nova Bomb on the mech's back, the radio hold, auto-aim as an option, cracking mirrored elites, the Dropship transitions; from heromedel's 0.3.2 logs: auto-fire as an option, pause menu options, off-screen ricochet, a tighter Tractor Beam, a softer Hex Repeater, the trade-kill win, a persistent play log and touch fixes. Difficulty calibration waits for heromedel's next logs.
 
+## Build 0.4.1 (approved 2026-11-09)
+
+(Note) Built 2026-11-09: Resonance tiers made obvious and significant (GDD 9H), boss banners clear of the boss, fusion progress that explains Mk caps.
+
 ## Plan C: Defense and tanks
 
 1. Planetary Defense and Tank Assault, sharing the tank form.

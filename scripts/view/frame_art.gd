@@ -24,7 +24,14 @@ static func draw_frame(ci: CanvasItem, frame_id: String, form: String, at: Vecto
 	# Resonance tints the trim toward its element as tiers come online (GDD 11F).
 	var resonance: Array = state.get("resonance", [])
 	if not resonance.is_empty() and int(resonance[1]) > 0:
-		trim = trim.lerp(TechData.ELEMENT_COLORS[resonance[0]], 0.25 + 0.2 * int(resonance[1]))
+		var tier := int(resonance[1])
+		var element_color: Color = TechData.ELEMENT_COLORS[resonance[0]]
+		trim = trim.lerp(element_color, minf(0.35 + 0.25 * tier, 1.0))
+		# A glow around the frame that grows with each tier, so you can see your Resonance in the fight.
+		var pulse := 0.75 + 0.25 * sin(time * 4.0)
+		Art.draw_glow(ci, at, (30.0 + 10.0 * tier) * state.get("scale", 1.3), Art.with_alpha(element_color, 0.12 * tier * pulse))
+		if tier >= 3:
+			Art.dashed_circle(ci, at, 34.0 * state.get("scale", 1.3), Art.with_alpha(element_color, 0.5 * pulse), 2.0, 10, time * 1.5)
 	if state.get("flash", 0.0) > 0.0:
 		hull = hull.lerp(Color.WHITE, 0.7)
 	var scale: float = state.get("scale", 1.3)

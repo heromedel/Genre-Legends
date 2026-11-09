@@ -88,13 +88,23 @@ static func _fusion_section(column: VBoxContainer, run: RunState) -> void:
 			continue
 		var parts := []
 		for needed in needs:
-			parts.append("%s %s" % [TechData.TECH[needed]["name"], ("%d/%d" % [run.level_of(needed), TechData.MAX_LEVEL]) if run.loadout.has(needed) else "(not equipped)"])
+			parts.append("%s %s" % [TechData.TECH[needed]["name"], _fusion_progress(run, needed)])
 		lines.append(["%s: %s" % [fusion["name"], " + ".join(parts)], Color(0.8, 0.65, 1.0)])
 	if lines.is_empty():
 		return
 	column.add_child(UiKit.label("FUSIONS (both tech at level 5)", 15, Art.GOLD, "bold"))
 	for line in lines:
 		column.add_child(UiKit.wrapped(line[0], 13, line[1]))
+
+
+## How far a tech is toward fusing: its level out of 5, or why it can't get there in this mission.
+static func _fusion_progress(run: RunState, tech_id: String) -> String:
+	if not run.loadout.has(tech_id):
+		return "(not equipped)"
+	var cap: int = run.tech_cap.get(tech_id, 3)
+	if cap < TechData.MAX_LEVEL:
+		return "%d/%d (needs a higher Mk from R&D)" % [run.level_of(tech_id), TechData.MAX_LEVEL]
+	return "%d/%d" % [run.level_of(tech_id), TechData.MAX_LEVEL]
 
 
 static func _field_section(column: VBoxContainer, run: RunState) -> void:

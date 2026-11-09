@@ -79,16 +79,20 @@ func tick(delta: float) -> void:
 	flash_amount = maxf(flash_amount - delta * 2.5, 0.0)
 	damage_vignette = maxf(damage_vignette - delta * 2.0, 0.0)
 	warning_time = maxf(warning_time - delta, 0.0)
-	if not covered:
-		radio_time = maxf(radio_time - delta, 0.0)
-	if banner_time > 0.0 and not covered:
+	queue_redraw()
+	# While a card or crate screen is up, the radio and banners wait underneath, unseen and unspent.
+	if covered:
+		return
+	radio_time = maxf(radio_time - delta, 0.0)
+	if banner_time > 0.0:
 		banner_time -= delta
 	elif not banners.is_empty():
 		current_banner = banners.pop_front()
 		banner_time = 1.2
+		# Its band is picked once, as it appears, so it doesn't jump when the boss moves.
+		current_banner["y"] = _banner_height(get_viewport_rect().size) if mission != null else 220.0
 	else:
 		current_banner = {}
-	queue_redraw()
 
 
 func _draw() -> void:
@@ -126,6 +130,10 @@ func _draw() -> void:
 		objective = ""
 	var shown_boss := mission.stage.active_boss()
 	if shown_boss == null or shown_boss.entering:
+		# A dark plate behind it, so over a boss's hull it still reads as HUD, not as part of the boss.
+		if objective != "":
+			var text_width := font_bold.get_string_size(objective.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x
+			draw_rect(Rect2(Vector2((screen.x - text_width) * 0.5 - 14, 10), Vector2(text_width + 28, 28)), Color(0.02, 0.04, 0.08, 0.6))
 		draw_string_outline(font_bold, Vector2(0, 30), objective.to_upper(), HORIZONTAL_ALIGNMENT_CENTER, screen.x, 20, 5, Color(0, 0, 0, 0.7))
 		draw_string(font_bold, Vector2(0, 30), objective.to_upper(), HORIZONTAL_ALIGNMENT_CENTER, screen.x, 20, Color(0.9, 0.95, 1.0))
 	else:
@@ -262,14 +270,28 @@ func _draw_banner(screen: Vector2) -> void:
 	var t := 1.2 - banner_time
 	var slide := ease(clampf(t / 0.2, 0.0, 1.0), 0.3)
 	var fade := clampf(banner_time / 0.3, 0.0, 1.0)
-	# Banners sit below the HUD bars and the radio box, so nothing piles up at the top (0.2.2 cold review).
-	var y := maxf(screen.y * 0.3, 220.0)
+	var y: float = current_banner["y"]
 	var band := Rect2(Vector2(0, y - 26), Vector2(screen.x, 36))
 	draw_rect(band, Color(0, 0, 0, 0.62 * fade))
 	draw_line(band.position, band.position + Vector2(screen.x * slide, 0), Art.with_alpha(color, fade), 2.0)
 	draw_line(band.end - Vector2(screen.x * slide, 0), band.end, Art.with_alpha(color, fade), 2.0)
 	draw_string_outline(font_title, Vector2(0, y), current_banner["text"], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 22, 9, Color(0, 0, 0, fade))
 	draw_string(font_title, Vector2(0, y), current_banner["text"], HORIZONTAL_ALIGNMENT_CENTER, screen.x, 22, Art.with_alpha(color.lightened(0.55), fade))
+
+
+## Banners sit below the HUD bars and the radio box, so nothing piles up at the top (0.2.2 cold review).
+## In a boss fight they take whichever band, upper or lower, is further from both the boss and you,
+## so they never cut through either (0.4 cold review).
+func _banner_height(screen: Vector2) -> float:
+	var upper := maxf(screen.y * 0.3, 220.0)
+	var boss := mission.stage.active_boss()
+	if boss == null:
+		return upper
+	var lower := screen.y * 0.66
+	var boss_y := (world_to_screen * boss.origin).y
+	var player_y := (world_to_screen * mission.player.pos).y
+	var clearance := func(band_y: float) -> float: return minf(absf(band_y - boss_y), absf(band_y - player_y))
+	return upper if clearance.call(upper) >= clearance.call(lower) else lower
 
 
 ## The shooter-genre boss intro: flashing red WARNING with hazard stripes and the boss's name.

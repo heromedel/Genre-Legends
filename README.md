@@ -6,6 +6,13 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
+## What's new in 0.4.1
+
+- **Resonance you can see:** a card that unlocks a Resonance tier wears its element's colour and a RESONANCE badge. Pick it and the action holds on a splash naming the tier and what it does. Your frame glows in the element's colour, brighter with each tier.
+- **Resonance that matters:** Capacitor Discharge (Energy II: a breaking shield lets go in a lightning nova), Chain Reaction (Explosive II: blasts ripple through a crowd), Splinter Rounds (Kinetic II: shots burst into fragments on hit). Tier I is stronger across the board.
+- **Banners stay clear of bosses:** mid-fight banners take whichever band is clear of the boss and you; wave counts are skipped during a fight; the objective has a dark plate so it reads over a boss's hull. Banners queued behind a card screen now wait instead of getting lost.
+- **Build panel:** fusion progress says when a tech's Mk is too low to reach level 5.
+
 ## What's new in 0.4
 
 - **Chained missions:** some planets crack open a fissure when the last hive nest falls; dive in and your mech becomes a ship for a Corridor Run. Some dungeons break out to the surface instead. The planet card tells you.
@@ -14,6 +21,7 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 - **Boss warnings come first**, then the boss. Thunder Lance fires a real rail. Enemies hold back while the opening radio line is read. Mirrored elites crack eventually.
 - **Settings, Accessibility:** Auto-aim (mech), off by default.
 - **The Dropship:** every mission launches from its bay (the mech folds into a ship and blasts out), arrives in space, on a planet or at a dungeon gate, and ends with the trip home, or with a tow back aboard after a loss. Tap to skip.
+- **Boss warnings name the boss** again, and the first radio line fits your form and auto-fire setting (from the 0.4 cold review).
 - **Fairer fights from heromedel's logs:** boss bodies shove you clear instead of draining you; the Warden's stomps show their reach first and its flail hits softer; if the last boss falls while your wreck is still burning, you traded with it and the mission counts as won.
 - **Settings, Accessibility:** Auto-fire (on by default). Off, weapons fire while you steer the ship or aim the mech (or hold J/Z or the right trigger).
 - **Pause menu options:** music and sound sliders, screen shake and glowing bullets, without leaving the mission.

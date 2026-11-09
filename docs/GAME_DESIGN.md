@@ -98,6 +98,8 @@
 - **9F. Likely (2026-11-08):** Planet cards list the enemy traits you'll face, so loadout choice matters.
 - **9G. Proposed (2026-11-08):** Some branches, forks or clusters are intentionally hard until you have a good build or grind a little.
 - **9H. Ai-Generated-Proposal (2026-11-08):** In-mission upgrades get strategy from fewer, bigger level-ups, elemental Resonance tiers, cards that show what they build toward, risky cards, two rerolls per mission and a Build screen.
+  - **Likely (2026-11-09):** Reaching a Resonance tier is obvious when it happens, shown right as you pick the upgrade that gave it, with a little splash. (heromedel.)
+  - **Ai-Generated-Proposal (2026-11-09):** Built in 0.4.1. A card that unlocks a tier wears the element's colour and a RESONANCE badge; picking it holds the action on a splash naming the tier and what it does; the frame glows in the element's colour, more with each tier. Tiers that were plain stat boosts became effects you can see: Capacitor Discharge (Energy II: a breaking shield lets go in a lightning nova), Chain Reaction (Explosive II: what a blast kills explodes a beat later, up to three links), Splinter Rounds (Kinetic II: shots that have flown a while burst into two fragments on hit). Tier I is stronger: arcs every 4th hit, Volatile 1 in 3, Hex Touch +30%; Storm Front arcs every 2nd hit.
 
 ## 10. Setting & Lore
 
@@ -167,4 +169,5 @@
 | 2026-11-09 | 6G, 11K, 11L | First chained missions built; mech auto-aim becomes an accessibility option; enemies hold back while the opening radio line is read. |
 | 2026-11-09 | 11M | The Dropship and its launch, arrival and return transitions around every mission. |
 | 2026-11-09 | 11N to 11Q | Auto-fire becomes an option in every mode; options on the pause menu; Ricochet comes back from off screen; a boss that falls as you do counts as a win. |
+| 2026-11-09 | 9H | Resonance tiers made obvious (card badge, splash on pick, frame glow) and the flat tiers reworked into visible effects. |
 | 2026-11-09 | 4E | Cold reviews in small, focused batches; every finding triaged into the review log. |

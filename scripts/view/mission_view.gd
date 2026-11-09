@@ -252,7 +252,8 @@ func _handle_events(events: Array) -> void:
 			"resonance":
 				pending_splashes.append(event)
 			"wave":
-				if event["index"] > 1:
+				# Mid-fight, a wave count is just noise over the boss (0.4 cold review).
+				if event["index"] > 1 and mission.stage.active_boss() == null:
 					hud.show_banner("WAVE %d" % event["index"], "cyan")
 
 
