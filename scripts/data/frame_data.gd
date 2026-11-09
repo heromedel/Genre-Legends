@@ -10,12 +10,12 @@ const FRAMES := {
 		"hull": Color(0.36, 0.78, 1.0), "trim": Color(1.0, 0.78, 0.35),
 		"trait": "breacher_plating",
 		"trait_name": "Breacher Plating",
-		"trait_text": "Extra armour bolted onto the hull: 20 more Armor, two hits' worth, on top of any plating.",
+		"trait_text": "Extra plating bolted onto the hull: 20 more Armor, two hits' worth, on top of any plating you wear.",
 		"unlock": "",
 	},
 	"tempest": {
 		"name": "Tempest",
-		"tagline": "Fast and fragile, trailed by afterimages that fight beside it.",
+		"tagline": "Fast and fragile, trailed by afterimages that fire when it does.",
 		"armor": 45.0, "speed": 370.0,
 		"hull": Color(0.55, 1.0, 0.7), "trim": Color(0.95, 0.4, 1.0),
 		"trait": "afterimage",
@@ -25,7 +25,7 @@ const FRAMES := {
 	},
 	"bulwark": {
 		"name": "Bulwark",
-		"tagline": "A walking fortress whose armoured front throws bullets back.",
+		"tagline": "A walking fortress whose armored front throws bullets back.",
 		"armor": 100.0, "speed": 250.0,
 		"hull": Color(1.0, 0.62, 0.3), "trim": Color(0.6, 0.85, 1.0),
 		"trait": "fortress_field",

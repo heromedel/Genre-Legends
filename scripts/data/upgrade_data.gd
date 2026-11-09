@@ -9,7 +9,7 @@ const FIELD := {
 	},
 	"mawjig_siphon": {
 		"name": "Mawjig Siphon", "limit": 2, "icon": "mawjig_siphon", "element": "mawjig",
-		"text": "Every kill siphons 1 Armor back into your frame, up to 10 each stage.",
+		"text": "Every kill siphons 1 Armor back into your frame, up to 10 per stage for each copy.",
 	},
 	"last_stand": {
 		"name": "Last Stand", "limit": 1, "icon": "last_stand", "element": "explosive",
@@ -21,7 +21,7 @@ const FIELD := {
 	},
 	"juggernaut_servos": {
 		"name": "Juggernaut Servos", "limit": 2, "icon": "juggernaut_servos", "element": "kinetic",
-		"text": "Move 15% faster, and ramming enemies hurts them more than you.",
+		"text": "Move 15% faster. Ramming an enemy hurts it badly and costs you half as much; bosses shrug it off.",
 	},
 	"tractor_beam": {
 		"name": "Tractor Beam", "limit": 2, "icon": "magnet", "element": "kinetic",
@@ -50,7 +50,7 @@ const RISKY_FIELD := {
 	},
 	"blood_pact": {
 		"name": "Blood Pact", "limit": 1, "icon": "mawjig_siphon", "element": "mawjig",
-		"text": "Every kill repairs Armor. Go two seconds without a kill and your Armor bleeds away, down to a third.",
+		"text": "Every kill repairs 1.5 Armor. Go two seconds without a kill and your Armor bleeds away, down to a third.",
 	},
 }
 

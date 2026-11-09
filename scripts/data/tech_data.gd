@@ -178,7 +178,7 @@ const TECH := {
 	# ---- Plating: the frame's outer armour, worn from the start of every mission (GDD 13L).
 	"dsp1_plate": {
 		"name": "DSP-1 Drop Plate", "slot": "plating", "element": "none",
-		"text": "Dropship Standard Plating, version 1: what your own Dropship prints. Reinforce it as you level up.",
+		"text": "Dropship Standard Plating, version 1: the armor your Dropship fits to every frame. Each level adds Armor.",
 		"levels": ["Standard plating", "+10 Armor", "Fork", "+10 Armor", "+10 Armor"],
 		"blueprint_from": ["star_cluster", "corridor", "planet", "dungeon"],
 		"forks": {

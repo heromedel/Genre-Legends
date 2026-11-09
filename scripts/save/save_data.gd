@@ -104,7 +104,7 @@ func repair(raw: Dictionary) -> Dictionary:
 	if int(raw.get("version", 0)) < VERSION:
 		# A save from before the last big change starts over, and the title screen says why.
 		clear_checkpoint()
-		clean["notice"] = "Build 0.6 changes how damage, armour and loadouts work, so this is a fresh start."
+		clean["notice"] = "Build 0.6 changes how damage, armor and loadouts work, so your old progress was cleared for a fresh start."
 		_log("save", "Save from version %d: starting fresh for version %d." % [int(raw.get("version", 0)), VERSION])
 		return clean
 	for key in clean:
