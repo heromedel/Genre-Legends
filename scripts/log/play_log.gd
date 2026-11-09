@@ -194,6 +194,9 @@ func observe(mission: Mission, frame: InputFrame, events: Array) -> void:
 				note("mission", "%s escaped" % event["name"])
 			"special_used":
 				note("input", "used special %s" % event["tech"])
+			"resonance":
+				var info: Dictionary = UpgradeData.RESONANCE[event["element"]]
+				note("mission", "Resonance: %s tier %d (%s)" % [info["name"], event["tier"], info["tiers"][int(event["tier"]) - 1][0]])
 			"room_entered":
 				note("mission", "entered %s room %s" % [event["kind"], str(event["room"])])
 	if mission.tick % 60 == 0:

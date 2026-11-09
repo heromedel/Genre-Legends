@@ -15,6 +15,9 @@ const MIRROR_ELITE_HITS := 15
 const TRACTOR_BEAMS := 4
 ## Seconds before the boss's prize starts drifting toward you.
 const PRIZE_DRIFT_DELAY := 3.0
+## Chain Reaction (Explosive II): how long each link waits, and how many links a cascade can run.
+const CHAIN_REACTION_DELAY := 0.12
+const CHAIN_REACTION_GENERATIONS := 3
 ## How far a ricocheting shot looks for its next target.
 ## How far a ricocheting shot flies out of view before it glances back (kept inside shot_bounds), and how
 ## far it can turn when it does.
@@ -71,6 +74,8 @@ var on_collect: Callable
 
 # Resonance tiers this tick (GDD 9H), refreshed by Mission so combat checks are cheap.
 var resonance := {"energy": 0, "explosive": 0, "kinetic": 0, "mawjig": 0}
+var chain_blasts: Array = []     # Chain Reaction blasts waiting to go off: {pos, delay, generation}
+var _chain_generation := 0       # how deep in a cascade the blast going off right now is
 
 
 func refresh_resonance() -> void:
@@ -299,7 +304,7 @@ func hurt_enemy(enemy: Enemy, amount: float, tech: String = "") -> bool:
 	# Mawjig resonance: hits hex, and hexed enemies take more damage.
 	if resonance["mawjig"] >= 1:
 		if enemy.hex_marked:
-			amount *= 1.2
+			amount *= 1.3
 		elif not from_resonance:
 			enemy.hex_marked = true
 	# A shielded elite's barrier soaks damage before its health does.
@@ -325,10 +330,36 @@ func hurt_enemy(enemy: Enemy, amount: float, tech: String = "") -> bool:
 	return false
 
 
+## Kinetic resonance II: two fragments fly on past the enemy the shot just hit.
+func _splinter(shot: Shot) -> void:
+	shot.splintered = true
+	if player_shots.size() > 500:
+		return
+	for side in [-1.0, 1.0]:
+		var fragment := player_shot(shot.pos, shot.vel.rotated(side * 0.45) * 0.9, shot.damage * 0.45, "splinter", "shard", Color(1, 0.85, 0.5))
+		fragment.life = 0.45
+		fragment.hit_ids = shot.hit_ids.duplicate()
+
+
+## Energy resonance II (Capacitor Discharge): a shield that breaks lets go in a lightning nova.
+func _capacitor_discharge() -> void:
+	clear_bullets(player.pos, 200.0)
+	var struck := {}
+	for i in 6:
+		var target := nearest_enemy(player.pos, 380.0, struck)
+		if target == null:
+			break
+		struck[target.id] = true
+		emit("lightning", {"from": player.pos, "to": target.pos})
+		hurt_enemy(target, 40.0 + 10.0 * resonance["energy"], "resonance")
+	emit("explosion", {"pos": player.pos, "size": 200.0, "color": Color(0.5, 0.9, 1.0), "ring": true})
+	emit("sound", {"name": "laser"})
+
+
 ## Energy resonance: every few hits, lightning arcs from the struck enemy to another.
 func _energy_resonance_hit(enemy: Enemy) -> void:
 	run.hit_counter += 1
-	var every := 3 if resonance["energy"] >= 3 else 6
+	var every := 2 if resonance["energy"] >= 3 else 4
 	if run.hit_counter % every != 0:
 		return
 	var hit := {enemy.id: true}
@@ -339,7 +370,7 @@ func _energy_resonance_hit(enemy: Enemy) -> void:
 			break
 		hit[next.id] = true
 		emit("lightning", {"from": from, "to": next.pos})
-		hurt_enemy(next, 14.0 + 4.0 * resonance["energy"], "resonance")
+		hurt_enemy(next, 18.0 + 5.0 * resonance["energy"], "resonance")
 		from = next.pos
 
 
@@ -387,8 +418,8 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 			child.memory["awake"] = true
 			child.vel = Vector2.from_angle(TAU * i / pieces) * 160.0
 			child.room = enemy.room
-	if tech != "resonance" and resonance["explosive"] >= 1 and rng.randf() < 0.25:
-		explode(enemy.pos, 70.0, 22.0 + 6.0 * resonance["explosive"], "resonance", Color(1.0, 0.55, 0.25))
+	if tech != "resonance" and resonance["explosive"] >= 1 and rng.randf() < 0.34:
+		explode(enemy.pos, 80.0, 26.0 + 6.0 * resonance["explosive"], "resonance", Color(1.0, 0.55, 0.25))
 	if run.field_count("blood_pact") > 0:
 		player.repair(1.5)
 	if run.is_online("soul_lantern"):
@@ -432,9 +463,7 @@ func update_allies(dt: float) -> void:
 
 ## A player explosion that damages every enemy in range once.
 func explode(at: Vector2, radius: float, damage: float, tech: String, color: Color, spreads_hex: bool = false) -> void:
-	# Explosive resonance: bigger blasts, then blasts that leave flames burning (Wildfire).
-	if resonance["explosive"] >= 2:
-		radius *= 1.33
+	# Explosive resonance III (Wildfire): blasts leave flames burning.
 	if resonance["explosive"] >= 3 and radius >= 40.0 and zones.size() < 40:
 		add_zone("fire", at, radius * 0.6, 1.6, 6.0, false, {"tick": 0.4, "color": Color(1, 0.5, 0.2)})
 	emit("explosion", {"pos": at, "size": radius, "color": color, "ring": true})
@@ -444,7 +473,26 @@ func explode(at: Vector2, radius: float, damage: float, tech: String, color: Col
 		if at.distance_to(enemy.pos) < radius + enemy.radius:
 			if spreads_hex:
 				enemy.hex_marked = true
-			hurt_enemy(enemy, damage, tech)
+			var killed := hurt_enemy(enemy, damage, tech)
+			# Explosive resonance II (Chain Reaction): what a blast kills goes off a moment later.
+			if killed and resonance["explosive"] >= 2 and _chain_generation < CHAIN_REACTION_GENERATIONS:
+				chain_blasts.append({"pos": enemy.pos, "delay": CHAIN_REACTION_DELAY, "generation": _chain_generation + 1})
+
+
+## Chain Reaction's queued blasts go off one beat after the kill that set them, so the cascade ripples outward.
+func update_chain_blasts(dt: float) -> void:
+	var due := []
+	for blast: Dictionary in chain_blasts:
+		blast["delay"] = float(blast["delay"]) - dt
+		if blast["delay"] <= 0.0:
+			due.append(blast)
+	for blast: Dictionary in due:
+		chain_blasts.erase(blast)
+		_chain_generation = blast["generation"]
+		explode(blast["pos"], 64.0, 20.0 + 8.0 * resonance["explosive"], "resonance", Color(1.0, 0.6, 0.3))
+		_chain_generation = 0
+	if not due.is_empty():
+		emit("sound", {"name": "explode"})
 
 
 ## Removes enemy bullets inside a circle; returns how many.
@@ -482,9 +530,12 @@ func reflect_shot(shot: Shot, damage: float, homing: bool, splits: int) -> void:
 func damage_player(amount: float, source: String) -> void:
 	if not player.alive or player.grace > 0.0:
 		return
+	var had_shield := player.shield > 0.0
 	var taken := player.take_hit(amount)
 	if taken <= 0.0:
 		return
+	if had_shield and player.shield <= 0.0 and resonance["energy"] >= 2:
+		_capacitor_discharge()
 	run.damage_taken += taken
 	run.hits_taken += 1
 	emit("player_hit", {"pos": player.pos, "amount": taken, "source": source})
@@ -587,9 +638,10 @@ func update_player_shots(dt: float) -> void:
 				emit("spark", {"pos": shot.pos, "color": Color(0.8, 0.8, 0.8), "blocked": true})
 				break
 			shot.hit_ids[enemy.id] = true
-			# Kinetic resonance II: shots that have flown a while hit harder.
-			var momentum := 1.4 if resonance["kinetic"] >= 2 and shot.age > 0.3 else 1.0
-			hurt_enemy(enemy, shot.damage * momentum, shot.tech)
+			hurt_enemy(enemy, shot.damage, shot.tech)
+			# Kinetic resonance II (Splinter Rounds): a shot that has flown a while bursts on its first hit.
+			if resonance["kinetic"] >= 2 and shot.age > 0.3 and not shot.splintered and shot.tech != "splinter":
+				_splinter(shot)
 			_on_shot_impact(shot, enemy)
 			if shot.bounces > 0:
 				shot.bounces -= 1
