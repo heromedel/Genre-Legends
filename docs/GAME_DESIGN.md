@@ -28,6 +28,11 @@
 - **3B. Likely (2026-11-08):** Before a build reaches heromedel, Claude's own testers (section 4) play it, and the problems they find are fixed first.
 - **3C. Likely (2026-11-08):** Builds go to Claude's own branch first. Ask heromedel before pushing to the `playtest` branch: he may still be playing the build that's there.
 - **3D. Likely (2026-11-08):** When heromedel gives an example, or something clearly labelled as an example, it illustrates the idea. Claude doesn't have to copy or implement the example directly, and isn't limited to it.
+- **3E. Hard Rule (2026-11-09):** Questions to heromedel are only real ones. In his words:
+  > "You are not required to find a question.
+  > You are not required to end a reply with questions.
+  > You do not need to repeat decided on or numbered points or suggestions as a question.
+  > The style guide of using Q1, Q2, Q3, if for if you have real questions, it is not meant to tell you to find questions. Do not nit pick or look for problems just to have some. Ask legit real questions when you actually, naturally have them and they have not been answered and you cannot find the answer and only if it is not a gap you were expected to fill in."
 
 ## 4. Testing & Play Log
 
@@ -195,3 +200,4 @@
 | 2026-11-09 | 4E | Cold reviews in small, focused batches; every finding triaged into the review log. |
 | 2026-11-09 | 10E | A Jig Drive only jumps through space; crossing realms is ancient Chulak tech or a Jig Phase Drive. |
 | 2026-11-09 | 1D | Alternatives offered side by side are never the same kind of ability; a dash or ram on its own is fine. |
+| 2026-11-09 | 3E | Hard Rule: only real questions; never invent questions, end on them by habit, or re-ask decided points. |

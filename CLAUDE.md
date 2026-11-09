@@ -9,6 +9,12 @@ Follow these in every session:
 
 ## Project notes
 
+- **Hard Rule (GDD 3E), heromedel's words:**
+  > "You are not required to find a question.
+  > You are not required to end a reply with questions.
+  > You do not need to repeat decided on or numbered points or suggestions as a question.
+  > The style guide of using Q1, Q2, Q3, if for if you have real questions, it is not meant to tell you to find questions. Do not nit pick or look for problems just to have some. Ask legit real questions when you actually, naturally have them and they have not been answered and you cannot find the answer and only if it is not a gap you were expected to fill in."
+
 - heromedel's examples illustrate an idea; don't copy them literally or limit yourself to them (GDD 3D).
 - Never push to `playtest` (the branch GitHub Pages serves) without asking heromedel first (GDD 3C). Push to your own branch.
 - Godot 4.6, GL Compatibility renderer, single-threaded web export into `play/` (`tools/export_web.sh`).
