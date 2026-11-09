@@ -32,6 +32,7 @@
 
 - **4A. Likely (2026-11-08):** Claude keeps a test harness, a QA harness, a blind playtester (plays like a new player using only what's on screen) and a break-it playtester (does everything wrong, tries to break or exploit the game).
 - **4B. Likely (2026-11-08):** A third playtester checks visuals, first impressions and assumptions by describing what it sees, cold. It catches things like a sword arc that looks nothing like a sword arc.
+- **4E. Likely (2026-11-09):** Cold reviews run in small batches, one subject each (a level, a boss, a menu), so each review goes deeper and its findings come back while the work is fresh, not after a 30-minute sweep. Every finding is triaged into the review log (`docs/REVIEW_LOG.md`): acted on, saved for later, or discarded with a note saying why it wasn't relevant. (heromedel's process.)
 - **4C. Likely (2026-11-08):** A built-in play log that, when heromedel sends it, is as good as watching him play the whole time: what he tapped and did, where he got stuck or panicked, readable like a replay.
 - **4D. Likely (2026-11-08):** A player's behaviour in a play log isn't automatically a problem. Missing a lot may just be the player screwing around. Claude's own bots doing something they weren't supposed to is different, and is a bug.
   - **Ai-Generated-Proposal (2026-11-08) — how 4C works:** The simulation runs on a fixed step with seeded randomness, so the recorded input replays the run exactly. The log also records menu taps, touches and game events with timestamps. Long idle stretches and bursts of erratic input are marked "possibly stuck" or "possibly panicking" as hints, never verdicts (4D). The log is exported as a text code to paste into chat.
@@ -166,3 +167,4 @@
 | 2026-11-09 | 6G, 11K, 11L | First chained missions built; mech auto-aim becomes an accessibility option; enemies hold back while the opening radio line is read. |
 | 2026-11-09 | 11M | The Dropship and its launch, arrival and return transitions around every mission. |
 | 2026-11-09 | 11N to 11Q | Auto-fire becomes an option in every mode; options on the pause menu; Ricochet comes back from off screen; a boss that falls as you do counts as a win. |
+| 2026-11-09 | 4E | Cold reviews in small, focused batches; every finding triaged into the review log. |
