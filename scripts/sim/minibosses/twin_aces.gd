@@ -6,11 +6,15 @@ extends BossBase
 var angry := false
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Twin Aces"
 	title = "Red and Blue"
 	look = "twin_aces"
 	color = Color(1.0, 0.4, 0.5)
+
+
+func spawn() -> void:
 	origin = Vector2(world.bounds.get_center().x, 180)
 	add_part("ace0", Vector2(-200, -300), 520, 20)
 	add_part("ace1", Vector2(200, -300), 520, 20)

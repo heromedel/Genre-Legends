@@ -22,6 +22,12 @@ var color := Color(1, 0.5, 0.4)
 
 func _init(target_world: World) -> void:
 	world = target_world
+	introduce()
+
+
+## Sets the name, title, look and colour. Runs when the boss is made, before its warning plays (Stage.start_boss).
+func introduce() -> void:
+	pass
 
 
 ## A pickup this fight dropped was collected (the Clone Projector's projector).

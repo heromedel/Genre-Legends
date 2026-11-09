@@ -10,11 +10,15 @@ const LONG_SURFACE_SECONDS := 5.0
 var eruptions := 0
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Dune Maw"
 	title = "The Ground Has Teeth"
 	look = "dune_maw"
 	color = Color(0.95, 0.75, 0.45)
+
+
+func spawn() -> void:
 	origin = world.player.pos + Vector2.from_angle(world.rng.randf() * TAU) * 300.0
 	add_part("core", Vector2.ZERO, 1500, 36, {"invulnerable": true, "hidden": true})
 	place_parts()

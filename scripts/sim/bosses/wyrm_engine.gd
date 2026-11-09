@@ -11,11 +11,15 @@ var charge_dir := Vector2.ZERO
 var charge_time := 0.0
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Wyrm Engine"
 	title = "The Corridor's End"
 	look = "wyrm_engine"
 	color = Color(0.5, 1.0, 0.75)
+
+
+func spawn() -> void:
 	origin = Vector2(world.bounds.get_center().x, -120)
 	add_part("core", Vector2.ZERO, 2000, 32, {"invulnerable": true})
 	for i in SEGMENTS:

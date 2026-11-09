@@ -7,11 +7,15 @@ extends BossBase
 const BAY_OFFSETS := [Vector2(-250, 6), Vector2(-125, 36), Vector2(125, 36), Vector2(250, 6)]
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Hive Carrier"
 	title = "Mother of the Swarm"
 	look = "hive_carrier"
 	color = Color(1.0, 0.45, 0.4)
+
+
+func spawn() -> void:
 	origin = Vector2(world.bounds.get_center().x, -200)
 	add_part("core", Vector2(0, -10), 2400, 44, {"invulnerable": true})
 	for i in BAY_OFFSETS.size():

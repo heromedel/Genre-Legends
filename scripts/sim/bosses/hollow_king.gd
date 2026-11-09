@@ -16,11 +16,15 @@ func setup_room(room_rect: Rect2) -> void:
 	anchors = [c + Vector2(-300, -170), c + Vector2(300, -170), c + Vector2(-300, 170), c + Vector2(300, 170), c]
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "The Hollow King"
 	title = "Crowned in Empty Light"
 	look = "hollow_king"
 	color = Color(0.75, 0.55, 1.0)
+
+
+func spawn() -> void:
 	origin = anchors[4]
 	add_part("core", Vector2.ZERO, 3000, 34, {"invulnerable": true})
 	add_part("orb0", Vector2(70, 0), 260, 16)

@@ -4,11 +4,15 @@ extends BossBase
 ## and landing in rings of teeth. When hurt it spills gold coins (Data Shards) everywhere.
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Mimic King"
 	title = "All That Glitters"
 	look = "mimic_king"
 	color = Color(1.0, 0.8, 0.35)
+
+
+func spawn() -> void:
 	add_part("core", Vector2.ZERO, 1300, 40)
 	place_parts()
 	memory["hop"] = 0.0

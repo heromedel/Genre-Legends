@@ -6,11 +6,15 @@ extends BossBase
 const TURRET_OFFSETS := [Vector2(-170, 10), Vector2(0, 28), Vector2(170, 10)]
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Bulkhead Fortress"
 	title = "None Shall Pass"
 	look = "turret_fortress"
 	color = Color(1.0, 0.65, 0.3)
+
+
+func spawn() -> void:
 	origin = Vector2(origin.x if origin.x != 0.0 else world.bounds.get_center().x, -90)
 	var spread := minf(170.0, float(memory.get("half_width", 300.0)) - 50.0) / 170.0
 	add_part("core", Vector2(0, -24), 900, 34, {"invulnerable": true})

@@ -8,11 +8,15 @@ const ESCORTS := 8
 const SHAPES := ["ring", "wedge", "wall"]
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Swarm Marshal"
 	title = "On My Mark"
 	look = "swarm_marshal"
 	color = Color(1.0, 0.5, 0.35)
+
+
+func spawn() -> void:
 	origin = Vector2(world.bounds.get_center().x, -120)
 	add_part("core", Vector2.ZERO, 900, 30, {"invulnerable": true})
 	for i in ESCORTS:

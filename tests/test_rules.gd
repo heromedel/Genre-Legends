@@ -239,6 +239,7 @@ func _build_03() -> void:
 				boss.spawn()
 				check(boss.look == boss_id, "%s builds a boss with the same look" % boss_id)
 				check(GuideData.BOSSES.has(boss_id), "%s has a guide entry" % boss_id)
+				check(BossRoster.make(boss_id, mission.world).boss_name not in ["", "Boss"], "%s is named before it spawns, for its warning" % boss_id)
 				check(not boss.parts.is_empty(), "%s has parts" % boss_id)
 	check(BossRoster.pick("star_cluster", "boss", "r0c0n0", 5) == "hive_carrier", "the first planet keeps the classic boss")
 	# Auto-fire off: weapons hold fire until the player steers, aims or presses fire (Settings).

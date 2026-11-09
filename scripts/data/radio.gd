@@ -23,9 +23,17 @@ static func mission_start_line(node: Dictionary, missions_flown: int) -> String:
 	if node.get("is_gate", false):
 		return "Break the gate and the next region opens up."
 	if missions_flown == 0:
-		return "Frame's warm, Commander. Weapons fire on their own. Just fly."
+		return _first_line(node)
 	# A special condition is worth a heads-up; a plain planet gets silence.
 	return CONDITION_LINES.get(node.get("modifier", ""), "")
+
+
+## The very first mission's line: what the controls do, in the frame's form and with your auto-fire setting.
+static func _first_line(node: Dictionary) -> String:
+	var mech: bool = node.get("type", "") in ["planet", "dungeon"]
+	if node.get("autofire", true):
+		return "Frame's warm, Commander. Weapons fire on their own. %s" % ("Just move." if mech else "Just fly.")
+	return "Frame's warm, Commander. %s" % ("Hold the aim stick and your guns answer." if mech else "Steer and your guns answer.")
 
 
 const CONDITION_LINES := {

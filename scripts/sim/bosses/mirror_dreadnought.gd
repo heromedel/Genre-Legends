@@ -9,11 +9,15 @@ const MIRROR_OFFSETS := [Vector2(-220, 40), Vector2(-110, 62), Vector2(0, 70), V
 const VENT_OFFSETS := [Vector2(-160, -62), Vector2(0, -84), Vector2(160, -62)]
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Mirror Dreadnought"
 	title = "Warden of the First Gate"
 	look = "mirror_dreadnought"
 	color = Color(0.75, 0.9, 1.0)
+
+
+func spawn() -> void:
 	origin = Vector2(world.bounds.get_center().x, -220)
 	add_part("core", Vector2(0, -10), 2000, 46, {"invulnerable": true})
 	for i in VENT_OFFSETS.size():

@@ -8,11 +8,15 @@ const LEG_OFFSETS := [Vector2(-78, -62), Vector2(78, -62), Vector2(-78, 62), Vec
 var collapsed := false
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Siege Crawler"
 	title = "Walker of the Burning Plain"
 	look = "siege_crawler"
 	color = Color(1.0, 0.6, 0.3)
+
+
+func spawn() -> void:
 	var away := Vector2.from_angle(world.rng.randf() * TAU) * 420.0
 	origin = (world.player.pos + away).clamp(world.bounds.position + Vector2(200, 200), world.bounds.end - Vector2(200, 200))
 	add_part("core", Vector2.ZERO, 2600, 50, {"invulnerable": true})

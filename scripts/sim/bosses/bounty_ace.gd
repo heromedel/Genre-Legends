@@ -5,11 +5,15 @@ extends BossBase
 ## calls in other hunters and throws a closing net of bullets with one gap.
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Bounty Hunter Ace"
 	title = "Dead or Alive"
 	look = "bounty_ace"
 	color = Color(1.0, 0.75, 0.3)
+
+
+func spawn() -> void:
 	origin = Vector2(world.bounds.get_center().x, -140)
 	add_part("core", Vector2.ZERO, 2400, 48, {"invulnerable": true})
 	add_part("drone0", Vector2(-80, 0), 420, 16)

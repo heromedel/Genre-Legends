@@ -7,11 +7,15 @@ extends BossBase
 const CLONE_Y := 170.0
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Clone Projector"
 	title = "Know Thyself"
 	look = "clone_projector"
 	color = Color(0.75, 0.55, 1.0)
+
+
+func spawn() -> void:
 	origin = Vector2(world.bounds.get_center().x, -120)
 	add_part("clone", Vector2.ZERO, 1400, 20)
 	var side := -1.0 if world.rng.randf() < 0.5 else 1.0

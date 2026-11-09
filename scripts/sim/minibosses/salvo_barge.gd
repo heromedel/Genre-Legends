@@ -5,11 +5,15 @@ extends BossBase
 ## The corridor waits until it falls.
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Salvo Barge"
 	title = "Incoming!"
 	look = "salvo_barge"
 	color = Color(0.95, 0.75, 0.4)
+
+
+func spawn() -> void:
 	var half_width := float(memory.get("half_width", 300.0))
 	origin = Vector2(origin.x if origin.x != 0.0 else world.bounds.get_center().x, -110)
 	var spread := minf(150.0, half_width - 60.0)

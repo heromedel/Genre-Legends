@@ -10,11 +10,15 @@ const CORE_OFFSET := Vector2(0, -1180)
 const STOP_Y := 220.0
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "Leviathan"
 	title = "The Sky Goes Dark"
 	look = "leviathan"
 	color = Color(0.6, 0.85, 1.0)
+
+
+func spawn() -> void:
 	origin = Vector2(world.bounds.get_center().x, -60)
 	# The hull passes overhead, so its parts never ram you; only their guns are dangerous.
 	add_part("core", CORE_OFFSET, 2600, 40, {"invulnerable": true, "contact": 0.0})

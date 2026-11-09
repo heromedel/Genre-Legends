@@ -14,11 +14,15 @@ func setup_room(room_rect: Rect2) -> void:
 	room = room_rect
 
 
-func spawn() -> void:
+## Who this boss is, known from the moment it's made so its warning can name it.
+func introduce() -> void:
 	boss_name = "The Warden"
 	title = "No One Leaves"
 	look = "warden"
 	color = Color(0.85, 0.7, 0.5)
+
+
+func spawn() -> void:
 	if room.size == Vector2.ZERO:
 		room = Rect2(world.bounds.get_center() - Vector2(400, 260), Vector2(800, 520))
 	origin = room.get_center() + Vector2(0, -40)
