@@ -132,7 +132,7 @@ const GATE_PRIZES := {1: "frame:bulwark"}
 ## What you'll face on a planet (GDD 9F), so loadout choice matters before you launch.
 const TYPE_TRAITS := {
 	"star_cluster": ["Diving formations", "Shielded wings (hit them from the side)"],
-	"corridor": ["Wall turrets", "Laser gates", "Narrow walls"],
+	"corridor": ["Wall turrets", "Laser gates", "Narrow passages"],
 	"planet": ["Hive nests", "Swarms of crawlers", "Acid spitters"],
 	"dungeon": ["Shielded knights (strike after they lunge)", "Mimics", "Locked doors"],
 }
@@ -141,7 +141,7 @@ const LESSON_TRAITS := {
 	"mirror": "Mirrored hull (straight shots bounce back; homing gets around it)",
 }
 const ARRIVAL_TRAITS := {
-	"cluster_drone": ["star_cluster", "Cluster Drones (split when hit)"],
+	"cluster_drone": ["star_cluster", "Cluster Drones (burst into homing shards when destroyed)"],
 	"centi_mech": ["planet", "Centi-Mechs"],
 }
 

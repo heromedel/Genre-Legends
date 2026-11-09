@@ -28,8 +28,8 @@ const MILESTONES := [
 
 ## What the radio says when a milestone brings a new enemy into the galaxy (GDD 9D).
 const ENEMY_ANNOUNCEMENTS := {
-	"cluster_drone": "Cluster Drones have been spotted in the galaxy. They split apart when hit. Watch the swarm.",
-	"centi_mech": "Centi-Mechs are now invading planets across the region. Long, armored, and they don't stop.",
+	"cluster_drone": "Cluster Drones have been spotted in the galaxy. Destroy one and it bursts into homing shards.",
+	"centi_mech": "Centi-Mechs are loose on planets across the galaxy. Kill the head and the next segment takes over.",
 }
 
 

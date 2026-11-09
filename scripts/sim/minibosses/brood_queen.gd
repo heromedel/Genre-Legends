@@ -7,7 +7,7 @@ extends BossBase
 ## Who this boss is, known from the moment it's made so its warning can name it.
 func introduce() -> void:
 	boss_name = "Brood Queen"
-	title = "Mother of the Hive"
+	title = "The Brood Wakes"
 	look = "brood_queen"
 	color = Color(0.75, 1.0, 0.4)
 

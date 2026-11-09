@@ -40,18 +40,18 @@ const TECH := {
 	# ---- Main weapons: fire on their own from the moment the mission starts.
 	"pulse_driver": {
 		"name": "Pulse Driver", "slot": "main", "element": "energy",
-		"text": "Rapid energy bolts. A blank slate that grows into something wild.",
-		"levels": ["Rapid bolts", "Twin bolts", "Fork", "Triple fan", "Overcharged bolts"],
+		"text": "Rapid energy bolts. Its forks make them ricochet between enemies or burst into fans.",
+		"levels": ["Rapid bolts", "Twin bolts", "Fork", "Triple fan", "Overcharged bolts: faster fire"],
 		"blueprint_from": ["star_cluster", "corridor"],
 		"forks": {
-			"a": {"name": "Ricochet Rounds", "text": "Bolts bounce from enemy to enemy, hitting harder each time, and shots that miss glance back in from somewhere out of view instead of flying away."},
+			"a": {"name": "Ricochet Rounds", "text": "Bolts bounce to another enemy and hit harder each time. Misses fly off screen and glance back in."},
 			"b": {"name": "Splitfire", "text": "Every bolt bursts into a fan of smaller bolts mid-flight."},
 		},
 	},
 	"thunder_lance": {
 		"name": "Thunder Lance", "slot": "main", "element": "energy",
 		"text": "A rail of lightning that punches through every enemy in a line.",
-		"levels": ["Piercing rail", "Faster charge", "Fork", "Heavier rail", "Storm-forged rail"],
+		"levels": ["Piercing rail", "Faster rails", "Fork", "Heavier rail", "Storm-forged rail: harder, faster rails"],
 		"blueprint_from": ["corridor", "planet"],
 		"forks": {
 			"a": {"name": "Chain Storm", "text": "Every hit arcs lightning into the enemies around it."},
@@ -61,7 +61,7 @@ const TECH := {
 	"hex_repeater": {
 		"name": "Hex Repeater", "slot": "main", "element": "mawjig",
 		"text": "Mawjig orbs that hunt down enemies on their own.",
-		"levels": ["Seeking orbs", "Faster orbs", "Fork", "Third orb", "Deep hex"],
+		"levels": ["Seeking orbs", "Faster orbs", "Fork", "Third orb", "Deep hex: orbs hit harder"],
 		"blueprint_from": ["dungeon", "planet"],
 		"forks": {
 			"a": {"name": "Hexplosion", "text": "Hexed enemies explode when they die, and the blast spreads the hex."},
@@ -72,7 +72,7 @@ const TECH := {
 	"arc_blade": {
 		"name": "Arc Blade", "slot": "weapon", "element": "energy",
 		"text": "A huge energy sword sweeps around the frame and cuts bullets out of the air.",
-		"levels": ["Blade sweep", "Wider sweep", "Fork", "Longer blade", "Master's edge"],
+		"levels": ["Blade sweep", "Longer reach", "Fork", "Wider sweep", "Master's edge: longer, harder sweeps"],
 		"blueprint_from": ["dungeon", "planet"],
 		"forks": {
 			"a": {"name": "Phantom Edge", "text": "Each sweep throws a crescent of light that cuts through everything."},
@@ -82,7 +82,7 @@ const TECH := {
 	"swarm_pods": {
 		"name": "Swarm Pods", "slot": "weapon", "element": "explosive",
 		"text": "Shoulder pods launch salvos of homing micro-missiles.",
-		"levels": ["Missile salvo", "Bigger salvo", "Fork", "Bigger blasts", "Saturation salvo"],
+		"levels": ["Missile salvo", "Bigger salvo", "Fork", "Bigger blasts", "Saturation salvo: eight missiles"],
 		"blueprint_from": ["star_cluster", "planet"],
 		"forks": {
 			"a": {"name": "Cluster Warheads", "text": "Each blast scatters bomblets that blow up again."},
@@ -92,28 +92,28 @@ const TECH := {
 	"orbital_halo": {
 		"name": "Orbital Halo", "slot": "weapon", "element": "kinetic",
 		"text": "Saw blades orbit the frame, shredding enemies and bullets they touch.",
-		"levels": ["Two saws", "Three saws", "Fork", "Four saws", "Diamond edges"],
+		"levels": ["Two saws", "Three saws", "Fork", "Four saws", "Diamond edges: saws cut harder"],
 		"blueprint_from": ["dungeon", "star_cluster"],
 		"forks": {
-			"a": {"name": "Supernova Rings", "text": "The halo blasts outward across the screen, then snaps back."},
+			"a": {"name": "Supernova Rings", "text": "Every few seconds the halo flares out wide, then snaps back."},
 			"b": {"name": "Saw Storm", "text": "Double the saws, spinning twice as fast."},
 		},
 	},
 	"starfall": {
 		"name": "Starfall", "slot": "weapon", "element": "mawjig",
 		"text": "Calls Mawjig meteors down where nearby enemies are heading. Each one blasts everything it lands on.",
-		"levels": ["One meteor", "Two meteors", "Fork", "Three meteors", "Cataclysm"],
+		"levels": ["One meteor", "Two meteors", "Fork", "Three meteors", "Cataclysm: harder, faster meteors"],
 		"blueprint_from": ["planet", "corridor"],
 		"forks": {
 			"a": {"name": "Comet Trail", "text": "Meteors leave a flaming trail that burns anything in it."},
-			"b": {"name": "Meteor Shower", "text": "Many smaller meteors rain across the field."},
+			"b": {"name": "Meteor Shower", "text": "Three extra meteors per volley, smaller and weaker."},
 		},
 	},
 	# ---- Support: passive systems that change how the frame plays.
 	"mirror_aegis": {
 		"name": "Mirror Aegis", "slot": "support", "element": "energy",
 		"text": "A mirror bubble flickers on and fires enemy bullets back at them.",
-		"levels": ["Mirror pulse", "Longer pulse", "Fork", "Faster pulse", "Perfect mirror"],
+		"levels": ["Mirror pulse", "Longer pulse", "Fork", "Faster pulse", "Perfect mirror: longer, more frequent pulses"],
 		"blueprint_from": ["star_cluster", "dungeon"],
 		"forks": {
 			"a": {"name": "Prism", "text": "Every reflected bullet splits into three."},
@@ -122,8 +122,8 @@ const TECH := {
 	},
 	"graze_engine": {
 		"name": "Graze Engine", "slot": "support", "element": "kinetic",
-		"text": "Bullets that barely miss you charge Overdrive: double fire rate and a golden glow.",
-		"levels": ["Graze charge", "Faster charge", "Fork", "Longer Overdrive", "Adrenaline"],
+		"text": "Bullets that barely miss you charge Overdrive: nearly double fire rate and a golden glow.",
+		"levels": ["Graze charge", "Faster charge", "Fork", "Longer Overdrive", "Adrenaline: Overdrive charges faster, lasts longer"],
 		"blueprint_from": ["star_cluster", "corridor"],
 		"forks": {
 			"a": {"name": "Adrenal Mend", "text": "Grazes restore your shield, and Overdrive patches armor."},
@@ -132,8 +132,8 @@ const TECH := {
 	},
 	"overheat_core": {
 		"name": "Overheat Core", "slot": "support", "element": "explosive",
-		"text": "Firing builds heat. Running hot fires faster, and maxing out vents a shockwave.",
-		"levels": ["Heat vent", "Bigger vent", "Fork", "Hotter core", "Reactor"],
+		"text": "Main weapon fire builds heat. Past half heat you fire 25% faster; at full heat you vent a shockwave that blasts enemies and wipes nearby bullets.",
+		"levels": ["Heat vent", "Bigger vent", "Fork", "Hotter core: vents more often", "Reactor: vents more often and wider"],
 		"blueprint_from": ["planet", "dungeon"],
 		"forks": {
 			"a": {"name": "Meltdown", "text": "Vents leave a ring of fire behind."},
@@ -142,8 +142,8 @@ const TECH := {
 	},
 	"option_pods": {
 		"name": "Option Pods", "slot": "support", "element": "kinetic",
-		"text": "Glowing pods trail your path and fire copies of your main weapon.",
-		"levels": ["Two pods", "Stronger copies", "Fork", "Third pod", "Perfect copies"],
+		"text": "Glowing pods trail your path and fire weaker copies of your main weapon.",
+		"levels": ["Two pods", "Stronger copies", "Fork", "Third pod", "Strongest copies"],
 		"blueprint_from": ["star_cluster", "corridor"],
 		"forks": {
 			"a": {"name": "Formation", "text": "Pods lock beside you in a firing line and hit harder."},
@@ -153,7 +153,7 @@ const TECH := {
 	"soul_lantern": {
 		"name": "Soul Lantern", "slot": "support", "element": "mawjig",
 		"text": "Enemies you destroy leave Mawjig wisps that circle you. Each wisp swallows one enemy bullet.",
-		"levels": ["Two wisps", "Three wisps", "Fork", "Four wisps", "Soul storm"],
+		"levels": ["Two wisps", "Three wisps", "Fork", "Five wisps", "Soul storm: six wisps"],
 		"blueprint_from": ["planet", "dungeon"],
 		"forks": {
 			"a": {"name": "Will-o'-Wisps", "text": "Wisps dart out at enemies on their own."},
@@ -164,7 +164,7 @@ const TECH := {
 	"nova_bomb": {
 		"name": "Nova Bomb", "slot": "special", "element": "explosive",
 		"text": "Your reactor erupts in a white-hot nova that erases every bullet on screen and blasts everything around you.",
-		"levels": ["Nova", "Faster recharge", "Fork", "Bigger nova", "Star-killer"],
+		"levels": ["Nova", "Faster recharge", "Fork", "Bigger nova", "Star-killer: harder blast, faster recharge"],
 		"blueprint_from": ["star_cluster", "dungeon"],
 		"forks": {
 			"a": {"name": "Black Hole", "text": "Drags enemies into one point, then detonates."},
@@ -174,17 +174,17 @@ const TECH := {
 	"time_brake": {
 		"name": "Time Brake", "slot": "special", "element": "mawjig",
 		"text": "Hits the brakes on time: for a few seconds everything but you crawls at a quarter speed.",
-		"levels": ["Slow time", "Faster recharge", "Fork", "Longer brake", "Frozen moment"],
+		"levels": ["Slow time", "Faster recharge", "Fork", "Longer brake", "Longest brake"],
 		"blueprint_from": ["corridor", "dungeon"],
 		"forks": {
-			"a": {"name": "Stasis Shatter", "text": "When time resumes, frozen bullets shatter into Data Shards."},
+			"a": {"name": "Stasis Shatter", "text": "When time resumes, slowed bullets shatter. Every two leave a Data Shard."},
 			"b": {"name": "Overclock Brake", "text": "Longer, and your weapons fire faster while it lasts."},
 		},
 	},
 	"ion_cannon": {
 		"name": "Ion Cannon", "slot": "special", "element": "energy",
 		"text": "A beam the length of the battlefield that burns through everything and erases bullets in its path.",
-		"levels": ["Ion beam", "Faster recharge", "Fork", "Wider beam", "Planet-cutter"],
+		"levels": ["Ion beam", "Faster recharge", "Fork", "Wider beam", "Planet-cutter: the beam lasts longer"],
 		"blueprint_from": ["corridor", "planet"],
 		"forks": {
 			"a": {"name": "Sweeping Beam", "text": "The beam sweeps across the field as it fires."},
@@ -194,11 +194,11 @@ const TECH := {
 	"thruster_explosion": {
 		"name": "Thruster Explosion", "slot": "special", "element": "kinetic",
 		"text": "Your thrusters detonate and hurl you forward, untouchable, blowing up everything along the way.",
-		"levels": ["Blast dash", "Faster recharge", "Fork", "Longer dash", "Supernova burn"],
+		"levels": ["Blast dash", "Faster recharge", "Fork", "Longer dash", "Supernova burn: harder blast, faster recharge"],
 		"blueprint_from": ["star_cluster", "planet"],
 		"forks": {
 			"a": {"name": "Afterburner", "text": "The dash leaves a trail of fire."},
-			"b": {"name": "Shockwave", "text": "The dash ends in a shockwave that wipes nearby bullets."},
+			"b": {"name": "Shockwave", "text": "The dash ends in a shockwave that hits enemies and wipes bullets nearby."},
 		},
 	},
 }

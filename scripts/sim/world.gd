@@ -611,7 +611,9 @@ func update_player_shots(dt: float) -> void:
 			if shot.pos.distance_squared_to(enemy.pos) > reach * reach:
 				continue
 			# Mirrored hulls throw straight shots back; homing shots curve around them.
-			if enemy.reflects:
+			# Homing shots get round a mirrored elite's mirror and hit it (the Guide says so); against the Mirror
+			# Dreadnought they curve past its mirrored hull to reach the vents on its back (GDD 9C).
+			if enemy.reflects and not (shot.homing > 0.0 and enemy.boss == null):
 				if shot.homing > 0.0:
 					continue
 				shot.dead = true

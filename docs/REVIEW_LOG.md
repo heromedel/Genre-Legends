@@ -7,6 +7,11 @@ a design point).
 
 | Review | Subject | Finding | Status | Note |
 |---|---|---|---|---|
+| Wording check (2026-11-09) | Tech, upgrades, radio, guide, events | Descriptions that promised more than the code does: Time Brake ("slams the brakes"), Graze's "double", Option Pods' "copies", Soul Lantern's wisp counts, Arc Blade's swapped steps, Supernova Rings, Meteor Shower, Overheat Core, Shockwave, Supernova Core, Armageddon, Cluster Drones, Centi-Mechs, the needle radio line, the Clone Projector, Distress Call, Wandering Trader. | **Fixed** (0.5) | Each rewritten to say what the code does. |
+| Wording check | Level-5 steps | Labels with no effect ("Cataclysm", "Star-killer", "Reactor"...) are the whole text of an upgrade card. | **Fixed** (0.5) | "Name: effect", e.g. "Cataclysm: harder, faster meteors". |
+| Wording check | Guide, Elites | Homing shots never hit mirrored elites, though the Guide says they get through. | **Fixed** (0.5) | A code bug: homing shots now hit mirrored elites; against the Mirror Dreadnought they still curve past its hull to the vents (GDD 9C). |
+| Wording check | Radio, Pulse Driver, Mimic, boss titles | Three-sentence radio lines; "a blank slate that grows into something wild"; "Until it isn't"; two near-identical boss titles. | **Fixed** (0.5) | Shorter lines, plain descriptions, new titles for the Brood Queen and Mirror Dreadnought. |
+| Wording check | Mission types | Star Cluster's unused type text says "take down their carrier", wrong on Bounty Hunter planets. | **Saved** | The text isn't shown anywhere yet; fix it if it ever is. |
 | Art test (2026-11-09) | Five-pass style vs current | Both cold reviewers (QA and blind playtester) picked the five-pass style for all four pieces without knowing which was new. | **Saved** | Supports the art overhaul (heromedel's idea). The fixes below go into it. |
 | Art test | Mech | Reads as seen from the front (visor and crest look like a face), so only the gun shows the facing. | **Saved** | Redraw from above: shoulders, top of the head, barrel reaching forward past the body. |
 | Art test | All pieces | Dark outlines and maroon hulls fade into dark space. | **Saved** | Add a thin rim light in the side's colour (cyan for the player, red for enemies). |

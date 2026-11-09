@@ -15,19 +15,19 @@ const EVENTS := {
 		"choices": [
 			{"label": "Board it", "outcomes": [
 				[0.65, "The hold was full. +3 blueprints.", {"blueprints_random": 3}],
-				[0.35, "It was rigged. You tear free with your armor scored: you'll start at 70%.", {"start_armor": 0.7}]]},
+				[0.35, "It was rigged. You tear free, but you'll start at 70% armor.", {"start_armor": 0.7}]]},
 			{"label": "Scan it from a distance", "outcomes": [
 				[1.0, "Your scanners pull a schematic from its memory. +1 blueprint.", {"blueprints_random": 1}]]},
 			{"label": "Fly on", "outcomes": [[1.0, "You leave it to drift.", {}]]}]},
 	"distress": {"title": "Distress Call", "text": "A survey drone is pinned down by raiders on the planet below.",
 		"choices": [
 			{"label": "Answer it", "outcomes": [
-				[1.0, "You'll land among the raiders. The drone drops you a Salvage Crate as you arrive.", {"elites": 2.0, "start_crates": 1}]]},
+				[1.0, "You'll land among the raiders, with twice the elites. The drone drops you a Salvage Crate as you arrive.", {"elites": 2.0, "start_crates": 1}]]},
 			{"label": "Ignore it", "outcomes": [[1.0, "The signal fades behind you.", {}]]}]},
 	"trader": {"title": "Wandering Trader", "text": "A Mawjig trader hails you: blueprints for salvage, no questions asked.",
 		"choices": [
 			{"label": "Trade 2 blueprints", "needs_blueprints": 2, "outcomes": [
-				[1.0, "Done. You'll start with a Salvage Crate and a spare reroll.", {"spend_blueprints": 2, "start_crates": 1, "rerolls": 1}]]},
+				[1.0, "Done. Two blueprints from your biggest pile buy a Salvage Crate and a spare reroll.", {"spend_blueprints": 2, "start_crates": 1, "rerolls": 1}]]},
 			{"label": "Decline", "outcomes": [[1.0, "The trader shrugs and drifts off.", {}]]}]},
 	"ambush": {"title": "Ambush", "text": "Hunters lie in wait in the debris ahead.",
 		"choices": [

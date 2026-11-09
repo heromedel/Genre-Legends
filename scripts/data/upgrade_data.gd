@@ -46,7 +46,7 @@ const RISKY_FIELD := {
 	},
 	"adrenaline_junkie": {
 		"name": "Adrenaline Junkie", "limit": 1, "icon": "overclocked_servos", "element": "kinetic",
-		"text": "Bullets that barely miss you give XP. Enemy bullets fly 15% faster.",
+		"text": "Bullets that barely miss you give Data Shards. Enemy bullets fly 15% faster.",
 	},
 	"blood_pact": {
 		"name": "Blood Pact", "limit": 1, "icon": "vampiric_plating", "element": "mawjig",
@@ -73,7 +73,7 @@ const RESONANCE := {
 		["Splinter Rounds", "Shots that have flown a while burst into two fragments when they hit."],
 		["Railstorm", "Every 2 s a slug tears through the nearest enemy and everything behind it."]]},
 	"mawjig": {"name": "Mawjig", "tiers": [
-		["Hex Touch", "Hits hex enemies. Hexed enemies take 30% more damage."],
+		["Hex Touch", "Your hits hex enemies, and hexed enemies take 30% more damage."],
 		["Contagion", "Hexed enemies burst when they die and hex everything nearby."],
 		["Doom Bell", "Every 8 s, meteors fall on up to three hexed enemies."]]},
 }
@@ -87,7 +87,7 @@ const FUSIONS := {
 	},
 	"armageddon_protocol": {
 		"name": "Armageddon Protocol", "needs": ["swarm_pods", "starfall"],
-		"text": "Missiles call down meteors, and meteors launch missiles.",
+		"text": "Missile blasts sometimes call down meteors, and every meteor launches missiles.",
 	},
 	"phoenix_driver": {
 		"name": "Phoenix Driver", "needs": ["pulse_driver", "graze_engine"],
@@ -95,7 +95,7 @@ const FUSIONS := {
 	},
 	"supernova_core": {
 		"name": "Supernova Core", "needs": ["overheat_core", "nova_bomb"],
-		"text": "Every heat vent is a full Nova that wipes the screen of bullets.",
+		"text": "Every heat vent wipes the screen of bullets and blasts half again as wide.",
 	},
 	"storm_halo": {
 		"name": "Storm Halo", "needs": ["orbital_halo", "thunder_lance"],
@@ -111,7 +111,7 @@ const FUSIONS := {
 	},
 	"event_horizon": {
 		"name": "Event Horizon", "needs": ["hex_repeater", "time_brake"],
-		"text": "Hex orbs drag enemy bullets into themselves and devour them.",
+		"text": "Hex orbs pull in nearby enemy bullets and devour them.",
 	},
 }
 

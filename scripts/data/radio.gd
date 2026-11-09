@@ -10,11 +10,11 @@ const OFFICER := "Lt. Arden, Operations"
 static func mission_start_line(node: Dictionary, missions_flown: int) -> String:
 	match node.get("lesson", ""):
 		"needles":
-			return "Needle swarms out there. Our shields can't stop them, so keep moving."
+			return "Needle swarms out there. A plain shield won't stop them, so keep moving."
 		"mirror":
 			return "That hull is mirrored. Shoot it head-on and it shoots you back."
 	if node.get("hazard", false):
-		return "Hazard route. Bring your best build, Commander."
+		return "Hazard route, Commander. Everything down there hits harder."
 	match node.get("chain", ""):
 		"corridor":
 			return "Scans show tunnels under that hive. When the ground opens, dive in."
@@ -47,7 +47,7 @@ const CONDITION_LINES := {
 
 ## What the officer says when you reach a lesson planet already owning its tech.
 static func came_prepared_line(tech_id: String) -> String:
-	return "You came prepared, Commander. Engineering stripped the wreck for %s parts. They're in R&D." % TechData.TECH[tech_id]["name"]
+	return "You came prepared, Commander. We pulled extra %s blueprints from the wreck; they're in R&D." % TechData.TECH[tech_id]["name"]
 
 
 ## What the officer says after a lesson planet hands over its tech (win or lose).
@@ -55,10 +55,10 @@ static func lesson_line(tech_id: String, won: bool) -> String:
 	match tech_id:
 		"mirror_aegis":
 			if won:
-				return "You beat the swarm the hard way. Engineering salvaged a Mirror Aegis from the debris. It's waiting in the Hangar."
-			return "Commander, we can't deal with those needles unless your frame has proper shields. We salvaged a Mirror Aegis. Equip it in the Hangar."
+				return "You beat the swarm the hard way. We salvaged a Mirror Aegis from the debris; it's in the Hangar."
+			return "Those needles need a shield that fights back. We salvaged a Mirror Aegis; it's in the Hangar."
 		"swarm_pods":
 			if won:
-				return "Gate's down. We pulled Swarm Pods from the wreck: homing missiles that curve around anything. They're in the Hangar."
-			return "We can't punch through those mirrors head-on. Engineering pulled Swarm Pods from the wreck: homing missiles that curve around the plates. Equip them in the Hangar."
+				return "Gate's down. We pulled homing Swarm Pods from the wreck; they're in the Hangar."
+			return "Mirrors won't break head-on. We pulled homing Swarm Pods from the wreck; they're in the Hangar."
 	return "New tech recovered: %s. It's in the Hangar." % TechData.TECH[tech_id]["name"]
