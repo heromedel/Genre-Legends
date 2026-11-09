@@ -17,6 +17,8 @@ var dead := false
 # Player shot behaviours
 var pierce := 0               # extra enemies it can pass through
 var bounces := 0              # ricochet: jumps to another enemy after a hit
+var out_of_view_for := 0.0    # ricochet past the edge: distance left before it glances back
+var coming_back := false      # ...and it's on its way back into the field
 var bounce_bonus := 0.0       # damage multiplier gained per bounce
 var homing := 0.0             # turn rate in radians per second
 var accel := 0.0              # missiles speed up

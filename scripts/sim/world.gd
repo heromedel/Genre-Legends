@@ -16,6 +16,10 @@ const TRACTOR_BEAMS := 4
 ## Seconds before the boss's prize starts drifting toward you.
 const PRIZE_DRIFT_DELAY := 3.0
 ## How far a ricocheting shot looks for its next target.
+## How far a ricocheting shot flies out of view before it glances back (kept inside shot_bounds), and how
+## far it can turn when it does.
+const RICOCHET_OUT_OF_VIEW := Vector2(25.0, 90.0)
+const RICOCHET_TURN := 0.8
 const RICOCHET_RANGE := 420.0
 ## Meteors (Starfall, Doom Bell) streak in from the upper left; Comet Trail fires lie along that path.
 const METEOR_FROM := Vector2(-0.5, -0.866)
@@ -34,6 +38,7 @@ var enemy_shots: Array = []
 var pickups: Array = []
 var zones: Array = []
 var blades: Array = []          # Arc Blade sweeps in progress
+var autofire := true             # weapons fire on their own (Settings); off: only while you hold fire
 var auto_aim := true             # the mech turns to the nearest enemy when you aren't aiming (Settings)
 var prize_waiting := false      # the last boss's prize is on the field; the mission ends once it's taken
 var wisps := 0                  # Soul Lantern: wisps circling the frame, each good for one bullet
@@ -541,9 +546,7 @@ func update_player_shots(dt: float) -> void:
 				else:
 					emit("spark", {"pos": shot.pos, "color": shot.color})
 				continue
-		# Ricochet: a shot with bounces left glances off the edge of the field instead of leaving it.
-		if shot.bounces > 0 and not bounds.has_point(shot.pos):
-			_bounce_off_edge(shot)
+		_ricochet_off_screen(shot, dt)
 		if not shot_bounds.has_point(shot.pos):
 			shot.dead = true
 			continue
@@ -637,17 +640,24 @@ func _split_shot(shot: Shot) -> void:
 	emit("spark", {"pos": shot.pos, "color": shot.color})
 
 
-func _bounce_off_edge(shot: Shot) -> void:
-	shot.bounces -= 1
-	if shot.pos.x < bounds.position.x or shot.pos.x > bounds.end.x:
-		shot.vel.x = -shot.vel.x
-	if shot.pos.y < bounds.position.y or shot.pos.y > bounds.end.y:
-		shot.vel.y = -shot.vel.y
-	shot.pos = shot.pos.clamp(bounds.position, bounds.end)
-	# A glancing bounce: a plain reflection that loses some punch, so a miss isn't free, just not wasted.
-	shot.damage *= 0.7
-	shot.life = maxf(shot.life, 0.8)
-	emit("ricochet", {"pos": shot.pos})
+## Ricochet past the edge: a shot with bounces left flies on out of view for a random distance,
+## glances off something out there and comes back in at an angle, a little weaker, so space doesn't
+## feel like a box. Walls inside the field still bounce it where you can see (_bounce_off_wall).
+func _ricochet_off_screen(shot: Shot, dt: float) -> void:
+	if shot.coming_back:
+		if bounds.has_point(shot.pos):
+			shot.coming_back = false
+	elif shot.out_of_view_for > 0.0:
+		shot.out_of_view_for -= shot.vel.length() * dt
+		if shot.out_of_view_for <= 0.0:
+			shot.bounces -= 1
+			# Back the way it came, turned up to about 45 degrees, as if off a round rock out there.
+			shot.vel = -shot.vel.rotated(rng.randf_range(-RICOCHET_TURN, RICOCHET_TURN))
+			shot.damage *= 0.7
+			shot.coming_back = true
+	elif shot.bounces > 0 and not bounds.has_point(shot.pos):
+		shot.out_of_view_for = rng.randf_range(RICOCHET_OUT_OF_VIEW.x, RICOCHET_OUT_OF_VIEW.y)
+		shot.life = maxf(shot.life, 1.6)
 
 
 func _bounce_off_wall(shot: Shot) -> void:

@@ -119,6 +119,7 @@ func _apply_difficulty() -> void:
 	world.reward_tech = node.get("reward_tech", "")
 	# Missions launched from the game carry the player's setting; tests and old logs keep auto-aim.
 	world.auto_aim = node.get("auto_aim", true)
+	world.autofire = node.get("autofire", true)
 
 
 ## Starts a stage. Also used for mid-mission hand-offs: the frame transforms to the new stage's form.
@@ -155,6 +156,8 @@ func step(input: InputFrame) -> void:
 			state_timer -= DT
 			world.time += DT
 			_update_world(InputFrame.new(), false)
+			if state == "lost" and _boss_down():
+				_trade_kill()
 			return
 		"intro":
 			state_timer -= DT
@@ -241,6 +244,18 @@ func _check_end() -> void:
 			world.emit("banner", {"text": "MISSION COMPLETE", "style": "gold"})
 			world.emit("sound", {"name": "victory"})
 			note("Mission complete")
+
+
+## The last boss fell to your shots still in flight after your frame went down: you traded with it.
+## Not in the docs yet: a trade counts as a win and the prize is yours, since the boss was beaten.
+func _trade_kill() -> void:
+	state = "won"
+	state_timer = END_SECONDS
+	world.prize_waiting = false
+	world.pickups = world.pickups.filter(func(pickup): return pickup.kind != "prize")
+	world.emit("banner", {"text": "TAKEN DOWN TOGETHER", "style": "gold"})
+	world.emit("sound", {"name": "victory"})
+	note("Boss fell after the frame was wrecked: counted as a win")
 
 
 ## Level-ups and crates queue up; they open one at a time once play resumes.

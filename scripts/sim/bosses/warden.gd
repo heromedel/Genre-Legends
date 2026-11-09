@@ -25,7 +25,7 @@ func spawn() -> void:
 	add_part("core", Vector2.ZERO, 3200, 52, {"invulnerable": true})
 	add_part("shackle0", Vector2(-room.size.x * 0.4, 0), 440, 20)
 	add_part("shackle1", Vector2(room.size.x * 0.4, 0), 440, 20)
-	var flail := add_part("flail", Vector2(170, 0), 1, 26, {"invulnerable": true, "contact": 26.0 * world.enemy_damage_scale})
+	var flail := add_part("flail", Vector2(170, 0), 1, 26, {"invulnerable": true, "contact": 18.0 * world.enemy_damage_scale})
 	flail.memory["unbreakable"] = true
 	place_parts()
 	memory["rise"] = 1.3

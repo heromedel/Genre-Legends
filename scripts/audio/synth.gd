@@ -84,7 +84,8 @@ func make_effect(effect: String) -> AudioStreamWAV:
 		"rail":
 			b = blank(0.3); voice(b, 0, 0.3, 2200, 300, "saw", 0.22); voice(b, 0, 0.12, 4000, 2000, "noise", 0.15)
 		"hex":
-			b = blank(0.14); voice(b, 0, 0.14, 700, 1100, "triangle", 0.25); voice(b, 0.03, 0.1, 1400, 2100, "sine", 0.12)
+			# A soft, low falling "thup": it repeats several times a second, so no rising chirp.
+			b = blank(0.1); voice(b, 0, 0.1, 440, 300, "triangle", 0.2, 0.004); voice(b, 0, 0.06, 880, 600, "sine", 0.05, 0.004)
 		"slash":
 			b = blank(0.22); voice(b, 0, 0.22, 3000, 800, "noise", 0.3, 0.01); voice(b, 0, 0.18, 900, 500, "saw", 0.08)
 		"missiles":

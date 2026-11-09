@@ -96,6 +96,9 @@ func _input_round_trip() -> void:
 	frame.choice = 2
 	var q := frame.quantized()
 	check(InputFrame.decode(q.encode()).equals(q), "input frames survive encode/decode")
+	check(InputFrame.decode("0,0,0,0,0,0,0,-1").fire, "old 8-field logs replay with the trigger held")
+	frame.fire = false
+	check(not InputFrame.decode(frame.quantized().encode()).fire, "the fire button survives encode/decode")
 	var runs := "1,2,3,4,5,6,0,-1*3;0,0,0,0,0,0,1,-1"
 	check(InputFrame.decode_runs(runs).size() == 4, "run-length input decoding")
 
@@ -186,11 +189,17 @@ func _build_022() -> void:
 		world.update_zones(World.DT)
 		world.player.grace = maxf(world.player.grace - World.DT, 0.0)
 	check(mission.run.hits_taken == 1, "a laser hits once per pass (took %d)" % mission.run.hits_taken)
-	# Ricochet shots glance off the field's edge instead of vanishing.
+	# Ricochet shots fly out of view, glance off something out there and come back in, weaker.
 	var shot := world.player_shot(Vector2(world.bounds.end.x - 2.0, 300.0), Vector2(900, 0), 5.0, "pulse_driver", "bolt", Color.WHITE)
 	shot.bounces = 2
-	world.update_player_shots(World.DT * 2.0)
-	check(not shot.dead and shot.bounces == 1 and shot.vel.x < 0.0, "ricochet bounces off the field edge")
+	var went_out := false
+	var came_back := false
+	for i in 40:
+		world.update_player_shots(World.DT)
+		went_out = went_out or not world.bounds.has_point(shot.pos)
+		came_back = came_back or (went_out and shot.bounces == 1 and world.bounds.has_point(shot.pos))
+	check(went_out and came_back and not shot.dead and shot.vel.x < 0.0 and shot.damage < 5.0,
+		"ricochet leaves the screen and glances back in, weaker")
 	# Tractor Beam pulls from three times as far, not across the whole field.
 	var base_reach := world.pickup_reach()
 	mission.run.field["tractor_beam"] = 1
@@ -232,6 +241,24 @@ func _build_03() -> void:
 				check(GuideData.BOSSES.has(boss_id), "%s has a guide entry" % boss_id)
 				check(not boss.parts.is_empty(), "%s has parts" % boss_id)
 	check(BossRoster.pick("star_cluster", "boss", "r0c0n0", 5) == "hive_carrier", "the first planet keeps the classic boss")
+	# Auto-fire off: weapons hold fire until the player steers, aims or presses fire (Settings).
+	for autofire in [true, false]:
+		var held := _test_mission("star_cluster")
+		held.world.autofire = autofire
+		var idle := InputFrame.new()
+		idle.fire = false
+		for i in 60:
+			held.weapons.update(idle, World.DT)
+		check((held.world.player_shots.size() > 0) == autofire, "auto-fire %s: idle frame %s" % ["on" if autofire else "off", "fires" if autofire else "holds fire"])
+	# Trading with the last boss: if it falls while your wreck burns, the mission counts as won.
+	var trade := _test_mission("star_cluster")
+	trade.stage.boss = BossRoster.make("hive_carrier", trade.world)
+	trade.stage.boss.spawn()
+	trade.state = "lost"
+	trade.state_timer = 2.0
+	trade.stage.boss.defeated = true
+	trade.step(InputFrame.new())
+	check(trade.state == "won" and trade.results(false)["won"], "the last boss falling during your wreck is a win")
 	for event_id in RouteEvents.EVENTS:
 		for choice: Dictionary in RouteEvents.EVENTS[event_id]["choices"]:
 			var total := 0.0

@@ -34,9 +34,15 @@ func _init(target_world: World) -> void:
 func update(input: InputFrame, dt: float) -> void:
 	_update_facing(input)
 	var fire_rate := _fire_rate_multiplier()
+	# With auto-fire off (Settings), weapons fire only while you hold fire; supports and the halo's
+	# orbit keep working either way.
+	var firing := world.autofire or input.fire
 	for tech_id in run.online_tech():
 		var slot: String = TechData.TECH[tech_id]["slot"]
 		if slot == "special":
+			continue
+		if not firing and slot != "support" and tech_id != "orbital_halo":
+			run.tech_timer[tech_id] = maxf(float(run.tech_timer.get(tech_id, 0.0)) - dt, 0.0)
 			continue
 		run.tech_timer[tech_id] = float(run.tech_timer.get(tech_id, 0.0)) - dt * (fire_rate if slot != "support" else 1.0)
 		_update_tech(tech_id, dt)

@@ -9,6 +9,7 @@ var drag := Vector2.ZERO    # ship form: finger drag this tick, in field units
 var aim := Vector2.ZERO     # aim stick; zero means auto-aim
 var special := false        # special button pressed this tick
 var choice := -1            # chosen card when a level-up or crate is showing
+var fire := true            # holding fire; only matters with auto-fire off (Settings)
 
 
 func quantized() -> InputFrame:
@@ -18,19 +19,21 @@ func quantized() -> InputFrame:
 	q.drag = (drag.limit_length(40.0) * 4.0).round() / 4.0
 	q.special = special
 	q.choice = clampi(choice, -1, 9)
+	q.fire = fire
 	return q
 
 
 func equals(other: InputFrame) -> bool:
 	return move == other.move and drag == other.drag and aim == other.aim \
-		and special == other.special and choice == other.choice
+		and special == other.special and choice == other.choice and fire == other.fire
 
 
-## Compact text form for the play log: "mx,my,dx,dy,ax,ay,s,c" with integers.
+## Compact text form for the play log: "mx,my,dx,dy,ax,ay,s,c,f" with integers. Logs from before the
+## fire field (8 values) decode as always firing, which is what auto-fire meant then.
 func encode() -> String:
-	return "%d,%d,%d,%d,%d,%d,%d,%d" % [
+	return "%d,%d,%d,%d,%d,%d,%d,%d,%d" % [
 		roundi(move.x * 64), roundi(move.y * 64), roundi(drag.x * 4), roundi(drag.y * 4),
-		roundi(aim.x * 64), roundi(aim.y * 64), int(special), choice]
+		roundi(aim.x * 64), roundi(aim.y * 64), int(special), choice, int(fire)]
 
 
 ## Decodes a run-length list of frames ("a;b*3;c") as written by the play log.
@@ -56,4 +59,5 @@ static func decode(text: String) -> InputFrame:
 	frame.aim = Vector2(int(parts[4]), int(parts[5])) / 64.0
 	frame.special = int(parts[6]) != 0
 	frame.choice = int(parts[7])
+	frame.fire = parts.size() < 9 or int(parts[8]) != 0
 	return frame

@@ -44,7 +44,7 @@ const TECH := {
 		"levels": ["Rapid bolts", "Twin bolts", "Fork", "Triple fan", "Overcharged bolts"],
 		"blueprint_from": ["star_cluster", "corridor"],
 		"forks": {
-			"a": {"name": "Ricochet Rounds", "text": "Bolts bounce from enemy to enemy, hitting harder each time, and glance off the edges of the field instead of flying away."},
+			"a": {"name": "Ricochet Rounds", "text": "Bolts bounce from enemy to enemy, hitting harder each time, and shots that miss glance back in from somewhere out of view instead of flying away."},
 			"b": {"name": "Splitfire", "text": "Every bolt bursts into a fan of smaller bolts mid-flight."},
 		},
 	},

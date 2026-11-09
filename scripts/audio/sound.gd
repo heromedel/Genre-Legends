@@ -12,8 +12,8 @@ const EFFECT_NAMES := ["shot", "rail", "hex", "slash", "missiles", "explode", "e
 	"laser", "ui", "radio"]
 const POLYPHONY := 14
 ## Quieter or rarer effects get a minimum gap so a hundred bullets don't make a hundred clicks.
-const MIN_GAP := {"shot": 0.06, "enemy_shot": 0.09, "pickup": 0.05, "explode": 0.05, "block": 0.08, "hex": 0.07, "rail": 0.08}
-const VOLUME := {"shot": -6.0, "enemy_shot": -8.0, "pickup": -6.0, "block": -8.0, "ui": -4.0}
+const MIN_GAP := {"shot": 0.06, "enemy_shot": 0.09, "pickup": 0.05, "explode": 0.05, "block": 0.08, "hex": 0.12, "rail": 0.08}
+const VOLUME := {"shot": -6.0, "enemy_shot": -8.0, "pickup": -6.0, "block": -8.0, "hex": -9.0, "ui": -4.0}
 
 var synth := Synth.new()
 var effects := {}

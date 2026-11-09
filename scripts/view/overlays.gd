@@ -312,12 +312,10 @@ static func build_pause(on_resume: Callable, on_abandon: Callable, run: RunState
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(title)
 	column.add_child(UiKit.button("Resume", on_resume, "Pause: Resume", true))
-	var shake_button := UiKit.button("", func(): pass, "Pause: Screen shake")
-	var refresh := func(): shake_button.text = "Screen shake: %s" % ("On" if Save.setting("screen_shake") else "Off")
-	refresh.call()
-	shake_button.pressed.connect(func():
-		Save.set_setting("screen_shake", not Save.setting("screen_shake"))
-		refresh.call())
-	column.add_child(shake_button)
+	# Options you can change mid-mission (they only change what you see and hear).
+	column.add_child(SettingsControls.slider("Music", "music"))
+	column.add_child(SettingsControls.slider("Sound effects", "sfx"))
+	column.add_child(SettingsControls.toggle("Screen shake", "screen_shake"))
+	column.add_child(SettingsControls.toggle("Bullets glow in the dark", "bullet_glow"))
 	column.add_child(UiKit.button("Abandon mission", on_abandon, "Pause: Abandon"))
 	return root

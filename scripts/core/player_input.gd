@@ -41,7 +41,7 @@ func _ensure_actions() -> void:
 	var keys := {
 		"move_left": [KEY_A, KEY_LEFT], "move_right": [KEY_D, KEY_RIGHT],
 		"move_up": [KEY_W, KEY_UP], "move_down": [KEY_S, KEY_DOWN],
-		"special": [KEY_SPACE, KEY_SHIFT], "pause": [KEY_ESCAPE, KEY_P],
+		"special": [KEY_SPACE, KEY_SHIFT], "pause": [KEY_ESCAPE, KEY_P], "fire": [KEY_J, KEY_Z],
 	}
 	for action in keys:
 		if InputMap.has_action(action):
@@ -98,6 +98,11 @@ func poll() -> InputFrame:
 			frame.aim = stick
 	if form == "mech" and _mouse_down and _mouse_aim != Vector2.ZERO:
 		frame.aim = _mouse_aim
+	# Holding fire (with auto-fire off): a finger steering the ship, the aim stick or mouse held in mech
+	# form, the fire key, or the controller's right stick or trigger.
+	var steering := _touches.values().any(func(t): return t["role"] in ["drag", "aim"])
+	frame.fire = steering or _mouse_down or Input.is_action_pressed("fire") or right_stick.length() > DEADZONE \
+		or Input.get_joy_axis(0, JOY_AXIS_TRIGGER_RIGHT) > 0.4
 	frame.drag = _drag_accumulated / maxf(world_scale, 0.01)
 	_drag_accumulated = Vector2.ZERO
 	frame.special = _special_queued or Input.is_action_just_pressed("special")

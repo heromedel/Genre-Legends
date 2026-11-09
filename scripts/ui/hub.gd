@@ -703,17 +703,19 @@ func _build_settings_page() -> Control:
 	column.add_theme_constant_override("separation", 12)
 	scroll.add_child(column)
 	column.add_child(UiKit.label("SETTINGS", 20, Color(0.6, 0.9, 1.0), "title"))
-	column.add_child(_slider("Music", "music"))
-	column.add_child(_slider("Sound effects", "sfx"))
-	column.add_child(_toggle("Full screen (iPad Safari: applies on your next tap)", "fullscreen"))
+	column.add_child(SettingsControls.slider("Music", "music"))
+	column.add_child(SettingsControls.slider("Sound effects", "sfx"))
+	column.add_child(SettingsControls.toggle("Full screen (iPad Safari: applies on your next tap)", "fullscreen"))
 	column.add_child(_threat_picker())
 	column.add_child(UiKit.label("ACCESSIBILITY", 18, Color(0.6, 0.9, 1.0), "title"))
-	column.add_child(_toggle("Screen shake", "screen_shake"))
-	column.add_child(_toggle("Bullets glow in the dark", "bullet_glow"))
+	column.add_child(SettingsControls.toggle("Screen shake", "screen_shake"))
+	column.add_child(SettingsControls.toggle("Bullets glow in the dark", "bullet_glow"))
 	column.add_child(UiKit.wrapped("On Blackout planets and in dark boss phases, enemy bullets glow so you can always see them coming.", 13, Color(0.65, 0.75, 0.88)))
-	column.add_child(_toggle("Auto-aim (mech)", "auto_aim"))
-	column.add_child(UiKit.wrapped("On planets and in dungeons, your mech turns to the nearest enemy whenever you aren't aiming.", 13, Color(0.65, 0.75, 0.88)))
-	column.add_child(_toggle("Play log", "play_log"))
+	column.add_child(SettingsControls.toggle("Auto-aim (mech)", "auto_aim"))
+	column.add_child(UiKit.wrapped("On planets and in dungeons, your mech turns to the nearest enemy whenever you aren't aiming. From your next mission.", 13, Color(0.65, 0.75, 0.88)))
+	column.add_child(SettingsControls.toggle("Auto-fire", "autofire"))
+	column.add_child(UiKit.wrapped("Weapons fire on their own. Off: they fire while you steer the ship or hold the aim stick (or the fire key). From your next mission.", 13, Color(0.65, 0.75, 0.88)))
+	column.add_child(SettingsControls.toggle("Play log", "play_log"))
 	column.add_child(UiKit.wrapped("The play log records what you tap and how missions go, so it can be sent and read like a replay. Nothing leaves this device unless you save the file and send it.", 13, Color(0.65, 0.75, 0.88)))
 	var log_row := HBoxContainer.new()
 	log_row.add_theme_constant_override("separation", 10)
@@ -754,42 +756,6 @@ func _build_settings_page() -> Control:
 	column.add_child(reset_button)
 	column.add_child(UiKit.label("Genre Legends " + BuildInfo.label(), 12, Color(0.45, 0.55, 0.65)))
 	return scroll
-
-
-func _slider(label: String, key: String) -> Control:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
-	var name := UiKit.label(label, 17)
-	name.custom_minimum_size = Vector2(180, 0)
-	row.add_child(name)
-	var slider := HSlider.new()
-	slider.min_value = 0.0
-	slider.max_value = 1.0
-	slider.step = 0.05
-	slider.value = Save.setting(key)
-	slider.custom_minimum_size = Vector2(300, 40)
-	slider.value_changed.connect(func(value):
-		Save.data["settings"][key] = value
-		Sound.refresh_volume())
-	slider.drag_ended.connect(func(_changed):
-		Save.write()
-		PlayLog.note("tap", "%s volume set to %d%%" % [label, int(slider.value * 100)]))
-	row.add_child(slider)
-	return row
-
-
-func _toggle(label: String, key: String) -> Control:
-	var button := UiKit.button("", func(): pass, "Settings: %s" % label)
-	var refresh := func(): button.text = "%s: %s" % [label, "On" if Save.setting(key) else "Off"]
-	refresh.call()
-	button.pressed.connect(func():
-		Save.set_setting(key, not Save.setting(key))
-		if key == "fullscreen":
-			Browser.set_fullscreen_wanted(Save.setting(key))
-			if not Save.setting(key):
-				Browser.leave_fullscreen()
-		refresh.call())
-	return button
 
 
 ## Threat: how hard missions hit. Shown as "Name: Default > Other" options (labelling guide 5).

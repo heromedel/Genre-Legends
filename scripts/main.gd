@@ -41,6 +41,7 @@ func launch_mission(node_id: String, event: Dictionary = {}) -> void:
 	node["threat"] = Save.setting("threat")
 	node["radio"] = Radio.mission_start_line(node, int(Save.data["stats"]["missions"]))
 	node["auto_aim"] = Save.setting("auto_aim")
+	node["autofire"] = Save.setting("autofire")
 	node["arrivals"] = Save.data["enemies_unlocked"].duplicate()
 	var first_clear := not Save.is_cleared(node_id)
 	var mission_seed := randi()
