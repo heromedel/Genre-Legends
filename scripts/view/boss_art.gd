@@ -22,6 +22,10 @@ static func draw(ci: CanvasItem, boss: BossBase, time: float) -> void:
 		"storm_colossus": _storm_colossus(ci, boss, time)
 		"gazer": _gazer(ci, boss, time)
 		"warden": _warden(ci, boss, time)
+		"swarm_marshal": _swarm_marshal(ci, boss, time)
+		"salvo_barge": _salvo_barge(ci, boss, time)
+		"ring_obelisk": _ring_obelisk(ci, boss, time)
+		"blade_wraith": _blade_wraith(ci, boss, time)
 
 
 static func draw_glow(ci: CanvasItem, boss: BossBase, time: float) -> void:
@@ -539,3 +543,91 @@ static func _warden(ci: CanvasItem, boss: BossBase, time: float) -> void:
 		ci.draw_circle(o + Vector2(10 * side, -60), 5.0, eyes)
 	if not core.invulnerable:
 		Art.draw_glow(ci, o + Vector2(0, -60), 40.0, Color(1, 0.5, 0.15, 0.5))
+
+
+# ---------------------------------------------------------------- build 0.3.2 mini-bosses
+
+static func _swarm_marshal(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	for escort: Enemy in boss.living_parts("escort"):
+		ci.draw_set_transform(escort.pos, PI * 0.5, Vector2(1.2, 1.2))
+		Art.shape(ci, PackedVector2Array([Vector2(14, 0), Vector2(-6, -10), Vector2(-2, 0), Vector2(-6, 10)]), _flash(escort, Color(0.35, 0.12, 0.08)), Color(1, 0.55, 0.4), 1.5)
+		ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	var core := boss.part_named("core")
+	if core == null or core.dead:
+		return
+	# The command ship: a broad flagship with a bridge tower and signal lights.
+	ci.draw_set_transform(core.pos, PI * 0.5, Vector2(2.4, 2.4))
+	var hull := Art.mirrored(PackedVector2Array([Vector2(20, 0), Vector2(10, -8), Vector2(-4, -22), Vector2(-14, -18), Vector2(-10, -6), Vector2(-16, 0)]))
+	Art.shape(ci, hull, _flash(core, Color(0.28, 0.1, 0.06)), Color(1, 0.5, 0.35), 1.6)
+	ci.draw_rect(Rect2(Vector2(-6, -4), Vector2(10, 8)), Color(1, 0.75, 0.4))
+	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	for side in [-1.0, 1.0]:
+		var on := int(time * 4.0 + (0 if side < 0 else 1)) % 2 == 0
+		ci.draw_circle(core.pos + Vector2(side * 40.0, -10), 4.0, Color(1, 0.9, 0.4) if on else Color(0.4, 0.2, 0.1))
+	if core.invulnerable:
+		ci.draw_arc(core.pos, 54.0, 0, TAU, 28, Color(1, 0.55, 0.4, 0.55), 3.0, true)
+
+
+static func _salvo_barge(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var o := boss.origin
+	var hull := PackedVector2Array([o + Vector2(-200, -40), o + Vector2(200, -40), o + Vector2(230, 10), o + Vector2(170, 50), o + Vector2(-170, 50), o + Vector2(-230, 10)])
+	ci.draw_colored_polygon(hull, Color(0.22, 0.19, 0.14))
+	ci.draw_polyline(hull + PackedVector2Array([hull[0]]), Color(0.95, 0.75, 0.4), 3.0, true)
+	for i in 6:
+		ci.draw_line(o + Vector2(-150 + i * 60, -36), o + Vector2(-150 + i * 60, 46), Color(0.32, 0.28, 0.2), 3.0)
+	for pod: Enemy in boss.living_parts("pod"):
+		# A launch pod: a box of six missile tubes.
+		ci.draw_rect(Rect2(pod.pos - Vector2(28, 22), Vector2(56, 44)), _flash(pod, Color(0.35, 0.3, 0.2)))
+		ci.draw_rect(Rect2(pod.pos - Vector2(28, 22), Vector2(56, 44)), Color(1, 0.8, 0.45), false, 2.5)
+		for r in 2:
+			for c in 3:
+				ci.draw_circle(pod.pos + Vector2(-16 + c * 16, -8 + r * 16), 5.0, Color(0.1, 0.08, 0.05))
+	var core := boss.part_named("core")
+	if core != null and not core.dead:
+		ci.draw_circle(core.pos, 32.0, _flash(core, Color(0.3, 0.22, 0.08)))
+		ci.draw_circle(core.pos, 15.0 + sin(time * 6.0) * 2.0, Color(1, 0.75, 0.3) if not core.invulnerable else Color(0.5, 0.4, 0.25))
+		if core.invulnerable:
+			ci.draw_arc(core.pos, 38.0, 0, TAU, 20, Color(1, 0.8, 0.45, 0.6), 3.0, true)
+
+
+static func _ring_obelisk(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var core := boss.part_named("core")
+	if core == null or core.dead:
+		return
+	var o := core.pos
+	# A tall four-sided pylon seen from above: a diamond with runes that glow brighter as it wakes.
+	var spire := PackedVector2Array([o + Vector2(0, -56), o + Vector2(40, 0), o + Vector2(0, 56), o + Vector2(-40, 0)])
+	ci.draw_colored_polygon(spire, _flash(core, Color(0.12, 0.22, 0.2)))
+	ci.draw_polyline(spire + PackedVector2Array([spire[0]]), Color(0.5, 1.0, 0.85), 3.0, true)
+	for i in 4:
+		var glow := 0.4 + 0.4 * sin(time * 3.0 + i)
+		ci.draw_circle(o + Vector2.from_angle(PI * 0.5 * i) * 22.0, 4.0, Color(0.6, 1.0, 0.9, glow))
+	ci.draw_circle(o, 12.0, Color(0.7, 1.0, 0.9) if not core.invulnerable else Color(0.3, 0.5, 0.45))
+	for crystal: Enemy in boss.living_parts("crystal"):
+		ci.draw_line(o, crystal.pos, Color(0.5, 1.0, 0.85, 0.35), 2.0)
+		Art.shape(ci, Transform2D(time * 2.0, crystal.pos) * Art.ngon(4, 18.0), _flash(crystal, Color(0.2, 0.5, 0.45)), Color(0.75, 1.0, 0.95), 2.0)
+	if core.invulnerable:
+		ci.draw_arc(o, 64.0, 0, TAU, 28, Color(0.5, 1.0, 0.85, 0.5), 3.0, true)
+
+
+static func _blade_wraith(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	var core := boss.part_named("core")
+	if core == null or core.dead:
+		return
+	var solid := not core.invulnerable
+	var o := core.pos + Vector2(0, sin(time * 2.0) * 5.0)
+	# The ghost: a hooded wisp, faint while it's untouchable, bright and solid while its swords are out.
+	var alpha := 0.95 if solid else 0.4
+	var hood := PackedVector2Array()
+	for point in [Vector2(0, -36), Vector2(24, -8), Vector2(18, 30), Vector2(6, 22), Vector2(0, 34), Vector2(-6, 22), Vector2(-18, 30), Vector2(-24, -8)]:
+		hood.append(o + point * 1.5)
+	ci.draw_colored_polygon(hood, Color(0.2, 0.25, 0.35, alpha))
+	ci.draw_polyline(hood + PackedVector2Array([hood[0]]), Color(0.7, 0.85, 1.0, alpha), 2.5, true)
+	for side in [-1.0, 1.0]:
+		ci.draw_circle(o + Vector2(12 * side, -18), 5.0, Color(0.6, 0.9, 1.0, alpha) if solid else Color(0.4, 0.5, 0.6, alpha))
+	for sword: Enemy in boss.living_parts("sword"):
+		ci.draw_set_transform(sword.pos, sword.facing, Vector2(1.7, 1.7))
+		ci.draw_colored_polygon(PackedVector2Array([Vector2(30, 0), Vector2(-6, -4), Vector2(-6, 4)]), Color(0.85, 0.92, 1.0))
+		ci.draw_line(Vector2(-6, -9), Vector2(-6, 9), Color(0.75, 0.6, 0.35), 3.0)
+		ci.draw_line(Vector2(-6, 0), Vector2(-16, 0), Color(0.45, 0.3, 0.2), 4.0)
+		ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

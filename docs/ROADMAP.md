@@ -60,6 +60,8 @@
 
 ## Build 0.3.2: more mini-bosses (approved 2026-11-08)
 
+(Note) Built 2026-11-09: Swarm Marshal, Salvo Barge, Ring Obelisk, Blade Wraith.
+
 1. A third mini-boss for each mission type, so the rare Clone Projector and every other pool have variety.
 
 ## Plan C: Defense and tanks

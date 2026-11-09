@@ -4,10 +4,10 @@ class_name BossRoster
 ## own random sequence and is the same every time the map is rebuilt.
 
 const POOLS := {
-	"star_cluster": {"boss": ["hive_carrier", "bounty_ace"], "miniboss": ["twin_aces", "clone_projector"]},
-	"corridor": {"boss": ["wyrm_engine", "leviathan"], "miniboss": ["turret_fortress", "crusher_gate"]},
-	"planet": {"boss": ["siege_crawler", "storm_colossus"], "miniboss": ["brood_queen", "dune_maw"]},
-	"dungeon": {"boss": ["hollow_king", "warden"], "miniboss": ["mimic_king", "gazer"]},
+	"star_cluster": {"boss": ["hive_carrier", "bounty_ace"], "miniboss": ["twin_aces", "clone_projector", "swarm_marshal"]},
+	"corridor": {"boss": ["wyrm_engine", "leviathan"], "miniboss": ["turret_fortress", "crusher_gate", "salvo_barge"]},
+	"planet": {"boss": ["siege_crawler", "storm_colossus"], "miniboss": ["brood_queen", "dune_maw", "ring_obelisk"]},
+	"dungeon": {"boss": ["hollow_king", "warden"], "miniboss": ["mimic_king", "gazer", "blade_wraith"]},
 }
 
 
@@ -54,5 +54,9 @@ static func make(boss_id: String, world: World) -> BossBase:
 		"warden": return Warden.new(world)
 		"mimic_king": return MimicKing.new(world)
 		"gazer": return Gazer.new(world)
+		"swarm_marshal": return SwarmMarshal.new(world)
+		"salvo_barge": return SalvoBarge.new(world)
+		"ring_obelisk": return RingObelisk.new(world)
+		"blade_wraith": return BladeWraith.new(world)
 	push_error("Unknown boss id: " + boss_id)
 	return HiveCarrier.new(world)

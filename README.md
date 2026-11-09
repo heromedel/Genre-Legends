@@ -6,6 +6,10 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
+## What's new in 0.3.2
+
+- **Four new mini-bosses**, a third for every mission type: the Swarm Marshal (a command ship drilling its escort into formations), the Salvo Barge (salvos of homing drones you shoot down), the Ring Obelisk (bullet-hell spirals and gapped rings) and the Blade Wraith (three flying swords; the ghost is solid only while they're thrown).
+
 ## What's new in 0.3.1
 
 - **The boss's prize:** the last boss drops the planet's blueprints as a big golden cache; grab it (it drifts to you) to end the mission. Levels and crates after the boss falls are banked as extra blueprints instead of offering upgrades you can't use.

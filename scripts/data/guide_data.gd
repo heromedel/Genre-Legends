@@ -67,5 +67,9 @@ const BOSSES := {
 	"storm_colossus": ["Storm Colossus", "Arms spray wheeling streams and lightning falls on you. Break the arms and it kneels, turning four storm beams a quarter turn."],
 	"gazer": ["Gazer", "Two eyes take turns opening. Shut, they can't be hurt; open, they lock a beam onto you."],
 	"warden": ["The Warden", "The jailer, chained by two shackles, swinging a flail that blocks shots. Break the shackles and it breaks free."],
+	"swarm_marshal": ["Swarm Marshal", "A command ship that drills its escort into a ring, a wedge and a sweeping wall, and sends them diving at you. Its core opens once half the escort is down."],
+	"salvo_barge": ["Salvo Barge", "Its pods fire salvos of homing drones: shoot them out of the air, then break the pods to open the core."],
+	"ring_obelisk": ["Ring Obelisk", "A pylon that fills the air with wheeling spirals and rings with one gap. Its three crystals keep it shielded."],
+	"blade_wraith": ["Blade Wraith", "Three swords circle a ghost and dash along the lines they show. The ghost is solid only while its swords are thrown."],
 	"mirror_dreadnought": ["Mirror Dreadnought", "Its mirrored underside throws straight shots back. Reach the vents on its back with homing shots, meteors, blasts or nerve."],
 }
