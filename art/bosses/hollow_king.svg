@@ -1,21 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -80 160 160">
-<!-- The Hollow King: a ragged violet robe around an empty hood, a gold crown and two cold eyes, seen from above.
-     The robe turns slowly. Centred on the part.
+<!-- The Hollow King: a tattered violet robe with wide sleeves and a ragged hem, an empty hood, a gold crown and
+     two cold eyes, seen from above. The robe sways. Centred on the part.
      Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
 <g stroke-linejoin="round" stroke-linecap="round">
 <g id="robe">
-<path d="M0,-48 L12,-30 L34,-36 L30,-14 L48,-4 L30,8 L38,30 L16,26 L6,46 L-6,28 L-26,40 L-24,18 L-46,10 L-30,-6 L-40,-28 L-16,-26 Z" fill="#0c0414" stroke="#0c0414" stroke-width="4"/>
-<path d="M0,-48 L12,-30 L34,-36 L30,-14 L48,-4 L30,8 L38,30 L16,26 L6,46 L-6,28 L-26,40 L-24,18 L-46,10 L-30,-6 L-40,-28 L-16,-26 Z" fill="#4a2a78"/>
-<path d="M2,-44 L12,-30 L34,-36 L30,-14 L48,-4 L30,8 L38,30 L16,26 L6,46 L2,30 Z" fill="#36205a"/>
-<path d="M-2,-44 L-16,-24 L-38,-26" stroke="#b898f0" stroke-width="2.2" fill="none"/>
+<path d="M-18,-30 C-34,-26 -50,-16 -52,0 L-40,4 L-44,18 L-30,14 L-30,34 L-20,28 L-14,42 L-6,32 L0,44 L6,32 L14,42 L20,28 L30,34 L30,14 L44,18 L40,4 L52,0 C50,-16 34,-26 18,-30 Z" fill="#0c0414" stroke="#0c0414" stroke-width="4"/>
+<path d="M-18,-30 C-34,-26 -50,-16 -52,0 L-40,4 L-44,18 L-30,14 L-30,34 L-20,28 L-14,42 L-6,32 L0,44 L6,32 L14,42 L20,28 L30,34 L30,14 L44,18 L40,4 L52,0 C50,-16 34,-26 18,-30 Z" fill="#6a3ca8"/>
+<path d="M2,-30 L18,-30 C34,-26 50,-16 52,0 L40,4 L44,18 L30,14 L30,34 L20,28 L14,42 L6,32 L2,40 Z" fill="#4a2a80"/>
+<path d="M-30,14 L-30,34 L-20,28 L-14,42 L-6,32 L0,44 L6,32 L14,42 L20,28 L30,34 L30,14 C10,22 -10,22 -30,14 Z" fill="#3a2066" opacity="0.8"/>
+<path d="M-20,-28 C-34,-24 -46,-14 -49,-2" stroke="#d0b8ff" stroke-width="2.4" fill="none"/>
+<path d="M-24,-10 L-20,20 M24,-10 L20,20" stroke="#2a1450" stroke-width="2"/>
 </g>
-<circle cx="0" cy="0" r="27" fill="#0c0414"/>
-<circle cx="0" cy="0" r="24" fill="#1c0e2e"/>
-<path d="M0,-24 A24,24 0 0 1 0,24 A18,24 0 0 0 0,-24 Z" fill="#120822"/>
-<g fill="#0c0414"><path d="M-14,-20 L-12,-38 L-6,-24 L0,-42 L6,-24 L12,-38 L14,-20 Z"/></g>
-<path d="M-12,-21 L-11,-35 L-6,-25 L0,-39 L6,-25 L11,-35 L12,-21 Z" fill="#ffcc4d"/>
-<path d="M0,-39 L6,-25 L11,-35 L12,-21 L0,-21 Z" fill="#d9a020"/>
-<circle cx="0" cy="-28" r="2.2" fill="#ff5a8c"/>
-<g id="eyes"><circle cx="-8" cy="-2" r="4.6" fill="#e8f0ff"/><circle cx="8" cy="-2" r="4.6" fill="#e8f0ff"/><circle cx="-8" cy="-2" r="2" fill="#8ab4ff"/><circle cx="8" cy="-2" r="2" fill="#8ab4ff"/></g>
+<circle cx="0" cy="-8" r="21" fill="#0c0414"/>
+<circle cx="0" cy="-8" r="18" fill="#1c0e2e"/>
+<path d="M0,-26 A18,18 0 0 1 0,10 A13,18 0 0 0 0,-26 Z" fill="#120822"/>
+<path d="M-13,-22 L-12,-38 L-6,-28 L0,-40 L6,-28 L12,-38 L13,-22 Z" fill="#0c0414" stroke="#0c0414" stroke-width="2"/>
+<path d="M-13,-22 L-12,-38 L-6,-28 L0,-40 L6,-28 L12,-38 L13,-22 Z" fill="#ffcc4d"/>
+<path d="M0,-40 L6,-28 L12,-38 L13,-22 L0,-22 Z" fill="#d9a020"/>
+<circle cx="0" cy="-27" r="2.2" fill="#ff5a8c"/>
+<g id="eyes"><circle cx="-7" cy="-8" r="4.2" fill="#e8f0ff"/><circle cx="7" cy="-8" r="4.2" fill="#e8f0ff"/><circle cx="-7" cy="-8" r="1.9" fill="#8ab4ff"/><circle cx="7" cy="-8" r="1.9" fill="#8ab4ff"/></g>
 </g>
 </svg>

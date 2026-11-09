@@ -6,9 +6,15 @@ class_name BossArt
 ## are authored facing up like the enemies and turned to face down.
 
 const ART := "res://art/bosses/%s.svg"
+## Everything you can hurt right now wears this bright rim, on every boss, so targets read at a glance.
+const TARGET_RIM := Color(1.0, 0.92, 0.6, 0.9)
+
+## The boss being drawn: its hull's rim is its own colour. Set by draw() before the boss's function runs.
+static var _boss_colour := Color.WHITE
 
 
 static func draw(ci: CanvasItem, boss: BossBase, time: float) -> void:
+	_boss_colour = boss.color
 	match boss.look:
 		"hive_carrier": _hive_carrier(ci, boss, time)
 		"wyrm_engine": _wyrm_engine(ci, boss, time)
@@ -44,21 +50,31 @@ static func draw_glow(ci: CanvasItem, boss: BossBase, time: float) -> void:
 			Art.draw_glow(ci, part.pos, part.radius * 2.2, Art.with_alpha(boss.color, 0.3))
 
 
-## One piece of boss art at a place, turned and scaled, flashing white while its part is hit.
+## One piece of boss art at a place, turned and scaled, flashing white while its part is hit, with its rim.
 static func _piece(ci: CanvasItem, art: String, at: Vector2, part: Enemy = null, rotation := 0.0, scale := 1.0, options := {}) -> void:
+	VectorArt.draw(ci, ART % art, Transform2D(rotation, Vector2(scale, scale), 0.0, at), _styled(part, options))
+
+
+## A part's flash and rim: the bright target rim while it can be hurt, a faint rim in the boss's colour while
+## it's armoured, and the boss's colour around the hull (no part).
+static func _styled(part: Enemy, options: Dictionary) -> Dictionary:
 	var drawn := options.duplicate()
 	if part != null and part.flash > 0.0:
 		drawn["flash"] = 0.55
-	VectorArt.draw(ci, ART % art, Transform2D(rotation, Vector2(scale, scale), 0.0, at), drawn)
+	if not drawn.has("rim"):
+		if part == null:
+			drawn["rim"] = Art.with_alpha(_boss_colour.lightened(0.2), 0.55)
+		elif part.invulnerable:
+			drawn["rim"] = Art.with_alpha(_boss_colour, 0.35)
+		else:
+			drawn["rim"] = TARGET_RIM
+	return drawn
 
 
 ## A ship authored facing up, flown facing down: mirrored top to bottom rather than turned around, so its
 ## light still falls from the top-left like everything else.
 static func _ship_down(ci: CanvasItem, art: String, at: Vector2, part: Enemy, scale: float, options := {}) -> void:
-	var drawn := options.duplicate()
-	if part != null and part.flash > 0.0:
-		drawn["flash"] = 0.55
-	VectorArt.draw(ci, ART % art, Transform2D(0.0, Vector2(scale, -scale), 0.0, at), drawn)
+	VectorArt.draw(ci, ART % art, Transform2D(0.0, Vector2(scale, -scale), 0.0, at), _styled(part, options))
 
 
 ## A boss's armoured core (art/bosses/core.svg) in the boss's own colour: shutters closed and the heart dim
@@ -72,7 +88,8 @@ static func _core(ci: CanvasItem, core: Enemy, time: float, colour: Color, scale
 		"remap": {"#ff8a3a": heart, "#ffd08a": heart.lightened(0.5), "#6a5038": armour, "#4a3826": armour.darkened(0.3),
 			"#e8d0b0": armour.lightened(0.55), "#120c06": armour.darkened(0.85)},
 		"groups": {"shutter_l": Transform2D(0.0, Vector2(-open, 0)), "shutter_r": Transform2D(0.0, Vector2(open, 0)),
-			"heart": Transform2D(0.0, Vector2.ONE * (1.0 + sin(time * 6.0) * 0.08 * float(open > 0.0)), 0.0, Vector2.ZERO)}})
+			"heart": Transform2D(0.0, Vector2.ONE * (1.0 + sin(time * 6.0) * 0.12 * float(open > 0.0)), 0.0, Vector2.ZERO),
+			"seam": Transform2D(0.0, Vector2(1.0, 1.0 + sin(time * 4.0) * 0.1), 0.0, Vector2.ZERO)}, "hide": [] if core.invulnerable else ["seam"]})
 
 
 ## Smoke rising from a wrecked part.
@@ -119,12 +136,12 @@ static func _wyrm_engine(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	for i in range(WyrmEngine.SEGMENTS - 1, -1, -1):
 		var segment := boss.part_named("segment%d" % i)
 		if segment != null and not segment.dead:
-			_piece(ci, "wyrm_segment", segment.pos, segment, segment.facing + PI * 0.5, 1.0, {"groups": {"gear": Transform2D(time * 2.0, Vector2.ZERO)}})
+			_piece(ci, "wyrm_segment", segment.pos, segment, segment.facing + PI * 0.5, 1.2, {"groups": {"gear": Transform2D(time * 2.0, Vector2.ZERO)}})
 	var head := boss.part_named("core")
 	if head != null and not head.dead:
 		var bite := 0.1 + absf(sin(time * 3.0)) * 0.35
 		var eye := {} if not head.invulnerable else {"#ff4a3a": Color(0.4, 0.5, 0.46), "#fff4d8": Color(0.6, 0.7, 0.66)}
-		_piece(ci, "wyrm_head", head.pos, head, head.facing + PI * 0.5, 1.0, {"remap": eye, "groups": {
+		_piece(ci, "wyrm_head", head.pos, head, head.facing + PI * 0.5, 1.35, {"remap": eye, "groups": {
 			"jaw_l": VectorArt.about(Vector2(-14, -8), -bite, Vector2.ONE), "jaw_r": VectorArt.about(Vector2(14, -8), bite, Vector2.ONE)}})
 		if head.invulnerable:
 			ci.draw_arc(head.pos, 36.0, 0, TAU, 24, Color(0.7, 0.9, 0.8, 0.6), 4.0, true)
@@ -162,7 +179,7 @@ static func _hollow_king(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	if boss.entering:
 		alpha = clampf(1.0 - float(boss.memory.get("rise", 0.0)) / 1.4, 0.0, 1.0)
 	_piece(ci, "hollow_king", core.pos, core, 0.0, 1.0, {"alpha": alpha, "groups": {
-		"robe": Transform2D(time * 0.3, Vector2.ZERO),
+		"robe": Transform2D(sin(time * 1.2) * 0.06, Vector2.ZERO),
 		"eyes": VectorArt.about(Vector2(0, -2), 0.0, Vector2.ONE * (0.85 + 0.15 * sin(time * 5.0)))}})
 	for orb: Enemy in boss.living_parts("orb"):
 		_piece(ci, "king_orb", orb.pos, orb, 0.0, 1.0, {"alpha": alpha, "groups": {"crystal": Transform2D(time * 2.0, Vector2.ZERO)}})
@@ -218,7 +235,7 @@ static func _turret_fortress(ci: CanvasItem, boss: BossBase, time: float) -> voi
 	# Warning lights that blink along its top edge.
 	for i in 4:
 		var on := int(time * 3.0 + i) % 2 == 0
-		ci.draw_circle(o + Vector2(-380 + i * 254, -74), 6.0, Color(1, 0.3, 0.2) if on else Color(0.35, 0.1, 0.08))
+		ci.draw_circle(o + Vector2(-380 + i * 254, -64), 5.0, Color(1, 0.3, 0.2) if on else Color(0.35, 0.1, 0.08))
 	for i in 3:
 		var turret := boss.part_named("turret%d" % i)
 		if turret != null and not turret.dead:
@@ -307,8 +324,8 @@ static func _crusher_gate(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	for piston: Enemy in boss.living_parts("piston"):
 		var inward := 1.0 if piston.part == "piston0" else -1.0
 		var rod := 18.0 + 10.0 * sin(time * 3.0)
-		ci.draw_line(piston.pos + Vector2(26 * inward, 0), piston.pos + Vector2((26 + rod) * inward, 0), Color(0.12, 0.1, 0.08), 13.0)
-		ci.draw_line(piston.pos + Vector2(26 * inward, 0), piston.pos + Vector2((26 + rod) * inward, 0), Color(0.78, 0.8, 0.86), 9.0)
+		ci.draw_line(piston.pos + Vector2(26 * inward, 0), piston.pos + Vector2((26 + rod) * inward, 0), Color(0.12, 0.1, 0.08), 19.0)
+		ci.draw_line(piston.pos + Vector2(26 * inward, 0), piston.pos + Vector2((26 + rod) * inward, 0), Color(0.78, 0.8, 0.86), 14.0)
 		_piece(ci, "crusher_piston", piston.pos, piston)
 	var core := boss.part_named("core")
 	_core(ci, core, time, Color(1.0, 0.72, 0.25))
@@ -343,10 +360,12 @@ static func _dune_maw(ci: CanvasItem, boss: BossBase, time: float) -> void:
 		return
 	if core.hidden:
 		# Underground: a churning mound of sand and ripples where it's tunnelling, plain to see.
-		ci.draw_circle(boss.origin, 44.0, Color(0.55, 0.42, 0.25, 0.55))
+		# Dark churned sand with a lighter rim of thrown sand, so the hidden threat reads on any ground.
+		ci.draw_circle(boss.origin, 48.0, Color(0.95, 0.82, 0.55, 0.7))
+		ci.draw_circle(boss.origin, 42.0, Color(0.28, 0.2, 0.1, 0.85))
 		for i in 6:
 			var a := time * 3.0 + TAU * i / 6.0
-			ci.draw_circle(boss.origin + Vector2.from_angle(a) * 30.0, 9.0, Color(0.7, 0.55, 0.35, 0.8))
+			ci.draw_circle(boss.origin + Vector2.from_angle(a) * 30.0, 9.0, Color(0.5, 0.38, 0.22, 0.95))
 		for i in 3:
 			var r := 46.0 + fmod(time * 60.0 + i * 26.0, 78.0)
 			ci.draw_arc(boss.origin, r, 0, TAU, 24, Color(1, 0.85, 0.55, 0.85 - r / 150.0), 4.0, true)
@@ -377,7 +396,7 @@ static func _storm_colossus(ci: CanvasItem, boss: BossBase, time: float) -> void
 	for i in 5:
 		var a := time * 2.0 + i * 1.7
 		var from := o + Vector2.from_angle(a) * 30.0
-		ci.draw_polyline(PackedVector2Array([from, from + Vector2.from_angle(a + 0.6) * 18.0, from + Vector2.from_angle(a - 0.4) * 34.0]), Color(0.75, 0.95, 1.0, 0.7), 2.0, true)
+		ci.draw_polyline(PackedVector2Array([from, from + Vector2.from_angle(a + 0.6) * 18.0, from + Vector2.from_angle(a - 0.4) * 34.0]), Color(0.85, 0.97, 1.0, 0.95), 3.5, true)
 	_core(ci, core, time, Color(0.6, 0.88, 1.0), 1.3, Color(0.3, 0.42, 0.6))
 	if core.invulnerable:
 		ci.draw_arc(core.pos, 48.0, 0, TAU, 24, Color(0.6, 0.85, 1.0, 0.55), 3.0, true)
@@ -387,9 +406,9 @@ static func _storm_colossus(ci: CanvasItem, boss: BossBase, time: float) -> void
 static func _gazer(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	for eye: Enemy in boss.living_parts("eye"):
 		if eye.invulnerable:
-			_piece(ci, "gazer_eye_closed", eye.pos, eye)
+			_piece(ci, "gazer_eye_closed", eye.pos, eye, 0.0, 1.3)
 		else:
-			_piece(ci, "gazer_eye", eye.pos, eye, 0.0, 1.0, {"groups": {"pupil": Transform2D(0.0, Vector2.from_angle(eye.facing) * 10.0)}})
+			_piece(ci, "gazer_eye", eye.pos, eye, 0.0, 1.3, {"groups": {"pupil": Transform2D(0.0, Vector2.from_angle(eye.facing) * 10.0)}})
 
 static func _warden(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	var core := boss.part_named("core")
@@ -467,7 +486,7 @@ static func _blade_wraith(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	var o := core.pos + Vector2(0, sin(time * 2.0) * 5.0)
 	# The ghost: faint while it's untouchable, bright and solid while its swords are out.
 	Art.draw_glow(ci, o, 70.0, Color(0.6, 0.8, 1.0, 0.25 if not solid else 0.45))
-	_piece(ci, "blade_wraith", o, core, 0.0, 1.0, {"alpha": 0.95 if solid else 0.4,
+	_piece(ci, "blade_wraith", o, core, 0.0, 1.0, {"alpha": 1.0 if solid else 0.35, "tint": Color(0.85, 0.95, 1.0, 0.35 if solid else 0.0),
 		"remap": {} if solid else {"#9ae6ff": Color(0.4, 0.5, 0.6)}})
 	for sword: Enemy in boss.living_parts("sword"):
-		_piece(ci, "wraith_sword", sword.pos, sword, sword.facing + PI * 0.5)
+		_piece(ci, "wraith_sword", sword.pos, sword, sword.facing + PI * 0.5, 1.4)

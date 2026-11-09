@@ -1,11 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -80 160 160">
-<!-- Gazer eye, closed: the lid sealed shut, a dark seam across it. Centred on the part.
+<!-- Gazer eye, shut: an iron shutter riveted across the stone socket. Armoured until it opens. Centred on the part.
      Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
 <g stroke-linejoin="round" stroke-linecap="round">
-<path d="M-44,0 C-30,-12 30,-12 44,0 C30,12 -30,12 -44,0 Z" fill="#200410" stroke="#200410" stroke-width="4"/>
-<path d="M-44,0 C-30,-12 30,-12 44,0 C30,12 -30,12 -44,0 Z" fill="#8a3050"/>
-<path d="M-40,0 C-28,4 28,4 40,0" stroke="#200410" stroke-width="3" fill="none"/>
-<path d="M-30,-5 C-18,-9 -6,-9 0,-9" stroke="#d87a98" stroke-width="2" fill="none"/>
-<path d="M-30,2 L-34,10 M-16,4 L-18,12 M0,4 L0,12 M16,4 L18,12 M30,2 L34,10" stroke="#200410" stroke-width="2"/>
+<path d="M-50,-4 C-46,-26 -24,-36 0,-36 C24,-36 46,-26 50,-4 L50,8 C46,28 24,36 0,36 C-24,36 -46,28 -50,8 Z" fill="#120e14" stroke="#120e14" stroke-width="4"/>
+<path d="M-50,-4 C-46,-26 -24,-36 0,-36 C24,-36 46,-26 50,-4 L50,8 C46,28 24,36 0,36 C-24,36 -46,28 -50,8 Z" fill="#6a6070"/>
+<path d="M2,-36 C24,-36 46,-26 50,-4 L50,8 C46,28 24,36 2,36 Z" fill="#504858"/>
+<path d="M-46,-6 C-42,-24 -22,-33 0,-33" stroke="#b8acc4" stroke-width="2.4" fill="none"/>
+<path d="M-40,22 L-32,16 M38,-22 L30,-16 M-36,-20 L-28,-14" stroke="#2a2430" stroke-width="2"/>
+
+<path d="M-40,-18 L40,-18 L40,18 L-40,18 Z" fill="#0a0808" stroke="#0a0808" stroke-width="3"/>
+<path d="M-40,-18 L40,-18 L40,18 L-40,18 Z" fill="#5a5a62"/>
+<path d="M1,-18 L40,-18 L40,18 L1,18 Z" fill="#46464e"/>
+<path d="M-40,0 L40,0" stroke="#0a0808" stroke-width="2.6"/>
+<path d="M-38,-16 L38,-16" stroke="#c8c8d4" stroke-width="2"/>
+<g fill="#a8a8b4"><circle cx="-34" cy="-11" r="2"/><circle cx="-34" cy="11" r="2"/><circle cx="34" cy="-11" r="2"/><circle cx="34" cy="11" r="2"/><circle cx="-12" cy="-11" r="2"/><circle cx="12" cy="-11" r="2"/><circle cx="-12" cy="11" r="2"/><circle cx="12" cy="11" r="2"/></g>
+<path d="M-6,-4 L6,-4 L6,4 L-6,4 Z" fill="#c84a72"/>
 </g>
 </svg>
