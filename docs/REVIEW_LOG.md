@@ -24,4 +24,4 @@ a design point).
 | 0.4 sweep | Planet ground | The same craters and ribcage around the spawn in every planet capture. | **Discarded** | Every capture uses the same debug seed; real planets vary. |
 | 0.4 sweep | Settings | Debug console and "-dirty" build strings are visible to players. | **Discarded** | Intentional: heromedel uses the console and version stamp while testing (GDD 3, Game Project Standards: more admin commands). |
 | 0.4 sweep | Settings | Threat is ordered Standard, Veteran, Casual. | **Discarded** | Intentional: the default comes first (Labelling Guide 5). |
-| 0.4 sweep | Pause, Build tab | The Build view of pause lacks the sliders the pause menu has. | **Discarded** | That capture opened the pause menu on a different scenario; both are the same screen. |
+| 0.4 sweep | Pause, Build tab | The Build view of pause lacks the sliders the pause menu has. | **Discarded** | That capture was taken before the pause options were added; `pause_menu_0012s` shows the current screen. |
