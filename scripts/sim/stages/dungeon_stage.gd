@@ -14,6 +14,7 @@ var current := Vector2i.ZERO
 var previous := Vector2i.ZERO
 var start_room := Vector2i.ZERO
 var boss_room := Vector2i.ZERO
+var breached := false            # chained missions: the boss door led up to the surface
 var key_room := Vector2i.ZERO
 var secret_room := Vector2i(999, 999)
 var secret_from := Vector2i.ZERO
@@ -319,6 +320,12 @@ func _weighted(rng: RandomNumberGenerator, roster: Dictionary) -> String:
 
 
 func _start_boss_room() -> void:
+	# Chained (GDD 6G): the boss door opens on a shaft to the surface, and the fight continues up there.
+	if has_next_stage():
+		breached = true
+		world.emit("banner", {"text": "BREAKING OUT TO THE SURFACE", "style": "gold"})
+		mission.note("Broke out to the surface")
+		return
 	rooms[current]["state"] = "active"
 	doors_closed = true
 	world.emit("doors", {"closed": true})
@@ -418,7 +425,7 @@ func on_key_collected() -> void:
 
 
 func is_cleared() -> bool:
-	return boss != null and boss.finished
+	return breached or (boss != null and boss.finished)
 
 
 func objective_text() -> String:

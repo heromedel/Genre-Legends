@@ -33,7 +33,7 @@ const FIELD := {
 	},
 	"lucky_salvage": {
 		"name": "Lucky Salvage", "limit": 1, "icon": "crate", "element": "",
-		"text": "Salvage Crates always give at least 2 upgrades, and more on average.",
+		"text": "Crates have improved odds: always at least 2 upgrades.",
 	},
 }
 

@@ -9,6 +9,8 @@ extends RefCounted
 
 const DT := 1.0 / 60.0
 const PICKUP_RADIUS := 105.0
+## Straight shots a mirrored elite can turn away before its mirror cracks.
+const MIRROR_ELITE_HITS := 15
 ## Seconds before the boss's prize starts drifting toward you.
 const PRIZE_DRIFT_DELAY := 3.0
 ## How far a ricocheting shot looks for its next target.
@@ -553,6 +555,14 @@ func update_player_shots(dt: float) -> void:
 				if shot.homing > 0.0:
 					continue
 				shot.dead = true
+				# A mirrored elite's mirror cracks after enough hits, so no build is ever locked out by one.
+				if enemy.boss == null:
+					enemy.memory["mirror_hits"] = int(enemy.memory.get("mirror_hits", 0)) + 1
+					if enemy.memory["mirror_hits"] >= MIRROR_ELITE_HITS:
+						enemy.reflects = false
+						enemy.elite_mod = "cracked"
+						emit("shield_break", {"pos": enemy.pos})
+						emit("sound", {"name": "shatter"})
 				# A mirrored elite throws back at most one shot every 0.4 s; the rest just glance off.
 				var ready := enemy.boss != null or time - float(enemy.memory.get("last_reflect", -9.0)) > 0.4
 				if ready:

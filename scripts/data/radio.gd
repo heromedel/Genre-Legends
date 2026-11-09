@@ -15,6 +15,11 @@ static func mission_start_line(node: Dictionary, missions_flown: int) -> String:
 			return "That hull is mirrored. Shoot it head-on and it shoots you back."
 	if node.get("hazard", false):
 		return "Hazard route. Bring your best build, Commander."
+	match node.get("chain", ""):
+		"corridor":
+			return "Scans show tunnels under that hive. When the ground opens, dive in."
+		"planet":
+			return "That dungeon has a shaft to the surface. Find the key and break out."
 	if node.get("is_gate", false):
 		return "Break the gate and the next region opens up."
 	if missions_flown == 0:

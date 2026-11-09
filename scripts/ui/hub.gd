@@ -310,6 +310,9 @@ func _fill_info(node_id: String) -> void:
 	type_row.add_child(type_text)
 	_info.add_child(type_row)
 	_info.add_child(UiKit.wrapped(node["need"], 16, Color(0.85, 0.9, 1.0)))
+	if node.get("chain", "") != "":
+		var next_type: Dictionary = MissionData.TYPES[node["chain"]]
+		_info.add_child(UiKit.wrapped("CHAINED: partway through, it becomes a %s (%s form)." % [next_type["name"], next_type["form"]], 15, Color(0.6, 1.0, 0.8)))
 	if node.get("hazard", false):
 		_info.add_child(UiKit.label("HAZARD ROUTE", 17, Color(1, 0.4, 0.4), "bold"))
 		_info.add_child(UiKit.wrapped("Much harder than its neighbours, and pays double blueprints. Optional.", 14, Color(1, 0.75, 0.7)))

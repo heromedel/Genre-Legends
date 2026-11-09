@@ -272,3 +272,16 @@ func draw_dungeon_light(ci: CanvasItem, view: Rect2, stage: DungeonStage, time: 
 		for corner in [Vector2(70, 70), Vector2(rect.size.x - 70, 70), Vector2(70, rect.size.y - 70), Vector2(rect.size.x - 70, rect.size.y - 70)]:
 			var flicker := 1.0 + sin(time * 13.0 + corner.x) * 0.1
 			Art.draw_glow(ci, rect.position + corner, 110.0 * flicker, Color(1, 0.6, 0.25, 0.35))
+
+
+## A chained planet's way down (GDD 6G): a glowing crack in the ground, pulling light into it.
+static func draw_fissure(ci: CanvasItem, at: Vector2, time: float) -> void:
+	var crack := PackedVector2Array([at + Vector2(-70, -6), at + Vector2(-30, -18), at + Vector2(-8, -8), at + Vector2(20, -22),
+		at + Vector2(64, -4), at + Vector2(30, 14), at + Vector2(0, 8), at + Vector2(-36, 20)])
+	Art.draw_glow(ci, at, 120.0, Color(1, 0.6, 0.25, 0.4 + 0.15 * sin(time * 4.0)))
+	ci.draw_colored_polygon(crack, Color(0.05, 0.02, 0.0))
+	ci.draw_polyline(crack + PackedVector2Array([crack[0]]), Color(1, 0.7, 0.3), 3.0, true)
+	for i in 6:
+		var a := time * 1.5 + TAU * i / 6.0
+		var r := 90.0 - fmod(time * 40.0 + i * 15.0, 80.0)
+		ci.draw_circle(at + Vector2.from_angle(a) * r, 2.5, Color(1, 0.85, 0.5, r / 90.0))

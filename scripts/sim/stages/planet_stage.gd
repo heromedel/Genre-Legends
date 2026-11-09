@@ -12,6 +12,9 @@ var rocks: Array = []           # Rect2 cover; also the art's rock list
 var roam_timer := 1.5
 var objective_ids: Array = []
 var roster: Dictionary
+var fissure_open := false        # chained missions: the way down into the next stage
+var fissure_pos := Vector2.ZERO
+var dived := false
 
 
 func stage_name() -> String:
@@ -39,7 +42,8 @@ func setup() -> void:
 
 
 func _place_camps(start: Vector2) -> void:
-	var camp_count := 4
+	# A breakout from below lands on a shorter surface run: two nests, then the boss.
+	var camp_count := 2 if short_stage else 4
 	for i in camp_count:
 		var angle := -PI * 0.5 + (i - 1.5) * 1.05 + world.rng.randf_range(-0.2, 0.2)
 		var at := WORLD_SIZE * 0.5 + Vector2.from_angle(angle) * world.rng.randf_range(1050.0, 1350.0)
@@ -98,8 +102,20 @@ func step(dt: float) -> void:
 	if roam_timer <= 0.0 and boss == null:
 		roam_timer = world.rng.randf_range(4.0, 6.5) / world.spawn_scale
 		_spawn_roaming_pack()
-	if miniboss == null and objectives_left() <= 2:
+	if miniboss == null and objectives_left() <= 2 and not short_stage:
 		start_miniboss(BossRoster.make(BossRoster.for_node(mission.node, "miniboss"), world))
+	# Chained: the last nest cracks the ground open, and the way on is down (GDD 6G).
+	if has_next_stage() and objectives_left() == 0 and not miniboss_active():
+		if not fissure_open:
+			fissure_open = true
+			fissure_pos = (mission.player.pos + Vector2(0, -320)).clamp(Vector2(300, 300), WORLD_SIZE - Vector2(300, 300))
+			world.emit("banner", {"text": "A FISSURE HAS OPENED", "style": "gold"})
+			world.emit("shake", {"amount": 14.0})
+			world.emit("burst_ground", {"pos": fissure_pos})
+			mission.note("Fissure opened")
+		elif mission.player.pos.distance_to(fissure_pos) < 70.0:
+			dived = true
+		return
 	if boss == null and objectives_left() == 0 and not miniboss_active():
 		mission.note("All hive nests destroyed")
 		start_boss(BossRoster.make(BossRoster.for_node(mission.node, "boss"), world))
@@ -158,7 +174,13 @@ func objectives_left() -> int:
 
 
 ## Where the HUD's arrows point: living nests, or the boss.
+func is_cleared() -> bool:
+	return dived or (boss != null and boss.finished)
+
+
 func objective_positions() -> Array:
+	if fissure_open:
+		return [fissure_pos]
 	if boss != null and not boss.defeated:
 		return [boss.origin]
 	if miniboss_active():
@@ -171,13 +193,11 @@ func objective_positions() -> Array:
 	return positions
 
 
-func is_cleared() -> bool:
-	return boss != null and boss.finished
-
-
 func objective_text() -> String:
 	if boss != null:
 		return "Destroy the %s" % boss.boss_name
 	if miniboss_active():
-		return "Kill the %s" % miniboss.boss_name
+		return "Destroy the %s" % miniboss.boss_name
+	if fissure_open:
+		return "Dive into the fissure"
 	return "Hive nests: %d left" % objectives_left()

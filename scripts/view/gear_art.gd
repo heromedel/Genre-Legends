@@ -17,7 +17,7 @@ const MECH_MOUNTS := [
 	[Vector2(-3, -20), 0.0],        # weapon: left shoulder
 	[Vector2(-3, 20), 0.0],         # weapon: right shoulder
 	[Vector2(-19, 0), PI],          # support: the backpack
-	[Vector2(3, 0), 0.0],           # special: the chest
+	[Vector2(-11, 0), 0.0],         # special: on the back, between cockpit and backpack (not over the face)
 ]
 ## Seconds a part takes to unfold when its tech comes online.
 const DEPLOY_SECONDS := 0.45

@@ -163,7 +163,7 @@ const TECH := {
 	# ---- Specials: fired with the special button, on a cooldown.
 	"nova_bomb": {
 		"name": "Nova Bomb", "slot": "special", "element": "explosive",
-		"text": "The panic button. Wipes every bullet on screen and blasts everything near you.",
+		"text": "Your reactor erupts in a white-hot nova that erases every bullet on screen and blasts everything around you.",
 		"levels": ["Nova", "Faster recharge", "Fork", "Bigger nova", "Star-killer"],
 		"blueprint_from": ["star_cluster", "dungeon"],
 		"forks": {

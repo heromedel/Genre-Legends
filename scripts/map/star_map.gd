@@ -175,11 +175,31 @@ func _make_node(rng: RandomNumberGenerator, node_id: String, region: int, column
 		"planet_look": rng.randi(),
 		"lesson": "",
 		"lesson_tech": "",
-		"boss": BossRoster.pick(mission_type, "boss", node_id, seed_value),
+		"chain": _chain_for(mission_type, node_id, region, local_column, is_gate),
+		"boss": BossRoster.pick(_final_type(mission_type, node_id, region, local_column, is_gate), "boss", node_id, seed_value),
 		"miniboss": BossRoster.pick(mission_type, "miniboss", node_id, seed_value),
 		"hazard": false,
 		"reward_scale": 1.0,
 	}
+
+
+## Chained missions (GDD 6G): some planets dive into a Corridor Run partway, some dungeons break out
+## onto the surface. Picked from the planet's id and the map seed so the map itself never shifts.
+const CHAINS := {"planet": "corridor", "dungeon": "planet"}
+const CHAIN_CHANCE := 0.35
+
+
+func _chain_for(mission_type: String, node_id: String, region: int, local_column: int, is_gate: bool) -> String:
+	if not CHAINS.has(mission_type) or is_gate or (region == 0 and local_column < 2):
+		return ""
+	var roll := float(absi(hash("%s|chain|%d" % [node_id, seed_value])) % 1000) / 1000.0
+	return CHAINS[mission_type] if roll < CHAIN_CHANCE else ""
+
+
+## The mission type the planet ends in (its boss comes from there).
+func _final_type(mission_type: String, node_id: String, region: int, local_column: int, is_gate: bool) -> String:
+	var chain := _chain_for(mission_type, node_id, region, local_column, is_gate)
+	return chain if chain != "" else mission_type
 
 
 func _apply_lesson(node: Dictionary, key: String) -> void:
@@ -189,7 +209,8 @@ func _apply_lesson(node: Dictionary, key: String) -> void:
 	node["lesson"] = lesson["lesson"]
 	node["lesson_tech"] = lesson["tech"]
 	node["need"] = lesson["need"]
-	node["boss"] = lesson.get("boss", "")
+	node["boss"] = lesson.get("boss", node["boss"])
+	node["chain"] = ""
 	node["modifier"] = ""
 
 

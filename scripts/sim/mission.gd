@@ -9,6 +9,8 @@ extends RefCounted
 
 const DT := World.DT
 const INTRO_SECONDS := 1.5
+## A mission that opens with a radio line holds the enemies back this much longer, so it can be read.
+const RADIO_HOLD_SECONDS := 2.5
 const END_SECONDS := 2.8
 
 var node: Dictionary
@@ -56,7 +58,11 @@ func _init(map_node: Dictionary, mission_seed: int, frame_id: String, loadout: A
 	lesson_hazards = LessonHazards.new(world, node.get("lesson", ""))
 	world.on_collect = _on_collect
 	world.on_player_hurt = _on_player_hurt
-	start_stage(StageFactory.make(node["type"], self))
+	var opening := StageFactory.make(node["type"], self)
+	opening.chain_to = node.get("chain", "")
+	start_stage(opening)
+	if node.get("radio", "") != "":
+		state_timer += RADIO_HOLD_SECONDS
 	_apply_route_event(node.get("event", {}))
 
 
@@ -153,6 +159,9 @@ func step(input: InputFrame) -> void:
 			world.time += DT
 			player.move(input, DT, 1.0)
 			_keep_player_in_bounds()
+			# While the radio line is up, the enemies hold off so it can be read (GDD 9E).
+			if state_timer > INTRO_SECONDS:
+				return
 			stage.step(DT)
 			if state_timer <= 0.0:
 				state = "play"

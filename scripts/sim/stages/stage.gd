@@ -34,12 +34,20 @@ func is_cleared() -> bool:
 	return false
 
 
+## Chained missions (GDD 6G): a stage can hand the mission on to another mission type, with the frame
+## shifting form. chain_to names the next stage's type; a chained-into stage is a shorter "short" one.
+var chain_to := ""
+var short_stage := false
+
+
 func has_next_stage() -> bool:
-	return false
+	return chain_to != ""
 
 
 func next_stage() -> Stage:
-	return null
+	var next := StageFactory.make(chain_to, mission)
+	next.short_stage = true
+	return next
 
 
 ## Called after the frame moves, so stages can react (dungeon doors, corridor scrolling).

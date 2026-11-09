@@ -9,6 +9,9 @@ var mission: Mission
 var rng := RandomNumberGenerator.new()
 var fork_preference := "a"
 var stuck_timer := 0.0
+var frozen_timer := 0.0          # seconds since the last stuck check
+var escape_timer := 0.0          # while > 0, head for the middle of the area to get unstuck
+var frozen_pos := Vector2.ZERO
 var last_pos := Vector2.ZERO
 var wander := Vector2.ZERO
 var grid := AStarGrid2D.new()
@@ -72,6 +75,18 @@ func next_input() -> InputFrame:
 		if stuck_timer > 0.6:
 			wander = Vector2.from_angle(rng.randf() * TAU)
 			stuck_timer = 0.0
+		# A last resort: if we haven't moved at all for 3 s, head for the middle of the room or area.
+		# Checked every 3 s: barely moved since the last check (standing or jittering in place) means stuck.
+		frozen_timer += World.DT
+		if frozen_timer >= 3.0:
+			frozen_timer = 0.0
+			if player.pos.distance_to(frozen_pos) < 40.0 and mission.state == "play":
+				escape_timer = 1.5
+			frozen_pos = player.pos
+		if escape_timer > 0.0:
+			escape_timer -= World.DT
+			var middle := (mission.stage as DungeonStage).room_rect((mission.stage as DungeonStage).current).get_center() if mission.stage is DungeonStage else world.bounds.get_center()
+			direction = (middle - player.pos).normalized()
 		if wander != Vector2.ZERO:
 			direction = (direction + wander * 1.5)
 			wander *= 0.97
@@ -197,12 +212,7 @@ func _dungeon_goal(stage: DungeonStage) -> Vector2:
 	var horizontal := direction == "e" or direction == "w"
 	var aligned := absf((player.pos.y - rect.get_center().y) if horizontal else (player.pos.x - rect.get_center().x)) < 40.0
 	var goal := door if aligned else lineup
-	# Something in the way (a block in the middle of the room)? Detour round the side first.
-	if not _clear_line(player.pos, goal):
-		var side := Vector2(DungeonStage.DIRECTIONS[direction]).orthogonal()
-		for detour in [player.pos + side * 260.0, player.pos - side * 260.0, rect.get_center() + side * 300.0, rect.get_center() - side * 300.0]:
-			if not mission.world.point_in_wall(detour) and _clear_line(player.pos, detour):
-				return detour
+	# Blocks in the way are routed round by the A* waypoints (_waypoint), so no hand-made detours here.
 	return goal
 
 

@@ -88,7 +88,7 @@ func _ready() -> void:
 	camera_center = mission.player.pos
 	PlayLog.set_screen("mission:%s" % node["type"])
 	PlayLog.begin_mission(mission, mission.run.loadout, mission.run.tech_mk)
-	var line := Radio.mission_start_line(node, int(Save.data["stats"]["missions"]) - 1)
+	var line: String = node.get("radio", "")
 	if line != "":
 		hud.show_radio(line)
 	Sound.play_music(node["type"])
@@ -361,6 +361,8 @@ func _paint_bodies(ci: CanvasItem) -> void:
 		BossArt.draw(ci, mission.stage.miniboss, time)
 	_draw_halo_saws(ci)
 	_draw_support_companions(ci)
+	if mission.stage is PlanetStage and mission.stage.fissure_open:
+		BackgroundArt.draw_fissure(ci, mission.stage.fissure_pos, time)
 	for ally: Dictionary in world.allies:
 		BossArt.draw_hologram(ci, mission.run.frame_id, ally["pos"], mission.player.facing, time, false)
 	var player := mission.player

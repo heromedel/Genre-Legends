@@ -16,6 +16,7 @@ var gates: Array = []               # {y, zone, period, timer}
 var scrape_timer := 0.0
 var corridor_seed := 0.0
 var fortress_skipped := false
+var length := LENGTH                 # shorter when a mission dives into this corridor from another stage
 
 
 func stage_name() -> String:
@@ -29,22 +30,26 @@ func setup() -> void:
 	world.shot_bounds = FIELD.grow(120)
 	mission.player.pos = Vector2(FIELD.get_center().x, FIELD.end.y - 110)
 	corridor_seed = world.rng.randf() * 100.0
+	# Dived into from another stage: a shorter run straight to the boss (the other stage had the mini-boss).
+	if short_stage:
+		length = LENGTH * 0.45
+		fortress_skipped = true
 	_rebuild_walls()
 
 
 ## Half-width of the open corridor at a given corridor distance. Narrows as the run goes on;
 ## opens wide for the boss.
 func half_width_at(corridor_y: float) -> float:
-	if corridor_y > LENGTH + 300.0:
+	if corridor_y > length + 300.0:
 		return 560.0
-	var progress := clampf(corridor_y / LENGTH, 0.0, 1.0)
+	var progress := clampf(corridor_y / length, 0.0, 1.0)
 	var base := lerpf(420.0, 300.0, progress)
 	var wave := sin(corridor_y * 0.0021 + corridor_seed) * 70.0 + sin(corridor_y * 0.0053 + corridor_seed * 2.0) * 35.0
 	return clampf(base + wave, 190.0, 560.0)
 
 
 func center_at(corridor_y: float) -> float:
-	if corridor_y > LENGTH + 300.0:
+	if corridor_y > length + 300.0:
 		return FIELD.get_center().x
 	return FIELD.get_center().x + sin(corridor_y * 0.0013 + corridor_seed * 3.0) * 110.0
 
@@ -109,10 +114,10 @@ func step(dt: float) -> void:
 		start_miniboss(fortress)
 	if miniboss_active():
 		return
-	if distance >= next_event and distance < LENGTH:
+	if distance >= next_event and distance < length:
 		_spawn_event()
 		next_event += world.rng.randf_range(260.0, 420.0) / world.spawn_scale
-	if distance >= LENGTH + 500.0 and not boss_started:
+	if distance >= length + 500.0 and not boss_started:
 		start_boss(BossRoster.make(BossRoster.for_node(mission.node, "boss"), world))
 
 
@@ -177,7 +182,7 @@ func _update_gates(dt: float, scroll: float) -> void:
 
 
 func debug_skip_to_boss() -> void:
-	distance = LENGTH + 480.0
+	distance = length + 480.0
 	fortress_skipped = true
 	for enemy: Enemy in world.enemies:
 		enemy.dead = true
@@ -188,7 +193,7 @@ func debug_skip_to_miniboss() -> void:
 
 
 func stage_progress() -> float:
-	return distance / LENGTH
+	return distance / length
 
 
 func is_cleared() -> bool:
@@ -200,4 +205,4 @@ func objective_text() -> String:
 		return "Destroy the %s" % boss.boss_name
 	if miniboss_active():
 		return "Break the %s" % miniboss.boss_name
-	return "Corridor %d%%" % int(clampf(distance / LENGTH, 0.0, 1.0) * 100.0)
+	return "Corridor %d%%" % int(clampf(distance / length, 0.0, 1.0) * 100.0)
