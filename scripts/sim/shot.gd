@@ -34,6 +34,7 @@ var hex_shatter := false      # hex swarm: shatter into smaller hunters
 var chain_arcs := 0           # chain storm: lightning arcs on hit
 var calls_meteor := false     # armageddon: impacts call a meteor
 var devours := false          # event horizon: eats nearby enemy bullets
+var splintered := false      # Splinter Rounds (Kinetic II) already burst from this shot
 var hit_ids := {}             # enemies already hit, so piercing shots hit each once
 
 # Enemy shot behaviours
