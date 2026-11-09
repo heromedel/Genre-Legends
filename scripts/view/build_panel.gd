@@ -77,34 +77,22 @@ static func _resonance_section(column: VBoxContainer, run: RunState) -> void:
 
 
 static func _fusion_section(column: VBoxContainer, run: RunState) -> void:
+	# Only fusions this mission can reach (or has made); the rest are goals for R&D, not for now.
 	var lines := []
 	for fusion_id in UpgradeData.FUSIONS:
 		var fusion: Dictionary = UpgradeData.FUSIONS[fusion_id]
-		var needs: Array = fusion["needs"]
-		if not (run.loadout.has(needs[0]) or run.loadout.has(needs[1])):
-			continue
 		if run.has_fusion(fusion_id):
 			lines.append(["%s: fused!" % fusion["name"], Art.GOLD])
-			continue
-		var parts := []
-		for needed in needs:
-			parts.append("%s %s" % [TechData.TECH[needed]["name"], _fusion_progress(run, needed)])
-		lines.append(["%s: %s" % [fusion["name"], " + ".join(parts)], Color(0.8, 0.65, 1.0)])
+		elif run.can_fuse(fusion_id):
+			var parts := []
+			for needed in fusion["needs"]:
+				parts.append("%s %d/%d" % [TechData.TECH[needed]["name"], run.level_of(needed), TechData.MAX_LEVEL])
+			lines.append(["%s: %s" % [fusion["name"], " + ".join(parts)], Color(0.8, 0.65, 1.0)])
 	if lines.is_empty():
 		return
 	column.add_child(UiKit.label("FUSIONS (both tech at level 5)", 15, Art.GOLD, "bold"))
 	for line in lines:
 		column.add_child(UiKit.wrapped(line[0], 13, line[1]))
-
-
-## How far a tech is toward fusing: its level out of 5, or why it can't get there in this mission.
-static func _fusion_progress(run: RunState, tech_id: String) -> String:
-	if not run.loadout.has(tech_id):
-		return "(not equipped)"
-	var cap: int = run.tech_cap.get(tech_id, 3)
-	if cap < TechData.MAX_LEVEL:
-		return "%d/%d (needs a higher Mk from R&D)" % [run.level_of(tech_id), TechData.MAX_LEVEL]
-	return "%d/%d" % [run.level_of(tech_id), TechData.MAX_LEVEL]
 
 
 static func _field_section(column: VBoxContainer, run: RunState) -> void:

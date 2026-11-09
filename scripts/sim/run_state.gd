@@ -75,6 +75,17 @@ func has_fusion(fusion_id: String) -> bool:
 	return fusions.has(fusion_id)
 
 
+## True if this mission can still reach the fusion: both tech equipped, and both able to reach level 5
+## with their R&D Mk. Fusions that can't happen aren't mentioned in the mission (heromedel).
+func can_fuse(fusion_id: String) -> bool:
+	if has_fusion(fusion_id):
+		return false
+	for tech_id in UpgradeData.FUSIONS[fusion_id]["needs"]:
+		if not loadout.has(tech_id) or int(tech_cap.get(tech_id, 3)) < TechData.MAX_LEVEL:
+			return false
+	return true
+
+
 func field_count(upgrade_id: String) -> int:
 	return int(field.get(upgrade_id, 0))
 

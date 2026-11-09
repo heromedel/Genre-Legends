@@ -150,10 +150,8 @@ func _describe_build_effect(card: Dictionary) -> void:
 	if card["tech"] != "":
 		for fusion_id in UpgradeData.FUSIONS:
 			var needs: Array = UpgradeData.FUSIONS[fusion_id]["needs"]
-			if needs.has(card["tech"]) and not run.has_fusion(fusion_id):
-				var partner: String = needs[0] if needs[1] == card["tech"] else needs[1]
-				if run.loadout.has(partner):
-					card["fusion_hint"] = "Toward fusion: %s" % UpgradeData.FUSIONS[fusion_id]["name"]
+			if needs.has(card["tech"]) and run.can_fuse(fusion_id):
+				card["fusion_hint"] = "Toward fusion: %s" % UpgradeData.FUSIONS[fusion_id]["name"]
 
 
 func _pick_weighted(pool: Array) -> Dictionary:
