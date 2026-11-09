@@ -9,9 +9,16 @@ extends Node
 ## On by default; Settings has the off switch. Problems with the game itself are always recorded.
 
 const MAX_LINES := 6000
+## The log is saved to the device every few seconds, so a reload (iPad Safari drops tabs under memory
+## pressure) or a crash can't lose it: the next session's exported file includes the previous one.
+const SESSION_PATH := "user://play_log_session.json"
+const SAVE_EVERY_SECONDS := 8.0
 const IDLE_HINT_SECONDS := 25.0
 
 var lines: Array = []
+var previous: Dictionary = {}      # the session before this one, loaded at boot
+var _save_timer := 0.0
+var _dirty := false
 var screen := "boot"
 var _last_input_msec := 0
 var _idle_hinted := false
@@ -35,6 +42,7 @@ func _ready() -> void:
 	_start_msec = Time.get_ticks_msec()
 	_last_input_msec = _start_msec
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	previous = _read_session()
 	note("boot", "Genre Legends %s on %s, window %s" % [BuildInfo.label(), OS.get_name(), str(DisplayServer.window_get_size())])
 
 
@@ -55,6 +63,7 @@ func note(category: String, text: String) -> void:
 	if category != "problem" and not enabled():
 		return
 	lines.append("%s  %-8s %s" % [clock(), category, text])
+	_dirty = true
 	if lines.size() > MAX_LINES:
 		lines = lines.slice(lines.size() - MAX_LINES)
 	if OS.is_debug_build():
@@ -89,13 +98,44 @@ func _unhandled_input(event: InputEvent) -> void:
 		note("tap", "clicked nothing at (%d, %d) on %s" % [event.position.x, event.position.y, screen])
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_save_timer -= delta
+	if _save_timer <= 0.0 and (_dirty or recording):
+		_save_timer = SAVE_EVERY_SECONDS
+		_dirty = false
+		_write_session()
 	if recording or _idle_hinted:
 		return
 	var idle := (Time.get_ticks_msec() - _last_input_msec) / 1000.0
 	if idle > IDLE_HINT_SECONDS and screen != "title":
 		_idle_hinted = true
 		note("hint", "possibly stuck or away: no input for %d s on %s" % [int(idle), screen])
+
+
+# ---------------------------------------------------------------- session file
+
+func _write_session() -> void:
+	var session := {"version": BuildInfo.label(), "lines": lines, "in_mission": recording, "screen": screen}
+	if recording:
+		var partial := record.duplicate()
+		partial["inputs"] = _encode_runs()
+		partial["result"] = {"won": false, "seconds": 0.0, "ticks": 0, "unfinished": true}
+		session["mission"] = partial
+	var file := FileAccess.open(SESSION_PATH, FileAccess.WRITE)
+	if file:
+		file.store_string(JSON.stringify(session))
+		file.close()
+
+
+func _read_session() -> Dictionary:
+	if not FileAccess.file_exists(SESSION_PATH):
+		return {}
+	var file := FileAccess.open(SESSION_PATH, FileAccess.READ)
+	if file == null:
+		return {}
+	var parsed = JSON.parse_string(file.get_as_text())
+	file.close()
+	return parsed if parsed is Dictionary else {}
 
 
 # ---------------------------------------------------------------- missions
@@ -257,6 +297,20 @@ func export_text() -> String:
 		var replay := last_record.duplicate()
 		replay.erase("snapshots")
 		out.append("REPLAY " + JSON.stringify(replay))
+	if not previous.is_empty():
+		out.append("")
+		out.append("== PREVIOUS SESSION (%s) ==" % previous.get("version", "?"))
+		if previous.get("in_mission", false):
+			out.append("(It ended in the middle of a mission, on %s: the page was reloaded, closed or crashed.)" % previous.get("screen", "?"))
+		out.append_array(previous.get("lines", []))
+		if previous.has("mission"):
+			var partial: Dictionary = previous["mission"]
+			out.append("")
+			out.append("== PREVIOUS SESSION'S UNFINISHED MISSION ==")
+			out.append_array(partial.get("snapshots", []))
+			var replay_partial := partial.duplicate()
+			replay_partial.erase("snapshots")
+			out.append("REPLAY " + JSON.stringify(replay_partial))
 	return "\n".join(out)
 
 

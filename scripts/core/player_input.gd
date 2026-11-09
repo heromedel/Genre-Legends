@@ -13,6 +13,9 @@ extends Control
 const STICK_RADIUS := 70.0
 const DEADZONE := 0.18
 
+## A held touch with no movement for this long is treated as stale when another finger comes down.
+const STALE_TOUCH_MSEC := 2500
+
 var form := "ship"
 var world_scale := 1.0              # screen pixels per world unit, from the camera
 var blocked_rects: Array = []       # screen rects owned by buttons (special, pause)
@@ -137,20 +140,64 @@ func _blocked(at: Vector2) -> bool:
 
 
 func _on_touch(event: InputEventScreenTouch) -> void:
+	# iOS can interrupt a touch (a notification, an edge swipe) and never send the lift. A cancelled
+	# touch counts as lifted, and a new press clears touches that have gone quiet, so input never jams.
+	if event.canceled:
+		_touches.erase(event.index)
+		queue_redraw()
+		return
 	if event.pressed:
-		if _blocked(event.position):
-			return
 		var role := "drag"
 		if form == "mech":
 			role = "move" if event.position.x < get_viewport_rect().size.x * 0.5 else "aim"
+		_clear_stale_touches(event.index, role)
+		if _blocked(event.position):
+			return
+		if form == "mech":
 			# One thumb per side: a second touch on the same side takes over.
 			for index in _touches.keys():
 				if _touches[index]["role"] == role:
 					_touches.erase(index)
-		_touches[event.index] = {"role": role, "origin": event.position, "pos": event.position, "last": event.position}
+		_touches[event.index] = {"role": role, "origin": event.position, "pos": event.position, "last": event.position,
+			"seen": Time.get_ticks_msec()}
 	else:
 		_touches.erase(event.index)
 	queue_redraw()
+
+
+## Another finger has come down on the same stick (or anywhere, in ship form): an old touch there that
+## has been silent a while was probably never lifted (an interrupted touch), so it's dropped, and the
+## interface is told the old press is over. A thumb held still on the other stick is left alone.
+func _clear_stale_touches(new_index: int, role: String) -> void:
+	var now := Time.get_ticks_msec()
+	var dropped := 0
+	for index in _touches.keys():
+		if index != new_index and _touches[index]["role"] == role and now - int(_touches[index].get("seen", now)) > STALE_TOUCH_MSEC:
+			_touches.erase(index)
+			dropped += 1
+	if dropped > 0:
+		_release_everything("a new touch replaced %d stale one(s)" % dropped)
+
+
+## Forgets every held touch and button, and tells the interface any press is over (what switching tabs
+## and back used to fix by hand).
+func _release_everything(reason: String) -> void:
+	_touches.clear()
+	_mouse_down = false
+	_drag_accumulated = Vector2.ZERO
+	var release := InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.pressed = false
+	release.position = get_viewport().get_mouse_position()
+	Input.parse_input_event(release)
+	PlayLog.note("input", "Input reset: %s" % reason)
+	queue_redraw()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		if not _touches.is_empty() or _mouse_down:
+			_release_everything("the page lost focus")
 
 
 func _on_drag(event: InputEventScreenDrag) -> void:
@@ -166,6 +213,7 @@ func _on_drag(event: InputEventScreenDrag) -> void:
 			touch["origin"] = event.position - offset.normalized() * STICK_RADIUS * 1.4
 	touch["last"] = event.position
 	touch["pos"] = event.position
+	touch["seen"] = Time.get_ticks_msec()
 	queue_redraw()
 
 
