@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-700 -700 1400 1400">
+<!-- The Leviathan: a battleship longer than the screen flying overhead, drawn in place around the boss origin
+     (nose at +80, tail at -1320). Batteries and the engine core are separate pieces.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M0,80 L90,-40 L150,-200 L150,-1150 L110,-1300 L0,-1320 L-110,-1300 L-150,-1150 L-150,-200 L-90,-40 Z" fill="#06101c" stroke="#06101c" stroke-width="6"/>
+<path d="M0,80 L90,-40 L150,-200 L150,-1150 L110,-1300 L0,-1320 L-110,-1300 L-150,-1150 L-150,-200 L-90,-40 Z" fill="#34507a"/>
+<path d="M4,78 L90,-40 L150,-200 L150,-1150 L110,-1300 L4,-1320 Z" fill="#283f62"/>
+<path d="M-4,74 L-86,-40 L-146,-200 L-146,-1150" stroke="#a8c8f0" stroke-width="4" fill="none"/>
+<path d="M0,70 L0,-1310" stroke="#1c2e48" stroke-width="7"/>
+<path d="M-100,-80 L100,-80 M-140,-215 L140,-215 M-140,-310 L140,-310 M-140,-405 L140,-405 M-140,-500 L140,-500 M-140,-595 L140,-595 M-140,-690 L140,-690 M-140,-785 L140,-785 M-140,-880 L140,-880 M-140,-975 L140,-975 M-140,-1070 L140,-1070 M-140,-1165 L140,-1165" stroke="#1c2e48" stroke-width="3"/>
+<g fill="#9ad9ff"><circle cx="-130" cy="-175" r="4"/><circle cx="-130" cy="-365" r="4"/><circle cx="-130" cy="-555" r="4"/><circle cx="-130" cy="-745" r="4"/><circle cx="-130" cy="-935" r="4"/><circle cx="-130" cy="-1125" r="4"/>
+<circle cx="130" cy="-270" r="4"/><circle cx="130" cy="-460" r="4"/><circle cx="130" cy="-650" r="4"/><circle cx="130" cy="-840" r="4"/><circle cx="130" cy="-1030" r="4"/></g>
+<g fill="#ffcc3a"><path d="M-80,-50 L-60,-50 L-48,-30 L-68,-30 Z"/><path d="M80,-50 L60,-50 L48,-30 L68,-30 Z"/></g>
+</g>
+</svg>

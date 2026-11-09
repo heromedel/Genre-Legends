@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Wyrm Engine head: a beetle-shell skull with snapping mandibles and one red eye. Facing up.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<g id="jaw_l"><path d="M-14,-8 L-18,-52 L-6,-34 Z" fill="#06140e" stroke="#06140e" stroke-width="2.4"/><path d="M-14,-8 L-18,-52 L-6,-34 Z" fill="#d4f0e0"/><path d="M-14,-12 L-17,-46" stroke="#ffffff" stroke-width="1.2"/></g>
+<g id="jaw_r"><path d="M14,-8 L18,-52 L6,-34 Z" fill="#06140e" stroke="#06140e" stroke-width="2.4"/><path d="M14,-8 L18,-52 L6,-34 Z" fill="#a8c8b8"/></g>
+<path d="M0,-34 L18,-22 L30,6 L22,26 L0,30 L-22,26 L-30,6 L-18,-22 Z" fill="#06140e" stroke="#06140e" stroke-width="3.4"/>
+<path d="M0,-34 L-18,-22 L-30,6 L-22,26 L0,30 Z" fill="#3a9a6e"/>
+<path d="M0,-34 L18,-22 L30,6 L22,26 L0,30 Z" fill="#26704e"/>
+<path d="M-1,-31 L-17,-20 L-28,5" stroke="#c8f8e0" stroke-width="2" fill="none"/>
+<path d="M-20,10 L20,10 M-14,20 L14,20" stroke="#164a32" stroke-width="2"/>
+<circle cx="0" cy="-12" r="10" fill="#06140e"/>
+<g id="eye"><circle cx="0" cy="-12" r="8.4" fill="#ff4a3a"/><circle cx="0" cy="-14" r="3.6" fill="#fff4d8"/></g>
+</g>
+</svg>

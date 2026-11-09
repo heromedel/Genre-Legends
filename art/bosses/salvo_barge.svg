@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-250 -250 500 500">
+<!-- Salvo Barge hull: a wide armoured missile carrier, drawn in place around the boss origin.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M-200,-40 L200,-40 L230,10 L170,50 L-170,50 L-230,10 Z" fill="#120c06" stroke="#120c06" stroke-width="6"/>
+<path d="M-200,-40 L200,-40 L230,10 L170,50 L-170,50 L-230,10 Z" fill="#5e5038"/>
+<path d="M4,-40 L200,-40 L230,10 L170,50 L4,50 Z" fill="#4a3e2c"/>
+<path d="M-230,10 L-170,50 L170,50 L230,10 L222,4 L166,40 L-166,40 L-222,4 Z" fill="#33291c"/>
+<path d="M-198,-36 L0,-36 M-226,8 L-198,-36" stroke="#d8c08a" stroke-width="3" fill="none"/>
+<path d="M-150,-36 L-150,46 M-90,-36 L-90,46 M-30,-36 L-30,46 M30,-36 L30,46 M90,-36 L90,46 M150,-36 L150,46" stroke="#33291c" stroke-width="3"/>
+<g fill="#ffcc33"><path d="M-220,4 L-208,4 L-200,-12 L-212,-12 Z"/><path d="M220,4 L208,4 L200,-12 L212,-12 Z"/></g>
+<g fill="#ff7a3a"><circle cx="-190" cy="30" r="4"/><circle cx="190" cy="30" r="4"/></g>
+<path d="M-60,-40 L-60,-56 L60,-56 L60,-40 Z" fill="#120c06" stroke="#120c06" stroke-width="4"/>
+<path d="M-58,-42 L-58,-54 L58,-54 L58,-42 Z" fill="#4a3e2c"/>
+<path d="M-40,-57 L-40,-62 M-20,-57 L-20,-62 M0,-57 L0,-62 M20,-57 L20,-62 M40,-57 L40,-62" stroke="#ff9a3c" stroke-width="5"/>
+</g>
+</svg>

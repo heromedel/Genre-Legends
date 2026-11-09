@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Wyrm Engine body segment: an armoured octagon around a spinning drive gear, with fins. Facing up.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M-20,-6 L-34,2 L-18,6 Z M20,-6 L34,2 L18,6 Z" fill="#06140e" stroke="#06140e" stroke-width="2.4"/>
+<path d="M-20,-6 L-34,2 L-18,6 Z M20,-6 L34,2 L18,6 Z" fill="#8ad9b0"/>
+<path d="M-9,-22 L9,-22 L22,-9 L22,9 L9,22 L-9,22 L-22,9 L-22,-9 Z" fill="#06140e" stroke="#06140e" stroke-width="3"/>
+<path d="M-9,-22 L9,-22 L22,-9 L22,9 L9,22 L-9,22 L-22,9 L-22,-9 Z" fill="#2f7a58"/>
+<path d="M0.6,-22 L9,-22 L22,-9 L22,9 L9,22 L0.6,22 Z" fill="#205a40"/>
+<path d="M-8.4,-20 L-20,-8.4 L-20,6" stroke="#b8f0d4" stroke-width="1.8" fill="none"/>
+<circle cx="0" cy="0" r="14" fill="#06140e"/>
+<g id="gear"><path d="M0,-12 L3,-8 L8,-9 L8,-4 L12,0 L8,4 L8,9 L3,8 L0,12 L-3,8 L-8,9 L-8,4 L-12,0 L-8,-4 L-8,-9 L-3,-8 Z" fill="#5ad99a"/><circle cx="0" cy="0" r="4" fill="#06140e"/></g>
+</g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Leviathan battery, destroyed: a scorched socket. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<circle cx="0" cy="0" r="20" fill="#06101c"/>
+<path d="M-14,-10 L-4,-16 L6,-12 L16,-14 L14,0 L18,10 L4,14 L-8,16 L-16,8 Z" fill="#100806"/>
+<path d="M-10,4 L-2,-4 L8,4" stroke="#ff7a3a" stroke-width="1.6" fill="none" opacity="0.8"/>
+</g>
+</svg>

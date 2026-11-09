@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Turret Fortress gun: a heavy armoured mount with a long barrel, drawn aiming down (+y). Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<rect x="-6" y="4" width="12" height="34" rx="2" fill="#120c06"/><rect x="-4.4" y="5" width="8.8" height="32" fill="#7a6a58"/><rect x="0.6" y="5" width="3.8" height="32" fill="#5a4c3e"/>
+<rect x="-7" y="32" width="14" height="6" rx="1" fill="#120c06"/><circle cx="0" cy="38" r="2.4" fill="#ffd9a0"/>
+<path d="M-12,-20 L12,-20 L22,-10 L22,10 L12,20 L-12,20 L-22,10 L-22,-10 Z" fill="#120c06" stroke="#120c06" stroke-width="3"/>
+<path d="M-12,-20 L12,-20 L22,-10 L22,10 L12,20 L-12,20 L-22,10 L-22,-10 Z" fill="#c88a4a"/>
+<path d="M0.6,-20 L12,-20 L22,-10 L22,10 L12,20 L0.6,20 Z" fill="#9a6632"/>
+<path d="M-11,-18 L-20,-9 L-20,6" stroke="#ffd8b0" stroke-width="1.8" fill="none"/>
+<circle cx="0" cy="0" r="8" fill="#120c06"/><circle cx="0" cy="0" r="5" fill="#ff9a3c"/>
+</g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Crusher Gate piston housing: a heavy block that drives the walls in. Its rod is drawn by BossArt. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<rect x="-28" y="-32" width="56" height="64" rx="3" fill="#120c06"/>
+<rect x="-26" y="-30" width="52" height="60" rx="2" fill="#8a7a5e"/>
+<rect x="1" y="-30" width="25" height="60" fill="#6a5c46"/>
+<path d="M-24,-28 L24,-28 M-24,-27 L-24,20" stroke="#e0ccaa" stroke-width="2"/>
+<path d="M-20,-14 L20,-14 M-20,0 L20,0 M-20,14 L20,14" stroke="#4a3e2e" stroke-width="2"/>
+<path d="M-26,-30 L-16,-30 L-26,-20 Z M26,30 L16,30 L26,20 Z" fill="#ffcc33"/>
+<circle cx="0" cy="-22" r="3" fill="#ff6a3a"/>
+</g>
+</svg>

@@ -26,7 +26,7 @@ const MORPH_WINDOWS := {
 }
 
 
-## state: speed, flash, scale, alpha, and optionally gear (see GearArt), fusions, and resonance [element, tier].
+## state: speed, flash, scale, alpha, tint, rim, and optionally gear (see GearArt), fusions, and resonance [element, tier].
 static func draw_frame(ci: CanvasItem, frame_id: String, form: String, at: Vector2, facing: float, time: float, state: Dictionary) -> void:
 	var p := 1.0 if form == "ship" else 0.0
 	_draw_parts(ci, frame_id, p, at, facing, time, state)
@@ -103,7 +103,8 @@ static func _draw_parts(ci: CanvasItem, frame_id: String, p: float, at: Vector2,
 		"remap": {"#" + data["trim"].to_html(false): trim},
 		"flash": 0.7 if state.get("flash", 0.0) > 0.0 else 0.0,
 		"alpha": state.get("alpha", 1.0),
-		"rim": PLAYER_RIM,
+		"tint": state.get("tint", Color(0, 0, 0, 0)),
+		"rim": state.get("rim", PLAYER_RIM),
 		"groups": groups,
 		"hide": hide,
 	})

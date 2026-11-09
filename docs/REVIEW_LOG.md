@@ -66,3 +66,11 @@ a design point).
 | Art pass 2 cold review | Highlights | Thin white highlight lines look blurry at 2x. | **Saved** | Part of a later polish pass on VectorArt's antialiasing. |
 | Art pass 2 cold review | Planet and dungeon shots | No enemies on screen to judge contrast. | **Acted on** | Gallery can now draw on planet ground and dungeon floor (bg=ground/floor); every enemy reads on both. |
 | Art pass 2 cold review | Star Cluster shot | Unexplained white arrow at the top. | **Discarded** | It's the off-screen enemy marker. |
+| Boss art cold review 1 | Hive Carrier, Mirror Dreadnought, Bounty Ace | New beats old: they read as a carrier, a mirror-plated battleship and a predatory fighter instead of outline diagrams. | **Acted on** | Kept the new art. |
+| Boss art cold review 1 | Hive Carrier bays | Bays drew as black holes. | **Acted on** | A VectorArt bug: a closed stroke-only shape filled its whole inside. Fixed in the painter, so it can't happen in any art. |
+| Boss art cold review 1 | Hittable parts | Turrets the same maroon as the hull; drones gold on a gold ring; sealed dreadnought core like a bolt head. | **Acted on** | Gunmetal turrets with gold lenses; crimson drones on brighter tethers; the sealed core keeps a dim blue glow. |
+| Boss art cold review 1 | Hive, Dreadnought | Engine blocks along the stern looked like they floated. | **Acted on** | They now tuck under the hull. Dropped the dreadnought's stray chevrons. |
+| Boss art cold review 1 | Swarm Marshal | Didn't read as a command carrier; one lone yellow dot. | **Acted on** | Redrawn flat and wide with glowing launch bays on both flanks; both signal lights stay visible and blink in turn. |
+| Boss art cold review 1 | Bounty Ace, Swarm Marshal size | Should be much bigger than the player. | **Discarded** | The art already extends past their hitboxes (radius 48 and 30); drawing them bigger would let shots pass through the wings harmlessly, which reads as unfair. |
+| Boss art cold review 1 | Clone Projector hologram | Looked like a normal player ship. | **Acted on** | Violet tint, see-through, flickering, stronger scanlines, no player rim (VectorArt and FrameArt gained a tint option). |
+| Boss art cold review 1 | Twin Aces capture | Blank screenshot. | **Discarded** | The gallery places them at their entry points off screen; a capture issue, not the art. |

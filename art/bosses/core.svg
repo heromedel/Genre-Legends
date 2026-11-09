@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- A boss core: an armoured ring around a glowing heart, with two shutters that slide apart when it opens.
+     Shared by several bosses and recoloured to each (BossArt._core): #ff8a3a and #ffd08a are the heart,
+     #6a5038 / #4a3826 the armour. Radius 30, centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<circle cx="0" cy="0" r="33" fill="#120c06"/>
+<circle cx="0" cy="0" r="30" fill="#6a5038"/>
+<path d="M0,-30 A30,30 0 0 1 0,30 L0,22 A22,22 0 0 0 0,-22 Z" fill="#4a3826"/>
+<path d="M-21,-20 A29,29 0 0 1 -4,-29" stroke="#e8d0b0" stroke-width="2.4" fill="none"/>
+<path d="M-30,0 L-24,0 M30,0 L24,0 M0,-30 L0,-24 M0,30 L0,24" stroke="#ffcc3a" stroke-width="3"/>
+<circle cx="0" cy="0" r="22" fill="#120c06"/>
+<g id="heart"><circle cx="0" cy="0" r="18" fill="#ff8a3a"/><circle cx="0" cy="0" r="11" fill="#ffd08a"/><circle cx="-3" cy="-3" r="3" fill="#ffffff"/></g>
+<g id="shutter_l">
+  <path d="M-2,-24 L-20,-14 L-20,14 L-2,24 Z" fill="#120c06" stroke="#120c06" stroke-width="3"/>
+  <path d="M-2,-24 L-20,-14 L-20,14 L-2,24 Z" fill="#6a5038"/>
+  <path d="M-4,-21 L-18,-13 L-18,4" stroke="#e8d0b0" stroke-width="1.6" fill="none"/>
+</g>
+<g id="shutter_r">
+  <path d="M2,-24 L20,-14 L20,14 L2,24 Z" fill="#120c06" stroke="#120c06" stroke-width="3"/>
+  <path d="M2,-24 L20,-14 L20,14 L2,24 Z" fill="#4a3826"/>
+</g>
+</g>
+</svg>

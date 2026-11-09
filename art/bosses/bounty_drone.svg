@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
-<!-- Bounty Ace drone: a spinning gold diamond on a tether. Centred on the part.
+<!-- Bounty Ace drone: a spinning crimson diamond on a tether, unlike the gold of its master. Centred on the part.
      Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
 <g stroke-linejoin="round" stroke-linecap="round">
-<path d="M0,-17 L17,0 L0,17 L-17,0 Z" fill="#1a1205" stroke="#1a1205" stroke-width="3"/>
-<path d="M0,-17 L17,0 L0,17 L-17,0 Z" fill="#c89a3a"/>
-<path d="M0,-17 L17,0 L0,17 Z" fill="#8a6620"/>
-<path d="M-1,-14 L-14,-1" stroke="#ffe8a8" stroke-width="1.6"/>
-<circle cx="0" cy="0" r="5" fill="#1a1205"/><circle cx="0" cy="0" r="3.4" fill="#fff1c4"/>
+<path d="M0,-17 L17,0 L0,17 L-17,0 Z" fill="#1c0504" stroke="#1c0504" stroke-width="3"/>
+<path d="M0,-17 L17,0 L0,17 L-17,0 Z" fill="#e8403a"/>
+<path d="M0,-17 L17,0 L0,17 Z" fill="#a8221e"/>
+<path d="M-1,-14 L-14,-1" stroke="#ffc0b0" stroke-width="1.6"/>
+<circle cx="0" cy="0" r="5" fill="#1c0504"/><circle cx="0" cy="0" r="3.4" fill="#fff1c4"/>
 </g>
 </svg>

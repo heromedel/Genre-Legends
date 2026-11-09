@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-320 -320 640 640">
+<!-- Crusher Gate: a sliding wall of riveted plates with a hazard band, drawn in place for a half-width of 300
+     (BossArt stretches it to the gate's width).
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<rect x="-302" y="-62" width="604" height="88" rx="3" fill="#120c06"/>
+<rect x="-300" y="-60" width="600" height="84" fill="#4e463a"/>
+<rect x="0" y="-60" width="300" height="84" fill="#40382e"/>
+<path d="M-296,-56 L296,-56" stroke="#b8a890" stroke-width="2.6"/>
+<g fill="#62584a" stroke="#120c06" stroke-width="1.8">
+<rect x="-294" y="-52" width="52" height="40"/><rect x="-234" y="-52" width="52" height="40"/><rect x="-174" y="-52" width="52" height="40"/><rect x="-114" y="-52" width="52" height="40"/><rect x="-54" y="-52" width="52" height="40"/>
+<rect x="6" y="-52" width="52" height="40"/><rect x="66" y="-52" width="52" height="40"/><rect x="126" y="-52" width="52" height="40"/><rect x="186" y="-52" width="52" height="40"/><rect x="246" y="-52" width="52" height="40"/></g>
+<rect x="-300" y="-2" width="600" height="22" fill="#261d08"/>
+<g fill="#ffcc33"><path d="M-300,20 L-286,-2 L-272,-2 L-286,20 Z"/><path d="M-260,20 L-246,-2 L-232,-2 L-246,20 Z"/><path d="M-220,20 L-206,-2 L-192,-2 L-206,20 Z"/><path d="M-180,20 L-166,-2 L-152,-2 L-166,20 Z"/><path d="M-140,20 L-126,-2 L-112,-2 L-126,20 Z"/><path d="M-100,20 L-86,-2 L-72,-2 L-86,20 Z"/><path d="M-60,20 L-46,-2 L-32,-2 L-46,20 Z"/><path d="M-20,20 L-6,-2 L8,-2 L-6,20 Z"/>
+<path d="M20,20 L34,-2 L48,-2 L34,20 Z"/><path d="M60,20 L74,-2 L88,-2 L74,20 Z"/><path d="M100,20 L114,-2 L128,-2 L114,20 Z"/><path d="M140,20 L154,-2 L168,-2 L154,20 Z"/><path d="M180,20 L194,-2 L208,-2 L194,20 Z"/><path d="M220,20 L234,-2 L248,-2 L234,20 Z"/><path d="M260,20 L274,-2 L288,-2 L274,20 Z"/></g>
+<path d="M-300,24 L300,24" stroke="#120c06" stroke-width="3"/>
+</g>
+</svg>

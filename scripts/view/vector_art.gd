@@ -24,6 +24,7 @@ static var _poses := {}         # path -> {group id: {pose name: Transform2D}}
 ## Draws an SVG file. xf places it (position, rotation, scale). options:
 ##   remap: {"#ffc759": Color}   swap any colour written in the file for another (lower-case hex)
 ##   flash: 0..1                  pull every colour toward white (a hit)
+##   tint: Color                  pull every colour toward this colour, by its alpha (a hologram)
 ##   alpha: 0..1                  fade the whole piece (a transformation's crossfade)
 ##   dim: 0..1                    pull every colour toward a dark steel (offline gear)
 ##   rim: Color                   trace a thin rim of this colour around every outline (alpha 0: none)
@@ -33,6 +34,7 @@ static func draw(ci: CanvasItem, path: String, xf: Transform2D, options: Diction
 	var shapes := _load(path)
 	var remap: Dictionary = options.get("remap", {})
 	var flash: float = options.get("flash", 0.0)
+	var tint: Color = options.get("tint", Color(0, 0, 0, 0))
 	var dim: float = options.get("dim", 0.0)
 	var alpha: float = options.get("alpha", 1.0)
 	var rim: Color = options.get("rim", Color(0, 0, 0, 0))
@@ -56,6 +58,8 @@ static func draw(ci: CanvasItem, path: String, xf: Transform2D, options: Diction
 		colour.a *= shape["opacity"] * alpha
 		if flash > 0.0:
 			colour = colour.lerp(Color(1, 1, 1, colour.a), flash)
+		if tint.a > 0.0:
+			colour = colour.lerp(Color(tint.r, tint.g, tint.b, colour.a), tint.a)
 		if dim > 0.0:
 			colour = colour.lerp(Color(0.1, 0.12, 0.16, colour.a), dim)
 		if shape["kind"] == FILL:
@@ -184,8 +188,9 @@ static func _add_element(shapes: Array, name: String, attributes: Dictionary, co
 	var stroke := String(style.get("stroke", "none"))
 	var width := float(style.get("stroke-width", "1")) * xf.get_scale().x
 	var closed_polygons: Array = subpaths.filter(func(s): return s[1] and s[0].size() >= 3).map(func(s): return s[0])
-	# 1. Outline: the stroke of a closed shape, as a rounded offset drawn under the fill.
-	if stroke != "none" and not closed_polygons.is_empty():
+	# 1. Outline: the stroke of a filled closed shape, as a rounded offset drawn under the fill. A closed shape
+	#    with no fill is just a ring of line (below), so it doesn't cover what's inside it.
+	if stroke != "none" and fill != "none" and not closed_polygons.is_empty():
 		var outline := []
 		var rim := []
 		for polygon: PackedVector2Array in closed_polygons:

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Salvo Barge launch pod: an armoured box of six missile tubes, warheads glinting. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<rect x="-30" y="-24" width="60" height="48" rx="3" fill="#120c06"/>
+<rect x="-28" y="-22" width="56" height="44" rx="2" fill="#9a8458"/>
+<rect x="1" y="-22" width="27" height="44" fill="#766440"/>
+<path d="M-26,-20 L26,-20 M-26,-19 L-26,14" stroke="#ecd8a8" stroke-width="2"/>
+<g fill="#120c06"><circle cx="-16" cy="-8" r="6"/><circle cx="0" cy="-8" r="6"/><circle cx="16" cy="-8" r="6"/><circle cx="-16" cy="8" r="6"/><circle cx="0" cy="8" r="6"/><circle cx="16" cy="8" r="6"/></g>
+<g fill="#ff5a3a"><circle cx="-16" cy="-8" r="3"/><circle cx="0" cy="-8" r="3"/><circle cx="16" cy="-8" r="3"/><circle cx="-16" cy="8" r="3"/><circle cx="0" cy="8" r="3"/><circle cx="16" cy="8" r="3"/></g>
+<g fill="#ffd0b0"><circle cx="-17" cy="-9" r="1"/><circle cx="-1" cy="-9" r="1"/><circle cx="15" cy="-9" r="1"/><circle cx="-17" cy="7" r="1"/><circle cx="-1" cy="7" r="1"/><circle cx="15" cy="7" r="1"/></g>
+</g>
+</svg>
