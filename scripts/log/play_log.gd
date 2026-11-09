@@ -14,6 +14,8 @@ const MAX_LINES := 6000
 const SESSION_PATH := "user://play_log_session.json"
 const SAVE_EVERY_SECONDS := 8.0
 const IDLE_HINT_SECONDS := 25.0
+const PAGE_CHECK_SECONDS := 2.0
+const MEMORY_CHECK_SECONDS := 30.0
 
 var lines: Array = []
 var previous: Dictionary = {}      # the session before this one, loaded at boot
@@ -36,6 +38,9 @@ var _panic_hinted_at := -100.0
 var _stuck_anchor := Vector2.ZERO
 var _stuck_since := 0.0
 var _stuck_hinted := false
+var _page_check := 0.0
+var _memory_check := 0.0
+var _memory_noted := -100.0
 
 
 func _ready() -> void:
@@ -43,7 +48,9 @@ func _ready() -> void:
 	_last_input_msec = _start_msec
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	previous = _read_session()
-	note("boot", "Genre Legends %s on %s, window %s" % [BuildInfo.label(), OS.get_name(), str(DisplayServer.window_get_size())])
+	var opened := Browser.navigation_type()
+	note("boot", "Genre Legends %s on %s, window %s%s" % [BuildInfo.label(), OS.get_name(), str(DisplayServer.window_get_size()),
+		", page %s" % ("reloaded" if opened == "reload" else "opened (%s)" % opened) if opened != "" else ""])
 
 
 func enabled() -> bool:
@@ -99,6 +106,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
+	_watch_page(delta)
 	_save_timer -= delta
 	if _save_timer <= 0.0 and (_dirty or recording):
 		_save_timer = SAVE_EVERY_SECONDS
@@ -110,6 +118,25 @@ func _process(delta: float) -> void:
 	if idle > IDLE_HINT_SECONDS and screen != "title":
 		_idle_hinted = true
 		note("hint", "possibly stuck or away: no input for %d s on %s" % [int(idle), screen])
+
+
+## What the browser does to the page (hidden, lost focus, restored) every couple of seconds, and the game's
+## memory whenever it has grown, so a page the iPad reloads leaves a trail of what came before.
+func _watch_page(delta: float) -> void:
+	_page_check -= delta
+	if _page_check > 0.0:
+		return
+	_page_check = PAGE_CHECK_SECONDS
+	for event in Browser.page_events():
+		note("page", str(event))
+	_memory_check -= PAGE_CHECK_SECONDS
+	if _memory_check > 0.0:
+		return
+	_memory_check = MEMORY_CHECK_SECONDS
+	var megabytes := Browser.memory_mb()
+	if megabytes >= 0.0 and absf(megabytes - _memory_noted) >= 1.0:
+		_memory_noted = megabytes
+		note("memory", "%d MB in use" % roundi(megabytes))
 
 
 # ---------------------------------------------------------------- session file

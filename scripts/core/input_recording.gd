@@ -5,27 +5,32 @@ extends RefCounted
 ## mission exactly (the simulation is deterministic). The play log keeps one for replays; the mission
 ## checkpoint keeps one to resume a mission after the browser closes.
 
-var _runs: Array = []          # [encoded frame, repeat count]
+var _texts := PackedStringArray()   # each run already written as text; the last one is rewritten as it grows
+var _last_frame := ""               # the last run's encoded frame
+var _last_count := 0                # how many ticks in a row it has held
 var ticks := 0
 
 
 func add(frame: InputFrame) -> void:
 	var encoded := frame.encode()
-	if not _runs.is_empty() and _runs[-1][0] == encoded:
-		_runs[-1][1] += 1
+	if _last_count > 0 and encoded == _last_frame:
+		_last_count += 1
+		_texts[-1] = "%s*%d" % [encoded, _last_count]
 	else:
-		_runs.append([encoded, 1])
+		_last_frame = encoded
+		_last_count = 1
+		_texts.append(encoded)
 	ticks += 1
 
 
 func clear() -> void:
-	_runs = []
+	_texts = PackedStringArray()
+	_last_frame = ""
+	_last_count = 0
 	ticks = 0
 
 
-## The runs as text: "frame;frame*repeats;..." (InputFrame.decode_runs reads it back).
+## The runs as text: "frame;frame*repeats;..." (InputFrame.decode_runs reads it back). Each run is written
+## once as it happens, so saving a long mission every few seconds is a single join, not a rewrite.
 func encode() -> String:
-	var parts := []
-	for run in _runs:
-		parts.append(run[0] if run[1] == 1 else "%s*%d" % [run[0], run[1]])
-	return ";".join(parts)
+	return ";".join(_texts)

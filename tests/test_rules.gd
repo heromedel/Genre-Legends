@@ -406,6 +406,20 @@ func _fusions() -> void:
 	for i in 60:
 		world.update_player_shots(World.DT)
 	check(orb.dead and drifter.hex_marked, "Event Horizon collapses in a burst that hexes what's around it")
+	# A formation dart that dives off the top of the screen comes back to its slot (heromedel's 0.5 log:
+	# one climbed away forever and the wave never ended).
+	mission = _test_mission("star_cluster")
+	world = mission.world
+	world.enemies.clear()
+	var diver := world.spawn_enemy("dart", Vector2(600, 20))
+	diver.brain = "formation"
+	diver.memory = {"slot": Vector2(600, 170)}
+	diver.state = 2
+	diver.timer = 2.0
+	diver.facing = -PI * 0.5
+	for i in 120:
+		mission.enemy_system.update(World.DT)
+	check(diver.state != 2 and diver.pos.y > -100.0, "a dart diving off the top of the screen returns to the formation")
 	# Wraith Drive: dashing through an enemy hurts it and lets loose a spirit.
 	mission = _test_mission("planet")
 	world = mission.world

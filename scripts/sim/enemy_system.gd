@@ -164,7 +164,8 @@ func _formation(enemy: Enemy, dt: float) -> void:
 			if enemy.timer > 0.35 and not memory.get("dive_shot", false):
 				memory["dive_shot"] = true
 				world.enemy_aimed(enemy.pos, 3, 0.35, 240.0)
-			if enemy.pos.y > world.bounds.end.y + 40.0 or enemy.pos.x < -60.0 or enemy.pos.x > world.bounds.end.x + 60.0:
+			# Leaving by any edge ends the dive, the top included: a dive started below you climbs off the top.
+			if not world.bounds.grow(60.0).has_point(enemy.pos):
 				enemy.pos = Vector2(slot.x, -40.0)
 				enemy.state = 3
 				memory["dive_shot"] = false
