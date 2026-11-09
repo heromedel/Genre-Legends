@@ -20,6 +20,7 @@ static var _cache := {}
 ## Draws an SVG file. xf places it (position, rotation, scale). options:
 ##   remap: {"#ffc759": Color}   swap any colour written in the file for another (lower-case hex)
 ##   flash: 0..1                  pull every colour toward white (a hit)
+##   dim: 0..1                    pull every colour toward a dark steel (offline gear)
 ##   rim: Color                   trace a thin rim of this colour around every outline (alpha 0: none)
 ##   groups: {"flame": Transform2D}   extra transform for a named group, in the art's own space
 ##   hide: ["stock_arms"]         named groups to leave out
@@ -27,6 +28,7 @@ static func draw(ci: CanvasItem, path: String, xf: Transform2D, options: Diction
 	var shapes := _load(path)
 	var remap: Dictionary = options.get("remap", {})
 	var flash: float = options.get("flash", 0.0)
+	var dim: float = options.get("dim", 0.0)
 	var rim: Color = options.get("rim", Color(0, 0, 0, 0))
 	var groups: Dictionary = options.get("groups", {})
 	var hide: Array = options.get("hide", [])
@@ -47,6 +49,8 @@ static func draw(ci: CanvasItem, path: String, xf: Transform2D, options: Diction
 		colour.a *= shape["opacity"]
 		if flash > 0.0:
 			colour = colour.lerp(Color(1, 1, 1, colour.a), flash)
+		if dim > 0.0:
+			colour = colour.lerp(Color(0.1, 0.12, 0.16, colour.a), dim)
 		if shape["kind"] == FILL:
 			for polygon: PackedVector2Array in shape["polygons"]:
 				ci.draw_colored_polygon(polygon, colour)

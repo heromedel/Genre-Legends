@@ -5,12 +5,13 @@
      Groups: "foot_l" / "foot_r" step; "stock_arms" is hidden when gear is fitted. -->
 <g stroke-linejoin="round" stroke-linecap="round">
 
-<!-- Swept fins off the back: the Tempest's signature -->
+<!-- Jet fins off the backpack, swept back with a thruster at each tip: the Tempest's signature -->
 <g>
-  <path d="M-6,8 L-24,24 L-17,24 L-4,14 Z M6,8 L24,24 L17,24 L4,14 Z" fill="#0a1f16" stroke="#0a1f16" stroke-width="2.2"/>
-  <path d="M-6,8 L-24,24 L-17,24 L-4,14 Z" fill="#c45ad6"/>
-  <path d="M6,8 L24,24 L17,24 L4,14 Z" fill="#8f3a9e"/>
-  <path d="M-6.4,9 L-22.8,23.4" stroke="#f9c4ff" stroke-width="1"/>
+  <path d="M-5,10 L-15,17 L-14,21 L-4,15 Z M5,10 L15,17 L14,21 L4,15 Z" fill="#0a1f16" stroke="#0a1f16" stroke-width="2.2"/>
+  <path d="M-5,10 L-15,17 L-14,21 L-4,15 Z" fill="#c45ad6"/>
+  <path d="M5,10 L15,17 L14,21 L4,15 Z" fill="#8f3a9e"/>
+  <path d="M-5.4,10.8 L-14.4,17.2" stroke="#f9c4ff" stroke-width="1"/>
+  <circle cx="-14.6" cy="20.6" r="1.8" fill="#e7a6ff"/><circle cx="14.6" cy="20.6" r="1.8" fill="#e7a6ff"/>
 </g>
 
 <!-- Feet: slim boots -->

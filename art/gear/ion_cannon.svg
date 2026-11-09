@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32">
+<!-- Ion Cannon: a heavy barrel with a glowing focusing lens.
+     Gear part, facing up (forward), about 12 units across. Five passes: outline, fill, shading, highlights, details.
+     "#39ff14" is the tech's glow (swapped for its element colour); groups named fork_a / fork_b show with that fork. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+  <path d="M-4,0 L4,0 L4,7 L-4,7 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.6"/>
+  <path d="M-4,0 L4,0 L4,7 L-4,7 Z" fill="#55697d"/>
+  <path d="M0.7999999999999998,0 L4,0 L4,7 L0.7999999999999998,7 Z" fill="#3a4a5a"/>
+  <path d="M-3.5,6.5 L-3.5,0.5 L0.0,0.5" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <path d="M-2.8,0 L-2.2,-12 L2.2,-12 L2.8,0 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.6"/>
+  <path d="M-2.8,0 L-2.2,-12 L2.2,-12 L2.8,0 Z" fill="#55697d"/>
+  <path d="M0.6,0 L0.6,-12 L2.2,-12 L2.8,0 Z" fill="#3a4a5a"/>
+  <path d="M-2.4,-1 L-1.9,-11" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <circle cx="0" cy="-12.4" r="2.8" fill="#0a1628"/>
+  <circle cx="0" cy="-12.4" r="2.1" fill="#39ff14"/>
+  <circle cx="-0.525" cy="-12.925" r="0.9450000000000001" fill="#d8ffcc"/>
+</g>
+</svg>

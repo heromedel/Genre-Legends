@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32">
+<!-- Option Pods: the pods' docking cradle; its sockets glow while the pods are out.
+     Gear part, facing up (forward), about 12 units across. Five passes: outline, fill, shading, highlights, details.
+     "#39ff14" is the tech's glow (swapped for its element colour); groups named fork_a / fork_b show with that fork. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+  <path d="M-5.5,-1 L5.5,-1 L5.5,3 L-5.5,3 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.6"/>
+  <path d="M-5.5,-1 L5.5,-1 L5.5,3 L-5.5,3 Z" fill="#55697d"/>
+  <path d="M1.0999999999999996,-1 L5.5,-1 L5.5,3 L1.0999999999999996,3 Z" fill="#3a4a5a"/>
+  <path d="M-5.0,2.5 L-5.0,-0.5 L0.0,-0.5" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <circle cx="-3.4" cy="-2.5" r="3" fill="#0a1628"/>
+  <circle cx="-3.4" cy="-2.5" r="2.2" fill="#2a3644"/>
+  <circle cx="-3.4" cy="-2.5" r="1.2" fill="#39ff14"/>
+  <circle cx="3.4" cy="-2.5" r="3" fill="#0a1628"/>
+  <circle cx="3.4" cy="-2.5" r="2.2" fill="#2a3644"/>
+  <circle cx="3.4" cy="-2.5" r="1.2" fill="#39ff14"/>
+</g>
+</svg>

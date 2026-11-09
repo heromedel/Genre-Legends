@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32">
+<!-- Orbital Halo: the emitter disc the saws orbit (the saws are drawn live).
+     Gear part, facing up (forward), about 12 units across. Five passes: outline, fill, shading, highlights, details.
+     "#39ff14" is the tech's glow (swapped for its element colour); groups named fork_a / fork_b show with that fork. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+  <circle cx="0" cy="0" r="5.6" fill="#0a1628"/>
+  <circle cx="0" cy="0" r="4.6" fill="#55697d"/>
+  <path d="M0.6,-4.5 A4.6,4.6 0 0 1 0.6,4.5 Z" fill="#3a4a5a"/>
+  <path d="M-3.8,1.6 A4,4 0 0 1 -1,-3.8" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <circle cx="0" cy="0" r="2.6" fill="none" stroke="#39ff14" stroke-width="1.2"/>
+</g>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32">
+<!-- Hex Repeater: a hexagonal orb chamber with a short muzzle.
+     Gear part, facing up (forward), about 12 units across. Five passes: outline, fill, shading, highlights, details.
+     "#39ff14" is the tech's glow (swapped for its element colour); groups named fork_a / fork_b show with that fork. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+  <path d="M-1.2,-11 L1.2,-11 L1.2,-5 L-1.2,-5 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.3"/>
+  <path d="M-1.2,-11 L1.2,-11 L1.2,-5 L-1.2,-5 Z" fill="#55697d"/>
+  <path d="M0.24,-11 L1.2,-11 L1.2,-5 L0.24,-5 Z" fill="#3a4a5a"/>
+  <path d="M-0.7,-5.5 L-0.7,-10.5 L0.0,-10.5" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <path d="M0,-6 L5,-3 L5,3 L0,6 L-5,3 L-5,-3 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.6"/>
+  <path d="M0,-6 L5,-3 L5,3 L0,6 L-5,3 L-5,-3 Z" fill="#55697d"/>
+  <path d="M0,-6 L5,-3 L5,3 L0,6 Z" fill="#3a4a5a"/>
+  <path d="M-4.6,2.6 L-4.6,-2.8 L-0.4,-5.6" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <circle cx="0" cy="0" r="3.0999999999999996" fill="#0a1628"/>
+  <circle cx="0" cy="0" r="2.4" fill="#39ff14"/>
+  <circle cx="-0.6" cy="-0.6" r="1.08" fill="#d8ffcc"/>
+</g>
+</svg>

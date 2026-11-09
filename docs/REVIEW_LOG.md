@@ -7,6 +7,12 @@ a design point).
 
 | Review | Subject | Finding | Status | Note |
 |---|---|---|---|---|
+| Frames review (2026-11-09) | Player frames, new art | Vanguard strongest; the cyan rim reads as "player"; ship and mech read as the same machine. | **Saved** | Keep: the rim and the chevron as facing marker. |
+| Frames review | Gear on the frames | Pale, flat, pasted-on parts; an arrow-like weapon, a nose clamp, a star that reads as a hit spark; grey ghost copies. | **Fixed** (0.5) | Ghosts were a misfiring outline trick, removed; every part redrawn in the frames' style (next commit). |
+| Frames review | Bulwark mech | Reads as a crate with no front; close to the loot chest's colour. | **Fixed** (0.5) | A chevron on the shield plate and a bolder visor. |
+| Frames review | Tempest mech | Swept fins read as a kickstand or legs. | **Fixed** (0.5) | Short jet fins on the backpack with thrusters at the tips. |
+| Frames review | Mechs | About 6% of the screen: small on an iPad mini. | **Fixed** (0.5) | Mechs draw 1.2x (the hitbox is unchanged). |
+| Frames review | Hangar | Locked frames dimmed to olive and brown. | **Discarded** | Intentional: locked. |
 | Wording check (2026-11-09) | Tech, upgrades, radio, guide, events | Descriptions that promised more than the code does: Time Brake ("slams the brakes"), Graze's "double", Option Pods' "copies", Soul Lantern's wisp counts, Arc Blade's swapped steps, Supernova Rings, Meteor Shower, Overheat Core, Shockwave, Supernova Core, Armageddon, Cluster Drones, Centi-Mechs, the needle radio line, the Clone Projector, Distress Call, Wandering Trader. | **Fixed** (0.5) | Each rewritten to say what the code does. |
 | Wording check | Level-5 steps | Labels with no effect ("Cataclysm", "Star-killer", "Reactor"...) are the whole text of an upgrade card. | **Fixed** (0.5) | "Name: effect", e.g. "Cataclysm: harder, faster meteors". |
 | Wording check | Guide, Elites | Homing shots never hit mirrored elites, though the Guide says they get through. | **Fixed** (0.5) | A code bug: homing shots now hit mirrored elites; against the Mirror Dreadnought they still curve past its hull to the vents (GDD 9C). |

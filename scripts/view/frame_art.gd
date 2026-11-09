@@ -7,6 +7,8 @@ class_name FrameArt
 
 ## Each mech's size, for scaling its gear (GearArt mounts are written for the Vanguard's).
 const MECH_GEAR_SCALE := {"vanguard": 1.0, "tempest": 0.8, "bulwark": 1.2}
+## How much larger a mech is drawn than its ship (the art is the same scale; the hitbox doesn't change).
+const MECH_DRAW_SCALE := 1.2
 ## The rim of light around the player's frame: one colour for every frame, so "this one is you" reads the same.
 const PLAYER_RIM := Color(0.62, 0.95, 1.0, 0.9)
 
@@ -15,7 +17,8 @@ const PLAYER_RIM := Color(0.62, 0.95, 1.0, 0.9)
 static func draw_frame(ci: CanvasItem, frame_id: String, form: String, at: Vector2, facing: float, time: float, state: Dictionary) -> void:
 	var data := FrameData.get_frame(frame_id)
 	var trim: Color = data["trim"]
-	var scale: float = state.get("scale", 1.3)
+	# Mechs draw a fifth larger than ships: seen from above they're compact, and small on an iPad mini.
+	var scale: float = state.get("scale", 1.3) * (MECH_DRAW_SCALE if form == "mech" else 1.0)
 	# Resonance tints the trim toward its element as tiers come online (GDD 11F), and adds a glow (GDD 9H).
 	var resonance: Array = state.get("resonance", [])
 	if not resonance.is_empty() and int(resonance[1]) > 0:

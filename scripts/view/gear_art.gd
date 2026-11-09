@@ -19,8 +19,9 @@ const MECH_MOUNTS := [
 	[Vector2(-19, 0), PI],          # support: the backpack
 	[Vector2(-11, 0), 0.0],         # special: on the back, between cockpit and backpack (not over the face)
 ]
-## The outline colour behind every part, matching the frames' vector art.
-const OUTLINE := Color(0.04, 0.07, 0.12)
+## The colours the gear art writes for its glow and the glow's hot core; swapped for the tech's element colour.
+const GLOW_TOKEN := "#39ff14"
+const CORE_TOKEN := "#d8ffcc"
 ## Seconds a part takes to unfold when its tech comes online.
 const DEPLOY_SECONDS := 0.45
 
@@ -64,16 +65,13 @@ static func _draw_part(ci: CanvasItem, frame: Transform2D, part: Dictionary, at:
 	var unfold := clampf(since / DEPLOY_SECONDS, 0.0, 1.0) if online else 0.0
 	var size := lerpf(0.5, 1.0, ease(unfold, 0.4))
 	var color := TechData.element_color(tech_id)
-	if not online:
-		color = color.darkened(0.6)
 	var flash := clampf(1.0 - since / DEPLOY_SECONDS, 0.0, 1.0) if online else 0.0
 	# The right-hand weapon pylon is the mirror image of the left.
 	var mirror := -1.0 if slot == 2 else 1.0
-	# A dark silhouette a size up, behind the part: the same outline the frame's vector art has.
-	ci.draw_set_transform_matrix(frame * Transform2D(rotation, Vector2(size, size * mirror) * 1.22, 0.0, at))
-	_draw_shape(ci, tech_id, part.get("fork", ""), level, OUTLINE, form, time)
-	ci.draw_set_transform_matrix(frame * Transform2D(rotation, Vector2(size, size * mirror), 0.0, at))
-	_draw_shape(ci, tech_id, part.get("fork", ""), level, color, form, time)
+	var local := frame * Transform2D(rotation, Vector2(size, size * mirror), 0.0, at)
+	_draw_vector_part(ci, local, tech_id, part.get("fork", ""), level, color, online)
+	ci.draw_set_transform_matrix(local)
+	_draw_live(ci, tech_id, part.get("fork", ""), level, color, time)
 	if flash > 0.0:
 		ci.draw_circle(Vector2.ZERO, 10.0 * flash + 3.0, Color(1, 1, 1, flash * 0.8))
 	# Level 5: a gold spark marks a maxed part.
@@ -82,95 +80,45 @@ static func _draw_part(ci: CanvasItem, frame: Transform2D, part: Dictionary, at:
 	ci.draw_set_transform_matrix(frame)
 
 
-## One part's shape, about 12 units across, drawn at the origin facing +x.
-static func _draw_shape(ci: CanvasItem, tech_id: String, fork: String, level: int, color: Color, form: String, time: float) -> void:
-	var dark := color.darkened(0.55)
+## The part's body: art/gear/<tech>.svg, turned from facing up to the frame's facing (+x), its glow in the
+## tech's element colour, dimmed while offline, showing only its fork's pieces.
+static func _draw_vector_part(ci: CanvasItem, local: Transform2D, tech_id: String, fork: String, level: int, color: Color, online: bool) -> void:
+	var hide := []
+	if fork != "a":
+		hide.append("fork_a")
+	if fork != "b":
+		hide.append("fork_b")
+	# Some forks replace a piece rather than add to it.
+	if tech_id == "pulse_driver" and fork == "a":
+		hide.append("barrels")
+	if tech_id == "mirror_aegis" and fork == "b":
+		hide.append("plate")
+	var groups := {}
+	if tech_id == "arc_blade":
+		# The blade grows with level, from its hilt.
+		var length := (12.0 + 2.0 * maxi(level, 1)) / 14.0
+		groups["blade"] = Transform2D(0.0, Vector2(1.0, length), 0.0, Vector2(0.0, -0.5 + 0.5 * length))
+	VectorArt.draw(ci, "res://art/gear/%s.svg" % tech_id, local * Transform2D(PI * 0.5, Vector2.ZERO), {
+		"remap": {GLOW_TOKEN: color, CORE_TOKEN: color.lightened(0.6)},
+		"dim": 0.0 if online else 0.55,
+		"groups": groups,
+		"hide": hide,
+	})
+
+
+## The parts that move: drawn live on top of the art, in the part's own space (facing +x).
+static func _draw_live(ci: CanvasItem, tech_id: String, fork: String, level: int, color: Color, time: float) -> void:
 	var bright := color.lightened(0.35)
 	match tech_id:
-		"pulse_driver":
-			# Twin barrels; Ricochet angles them into prongs, Splitfire adds a third.
-			var barrels := [-2.5, 2.5] if fork != "b" else [-3.5, 0.0, 3.5]
-			for y: float in barrels:
-				var tip := Vector2(9, y * (1.6 if fork == "a" else 1.0))
-				ci.draw_line(Vector2(-3, y), tip, bright, 2.2, true)
-			Art.shape(ci, PackedVector2Array([Vector2(-6, -4), Vector2(1, -4), Vector2(1, 4), Vector2(-6, 4)]), dark, color, 1.2)
 		"thunder_lance":
-			# A long rail between coils; the coils crackle when online.
-			ci.draw_line(Vector2(-7, 0), Vector2(13, 0), bright, 2.4, true)
-			for i in 3:
-				ci.draw_arc(Vector2(-3 + i * 4.5, 0), 3.2, 0, TAU, 8, color, 1.2, true)
 			if level > 0:
-				ci.draw_line(Vector2(13, 0), Vector2(16, sin(time * 30.0) * 2.0), Color(0.8, 1, 1), 1.2, true)
-		"hex_repeater":
-			Art.shape(ci, Art.ngon(6, 5.5), dark, color, 1.4)
-			ci.draw_circle(Vector2.ZERO, 2.2, bright)
-			ci.draw_line(Vector2(5, 0), Vector2(10, 0), color, 2.0, true)
-		"arc_blade":
-			# A hilt and a glowing blade; Whirlwind doubles it into a twin blade.
-			ci.draw_line(Vector2(-4, 0), Vector2(0, 0), dark.lightened(0.3), 3.0, true)
-			ci.draw_line(Vector2(0, -3), Vector2(0, 3), color, 1.6, true)
-			var blade := 12.0 + 2.0 * level
-			ci.draw_line(Vector2(0, 0), Vector2(blade, 0), Art.with_alpha(bright, 0.9), 2.4, true)
-			if fork == "b":
-				ci.draw_line(Vector2(-4, 0), Vector2(-4 - blade * 0.7, 0), Art.with_alpha(bright, 0.9), 2.4, true)
-			if fork == "a":
-				ci.draw_arc(Vector2(blade * 0.6, 0), 4.0, -1.2, 1.2, 8, bright, 1.2, true)
-		"swarm_pods":
-			# A missile rack; Cluster Warheads fatten the tips, Hunter Swarm adds a row.
-			var rows := 3 if fork == "b" else 2
-			Art.shape(ci, PackedVector2Array([Vector2(-6, -4.5), Vector2(4, -4.5), Vector2(4, 4.5), Vector2(-6, 4.5)]), dark, color, 1.2)
-			for r in rows:
-				for c in 2:
-					ci.draw_circle(Vector2(5.0 - r * 3.0, -2.5 + c * 5.0), 1.6 if fork != "a" else 2.2, bright)
+				ci.draw_line(Vector2(14.5, 0), Vector2(17.5, sin(time * 30.0) * 2.0), Color(0.8, 1, 1), 1.2, true)
 		"orbital_halo":
-			ci.draw_arc(Vector2.ZERO, 5.5, 0, TAU, 14, color, 1.6, true)
 			for i in 3:
-				var a := time * 4.0 + TAU * i / 3.0
-				ci.draw_circle(Vector2.from_angle(a) * 5.5, 1.6, bright)
+				ci.draw_circle(Vector2.from_angle(time * 4.0 + TAU * i / 3.0) * 6.5, 1.5, bright)
 		"starfall":
-			# A beacon mast with a Mawjig orb.
-			ci.draw_line(Vector2(-4, 0), Vector2(8, 0), dark.lightened(0.3), 2.0, true)
-			ci.draw_circle(Vector2(9, 0), 3.0 + 0.5 * sin(time * 5.0), bright)
 			if fork == "b":
 				for i in 3:
-					ci.draw_circle(Vector2(9, 0) + Vector2.from_angle(time * 3.0 + TAU * i / 3.0) * 5.0, 1.0, color)
-		"mirror_aegis":
-			# A curved mirror plate; Bastion makes it a full wall.
-			var span := 1.1 if fork != "b" else 1.5
-			ci.draw_arc(Vector2(-4, 0), 8.0, -span, span, 10, bright, 2.4, true)
-			ci.draw_arc(Vector2(-4, 0), 6.0, -span, span, 10, Art.with_alpha(Color(0.85, 1, 1), 0.5), 1.0, true)
-		"graze_engine":
-			for side in [-1.0, 1.0]:
-				ci.draw_colored_polygon(PackedVector2Array([Vector2(-6, 0), Vector2(4, 6 * side), Vector2(2, 2 * side)]), color)
-			ci.draw_circle(Vector2(-6, 0), 1.8, bright)
-		"overheat_core":
-			# Radiator fins that glow hotter with level.
-			for i in 3:
-				ci.draw_line(Vector2(-5 + i * 4.0, -5), Vector2(-5 + i * 4.0, 5), color, 2.0, true)
-			ci.draw_circle(Vector2(0, 0), 2.0, Color(1, 0.5 + 0.1 * level, 0.2))
-		"nova_bomb":
-			Art.shape(ci, Art.star(4, 6.0, 2.5), Art.with_alpha(color, 0.6), bright, 1.2)
-			if fork == "b":
-				ci.draw_circle(Vector2(0, 0), 1.6, Color(1, 1, 0.8))
+					ci.draw_circle(Vector2(8.5, 0) + Vector2.from_angle(time * 3.0 + TAU * i / 3.0) * 4.5, 0.9, color)
 		"time_brake":
-			ci.draw_arc(Vector2.ZERO, 5.5, 0, TAU, 14, color, 1.4, true)
-			ci.draw_line(Vector2.ZERO, Vector2.from_angle(time * (0.5 if level > 0 else 0.0)) * 4.5, bright, 1.4, true)
-			ci.draw_line(Vector2.ZERO, Vector2(0, -3.5), bright, 1.2, true)
-		"option_pods":
-			# The pods' docking cradle: two empty sockets with a glow while they're out flying.
-			for y in [-3.5, 3.5]:
-				ci.draw_arc(Vector2(0, y), 3.0, 0, TAU, 8, color, 1.4, true)
-			ci.draw_line(Vector2(-5, 0), Vector2(4, 0), dark.lightened(0.3), 2.0, true)
-		"soul_lantern":
-			Art.shape(ci, PackedVector2Array([Vector2(-4, -4), Vector2(4, -4), Vector2(4, 4), Vector2(-4, 4)]), Art.with_alpha(color, 0.35), color, 1.2)
-			ci.draw_circle(Vector2.ZERO, 2.0 + 0.6 * sin(time * 7.0), bright)
-		"ion_cannon":
-			Art.shape(ci, PackedVector2Array([Vector2(-6, -3.5), Vector2(10, -2.5), Vector2(10, 2.5), Vector2(-6, 3.5)]), dark, color, 1.2)
-			ci.draw_circle(Vector2(10, 0), 2.2, bright)
-		"thruster_explosion":
-			# Twin booster bells that flare orange.
-			for y in [-3.0, 3.0]:
-				ci.draw_colored_polygon(PackedVector2Array([Vector2(-2, y - 1.5), Vector2(-8, y - 3.0), Vector2(-8, y + 3.0), Vector2(-2, y + 1.5)]), color)
-			ci.draw_circle(Vector2(-9, 0), 2.0 + sin(time * 20.0), Color(1, 0.7, 0.3))
-		_:
-			ci.draw_circle(Vector2.ZERO, 3.0, color)
+			ci.draw_line(Vector2.ZERO, Vector2.from_angle(time * (0.5 if level > 0 else 0.0)) * 3.2, bright, 1.1, true)

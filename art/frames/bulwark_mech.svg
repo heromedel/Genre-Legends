@@ -69,7 +69,9 @@
   <path d="M-13,-15 C-6,-21 6,-21 13,-15 L11,-11 C5,-16 -5,-16 -11,-11 Z" fill="#ffb26b"/>
   <path d="M0.5,-19.5 C6,-19.2 10,-17.4 13,-15 L11,-11 C8,-13.6 4.4,-15.2 0.5,-15.8 Z" fill="#d97a34"/>
   <path d="M-12,-15.2 C-6,-20 -1,-20.2 0,-20.2" stroke="#ffe3c7" stroke-width="1.2" fill="none"/>
-  <path d="M-5,-17.6 L5,-17.6" stroke="#99d9ff" stroke-width="1.8"/>
+  <!-- a chevron on the shield, pointing where it faces -->
+  <path d="M-6,-14.6 L0,-19 L6,-14.6" stroke="#2a1206" stroke-width="3.6" fill="none"/>
+  <path d="M-6,-14.6 L0,-19 L6,-14.6" stroke="#99d9ff" stroke-width="2" fill="none"/>
 </g>
 
 <!-- Helmet: low and armoured, sunk between the shoulders; a narrow visor slit at the front -->
@@ -77,7 +79,7 @@
   <path d="M-5.5,-9 L5.5,-9 L6,-1 L-6,-1 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2"/>
   <path d="M-5.5,-9 L5.5,-9 L6,-1 L-6,-1 Z" fill="#e08840"/>
   <path d="M0.5,-9 L5.5,-9 L6,-1 L0.5,-1 Z" fill="#a8541d"/>
-  <path d="M-4.6,-8 L4.6,-8" stroke="#9ff6ff" stroke-width="1.6"/>
+  <path d="M-4.6,-8 L4.6,-8" stroke="#9ff6ff" stroke-width="2.4"/>
 </g>
 
 </g>

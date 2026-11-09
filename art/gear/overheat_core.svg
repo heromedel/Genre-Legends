@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32">
+<!-- Overheat Core: a radiator block with three fins around a hot core.
+     Gear part, facing up (forward), about 12 units across. Five passes: outline, fill, shading, highlights, details.
+     "#39ff14" is the tech's glow (swapped for its element colour); groups named fork_a / fork_b show with that fork. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+  <path d="M-5,-4 L5,-4 L5,5 L-5,5 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.6"/>
+  <path d="M-5,-4 L5,-4 L5,5 L-5,5 Z" fill="#55697d"/>
+  <path d="M1.0,-4 L5,-4 L5,5 L1.0,5 Z" fill="#3a4a5a"/>
+  <path d="M-4.5,4.5 L-4.5,-3.5 L0.0,-3.5" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <path d="M-4.4,-8 L-2.6000000000000005,-8 L-2.6000000000000005,-3.5999999999999996 L-4.4,-3.5999999999999996 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.1"/>
+  <path d="M-4.4,-8 L-2.6000000000000005,-8 L-2.6000000000000005,-3.5999999999999996 L-4.4,-3.5999999999999996 Z" fill="#3a4a5a"/>
+  <path d="M-3.3200000000000003,-8 L-2.6000000000000005,-8 L-2.6000000000000005,-3.5999999999999996 L-3.3200000000000003,-3.5999999999999996 Z" fill="#2a3644"/>
+  <path d="M-3.9000000000000004,-4.1 L-3.9000000000000004,-7.5 L-3.5000000000000004,-7.5" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <path d="M-0.9,-8 L0.9,-8 L0.9,-3.5999999999999996 L-0.9,-3.5999999999999996 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.1"/>
+  <path d="M-0.9,-8 L0.9,-8 L0.9,-3.5999999999999996 L-0.9,-3.5999999999999996 Z" fill="#3a4a5a"/>
+  <path d="M0.18000000000000005,-8 L0.9,-8 L0.9,-3.5999999999999996 L0.18000000000000005,-3.5999999999999996 Z" fill="#2a3644"/>
+  <path d="M-0.4,-4.1 L-0.4,-7.5 L0.0,-7.5" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <path d="M2.6,-8 L4.4,-8 L4.4,-3.5999999999999996 L2.6,-3.5999999999999996 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.1"/>
+  <path d="M2.6,-8 L4.4,-8 L4.4,-3.5999999999999996 L2.6,-3.5999999999999996 Z" fill="#3a4a5a"/>
+  <path d="M3.68,-8 L4.4,-8 L4.4,-3.5999999999999996 L3.68,-3.5999999999999996 Z" fill="#2a3644"/>
+  <path d="M3.1,-4.1 L3.1,-7.5 L3.5,-7.5" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <circle cx="0" cy="0.5" r="2.9" fill="#0a1628"/>
+  <circle cx="0" cy="0.5" r="2.2" fill="#ff7a2a"/>
+  <circle cx="-0.5" cy="0" r="0.9" fill="#ffe0b0"/>
+</g>
+</svg>
