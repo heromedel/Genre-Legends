@@ -90,6 +90,13 @@
 1. Horde Siege.
 2. Titan Hunt and the combined super-robot form.
 
+## Plan H: Real environmental hazards (idea, heromedel 2026-11-09)
+
+(Note) Proposed (2026-11-09): saved as an idea for the roadmap; not planned into a build yet. Planets where the place itself fights everyone, not just you (GDD 12D's special conditions, made physical).
+
+1. Meteor swarms: meteors cross the field and can hit you or your shields, and maybe enemies and their shields too.
+2. Ion storms: ion pulses that knock one or two pieces of your equipment offline for 15 to 30 seconds. (Ai-Generated-Proposal: this could become what the existing "Ion Storm" special condition does; today it only speeds up enemy shots.)
+
 ## Plan G: Realms (later)
 
 1. The first realm: a dimension reached through a rare event, with its own galaxy, look and rules (GDD 10B, 10E).

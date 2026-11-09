@@ -152,6 +152,8 @@
 - **11J. Likely (2026-11-08):** Bullets that glow in the dark are an accessibility option, not a rule: Settings, "Bullets glow in the dark: Off > On".
 - **11H. Ai-Generated-Proposal (2026-11-08):** Explosive Resonance III is renamed Wildfire, and burning effects never mention the ground, since many fights are in space.
 
+- **11X. Proposed (2026-11-09):** Real environmental hazards on some planets: meteor swarms that can hit you or your shields (and maybe enemies and theirs), and ion storms whose pulses knock one or two pieces of equipment offline for 15 to 30 seconds. (heromedel's idea, saved for the roadmap: Plan H.)
+
 ## 12. Build 0.3 Content
 
 - **12A. Ai-Generated-Proposal (2026-11-08):** Each mission type has two bosses and (from build 0.3.2) three mini-bosses; a planet's pair is fixed by the map and shown on its card. The first planet always has the classic pair, and the Tempest Run ends on the Bounty Hunter Ace.
@@ -184,6 +186,7 @@
 | 2026-11-09 | 11N to 11Q | Auto-fire becomes an option in every mode; options on the pause menu; Ricochet comes back from off screen; a boss that falls as you do counts as a win. |
 | 2026-11-09 | 9H | Resonance tiers made obvious (card badge, splash on pick, frame glow) and the flat tiers reworked into visible effects. |
 | 2026-11-09 | 11R to 11T | Tabs on top and the planet card under a full-width star map; banners that stay up long enough to read; risky cards with their own prices. |
+| 2026-11-09 | 11X | Environmental hazards (meteor swarms, ion storms) saved as an idea: ROADMAP Plan H. |
 | 2026-11-09 | 11U, 11V | Missions autosave and can be continued after the browser closes; no accidental upgrade picks. |
 | 2026-11-09 | 5E, 7G | A real transformation between forms (spin as a setting while it's compared); fusions stay at max level if they're impressive enough. |
 | 2026-11-09 | 4F | A wording checker for player-facing text. |
