@@ -4,8 +4,8 @@
 reviewed, the agreed points move into the GDD as section 13 with their tags, and this file becomes the build plan.
 Every point is Ai-Generated-Proposal unless it names heromedel's words and carries their tag.
 
-Based on: 27 points. 2 agreed (the two new slots, the Armor name), 11 proposals (heromedel's Proposed direction),
-14 filled in here (7% / 41% / 52%).
+Based on: 33 points. 2 agreed (the two new slots, the Armor name), 11 proposals (heromedel's Proposed direction),
+20 filled in here (6% / 33% / 61%). Revised the same day after a second research pass on frames, parts and stats.
 
 ## Why
 
@@ -55,6 +55,25 @@ Based on: 27 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
     attrition to death.
   - Telegraphs need to land well inside reaction time: about 100 ms to notice, and anything slower than about
     200 ms feels sluggish.
+- **Second pass, frames and parts (2026-11-09):**
+  - Armored Core 6: two hard sortie limits (leg load, generator output) and one soft one (arms load). Light,
+    medium and heavy aren't classes; they come from parts, and the parts that matter change how you move (hover,
+    jump, no jump) as well as the numbers. Selling a part back refunds it in full so players experiment.
+  - MechWarrior Online: a chassis' fixed hardpoints give it identity more than percentage quirks. Hidden "ghost
+    heat" is widely resented.
+  - FTL: every system bar needs a reactor bar; the Kestrel starts with exactly 8 of 8 used. The Stealth cruiser
+    swaps shields for a cloak. Critics note power is rarely re-routed mid-fight, so the budget matters most when
+    building.
+  - Into the Breach: reactor cores as countable pips; a weapon on the "wrong" mech costs more cores rather than
+    being banned. Its designers found animated previews worked where text descriptions failed.
+  - Roguelite progress: unlocks that add options (FTL layouts, Hades aspects) age better than flat stat gains
+    (Rogue Legacy 2's rising prices were its biggest criticism). Opt-in difficulty (Hades' Heat, Dead Cells' Boss
+    Cells) hands challenge back.
+  - Optional overheat is fun when the player chose it, running hot is rewarded (Darktide's Peril, Deep Rock's
+    unstable overclocks), venting is a skill and the heat shows on the character; it's annoying when hidden or
+    when it locks out control for long.
+  - People count up to about four things at a glance; past that they have to count. Six Armor ticks read better
+    grouped in threes.
 - **Not confirmed by any source:** the base length of Isaac's and Gungeon's immunity after a hit.
 
 ## 13. Damage, Loadout and Frames
@@ -66,7 +85,8 @@ Based on: 27 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
   - **Likely (2026-11-09):** The pool is called **Armor**: the mech is power armor, and the name reminds you someone
     is inside it. (heromedel.) The old armor and shield pools merge into it.
   - **Ai-Generated-Proposal:**
-    - The bar has a tick every 10, so you read it as hits.
+    - The bar has a tick every 10, so you read it as hits; every third tick is taller, so six hits read as two
+      groups of three at a glance.
     - A hit flashes the ticks it took away.
 - **13B. Proposed (2026-11-09):** The starter frame has no shield and about 6 hits. (heromedel.)
   - **Ai-Generated-Proposal:** Vanguard has 60 Armor. Planet 1 Standard's bullets do 7, so the starter can take about
@@ -173,25 +193,46 @@ Based on: 27 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
       Off > On"). (heromedel.)
     - **Overheat Core** becomes the overclocker's tech. Its vent fires on every overheat and grows with the heat you
       had built up. That way the name finally means what it says.
-  - **Ai-Generated-Proposal: sample numbers** (in tons and Mawjigs, Mj), to show the shape:
+  - **Ai-Generated-Proposal (revised after the second research pass): counted in pips, not tons.**
+    - Load and Output are small whole numbers shown as pips, the way FTL shows reactor power and Into the Breach
+      shows reactor cores: a part weighs 1 to 4 pips and draws 0 to 3. At a glance on an iPad, you can count pips;
+      "112 t of 120 t" you have to read.
+    - The Hangar shows two pip rows, Load and Output. Pips past your Output turn orange and the row reads
+      **OVERCLOCKED**, so going over is a visible choice and never a hidden penalty (MechWarrior Online's "ghost
+      heat" is the cautionary tale: invisible penalties are resented).
+  - **Ai-Generated-Proposal: the element decides the cost, so no part needs its own special rule.** Energy and Mawjig
+    tech is light but draws power; Kinetic and Explosive tech is heavy and draws little or none. That ties the two
+    meters to Resonance (GDD 9H): an energy build leans on Output, an explosive build leans on Load, and the frames
+    that favour one or the other (13O) favour those builds.
 
-    | Part | Weight | Draw |
-    |---|---|---|
-    | Pulse Driver / Thunder Lance / Hex Repeater | 8 / 12 / 10 | 10 / 25 / 20 |
-    | Swarm Pods / Orbital Halo / Starfall | 14 / 10 / 12 | 5 / 15 / 20 |
-    | Shield Generator / Arc Blade / Mirror Aegis / Soul Lantern | 10 / 8 / 12 / 6 | 30 / 25 / 35 / 30 |
-    | Graze Engine / Overheat Core / Option Pods | 4 / 8 / 10 | 10 / 15 / 20 |
-    | Coolant Loop / Auxiliary Generator | 8 / 18 | 0 / adds 30 |
-    | Nova Bomb / Time Brake / Ion Cannon / Thruster Explosion | 10 / 6 / 14 / 10 | 10 / 25 / 30 / 10 |
-    | Standard / Heavy / Light / Ablative Plating | 15 / 40 / 5 / 20 | 0 |
+    | Part | Element | Weight | Draw |
+    |---|---|---|---|
+    | Pulse Driver / Thunder Lance / Hex Repeater | E / E / M | 1 / 1 / 1 | 1 / 3 / 2 |
+    | Swarm Pods / Orbital Halo / Starfall | X / K / M | 3 / 2 / 1 | 0 / 1 / 3 |
+    | Shield Generator / Arc Blade / Mirror Aegis / Soul Lantern | E / E / E / M | 1 / 1 / 1 / 1 | 3 / 2 / 3 / 2 |
+    | Graze Engine / Overheat Core / Drone Pods | K / X / K | 1 / 2 / 2 | 0 / 0 / 1 |
+    | Coolant Loop / Auxiliary Generator | none | 2 / 3 | 0 / adds 3 |
+    | Nova Bomb / Time Brake / Ion Cannon / Thruster Explosion | X / M / E / K | 2 / 1 / 2 / 2 | 0 / 3 / 3 / 0 |
+    | Standard / Heavy / Light / Ablative Plating | none | 2 / 4 / 1 / 3 | 0 |
 
-    - The starter build is Pulse Driver, Arc Blade, Nova Bomb and Standard Plating: 41 t and 45 Mj on a 90 t /
-      100 Mj Vanguard. That leaves room to grow.
-    - A greedy mid-game build is Thunder Lance, Swarm Pods, Orbital Halo, Shield Generator, Option Pods, Ion Cannon
-      and Heavy Plating: 110 t and 125 Mj.
-      - That's over load, so it can't launch.
-      - Swap in Standard Plating and it fits at 85 t, but it's still 25 Mj over output: overclocked.
-      - From there you choose: drop the Halo, fit an Auxiliary Generator in place of Option Pods, or run hot.
+    - The starter build (Pulse Driver, Arc Blade, Nova Bomb, Standard Plating) is 6 Load and 3 Output on a
+      12 / 9 Vanguard: room to grow.
+    - A greedy mid-game build (Thunder Lance, Swarm Pods, Orbital Halo, Shield Generator, Drone Pods, Ion Cannon,
+      Heavy Plating) is 15 Load and 11 Output.
+      - Over Load, so it can't launch.
+      - With Standard Plating it's 13: still over by one. Swap the Halo for Starfall and it fits at 12, but now it
+        draws 13 of 9 Output: four pips overclocked.
+      - From there: drop a powered part, trade Drone Pods for an Auxiliary Generator, move to the Tempest, or run hot.
+  - **Ai-Generated-Proposal: heat, in numbers to start tuning from.**
+    - Heat only exists on an overclocked build. It rises 2.5% a second for each pip over Output while you fight;
+      Coolant Loop takes away one pip's worth. Two pips over is an overheat about every 20 s; four pips over, every
+      10 s.
+    - The frame shows it: vents glow orange, then red, before it vents (Hawken drops its arms; heat on the frame
+      reads faster than a bar).
+    - The vent is short (3 s) and only switches off powered parts; unpowered weapons keep firing. Players who never
+      overclock never see any of it.
+    - Running hot is rewarded, not just allowed (Darktide's Peril, Deep Rock's unstable overclocks): Overheat Core
+      pays off the hotter you run, and its vent blast grows with the heat you'd built.
 
 ### Frames
 
@@ -202,14 +243,28 @@ Based on: 27 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
 
     | Frame | Armor | Load | Output | Speed | Identity |
     |---|---|---|---|---|---|
-    | Vanguard (starter) | 60, +20 built in | 90 t | 100 Mj | 300 | A simple beginner build: built-in extra plating worth 2 more hits, replacing Second Wind (heromedel, Proposed). |
-    | Tempest | 40 | 70 t | 130 Mj | 370 | Fast and fragile, the energy frame: overclocks easily. Afterimage stays. |
-    | Bulwark | 90 | 140 t | 80 Mj | 250 | Carries anything but powers little: heavy plating and kinetic weapons. Fortress Field reflects a quarter of the bullets that hit its front, with no shield needed. |
-    | Later frames | | | | | **Proposed (heromedel):** a built-in Arc Blade, a built-in shield, or built-in mini missiles, using none of the frame's own load. **Ai-Generated-Proposal:** one built to overclock, with high cooling. |
+    | Vanguard (starter) | 60, +20 built in | 12 | 9 | 300 | A simple beginner build: built-in extra plating worth 2 more hits, replacing Second Wind (heromedel, Proposed). Balanced, so either element fits. |
+    | Tempest | 40 | 9 | 13 | 370 | Fast and fragile, the energy frame: Energy and Mawjig builds fit, and it has room to overclock. Afterimage stays. |
+    | Bulwark | 90 | 16 | 6 | 250 | Carries anything but powers little: the Kinetic and Explosive frame. Fortress Field reflects a quarter of the bullets that hit its front, with no shield needed. |
+    | Later frames | | | | | **Proposed (heromedel):** a built-in Arc Blade, a built-in shield, or built-in mini missiles. **Ai-Generated-Proposal:** one built to overclock, with high cooling. |
 
+  - **Ai-Generated-Proposal: a built-in part fills a slot for good.** A frame with a built-in Arc Blade has its
+    Generator slot taken by the blade, costing no Load or Output, and you can't change it. Identity from what you
+    can't change is what makes FTL's Stealth cruiser (no shields, a cloak instead) and MechWarrior's fixed hardpoints
+    memorable; percentage bonuses read as patches. Vanguard's built-in plating is the exception: it's extra Armor on
+    top of its plating slot, which keeps the starter simple.
+  - **Ai-Generated-Proposal: a part changes how you move, not only a number** (Armored Core 6's legs). Light Plating
+    adds the flick dash; Heavy Plating lets you **ram**: small enemies you run into take heavy damage and you take
+    half the contact damage. Each plating is then a different way to play, not a bigger or smaller number.
   - **Proposed (2026-11-09):** Frame upgrades use **frame blueprints**. (heromedel.)
-    - **Ai-Generated-Proposal:** Frame blueprints drop like tech blueprints, from planets that show one on the card,
-      and each frame upgrade (Armor, Max Load, Mawjig Output, Cooling) costs a rising number of them.
+    - **Ai-Generated-Proposal:**
+      - Frame blueprints drop like tech blueprints, from planets that show one on the card.
+      - Each frame has three upgrade tiers. Each tier picks one of +1 Load, +1 Output, +10 Armor or better
+        Cooling, so two Vanguards can grow differently. Tiers cost 3, 6 and 10 blueprints.
+      - The caps are kept small on purpose. Research on Rogue Legacy 2 and Hades shows flat stat growth erodes
+        difficulty; new frames and choices keep progress interesting without making planet 1 trivial later.
+      - The Threat setting (Standard > Veteran > Casual) stays the way to make the game harder or easier on purpose,
+        like Hades' Heat or Dead Cells' Boss Cells.
 
 ### Difficulty targets
 
