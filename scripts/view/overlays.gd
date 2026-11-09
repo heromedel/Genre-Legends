@@ -45,7 +45,9 @@ class Card:
 	var card: Dictionary
 	var on_pick: Callable
 	var appear := 0.0
-	var touched := false          # the finger came down on this card after it appeared
+	var touched := false          # the finger came down on this card after it settled
+	var age := 0.0                # seconds since the card appeared
+	var press_at := Vector2.ZERO  # where the finger came down
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
@@ -53,16 +55,20 @@ class Card:
 
 	func _process(delta: float) -> void:
 		appear = minf(appear + delta * 4.0, 1.0)
+		age += delta
 		queue_redraw()
 
 	func _gui_input(event: InputEvent) -> void:
-		# A pick is a tap that starts and ends on the card: a finger already down when the cards appeared
-		# (still steering) that lifts over one doesn't pick it (heromedel lost an upgrade that way).
+		# A pick is a deliberate tap: it starts on the card once the cards have settled, and the finger
+		# doesn't slide on the way. A finger still steering when the cards appear, or one that slips across
+		# the screen, picks nothing (heromedel lost upgrades both ways).
 		if Overlays.is_tap_down(event):
-			touched = appear >= 1.0
+			touched = age >= Overlays.CARD_SETTLE_SECONDS
+			press_at = event.position
 		elif Overlays.is_tap_up(event) and touched and on_pick.is_valid():
 			touched = false
-			on_pick.call()
+			if event.position.distance_to(press_at) <= Overlays.TAP_SLOP:
+				on_pick.call()
 			accept_event()
 
 	func _draw() -> void:
@@ -125,6 +131,12 @@ class Card:
 		lines.append(current)
 		for i in lines.size():
 			draw_string(font, at + Vector2(0, i * (font_size + 4)), lines[i], HORIZONTAL_ALIGNMENT_CENTER, width, font_size, color)
+
+
+## Cards ignore taps for this long after they appear, so a finger already moving can't land a pick.
+const CARD_SETTLE_SECONDS := 0.5
+## How far a finger may slide between touching and lifting and still count as a tap, not a slip.
+const TAP_SLOP := 24.0
 
 
 ## A finger or the mouse coming down (the emulated mouse copy of a touch is ignored).

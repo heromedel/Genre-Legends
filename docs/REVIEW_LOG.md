@@ -7,6 +7,7 @@ a design point).
 
 | Review | Subject | Finding | Status | Note |
 |---|---|---|---|---|
+| heromedel (2026-11-09) | Level-up cards | A finger slipping on the screen sometimes picks an upgrade by accident. | **Fixed** (0.5) | Cards ignore taps for their first half second, and a touch that slides more than 24 px isn't a pick. |
 | Wording check (2026-11-09) | Storm Halo, Wraith Drive, Event Horizon | Storm Halo left out its arcing hits; Wraith Drive ran on; Event Horizon undersold eating bullets. | **Fixed** (0.5) | The checker's rewrites. |
 | heromedel (2026-11-09) | Level-up cards | A level-up vanished without a pick after a long finger hold. | **Fixed** (0.5) | Cards (and the crate summary) picked on any release, even of a finger already down when they appeared. Now a pick is a tap that starts and ends on the card. |
 | heromedel (2026-11-09) | Build panel, cards | The pause screen lists fusions that can't happen this mission (every tech capped below level 5). | **Fixed** (0.5) | The Build panel and "Toward fusion" hints only mention fusions this mission can reach (RunState.can_fuse). |
