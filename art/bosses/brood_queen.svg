@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -80 160 160">
+<!-- Brood Queen body: a bloated armoured insect, abdomen ribbed, legs drawn by BossArt. Facing up; the head is
+     its own piece.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M0,-40 C26,-40 44,-20 44,4 C44,30 26,48 0,50 C-26,48 -44,30 -44,4 C-44,-20 -26,-40 0,-40 Z" fill="#0c1806" stroke="#0c1806" stroke-width="4"/>
+<path d="M0,-40 C26,-40 44,-20 44,4 C44,30 26,48 0,50 C-26,48 -44,30 -44,4 C-44,-20 -26,-40 0,-40 Z" fill="#6a9a30"/>
+<path d="M1,-40 C26,-40 44,-20 44,4 C44,30 26,48 1,50 Z" fill="#4e7822"/>
+<path d="M-40,-4 C-30,6 30,6 40,-4 M-42,14 C-30,24 30,24 42,14 M-36,32 C-24,40 24,40 36,32" stroke="#2c4a12" stroke-width="2.4" fill="none"/>
+<path d="M-30,-30 C-38,-22 -42,-12 -42,-2" stroke="#d4f8a0" stroke-width="2.4" fill="none"/>
+<path d="M-20,-28 L20,-28" stroke="#2c4a12" stroke-width="2"/>
+<circle cx="-14" cy="-10" r="3" fill="#c8ff60"/><circle cx="14" cy="-10" r="3" fill="#a8e040"/>
+</g>
+</svg>

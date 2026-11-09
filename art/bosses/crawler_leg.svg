@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -80 160 160">
+<!-- Siege Crawler leg turret: the armoured foot at the end of a leg, a gun port glowing in it. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M0,-25 L22,-12 L22,12 L0,25 L-22,12 L-22,-12 Z" fill="#1a0e06" stroke="#1a0e06" stroke-width="4"/>
+<path d="M0,-25 L22,-12 L22,12 L0,25 L-22,12 L-22,-12 Z" fill="#a8683a"/>
+<path d="M1,-25 L22,-12 L22,12 L1,25 Z" fill="#7e4a24"/>
+<path d="M-1,-22 L-20,-11 L-20,6" stroke="#ffd8a8" stroke-width="2" fill="none"/>
+<circle cx="0" cy="0" r="10" fill="#1a0e06"/>
+<g id="port"><circle cx="0" cy="0" r="7" fill="#ffb347"/><circle cx="0" cy="0" r="3" fill="#fff1c4"/></g>
+</g>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -80 160 160">
+<!-- Siege Crawler body: a hexagonal armoured hull, plated and riveted, around its core. Centred on the boss;
+     it turns slowly. The cracks show once its legs are gone and it collapses.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M-32,-55 L32,-55 L64,0 L32,55 L-32,55 L-64,0 Z" fill="#1a0e06" stroke="#1a0e06" stroke-width="5"/>
+<path d="M-32,-55 L32,-55 L64,0 L32,55 L-32,55 L-64,0 Z" fill="#8a5630"/>
+<path d="M2,-55 L32,-55 L64,0 L32,55 L2,55 Z" fill="#6a3e20"/>
+<path d="M-64,0 L-32,55 L32,55 L64,0 L56,0 L28,46 L-28,46 L-56,0 Z" fill="#54301a"/>
+<path d="M-30,-51 L-59,0 M-30,-51 L0,-51" stroke="#f0c090" stroke-width="3" fill="none"/>
+<path d="M-22,-38 L22,-38 L44,0 L22,38 L-22,38 L-44,0 Z" fill="#1a0e06" stroke="#1a0e06" stroke-width="3"/>
+<path d="M-22,-38 L22,-38 L44,0 L22,38 L-22,38 L-44,0 Z" fill="#a8683a"/>
+<path d="M2,-38 L22,-38 L44,0 L22,38 L2,38 Z" fill="#83502a"/>
+<path d="M-20,-35 L-41,0" stroke="#ffd8a8" stroke-width="2" fill="none"/>
+<g fill="#ffcc3a"><path d="M-58,-6 L-52,-16 L-46,-16 L-52,-6 Z"/><path d="M58,6 L52,16 L46,16 L52,6 Z"/></g>
+<g fill="#c88a50"><circle cx="-28" cy="-48" r="2.6"/><circle cx="28" cy="-48" r="2.6"/><circle cx="-28" cy="48" r="2.6"/><circle cx="28" cy="48" r="2.6"/><circle cx="-56" cy="0" r="2.6"/><circle cx="56" cy="0" r="2.6"/></g>
+<g id="cracks"><path d="M-50,-20 L-20,0 L-30,30 M40,-30 L18,4 L44,26 M-6,-50 L4,-30" stroke="#0a0402" stroke-width="3.4" fill="none"/>
+<path d="M-48,-19 L-22,-1 M40,-28 L20,2" stroke="#ff7a3a" stroke-width="1.2" fill="none" opacity="0.8"/></g>
+</g>
+</svg>

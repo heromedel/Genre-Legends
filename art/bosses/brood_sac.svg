@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -80 160 160">
+<!-- Brood Queen egg sac: a swollen translucent sac crowded with eggs. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<circle cx="0" cy="0" r="28" fill="#0c1806" opacity="0.9"/>
+<circle cx="0" cy="0" r="26" fill="#8cd04a" opacity="0.92"/>
+<path d="M0,-26 A26,26 0 0 1 0,26 A20,26 0 0 0 0,-26 Z" fill="#62a030" opacity="0.9"/>
+<g fill="#e8ffb8"><circle cx="-10" cy="-8" r="5"/><circle cx="6" cy="-12" r="4.4"/><circle cx="12" cy="4" r="5"/><circle cx="-4" cy="10" r="4.6"/><circle cx="-14" cy="6" r="3.6"/></g>
+<g fill="#ffffff"><circle cx="-11.4" cy="-9.6" r="1.6"/><circle cx="4.8" cy="-13.4" r="1.4"/><circle cx="10.6" cy="2.6" r="1.6"/></g>
+<path d="M-18,-16 A24,24 0 0 1 -4,-24" stroke="#ffffff" stroke-width="2.4" fill="none" opacity="0.8"/>
+</g>
+</svg>
