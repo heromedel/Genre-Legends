@@ -23,7 +23,13 @@ var blocked_rects: Array = []       # screen rects owned by buttons (special, pa
 var _drag_accumulated := Vector2.ZERO
 var _special_queued := false
 var _choice_queued := -1
-var _touches := {}                  # index -> {role, origin, pos, last}
+var _touches := {}                  # index -> {role, origin, pos, last, seen, down, special}
+## Double-tap special (Settings): a quick tap, then a second touch held nearby, aims (or steers) as usual and
+## fires the special when it lifts, so the thumb never leaves the stick for the button (heromedel's gesture).
+var _last_tap := {}                 # the last short tap: {role, pos, at}
+const DOUBLE_TAP_MSEC := 400
+const DOUBLE_TAP_DISTANCE := 140.0
+const TAP_MSEC := 300
 var _mouse_down := false
 var _mouse_last := Vector2.ZERO
 var _mouse_aim := Vector2.ZERO
@@ -163,10 +169,22 @@ func _on_touch(event: InputEventScreenTouch) -> void:
 			for index in _touches.keys():
 				if _touches[index]["role"] == role:
 					_touches.erase(index)
+		var now := Time.get_ticks_msec()
+		var double_tap: bool = Save.setting("double_tap_special") and not _last_tap.is_empty() and _last_tap["role"] == role \
+			and now - int(_last_tap["at"]) < DOUBLE_TAP_MSEC and event.position.distance_to(_last_tap["pos"]) < DOUBLE_TAP_DISTANCE
+		_last_tap = {}
 		_touches[event.index] = {"role": role, "origin": event.position, "pos": event.position, "last": event.position,
-			"seen": Time.get_ticks_msec()}
+			"seen": now, "down": now, "special": double_tap}
 	else:
+		var touch: Dictionary = _touches.get(event.index, {})
 		_touches.erase(event.index)
+		if not touch.is_empty():
+			var now := Time.get_ticks_msec()
+			if touch.get("special", false):
+				PlayLog.note("input", "double-tap special")
+				queue_special()
+			elif now - int(touch["down"]) < TAP_MSEC and event.position.distance_to(touch["origin"]) < 30.0:
+				_last_tap = {"role": touch["role"], "pos": event.position, "at": now}
 	queue_redraw()
 
 
@@ -224,6 +242,11 @@ func _on_drag(event: InputEventScreenDrag) -> void:
 
 func _draw() -> void:
 	for touch in _touches.values():
+		# A double-tap special touch glows gold: lifting it fires the special.
+		if touch.get("special", false):
+			var pulse := 0.6 + 0.4 * sin(Time.get_ticks_msec() / 80.0)
+			draw_arc(touch["pos"], 40.0, 0, TAU, 32, Color(1, 0.8, 0.3, pulse), 4.0, true)
+			draw_circle(touch["pos"], 30.0, Color(1, 0.8, 0.3, 0.18))
 		if touch["role"] == "drag":
 			continue
 		var origin: Vector2 = touch["origin"]

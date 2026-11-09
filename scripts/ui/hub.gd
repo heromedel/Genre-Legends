@@ -767,6 +767,8 @@ func _build_settings_page() -> Control:
 	column.add_child(SettingsControls.slider("Sound effects", "sfx"))
 	column.add_child(SettingsControls.toggle("Full screen (iPad Safari: applies on your next tap)", "fullscreen"))
 	column.add_child(_threat_picker())
+	column.add_child(SettingsControls.toggle("Double-tap special", "double_tap_special"))
+	column.add_child(UiKit.wrapped("Tap, then tap again and hold: the second touch aims (or steers) as usual and fires your special when you lift it.", 13, Color(0.65, 0.75, 0.88)))
 	column.add_child(SettingsControls.toggle("Transformation spin", "transform_spin"))
 	column.add_child(UiKit.wrapped("Your frame spins a full turn as it changes between ship and mech.", 13, Color(0.65, 0.75, 0.88)))
 	column.add_child(UiKit.label("ACCESSIBILITY", 18, Color(0.6, 0.9, 1.0), "title"))

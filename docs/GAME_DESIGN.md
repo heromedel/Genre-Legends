@@ -148,6 +148,7 @@
   - **Ai-Generated-Proposal (2026-11-09):** Every 5 s (and when the tab loses focus) the checkpoint saves how the mission was launched and every input so far; continuing rebuilds the mission and fast-forwards the deterministic simulation through the inputs, then resumes paused. Abandoning settles it like the pause menu's abandon, so a loss still pays. A checkpoint from an older build can't be replayed, and the player is told so.
 - **11V. Likely (2026-11-09):** Upgrade cards can't be picked by accident. (heromedel.)
   - **Ai-Generated-Proposal (2026-11-09):** A pick is a deliberate tap: it starts on the card, at least half a second after the cards appear, and doesn't slide more than a little.
+- **11W. Likely (2026-11-09):** The special can be fired by a gesture as well as the button: tap, then tap again and hold; the second touch aims (or steers) as usual and fires the special when it lifts. Settings: "Double-tap special: On > Off". (heromedel's gesture.) The mech also keeps its aim for 0.8 s after the aim stick is let go.
 - **11J. Likely (2026-11-08):** Bullets that glow in the dark are an accessibility option, not a rule: Settings, "Bullets glow in the dark: Off > On".
 - **11H. Ai-Generated-Proposal (2026-11-08):** Explosive Resonance III is renamed Wildfire, and burning effects never mention the ground, since many fights are in space.
 
