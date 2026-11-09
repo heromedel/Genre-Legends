@@ -68,7 +68,7 @@ func _draw() -> void:
 	var fade := clampf(1.0 - time / 0.25, 0.0, 1.0) + clampf((time - (length - 0.35)) / 0.35, 0.0, 1.0)
 	if fade > 0.0:
 		draw_rect(Rect2(Vector2.ZERO, screen), Color(0, 0, 0, clampf(fade, 0.0, 1.0)))
-	draw_string(UiKit.font("body"), Vector2(0, screen.y - 22), "Tap to skip", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 14, Color(1, 1, 1, 0.35))
+	draw_string(UiKit.font("bold"), Vector2(0, screen.y - 22), "Tap to skip", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 16, Color(1, 1, 1, 0.65))
 
 
 func _frame(at: Vector2, form: String, facing: float, scale: float, flash: float = 0.0) -> void:
@@ -84,26 +84,25 @@ func _stars(screen: Vector2, speed: float) -> void:
 		draw_line(Vector2(x, y), Vector2(x, y - speed * 0.02 - 1.0), Color(1, 1, 1, 0.5), 1.5)
 
 
-## The Dropship's launch bay seen from above: deck plating, guide lights, and bay doors at the top.
-func _bay(screen: Vector2, c: Vector2, doors_open: float, zoom: float) -> void:
-	var bay := Rect2(c - Vector2(240, 300) * zoom, Vector2(480, 600) * zoom)
-	draw_rect(bay, Color(0.1, 0.12, 0.16))
+## The Dropship seen from above (art/scenes/dropship.svg), its bay doors open by doors_open (0-1), its guide
+## lights chasing toward the bay mouth. rotation PI turns it bow-down (the return trip, climbing in from below).
+func _dropship(center: Vector2, doors_open: float, zoom: float, rotation: float = 0.0) -> void:
+	var xf := Transform2D(rotation, Vector2(zoom, zoom), 0.0, center)
+	# The doors fold back into the hull's sides like a concertina, each toward its own edge (x = -240 / 240).
+	var folded := 1.0 - 0.88 * doors_open
+	VectorArt.draw(self, "res://art/scenes/dropship.svg", xf, {"groups": {
+		"door_l": Transform2D(0.0, Vector2(folded, 1.0), 0.0, Vector2(-240.0 * (1.0 - folded), 0.0)),
+		"door_r": Transform2D(0.0, Vector2(folded, 1.0), 0.0, Vector2(240.0 * (1.0 - folded), 0.0)),
+	}})
+	draw_set_transform_matrix(xf)
 	for i in 7:
-		var y := bay.position.y + (i + 0.5) * bay.size.y / 7.0
-		draw_line(Vector2(bay.position.x, y), Vector2(bay.end.x, y), Color(0.16, 0.19, 0.24), 3.0 * zoom)
-		for side in [0.08, 0.92]:
-			var on := int(time * 6.0 - i) % 7 == 0
-			draw_circle(Vector2(bay.position.x + bay.size.x * side, y), 5.0 * zoom, Color(1, 0.7, 0.25) if on else Color(0.35, 0.25, 0.1))
-	draw_rect(bay, Color(0.45, 0.6, 0.75), false, 4.0 * zoom)
-	# Bay doors slide apart onto open space.
-	var gap := bay.size.x * 0.5 * doors_open
-	var door_h := 70.0 * zoom
-	draw_rect(Rect2(bay.position - Vector2(0, door_h), Vector2(bay.size.x * 0.5 - gap, door_h)), Color(0.3, 0.33, 0.38))
-	draw_rect(Rect2(Vector2(c.x + gap, bay.position.y - door_h), Vector2(bay.size.x * 0.5 - gap, door_h)), Color(0.3, 0.33, 0.38))
-	# The Dropship's hull around the bay.
-	var hull := PackedVector2Array([c + Vector2(-340, -420) * zoom, c + Vector2(340, -420) * zoom, c + Vector2(420, 260) * zoom,
-		c + Vector2(260, 420) * zoom, c + Vector2(-260, 420) * zoom, c + Vector2(-420, 260) * zoom])
-	draw_polyline(hull + PackedVector2Array([hull[0]]), Color(0.45, 0.6, 0.75, 0.8), 6.0 * zoom, true)
+		var y := 260.0 - i * 86.0
+		var lit := int(time * 8.0) % 7 == i
+		for x in [-220.0, 220.0]:
+			draw_circle(Vector2(x, y), 9.0, Color(1, 0.72, 0.28) if lit else Color(0.32, 0.22, 0.1))
+			if lit:
+				Art.draw_glow(self, Vector2(x, y), 30.0, Color(1, 0.6, 0.2, 0.6))
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 func _draw_launch(screen: Vector2, c: Vector2) -> void:
@@ -113,13 +112,20 @@ func _draw_launch(screen: Vector2, c: Vector2) -> void:
 		_stars(screen, 40.0 + maxf(time - 1.5, 0.0) * 900.0)
 		var zoom := 1.0 - clampf((time - 1.5) / 1.1, 0.0, 1.0) * 0.55
 		var bay_center := c + Vector2(0, clampf((time - 1.5) / 1.1, 0.0, 1.0) * 260.0)
-		_bay(screen, bay_center, clampf(time / 1.0, 0.0, 1.0), zoom)
+		_dropship(bay_center, clampf(time / 1.0, 0.0, 1.0), zoom)
 		if time < 1.25:
 			_frame(bay_center + Vector2(0, 80) * zoom, "mech", -PI * 0.5, 3.2 * zoom)
 		else:
 			var lift := clampf((time - 1.5) / 1.1, 0.0, 1.0)
 			var at := bay_center + Vector2(0, 80) * zoom - Vector2(0, ease(lift, 2.4) * (screen.y * 0.9))
-			draw_line(at + Vector2(0, 30), at + Vector2(0, 30 + 140.0 * lift), Color(1, 0.65, 0.3, 0.8), 14.0 * (1.0 - lift * 0.5))
+			# The catapult fires: a flash down the rails, then speed lines and a long thruster trail.
+			if lift < 0.25:
+				Art.draw_glow(self, bay_center + Vector2(0, 80) * zoom, 260.0 * zoom, Color(1, 0.85, 0.5, 0.7 * (1.0 - lift / 0.25)))
+			for i in 14:
+				var x := c.x + (fmod(i * 97.0, 700.0) - 350.0)
+				var y := fmod(i * 173.0 + time * 2600.0, screen.y + 200.0) - 100.0
+				draw_line(Vector2(x, y), Vector2(x, y + 60.0 + 140.0 * lift), Color(0.8, 0.9, 1.0, 0.35 * lift), 2.0)
+			draw_line(at + Vector2(0, 30), at + Vector2(0, 30 + 220.0 * lift), Color(1, 0.65, 0.3, 0.8), 16.0 * (1.0 - lift * 0.5))
 			_frame(at, "ship", -PI * 0.5, 3.2 * zoom)
 		if time > 1.0 and time < 1.6:
 			FrameArt.draw_transform(self, bay_center + Vector2(0, 80) * zoom, (time - 1.0) / 0.6, Color(0.5, 0.9, 1.0))
@@ -131,42 +137,53 @@ func _draw_launch(screen: Vector2, c: Vector2) -> void:
 			_stars(screen, 1200.0)
 			_frame(c + Vector2(0, 120 - t * 260.0), "ship", -PI * 0.5, 3.0)
 		"launch_planet":
-			# Down through the atmosphere wrapped in fire, then a flare of thrusters and the mech lands.
-			var land := clampf((t - 1.1) / 0.5, 0.0, 1.0)
-			draw_rect(Rect2(Vector2.ZERO, screen), ground.darkened(0.6).lerp(ground, clampf(t / 1.1, 0.0, 1.0)))
-			if t < 1.1:
-				var heat := 1.0 - t / 1.1
-				var scale := lerpf(1.2, 3.0, t / 1.1)
-				for i in 5:
-					draw_line(c - Vector2(0, 40 + i * 30) * scale * 0.4, c - Vector2(0, 200 + i * 40) * scale * 0.4, Color(1, 0.5 + i * 0.08, 0.2, 0.6 * heat), 22.0 - i * 3.0)
-				Art.draw_glow(self, c, 120.0 * scale * 0.4, Color(1, 0.55, 0.2, 0.8 * heat))
-				_frame(c, "ship", PI * 0.5, scale)
+			# Seen from above: the ground swells as you come down through the atmosphere wrapped in fire, your
+			# shadow closes in under you, and the ship touches down and stands up as the mech.
+			var descent := clampf(t / 1.2, 0.0, 1.0)
+			var land := clampf((t - 1.2) / 0.5, 0.0, 1.0)
+			draw_rect(Rect2(Vector2.ZERO, screen), ground.darkened(0.25))
+			var ground_zoom := lerpf(0.35, 1.0, ease(descent, 0.6))
+			for i in 14:
+				var spot := Vector2(fmod(i * 211.0, 1400.0) - 700.0, fmod(i * 157.0, 900.0) - 450.0)
+				var radius := (30.0 + float(i % 4) * 22.0) * ground_zoom
+				draw_circle(c + spot * ground_zoom, radius, ground.darkened(0.42))
+				draw_circle(c + spot * ground_zoom + Vector2(-0.18, -0.18) * radius, radius * 0.82, ground.darkened(0.3))
+			var altitude := 1.0 - descent
+			draw_circle(c + Vector2(90, 90) * altitude, 70.0 * (1.0 - altitude * 0.4), Color(0, 0, 0, 0.25 + 0.2 * descent))
+			if t < 1.2:
+				var heat := altitude
+				for i in 6:
+					var angle := PI * 0.5 + (i - 2.5) * 0.28
+					draw_line(c + Vector2.from_angle(angle) * 50.0, c + Vector2.from_angle(angle) * (150.0 + 60.0 * sin(time * 30.0 + i)),
+						Color(1, 0.45 + i * 0.07, 0.2, 0.65 * heat), 18.0 - i * 2.0)
+				Art.draw_glow(self, c, 170.0, Color(1, 0.5, 0.2, 0.75 * heat))
+				_frame(c, "ship", -PI * 0.5, 3.0)
 			else:
 				for i in 3:
-					draw_arc(c, 40.0 + land * 160.0 + i * 30.0, 0, TAU, 32, Color(0.85, 0.75, 0.6, (1.0 - land) * 0.6), 6.0, true)
+					draw_arc(c, 40.0 + land * 180.0 + i * 34.0, 0, TAU, 32, ground.lightened(0.35) * Color(1, 1, 1, (1.0 - land) * 0.7), 8.0, true)
 				_frame(c, "mech" if land > 0.4 else "ship", -PI * 0.5, 3.0)
 				if land < 0.6:
 					FrameArt.draw_transform(self, c, land / 0.6, Color(0.5, 0.9, 1.0))
 		"launch_dungeon":
 			# Landing at the dungeon gate, walking in, and the gate slamming shut behind.
 			draw_rect(Rect2(Vector2.ZERO, screen), Color(0.14, 0.13, 0.13))
-			# A stone archway set into the cliff, torches either side, darkness inside.
+			# The gate: a stone arch cut into the cliff (art/scenes/dungeon_gate.svg), torches either side.
 			var gate := Rect2(c + Vector2(-110, -280), Vector2(220, 220))
-			draw_rect(Rect2(gate.position - Vector2(70, 40), gate.size + Vector2(140, 40)), Color(0.24, 0.22, 0.21))
-			draw_rect(gate, Color(0.02, 0.01, 0.03))
-			draw_arc(gate.position + Vector2(gate.size.x * 0.5, 0), gate.size.x * 0.5 + 20.0, PI, TAU, 24, Color(0.38, 0.34, 0.3), 40.0)
+			VectorArt.draw(self, "res://art/scenes/dungeon_gate.svg", Transform2D(0.0, c))
 			for side in [-1.0, 1.0]:
-				var pillar := Rect2(Vector2(c.x + side * 130.0 - 20.0, gate.position.y - 10.0), Vector2(40, gate.size.y + 10.0))
-				draw_rect(pillar, Color(0.38, 0.34, 0.3))
-				var flame := Vector2(c.x + side * 190.0, gate.position.y + 60.0)
-				Art.draw_glow(self, flame, 46.0, Color(1, 0.6, 0.25, 0.7 + 0.2 * sin(time * 9.0 + side)))
-				draw_circle(flame, 7.0, Color(1, 0.85, 0.4))
+				var flame := c + Vector2(side * 195.0, -215.0)
+				Art.draw_glow(self, flame, 52.0, Color(1, 0.6, 0.25, 0.7 + 0.2 * sin(time * 9.0 + side)))
+				draw_colored_polygon(PackedVector2Array([flame + Vector2(-8, 10), flame + Vector2(0, -16 - 4.0 * sin(time * 14.0 + side)), flame + Vector2(8, 10)]), Color(1, 0.6, 0.2))
+				draw_circle(flame + Vector2(0, 4), 5.0, Color(1, 0.92, 0.6))
 			var walk := clampf((t - 0.4) / 1.0, 0.0, 1.0)
-			var at := c + Vector2(0, 220) - Vector2(0, walk * 420.0)
+			var at := c + Vector2(0, 220) - Vector2(0, walk * 360.0)
 			if t < 0.4:
 				FrameArt.draw_transform(self, c + Vector2(0, 220), t / 0.4, Color(0.5, 0.9, 1.0))
-			if walk < 0.95:
-				_frame(at, "mech", -PI * 0.5, 2.6 * (1.0 - walk * 0.4))
+			_frame(at, "mech", -PI * 0.5, 2.6 * (1.0 - walk * 0.35))
+			# Stepping into the gate, the dark swallows it.
+			var swallowed := clampf((gate.end.y + 40.0 - at.y) / 140.0, 0.0, 1.0)
+			if swallowed > 0.0:
+				draw_rect(Rect2(gate.position.x, gate.position.y, gate.size.x, gate.size.y + 60.0), Color(0.01, 0.005, 0.015, swallowed))
 			# The portcullis crashes down behind you.
 			var slam := clampf((t - 1.4) / 0.2, 0.0, 1.0)
 			for i in 6:
@@ -199,27 +216,23 @@ func _draw_breakout(screen: Vector2, c: Vector2) -> void:
 func _draw_return(screen: Vector2, c: Vector2, won: bool) -> void:
 	_stars(screen, 160.0)
 	var t := clampf(time / 2.4, 0.0, 1.0)
-	# The Dropship sweeps in overhead.
-	var ship_y := lerpf(-260.0, 150.0, ease(t, 0.5))
-	var hull := PackedVector2Array([Vector2(-220, -70), Vector2(220, -70), Vector2(280, 30), Vector2(160, 90), Vector2(-160, 90), Vector2(-280, 30)])
-	var placed := PackedVector2Array()
-	for point in hull:
-		placed.append(point + Vector2(c.x, ship_y))
-	draw_colored_polygon(placed, Color(0.14, 0.18, 0.26))
-	draw_polyline(placed + PackedVector2Array([placed[0]]), Color(0.45, 0.6, 0.75), 3.0, true)
-	draw_rect(Rect2(Vector2(c.x - 50, ship_y + 60), Vector2(100, 30)), Color(1, 0.75, 0.35, 0.6))
+	# The Dropship sweeps in overhead, bow down, bay doors open toward you.
+	var ship_y := lerpf(-260.0, 120.0, ease(t, 0.5))
+	var zoom := 0.42
+	_dropship(Vector2(c.x, ship_y), 1.0, zoom, PI)
+	var mouth_y := ship_y + 330.0 * zoom
 	if won:
 		# The frame folds into its ship and climbs into the bay.
 		var climb := clampf((time - 0.6) / 1.6, 0.0, 1.0)
-		var at := Vector2(c.x, lerpf(screen.y * 0.75, ship_y + 75.0, ease(climb, 2.0)))
+		var at := Vector2(c.x, lerpf(screen.y * 0.75, mouth_y, ease(climb, 2.0)))
 		_frame(at, "ship", -PI * 0.5, lerpf(2.6, 1.0, climb))
 		if time < 0.6:
 			FrameArt.draw_transform(self, Vector2(c.x, screen.y * 0.75), time / 0.6, Color(0.5, 0.9, 1.0))
 	else:
 		# Recovered, not lost: a tractor beam hauls the battered frame aboard.
 		var haul := clampf((time - 0.7) / 1.6, 0.0, 1.0)
-		var at := Vector2(c.x, lerpf(screen.y * 0.78, ship_y + 75.0, haul))
-		draw_colored_polygon(PackedVector2Array([Vector2(c.x - 50, ship_y + 85), Vector2(c.x + 50, ship_y + 85), Vector2(c.x + 110, at.y + 40), Vector2(c.x - 110, at.y + 40)]),
+		var at := Vector2(c.x, lerpf(screen.y * 0.78, mouth_y, haul))
+		draw_colored_polygon(PackedVector2Array([Vector2(c.x - 50, mouth_y), Vector2(c.x + 50, mouth_y), Vector2(c.x + 110, at.y + 40), Vector2(c.x - 110, at.y + 40)]),
 			Color(0.5, 1.0, 0.85, 0.18 + 0.06 * sin(time * 12.0)))
 		_frame(at, "mech", -PI * 0.5 + sin(time * 2.0) * 0.3, lerpf(2.4, 1.0, haul), 0.3 if int(time * 8.0) % 2 == 0 else 0.0)
 	draw_string(UiKit.font("title"), Vector2(0, screen.y * 0.9), "RECOVERED BY THE DROPSHIP" if not won else "RETURNING TO THE DROPSHIP",
