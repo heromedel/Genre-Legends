@@ -21,7 +21,7 @@
 </g>
 
 <!-- Main wings: long blades swept back from the waist (the pylon mounts sit on them) -->
-<g>
+<g id="wings">
   <path d="M-3,-2 L-21,10 L-21,13 L-4,9 Z M3,-2 L21,10 L21,13 L4,9 Z" fill="#0a1f16" stroke="#0a1f16" stroke-width="2.2"/>
   <path d="M-3,-2 L-21,10 L-21,13 L-4,9 Z" fill="#6fe8a0"/>
   <path d="M3,-2 L21,10 L21,13 L4,9 Z" fill="#45b97b"/>
@@ -32,7 +32,7 @@
 </g>
 
 <!-- Canards: small forward wings, the Tempest's signature -->
-<g>
+<g id="wings">
   <path d="M-3,-14 L-15,-17 L-16,-12.5 L-3.5,-8 Z M3,-14 L15,-17 L16,-12.5 L3.5,-8 Z" fill="#0a1f16" stroke="#0a1f16" stroke-width="2"/>
   <path d="M-3,-14 L-15,-17 L-16,-12.5 L-3.5,-8 Z" fill="#7ff2ae"/>
   <path d="M3,-14 L15,-17 L16,-12.5 L3.5,-8 Z" fill="#4cc283"/>

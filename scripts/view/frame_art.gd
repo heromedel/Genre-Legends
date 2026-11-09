@@ -59,6 +59,50 @@ static func draw_frame(ci: CanvasItem, frame_id: String, form: String, at: Vecto
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
+## The frame mid-transformation (GDD 5E): progress 0 is the mech, 1 the ship. The mech's parts fold in (feet
+## swing back toward the engines, shoulders close in, the helmet sinks) while the ship's body slides out from
+## under them, its wings unfolding, and a line of light sweeps across. With spin, it turns a full circle as
+## it changes (Settings: "Transformation spin"). Gear folds away for the moment and redeploys after.
+static func draw_morph(ci: CanvasItem, frame_id: String, at: Vector2, facing: float, progress: float, time: float, state: Dictionary) -> void:
+	var p := clampf(progress, 0.0, 1.0)
+	var data := FrameData.get_frame(frame_id)
+	var scale: float = state.get("scale", 1.3)
+	var spin: bool = state.get("spin", Save.setting("transform_spin"))
+	var turn := TAU * smoothstep(0.0, 1.0, p) if spin else 0.0
+	var remap := {"#" + data["trim"].to_html(false): data["trim"]}
+	# The mech folds up over the first two thirds.
+	var fold := clampf(p / 0.65, 0.0, 1.0)
+	var mech_alpha := 1.0 - smoothstep(0.44, 0.6, p)
+	if mech_alpha > 0.0:
+		var shrink := 1.0 - 0.45 * fold
+		VectorArt.draw(ci, "res://art/frames/%s_mech.svg" % frame_id, Transform2D(facing + PI * 0.5 + turn, Vector2.ONE * scale * MECH_DRAW_SCALE, 0.0, at), {
+			"remap": remap, "rim": PLAYER_RIM, "alpha": mech_alpha, "hide": ["stock_arms"] if fold > 0.3 else [],
+			"groups": {
+				"foot_l": Transform2D(0.0, Vector2.ONE * shrink, 0.0, Vector2(7.0, 12.0) * fold),
+				"foot_r": Transform2D(0.0, Vector2.ONE * shrink, 0.0, Vector2(-7.0, 12.0) * fold),
+				"shoulders": Transform2D(0.0, Vector2(1.0 - 0.5 * fold, 1.0), 0.0, Vector2.ZERO),
+				"helmet": Transform2D(0.0, Vector2.ONE * (1.0 - 0.7 * fold), 0.0, Vector2(0.0, -4.0) * 0.7 * fold),
+				"stock_arms": Transform2D(0.0, Vector2(1.0 - 0.6 * fold, 1.0), 0.0, Vector2.ZERO),
+			}})
+	# The ship slides out from under it, wings unfolding, over the last two thirds.
+	var unfold := smoothstep(0.35, 1.0, p)
+	var ship_alpha := smoothstep(0.42, 0.58, p)
+	if ship_alpha > 0.0:
+		VectorArt.draw(ci, "res://art/frames/%s_ship.svg" % frame_id, Transform2D(facing + PI * 0.5 + turn, Vector2.ONE * scale * (0.75 + 0.25 * unfold), 0.0, at), {
+			"remap": remap, "rim": PLAYER_RIM, "alpha": ship_alpha,
+			"groups": {"wings": Transform2D(0.0, Vector2(0.15 + 0.85 * unfold, 1.0), 0.0, Vector2.ZERO),
+				"flame": Transform2D(0.0, Vector2(1.0, unfold), 0.0, Vector2(0.0, 20.0 - 20.0 * unfold))}})
+	# A line of light sweeps across the frame, nose to tail, as it changes.
+	var sweep := Transform2D(facing + PI * 0.5 + turn, Vector2.ONE * scale, 0.0, at)
+	ci.draw_set_transform_matrix(sweep)
+	var y := lerpf(-26.0, 24.0, p)
+	var light := sin(p * PI)
+	ci.draw_line(Vector2(-26, y), Vector2(26, y), Color(0.6, 0.95, 1.0, 0.85 * light), 2.5, true)
+	ci.draw_line(Vector2(-26, y), Vector2(26, y), Color(1, 1, 1, 0.9 * light), 1.0, true)
+	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	Art.draw_glow(ci, at, 50.0 * scale * 0.6, Color(0.5, 0.9, 1.0, 0.35 * light))
+
+
 ## The glow that sits under the frame on the additive layer.
 static func draw_glow(ci: CanvasItem, frame_id: String, form: String, at: Vector2, facing: float, state: Dictionary) -> void:
 	var data := FrameData.get_frame(frame_id)
@@ -70,14 +114,3 @@ static func draw_glow(ci: CanvasItem, frame_id: String, form: String, at: Vector
 		Art.draw_glow(ci, at, 70.0, Color(1, 0.8, 0.3, 0.55))
 	if state.get("last_stand", false):
 		Art.draw_glow(ci, at, 64.0, Color(1, 0.2, 0.2, 0.5))
-
-
-## The shift between forms: a burst of light with the outline of the old and new forms.
-static func draw_transform(ci: CanvasItem, at: Vector2, progress: float, color: Color) -> void:
-	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	var ring := 20.0 + progress * 90.0
-	ci.draw_arc(at, ring, 0, TAU, 40, Art.with_alpha(color, 1.0 - progress), 4.0, true)
-	Art.draw_glow(ci, at, 60.0 + progress * 40.0, Art.with_alpha(color, (1.0 - progress) * 0.9))
-	for i in 8:
-		var a := TAU * i / 8.0 + progress * 2.0
-		ci.draw_line(at + Vector2.from_angle(a) * ring * 0.4, at + Vector2.from_angle(a) * ring, Art.with_alpha(Color.WHITE, 1.0 - progress), 2.0, true)

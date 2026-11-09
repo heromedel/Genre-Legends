@@ -58,7 +58,7 @@
 </g>
 
 <!-- Shoulder pauldrons: angled plates trimmed in gold (the weapon mounts) -->
-<g>
+<g id="shoulders">
   <path d="M-11,-10 L-21,-7 L-22,5 L-12,7 Z M11,-10 L21,-7 L22,5 L12,7 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2.4"/>
   <path d="M-11,-10 L-21,-7 L-22,5 L-12,7 Z" fill="#4aaee6"/>
   <path d="M11,-10 L21,-7 L22,5 L12,7 Z" fill="#2f7cb6"/>
@@ -71,7 +71,7 @@
 
 <!-- Helmet, seen from above: the visor strip on its leading edge shows where it looks; the gold crest
      fins sweep back from the brow -->
-<g>
+<g id="helmet">
   <path d="M0,-12 C4.4,-12 6,-8 6,-4 C6,1 3.5,3 0,3 C-3.5,3 -6,1 -6,-4 C-6,-8 -4.4,-12 0,-12 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2.2"/>
   <path d="M0,-12 C4.4,-12 6,-8 6,-4 C6,1 3.5,3 0,3 C-3.5,3 -6,1 -6,-4 C-6,-8 -4.4,-12 0,-12 Z" fill="#4fb4ea"/>
   <path d="M0.6,-11.9 C4.6,-11.6 6,-8 6,-4 C6,1 3.5,3 0.6,3 Z" fill="#2f7cb6"/>

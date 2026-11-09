@@ -3,7 +3,8 @@ extends Control
 ## Debug page for art tests: draws one piece of the game's art alone, centred, on a plain background,
 ## at a chosen zoom, so old and new art can be compared at the same size (main.gd: gallery=<subject>&zoom=N).
 ## Subjects: ship, mech, dart, any boss id (hive_carrier, warden, ...), or an SVG drawn through VectorArt
-## (gallery=docs/art_test/ship.svg; add rim=1 for the rim light).
+## (gallery=art/frames/vanguard_ship.svg; add rim=1 for the rim light), or "morph": the transformation looping,
+## without the spin on the left and with it on the right.
 
 const SPACE := Color(0.04, 0.05, 0.12)
 const GROUND := Color(0.42, 0.39, 0.29)
@@ -34,6 +35,14 @@ class Stand:
 				FrameArt.draw_frame(self, "vanguard", subject, Vector2.ZERO, -PI * 0.5, time, {})
 			"dart":
 				EnemyArt.draw(self, enemy, time)
+			"morph":
+				# Mech, fold into the ship, hold, fold back: 0.8 s each way with a pause between.
+				var cycle := fmod(time, 3.2)
+				var progress := clampf(cycle / 0.8, 0.0, 1.0) if cycle < 1.6 else 1.0 - clampf((cycle - 1.6) / 0.8, 0.0, 1.0)
+				for side in [-1.0, 1.0]:
+					FrameArt.draw_morph(self, "vanguard", Vector2(side * 70.0, 0.0), -PI * 0.5, progress, time, {"spin": side > 0.0})
+					draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+					draw_string(UiKit.font("bold"), Vector2(side * 70.0 - 40.0, 62.0), "spin" if side > 0.0 else "no spin", HORIZONTAL_ALIGNMENT_CENTER, 80, 9, Color(0.8, 0.9, 1.0))
 			_ when subject.ends_with(".svg"):
 				VectorArt.draw(self, "res://" + subject, Transform2D.IDENTITY, {"rim": Color(0.5, 0.9, 1.0) if rim else Color(0, 0, 0, 0)})
 			_:
@@ -51,7 +60,7 @@ func _ready() -> void:
 	if subject == "dart":
 		_stage.enemy = mission.world.spawn_enemy("dart", Vector2.ZERO)
 		_stage.enemy.facing = PI * 0.5
-	elif subject not in ["ship", "mech"] and not subject.ends_with(".svg"):
+	elif subject not in ["ship", "mech", "morph"] and not subject.ends_with(".svg"):
 		_stage.boss = BossRoster.make(subject, mission.world)
 		_stage.boss.spawn()
 		_stage.boss.entering = false

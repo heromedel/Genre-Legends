@@ -51,10 +51,13 @@ func _draw() -> void:
 	var frames := ["vanguard", "tempest", "bulwark"]
 	var frame_id: String = frames[int(time / 8.0) % 3]
 	Art.draw_glow(self, path, 150.0, Color(0.4, 0.8, 1.0, 0.35))
-	FrameArt.draw_frame(self, frame_id, form, path, heading, time, {"speed": 1.0, "scale": 3.2, "gear": GearArt.loadout_gear(TechData.STARTING_LOADOUT, 3)})
+	# Every few seconds it folds from one form into the other.
 	var since_shift := fmod(time, 4.0)
-	if since_shift < 0.6:
-		FrameArt.draw_transform(self, path, since_shift / 0.6, FrameData.get_frame(frame_id)["hull"])
+	if since_shift < 0.7:
+		var toward_ship := since_shift / 0.7
+		FrameArt.draw_morph(self, frame_id, path, heading, toward_ship if form == "ship" else 1.0 - toward_ship, time, {"scale": 3.2})
+	else:
+		FrameArt.draw_frame(self, frame_id, form, path, heading, time, {"speed": 1.0, "scale": 3.2, "gear": GearArt.loadout_gear(TechData.STARTING_LOADOUT, 3)})
 	# Title.
 	var title_font := UiKit.font("title")
 	var title_size := int(clampf(screen.x / 11.0, 48.0, 110.0))

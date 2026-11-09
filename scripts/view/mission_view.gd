@@ -27,6 +27,8 @@ var camera_center := Vector2.ZERO
 var camera_scale := 1.0
 var shake := 0.0
 var time := 0.0
+## How long the frame takes to fold from one form into the other (FrameArt.draw_morph).
+const TRANSFORM_SECONDS := 0.8
 var transform_time := 0.0
 var hit_flash := 0.0
 var tech_online_since := {}      # tech id -> view time it came online, for GearArt's unfold
@@ -234,7 +236,7 @@ func _handle_events(events: Array) -> void:
 				hud.hurt()
 				hit_flash = 0.15
 			"stage_start":
-				transform_time = 0.8
+				transform_time = TRANSFORM_SECONDS
 				# A chained mission handing over: down the fissure, or up out of the dungeon.
 				if mission.stages_played.size() > 1:
 					_play_cutscene("dive" if event["form"] == "ship" else "breakout", Callable())
@@ -428,9 +430,14 @@ func _paint_bodies(ci: CanvasItem) -> void:
 	if player.alive and mission.state != "lost":
 		var speed := clampf(player.vel.length() / 300.0, 0.0, 1.0)
 		var flicker := player.grace > 0.0 and player.grace < 5.0 and int(time * 16.0) % 2 == 0
-		FrameArt.draw_frame(ci, mission.run.frame_id, player.form, player.pos, player.facing, time,
-			{"speed": speed, "flash": 1.0 if flicker else hit_flash, "gear": _gear(), "fusions": mission.run.fusions,
-			"resonance": _top_resonance()})
+		if transform_time > 0.0:
+			# Changing form mid-mission (a chained stage): the frame folds from one form into the other.
+			var toward_ship := 1.0 - transform_time / TRANSFORM_SECONDS
+			FrameArt.draw_morph(ci, mission.run.frame_id, player.pos, player.facing, toward_ship if player.form == "ship" else 1.0 - toward_ship, time, {})
+		else:
+			FrameArt.draw_frame(ci, mission.run.frame_id, player.form, player.pos, player.facing, time,
+				{"speed": speed, "flash": 1.0 if flicker else hit_flash, "gear": _gear(), "fusions": mission.run.fusions,
+				"resonance": _top_resonance()})
 	for shot: Shot in world.enemy_shots:
 		ShotArt.draw_enemy_shot(ci, shot, time)
 
@@ -527,8 +534,6 @@ func _paint_glow(ci: CanvasItem) -> void:
 			Art.draw_glow(ci, player.pos, World.MIRROR_RADIUS * 1.4, Color(0.4, 0.9, 1.0, 0.25))
 		if mission.run.fork_of("mirror_aegis") == "b" and mission.run.is_online("mirror_aegis"):
 			ci.draw_arc(player.pos, 58.0, player.facing - 1.08, player.facing + 1.08, 16, Color(0.6, 1, 1, 0.6), 3.0, true)
-	if transform_time > 0.0:
-		FrameArt.draw_transform(ci, player.pos, 1.0 - transform_time / 0.8, FrameData.get_frame(mission.run.frame_id)["hull"])
 
 
 func _paint_effects(ci: CanvasItem) -> void:

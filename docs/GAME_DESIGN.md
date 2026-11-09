@@ -49,6 +49,7 @@
   - **Ai-Generated-Proposal (2026-11-08):** The map shows a themed branch's prize before you commit to it.
 - **5E. Proposed (2026-11-08):** You pilot a mech that can turn into a ship. Its form matches the mission type: ship, mech, turret or tank.
   - **Ai-Generated-Proposal (2026-11-08):** The transformation plays as the mission starts. A combining super-robot form is kept for giant bosses.
+  - **Likely (2026-11-09):** The form change is a real transformation, not a flash: the mech's parts fold in as the ship's body slides out. Built with and without a full-turn spin, a setting ("Transformation spin: On > Off") so heromedel can compare. (heromedel asked whether it was "just poof".)
 - **5F. Proposed (2026-11-08):** Abilities work in every mission type.
   - **Ai-Generated-Proposal (2026-11-08):** Each piece of tech has a version for each form, e.g. a shoulder chaingun is a wing gun on the ship and a turret on the tank.
 - **5G. Proposed (2026-11-08):** Base ships (frames) have their own stats and unique properties.
@@ -75,6 +76,7 @@
 - **7C. Proposed (2026-11-08):** Equipping doesn't give full power. Tech is upgraded during missions, like Vampire Survivors or Cell Survivor, probably with a point system, missable drops and occasionally a slot-machine upgrade.
 - **7D. Proposed (2026-11-08):** Only the base weapon starts working in a mission, so base weapons are their own category.
 - **7E. Proposed (2026-11-08):** Tech can draw on MechWarrior, Armored Core and The Guardian Legend, or be magic abilities described as Mawjig energy.
+- **7G. Likely (2026-11-09):** Fusions stay at max level (both tech at level 5, so Mk 3), as a late-game goal, as long as each fusion is game-changing enough to be impressive. (heromedel.) The game only mentions a fusion when the mission can reach it.
 - **7F. Proposed (2026-11-08):** Upgrades fork a weapon into different behaviours (e.g. ricochet as an upgrade step of the starter weapon), and two pieces of high-level tech can fuse into a named fusion with a new effect. (Claude's idea; heromedel: "sounds cool".)
 
 ## 8. Rewards, Co-op & Extras
@@ -177,5 +179,6 @@
 | 2026-11-09 | 11N to 11Q | Auto-fire becomes an option in every mode; options on the pause menu; Ricochet comes back from off screen; a boss that falls as you do counts as a win. |
 | 2026-11-09 | 9H | Resonance tiers made obvious (card badge, splash on pick, frame glow) and the flat tiers reworked into visible effects. |
 | 2026-11-09 | 11R to 11T | Tabs on top and the planet card under a full-width star map; banners that stay up long enough to read; risky cards with their own prices. |
+| 2026-11-09 | 5E, 7G | A real transformation between forms (spin as a setting while it's compared); fusions stay at max level if they're impressive enough. |
 | 2026-11-09 | 4F | A wording checker for player-facing text. |
 | 2026-11-09 | 4E | Cold reviews in small, focused batches; every finding triaged into the review log. |

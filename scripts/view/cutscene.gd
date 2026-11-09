@@ -76,6 +76,12 @@ func _frame(at: Vector2, form: String, facing: float, scale: float, flash: float
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
+## The frame mid-transformation: progress 0 is the mech, 1 the ship (FrameArt.draw_morph).
+func _morph(at: Vector2, facing: float, progress: float, scale: float) -> void:
+	FrameArt.draw_morph(self, frame_id, at, facing, progress, time, {"scale": scale})
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
 func _stars(screen: Vector2, speed: float) -> void:
 	draw_rect(Rect2(Vector2.ZERO, screen), Color(0.01, 0.015, 0.04))
 	for i in 90:
@@ -113,8 +119,10 @@ func _draw_launch(screen: Vector2, c: Vector2) -> void:
 		var zoom := 1.0 - clampf((time - 1.5) / 1.1, 0.0, 1.0) * 0.55
 		var bay_center := c + Vector2(0, clampf((time - 1.5) / 1.1, 0.0, 1.0) * 260.0)
 		_dropship(bay_center, clampf(time / 1.0, 0.0, 1.0), zoom)
-		if time < 1.25:
+		if time < 1.0:
 			_frame(bay_center + Vector2(0, 80) * zoom, "mech", -PI * 0.5, 3.2 * zoom)
+		elif time < 1.6:
+			_morph(bay_center + Vector2(0, 80) * zoom, -PI * 0.5, (time - 1.0) / 0.6, 3.2 * zoom)
 		else:
 			var lift := clampf((time - 1.5) / 1.1, 0.0, 1.0)
 			var at := bay_center + Vector2(0, 80) * zoom - Vector2(0, ease(lift, 2.4) * (screen.y * 0.9))
@@ -127,8 +135,6 @@ func _draw_launch(screen: Vector2, c: Vector2) -> void:
 				draw_line(Vector2(x, y), Vector2(x, y + 60.0 + 140.0 * lift), Color(0.8, 0.9, 1.0, 0.35 * lift), 2.0)
 			draw_line(at + Vector2(0, 30), at + Vector2(0, 30 + 220.0 * lift), Color(1, 0.65, 0.3, 0.8), 16.0 * (1.0 - lift * 0.5))
 			_frame(at, "ship", -PI * 0.5, 3.2 * zoom)
-		if time > 1.0 and time < 1.6:
-			FrameArt.draw_transform(self, bay_center + Vector2(0, 80) * zoom, (time - 1.0) / 0.6, Color(0.5, 0.9, 1.0))
 		return
 	var t := time - 2.6
 	match kind:
@@ -161,9 +167,10 @@ func _draw_launch(screen: Vector2, c: Vector2) -> void:
 			else:
 				for i in 3:
 					draw_arc(c, 40.0 + land * 180.0 + i * 34.0, 0, TAU, 32, ground.lightened(0.35) * Color(1, 1, 1, (1.0 - land) * 0.7), 8.0, true)
-				_frame(c, "mech" if land > 0.4 else "ship", -PI * 0.5, 3.0)
-				if land < 0.6:
-					FrameArt.draw_transform(self, c, land / 0.6, Color(0.5, 0.9, 1.0))
+				if land < 0.7:
+					_morph(c, -PI * 0.5, 1.0 - land / 0.7, 3.0)
+				else:
+					_frame(c, "mech", -PI * 0.5, 3.0)
 		"launch_dungeon":
 			# Landing at the dungeon gate, walking in, and the gate slamming shut behind.
 			draw_rect(Rect2(Vector2.ZERO, screen), Color(0.14, 0.13, 0.13))
@@ -177,9 +184,10 @@ func _draw_launch(screen: Vector2, c: Vector2) -> void:
 				draw_circle(flame + Vector2(0, 4), 5.0, Color(1, 0.92, 0.6))
 			var walk := clampf((t - 0.4) / 1.0, 0.0, 1.0)
 			var at := c + Vector2(0, 220) - Vector2(0, walk * 360.0)
-			if t < 0.4:
-				FrameArt.draw_transform(self, c + Vector2(0, 220), t / 0.4, Color(0.5, 0.9, 1.0))
-			_frame(at, "mech", -PI * 0.5, 2.6 * (1.0 - walk * 0.35))
+			if t < 0.5:
+				_morph(at, -PI * 0.5, 1.0 - t / 0.5, 2.6)
+			else:
+				_frame(at, "mech", -PI * 0.5, 2.6 * (1.0 - walk * 0.35))
 			# Stepping into the gate, the dark swallows it.
 			var swallowed := clampf((gate.end.y + 40.0 - at.y) / 140.0, 0.0, 1.0)
 			if swallowed > 0.0:
@@ -199,9 +207,13 @@ func _draw_dive(screen: Vector2, c: Vector2) -> void:
 	for i in 6:
 		var r := fmod(time * 380.0 + i * 120.0, 720.0)
 		draw_arc(c, r, 0, TAU, 40, Color(1, 0.55, 0.25, 0.35 * (1.0 - r / 720.0)), 8.0, true)
-	_frame(c, "mech" if fall < 0.5 else "ship", PI * 0.5 if fall >= 0.5 else -PI * 0.5, lerpf(3.2, 1.8, fall))
-	if fall > 0.35 and fall < 0.7:
-		FrameArt.draw_transform(self, c, (fall - 0.35) / 0.35, Color(0.5, 0.9, 1.0))
+	var scale := lerpf(3.2, 1.8, fall)
+	if fall < 0.35:
+		_frame(c, "mech", -PI * 0.5, scale)
+	elif fall < 0.7:
+		_morph(c, lerp_angle(-PI * 0.5, PI * 0.5, (fall - 0.35) / 0.35), (fall - 0.35) / 0.35, scale)
+	else:
+		_frame(c, "ship", PI * 0.5, scale)
 
 
 func _draw_breakout(screen: Vector2, c: Vector2) -> void:
@@ -225,9 +237,10 @@ func _draw_return(screen: Vector2, c: Vector2, won: bool) -> void:
 		# The frame folds into its ship and climbs into the bay.
 		var climb := clampf((time - 0.6) / 1.6, 0.0, 1.0)
 		var at := Vector2(c.x, lerpf(screen.y * 0.75, mouth_y, ease(climb, 2.0)))
-		_frame(at, "ship", -PI * 0.5, lerpf(2.6, 1.0, climb))
 		if time < 0.6:
-			FrameArt.draw_transform(self, Vector2(c.x, screen.y * 0.75), time / 0.6, Color(0.5, 0.9, 1.0))
+			_morph(at, -PI * 0.5, time / 0.6, 2.6)
+		else:
+			_frame(at, "ship", -PI * 0.5, lerpf(2.6, 1.0, climb))
 	else:
 		# Recovered, not lost: a tractor beam hauls the battered frame aboard.
 		var haul := clampf((time - 0.7) / 1.6, 0.0, 1.0)

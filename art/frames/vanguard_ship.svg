@@ -21,7 +21,7 @@
 </g>
 
 <!-- Wings -->
-<g>
+<g id="wings">
   <!-- 1 outline -->
   <path d="M-4,-7 L-24,6 L-27.5,13 L-22,15.5 L-7,12 Z M4,-7 L24,6 L27.5,13 L22,15.5 L7,12 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2.4"/>
   <!-- 2 fill: the lit wing is brighter than the one turned from the light -->

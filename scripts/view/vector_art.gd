@@ -20,6 +20,7 @@ static var _cache := {}
 ## Draws an SVG file. xf places it (position, rotation, scale). options:
 ##   remap: {"#ffc759": Color}   swap any colour written in the file for another (lower-case hex)
 ##   flash: 0..1                  pull every colour toward white (a hit)
+##   alpha: 0..1                  fade the whole piece (a transformation's crossfade)
 ##   dim: 0..1                    pull every colour toward a dark steel (offline gear)
 ##   rim: Color                   trace a thin rim of this colour around every outline (alpha 0: none)
 ##   groups: {"flame": Transform2D}   extra transform for a named group, in the art's own space
@@ -29,12 +30,14 @@ static func draw(ci: CanvasItem, path: String, xf: Transform2D, options: Diction
 	var remap: Dictionary = options.get("remap", {})
 	var flash: float = options.get("flash", 0.0)
 	var dim: float = options.get("dim", 0.0)
+	var alpha: float = options.get("alpha", 1.0)
 	var rim: Color = options.get("rim", Color(0, 0, 0, 0))
 	var groups: Dictionary = options.get("groups", {})
 	var hide: Array = options.get("hide", [])
 	# Pass 0: the rim, under everything, so the silhouette gets a thin edge of light.
 	if rim.a > 0.0:
 		var rim_colour := rim.lerp(Color.WHITE, flash)
+		rim_colour.a *= alpha
 		for shape: Dictionary in shapes:
 			if shape["rim"].is_empty() or hide.has(shape["group"]):
 				continue
@@ -46,7 +49,7 @@ static func draw(ci: CanvasItem, path: String, xf: Transform2D, options: Diction
 			continue
 		ci.draw_set_transform_matrix(xf * groups.get(shape["group"], Transform2D.IDENTITY))
 		var colour: Color = remap.get(shape["key"], shape["colour"])
-		colour.a *= shape["opacity"]
+		colour.a *= shape["opacity"] * alpha
 		if flash > 0.0:
 			colour = colour.lerp(Color(1, 1, 1, colour.a), flash)
 		if dim > 0.0:

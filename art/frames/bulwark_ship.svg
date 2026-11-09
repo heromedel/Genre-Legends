@@ -11,7 +11,7 @@
 </g>
 
 <!-- Block wings: thick armoured slabs -->
-<g>
+<g id="wings">
   <path d="M-10,-7 L-25,-3 L-28,15 L-12,17 Z M10,-7 L25,-3 L28,15 L12,17 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2.6"/>
   <path d="M-10,-7 L-25,-3 L-28,15 L-12,17 Z" fill="#f08a3c"/>
   <path d="M10,-7 L25,-3 L28,15 L12,17 Z" fill="#c9692a"/>

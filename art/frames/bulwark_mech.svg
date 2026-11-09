@@ -54,7 +54,7 @@
 </g>
 
 <!-- Shoulders: huge slabs, set high -->
-<g>
+<g id="shoulders">
   <path d="M-12,-11 L-24,-9 L-24,6 L-12,8 Z M12,-11 L24,-9 L24,6 L12,8 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2.6"/>
   <path d="M-12,-11 L-24,-9 L-24,6 L-12,8 Z" fill="#f08a3c"/>
   <path d="M12,-11 L24,-9 L24,6 L12,8 Z" fill="#b85e22"/>
@@ -75,7 +75,7 @@
 </g>
 
 <!-- Helmet: low and armoured, sunk between the shoulders; a narrow visor slit at the front -->
-<g>
+<g id="helmet">
   <path d="M-5.5,-9 L5.5,-9 L6,-1 L-6,-1 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2"/>
   <path d="M-5.5,-9 L5.5,-9 L6,-1 L-6,-1 Z" fill="#e08840"/>
   <path d="M0.5,-9 L5.5,-9 L6,-1 L0.5,-1 Z" fill="#a8541d"/>
