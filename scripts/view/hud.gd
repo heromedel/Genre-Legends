@@ -31,6 +31,12 @@ var flash_amount := 0.0
 var damage_vignette := 0.0
 var time := 0.0
 
+## How long a banner stays up: long enough to read comfortably, longer for longer lines (heromedel: 1.2 s
+## was too fast even for a fast reader).
+static func banner_seconds(text: String) -> float:
+	return minf(2.0 + 0.04 * text.length(), 3.2)
+
+
 const STYLE_COLORS := {
 	"gold": Color(1.0, 0.8, 0.35), "red": Color(1.0, 0.35, 0.4), "cyan": Color(0.45, 0.9, 1.0),
 	"violet": Color(0.8, 0.55, 1.0), "blue": Color(0.5, 0.75, 1.0),
@@ -88,7 +94,8 @@ func tick(delta: float) -> void:
 		banner_time -= delta
 	elif not banners.is_empty():
 		current_banner = banners.pop_front()
-		banner_time = 1.2
+		current_banner["length"] = banner_seconds(current_banner["text"])
+		banner_time = current_banner["length"]
 		# Its band is picked once, as it appears, so it doesn't jump when the boss moves.
 		current_banner["y"] = _banner_height(get_viewport_rect().size) if mission != null else 220.0
 	else:
@@ -267,7 +274,7 @@ func _draw_banner(screen: Vector2) -> void:
 	if current_banner.is_empty() or covered:
 		return
 	var color: Color = STYLE_COLORS.get(current_banner["style"], Color.WHITE)
-	var t := 1.2 - banner_time
+	var t: float = current_banner["length"] - banner_time
 	var slide := ease(clampf(t / 0.2, 0.0, 1.0), 0.3)
 	var fade := clampf(banner_time / 0.3, 0.0, 1.0)
 	var y: float = current_banner["y"]

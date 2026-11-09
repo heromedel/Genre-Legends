@@ -26,7 +26,9 @@ func _process(delta: float) -> void:
 
 
 func _gui_input(event: InputEvent) -> void:
-	var tapped: bool = (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed)
+	# A tap arrives as a touch and again as an emulated mouse click; only the touch counts.
+	var tapped: bool = (event is InputEventScreenTouch and event.pressed) or \
+		(event is InputEventMouseButton and event.pressed and event.device != InputEvent.DEVICE_ID_EMULATION)
 	# A short guard so the tap that picked the card doesn't also skip the splash.
 	if tapped and time > 0.4:
 		PlayLog.button("Resonance splash: skip")

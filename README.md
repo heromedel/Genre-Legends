@@ -6,6 +6,15 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
+## What's new in 0.4.2
+
+- **A wider star map:** the command center's pages are tabs along the top and the planet card is a strip under the map, so the map gets the full width. The region's name no longer slides off the edge.
+- **Banners you can read:** they stay up 2–3 s instead of 1.2 s.
+- **Thunder Lance fires from the muzzle**, not from behind the mech.
+- **Blood Pact** has its own price now: two seconds without a kill and your armor bleeds away (never below a third). It no longer touches the shield, so it doesn't overlap Glass Reactor.
+- **Sound that comes back:** if the iPad suspends the game's audio, the next tap resumes it, and the play log records what happened to the audio.
+- Skipping a cutscene or the Resonance splash is logged once per tap, not twice.
+
 ## What's new in 0.4.1
 
 - **Resonance you can see:** a card that unlocks a Resonance tier wears its element's colour and a RESONANCE badge. Pick it and the action holds on a splash naming the tier and what it does. Your frame glows in the element's colour, brighter with each tier.

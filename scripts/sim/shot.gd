@@ -4,6 +4,7 @@ extends RefCounted
 ## (WeaponSystem for the player, EnemySystem and bosses for enemies) and read by World when it moves.
 
 var pos := Vector2.ZERO
+var origin := Vector2.ZERO    # where it was fired from: streaks are never drawn behind it
 var vel := Vector2.ZERO
 var radius := 5.0
 var damage := 10.0

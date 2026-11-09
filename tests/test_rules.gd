@@ -23,6 +23,7 @@ func _init() -> void:
 	_build_022()
 	_build_03()
 	_resonance_tiers()
+	_blood_pact()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -352,3 +353,21 @@ func _resonance_tiers() -> void:
 	world.player.shield = 5.0
 	world.damage_player(20.0, "test")
 	check(near.hp < near_hp, "Capacitor Discharge strikes when the shield breaks")
+
+
+## Blood Pact: no kills for a while bleeds armor, but never below a third; it no longer touches the shield.
+func _blood_pact() -> void:
+	var mission := _test_mission("planet")
+	mission.run.field["blood_pact"] = 1
+	var player := mission.player
+	for i in 60 * 120:
+		mission._blood_pact_bleed()
+	check(is_equal_approx(player.armor, player.max_armor / 3.0), "Blood Pact bleeds armor down to a third and no further (%.1f)" % player.armor)
+	player.since_kill = 0.0
+	var armor_before := player.armor
+	mission._blood_pact_bleed()
+	check(player.armor == armor_before, "Blood Pact doesn't bleed right after a kill")
+	player.shield = 0.0
+	player.shield_delay = 0.0
+	mission._update_world(InputFrame.new(), true)
+	check(player.shield > 0.0, "Blood Pact leaves the shield recharging")

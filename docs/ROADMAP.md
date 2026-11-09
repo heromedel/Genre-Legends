@@ -72,6 +72,10 @@
 
 (Note) Built 2026-11-09: Resonance tiers made obvious and significant (GDD 9H), boss banners clear of the boss, fusion progress that explains Mk caps.
 
+## Build 0.4.2 (2026-11-09, from heromedel's 0.4.1 log)
+
+(Note) Built 2026-11-09: tabs on top and a full-width star map (GDD 11R), readable banners (11S), Blood Pact's own price (11T), Thunder Lance from the muzzle, audio that resumes on a tap and is logged.
+
 ## Plan C: Defense and tanks
 
 1. Planetary Defense and Tank Assault, sharing the tank form.

@@ -38,6 +38,7 @@ var echo_counter := 0
 var afterimages: Array = []     # recent positions: the Tempest's afterimage, Option Pods' trail, the trail art
 var dash_time := 0.0            # Thruster Explosion: seconds of dash left
 var dash_dir := Vector2.ZERO
+var since_kill := 0.0           # Blood Pact: seconds since the last kill
 var ion_time := 0.0             # Ion Cannon: seconds of beam left
 
 ## Thruster Explosion's dash speed, in units per second.

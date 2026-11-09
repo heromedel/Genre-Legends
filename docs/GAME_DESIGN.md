@@ -136,6 +136,11 @@
 - **11P. Likely (2026-11-09):** Ricochet shots that miss leave the screen and come back from out of view, so space doesn't feel like a small box. (heromedel's idea.)
   - **Ai-Generated-Proposal (2026-11-09):** Each flies 25–90 px out of view, then comes back the way it came, turned up to about 45 degrees as if off a round rock, at 70% damage. Planet and dungeon walls still bounce where you can see.
 - **11Q. Ai-Generated-Proposal (2026-11-09):** If the last boss falls to your shots while your wreck is still burning, you traded with it: the mission counts as won and the prize is yours.
+- **11R. Likely (2026-11-09):** The command center's pages are tabs along the top and the planet card is a strip under the star map, so the map gets the full width. (heromedel's idea.)
+  - **Ai-Generated-Proposal (2026-11-09):** The map zooms out a little on short screens so a whole region fits top to bottom, and each region's name stays pinned inside the view.
+- **11S. Likely (2026-11-09):** Banners stay up long enough to read comfortably: 1.2 s was too fast even for a fast reader. (heromedel.)
+  - **Ai-Generated-Proposal (2026-11-09):** 2 s plus a little per letter, at most 3.2 s.
+- **11T. Ai-Generated-Proposal (2026-11-09):** Each risky card has its own price, so taking one never makes another free (heromedel spotted Glass Reactor and Blood Pact both costing the shield). Blood Pact: kills repair armor, but two seconds without a kill bleeds armor away, never below a third.
 - **11J. Likely (2026-11-08):** Bullets that glow in the dark are an accessibility option, not a rule: Settings, "Bullets glow in the dark: Off > On".
 - **11H. Ai-Generated-Proposal (2026-11-08):** Explosive Resonance III is renamed Wildfire, and burning effects never mention the ground, since many fights are in space.
 
@@ -170,4 +175,5 @@
 | 2026-11-09 | 11M | The Dropship and its launch, arrival and return transitions around every mission. |
 | 2026-11-09 | 11N to 11Q | Auto-fire becomes an option in every mode; options on the pause menu; Ricochet comes back from off screen; a boss that falls as you do counts as a win. |
 | 2026-11-09 | 9H | Resonance tiers made obvious (card badge, splash on pick, frame glow) and the flat tiers reworked into visible effects. |
+| 2026-11-09 | 11R to 11T | Tabs on top and the planet card under a full-width star map; banners that stay up long enough to read; risky cards with their own prices. |
 | 2026-11-09 | 4E | Cold reviews in small, focused batches; every finding triaged into the review log. |

@@ -50,7 +50,7 @@ const RISKY_FIELD := {
 	},
 	"blood_pact": {
 		"name": "Blood Pact", "limit": 1, "icon": "vampiric_plating", "element": "mawjig",
-		"text": "Every kill repairs armor. Your shield never recharges.",
+		"text": "Every kill repairs armor. Go two seconds without a kill and your armor bleeds away, down to a third.",
 	},
 }
 

@@ -153,6 +153,7 @@ func _maybe_promote(enemy: Enemy, data: Dictionary) -> void:
 func enemy_shot(at: Vector2, angle: float, speed: float, options: Dictionary = {}) -> Shot:
 	var shot := Shot.new()
 	shot.pos = at
+	shot.origin = at
 	var speed_scale := bullet_speed_scale * (0.8 if gentle else 1.0)
 	shot.vel = Vector2.from_angle(angle) * speed * speed_scale
 	shot.radius = options.get("radius", 6.0)
@@ -181,6 +182,7 @@ func enemy_ring(at: Vector2, count: int, speed: float, offset: float = 0.0, opti
 func player_shot(at: Vector2, velocity: Vector2, damage: float, tech: String, look: String, color: Color) -> Shot:
 	var shot := Shot.new()
 	shot.pos = at
+	shot.origin = at
 	shot.vel = velocity
 	shot.damage = damage
 	shot.tech = tech
@@ -421,7 +423,8 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 	if tech != "resonance" and resonance["explosive"] >= 1 and rng.randf() < 0.34:
 		explode(enemy.pos, 80.0, 26.0 + 6.0 * resonance["explosive"], "resonance", Color(1.0, 0.55, 0.25))
 	if run.field_count("blood_pact") > 0:
-		player.repair(1.5)
+		player.repair(2.0)
+		player.since_kill = 0.0
 	if run.is_online("soul_lantern"):
 		wisps = mini(wisps + 1, max_wisps())
 	# Hexplosion fork, or Mawjig resonance II: hexed enemies burst and spread the hex.

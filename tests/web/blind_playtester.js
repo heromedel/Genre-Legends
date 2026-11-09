@@ -21,7 +21,7 @@ const playSeconds = Number(process.argv[3] || 150);
   await page.mouse.click(566, 400);            // "TAP TO START" - anywhere works
   await page.waitForTimeout(2500);
   await snap('hub');
-  await page.mouse.click(960, 437);            // the big LAUNCH button on the planet card
+  await page.mouse.click(970, 647);            // the big LAUNCH button on the planet card strip
   await page.waitForTimeout(3000);
   // Play: a thumb drags the ship around in loose sweeps, and taps the middle card whenever cards appear.
   let x = 566, y = 620;
@@ -46,11 +46,11 @@ const playSeconds = Number(process.argv[3] || 150);
   for (const y of [530, 509, 493]) { await page.mouse.click(566, y); await page.waitForTimeout(800); }   // "Continue" (its height depends on the text above it)
   await page.waitForTimeout(1500);
   await snap('back_to_hub');
-  await page.mouse.click(57, 560); await page.waitForTimeout(1500);   // rail: SETTINGS
+  await page.mouse.click(643, 26); await page.waitForTimeout(1500);   // tab: SETTINGS
   const download = page.waitForEvent('download', { timeout: 15000 }).catch(() => null);
   // Scrolled to the bottom, the button sits at a fixed spot however many settings are added above it.
   await page.mouse.move(600, 500); await page.mouse.wheel(0, 3000); await page.waitForTimeout(800);
-  await page.mouse.click(206, 351);   // Settings: "Save play log file"
+  await page.mouse.click(94, 351);   // Settings: "Save play log file"
   const file = await download;
   if (file) { await file.saveAs(`${out}/play_log.txt`); console.log('play log saved'); } else { console.log('no play log download'); }
   console.log(errors.length ? errors.slice(0, 10).join('\n') : 'no console errors');

@@ -204,7 +204,8 @@ func _thunder_lance() -> void:
 		if fork == "b":
 			angles = [-0.12, 0.12] if level < 5 else [-0.14, 0.0, 0.14]
 		for spread: float in angles:
-			var shot := world.player_shot(origin, Vector2.from_angle(player.facing + spread) * 2300.0,
+			# The rail leaves from the muzzle, in front of the frame, not from its middle.
+			var shot := world.player_shot(origin + Vector2.from_angle(player.facing) * 22.0, Vector2.from_angle(player.facing + spread) * 2300.0,
 				damage * scale, "thunder_lance", "rail", Color(0.6, 0.85, 1.0))
 			shot.radius = 8.0
 			shot.pierce = 99

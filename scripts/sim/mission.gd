@@ -24,6 +24,10 @@ var offers: UpgradeOffers
 var lesson_hazards: LessonHazards
 var stage: Stage
 
+## Blood Pact: seconds without a kill before armor starts bleeding, and how fast it bleeds per second.
+const BLOOD_PACT_GRACE := 2.0
+const BLOOD_PACT_BLEED := 2.5
+
 var state := "intro"            # intro, play, offer, crate, won, lost
 var state_timer := 0.0
 var tick := 0
@@ -187,9 +191,9 @@ func _update_world(input: InputFrame, player_active: bool) -> void:
 		player.move(input, DT, 1.0 + 0.15 * run.field_count("overclocked_servos"))
 		_keep_player_in_bounds()
 		var shield_regen := 1.6 if FrameData.get_frame(run.frame_id)["trait"] == "fortress_field" else 1.0
-		if run.field_count("blood_pact") > 0:
-			shield_regen = 0.0
 		player.tick_timers(DT, shield_regen)
+		if run.field_count("blood_pact") > 0:
+			_blood_pact_bleed()
 		weapons.update(input, DT)
 		_track_time_brake()
 	stage.tick_pending_boss(DT)
@@ -205,6 +209,15 @@ func _update_world(input: InputFrame, player_active: bool) -> void:
 	world.update_pickups(DT)
 	world.update_allies(DT)
 	world.cleanup()
+
+
+## Blood Pact's price: without a kill for a couple of seconds, armor bleeds away, but never below a third,
+## so it pushes you to keep killing without being what wrecks you. Its own penalty, so it doesn't overlap
+## Glass Reactor's lost shield (heromedel).
+func _blood_pact_bleed() -> void:
+	player.since_kill += DT
+	if player.since_kill > BLOOD_PACT_GRACE and player.armor > player.max_armor / 3.0:
+		player.armor = maxf(player.armor - BLOOD_PACT_BLEED * DT, player.max_armor / 3.0)
 
 
 func _keep_player_in_bounds() -> void:

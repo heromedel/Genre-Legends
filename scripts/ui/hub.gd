@@ -1,7 +1,8 @@
 class_name Hub
 extends Control
-## The command center (GDD 5A): a console menu with text and icons. A rail on the left switches pages:
-## Star Map (pick where to go), Hangar (frame and loadout), R&D (spend blueprints) and Settings.
+## The command center (GDD 5A): a console menu with text and icons. Tabs along the top switch pages:
+## Star Map (pick where to go), Hangar (frame and loadout), R&D (spend blueprints), Guide, Records and
+## Settings. The tabs sit on top, not in a side rail, so the star map gets the screen's full width (heromedel).
 
 ## event: what a route event (RouteEvents) leaves for the mission, or {} for a quiet trip.
 signal launch_requested(node_id: String, event: Dictionary)
@@ -9,8 +10,8 @@ signal launch_requested(node_id: String, event: Dictionary)
 var star_map: StarMap
 var page := "map"
 var content: Control
-var rail_buttons := {}
-var rail_dots := {}             # page id -> its green dot, refreshed on every rebuild
+var tab_buttons := {}
+var tab_dots := {}              # page id -> its green dot, refreshed on every rebuild
 var selected_node := ""
 var picker_slot := -1
 var admin: AdminConsole
@@ -28,15 +29,10 @@ func _ready() -> void:
 	backdrop.color = Color(0.025, 0.035, 0.07)
 	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(backdrop)
-	var root := HBoxContainer.new()
-	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	root.add_theme_constant_override("separation", 0)
-	add_child(root)
-	root.add_child(_build_rail())
 	var main := VBoxContainer.new()
-	main.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	main.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	main.add_theme_constant_override("separation", 0)
-	root.add_child(main)
+	add_child(main)
 	main.add_child(_build_top_bar())
 	content = MarginContainer.new()
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -140,72 +136,73 @@ func _largest_blueprint_pile_id() -> String:
 	return best
 
 
-func _build_rail() -> Control:
-	var rail := PanelContainer.new()
-	rail.add_theme_stylebox_override("panel", UiKit._box(Color(0.04, 0.06, 0.1), Color(0.15, 0.24, 0.35), 0, 0))
-	rail.custom_minimum_size = Vector2(112, 0)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 10)
-	rail.add_child(column)
-	var logo := UiKit.label("GL", 30, Art.GOLD, "title")
-	logo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(UiKit.spacer(6))
-	column.add_child(logo)
-	column.add_child(UiKit.spacer(8))
+## One tab per page: an icon and its name, in a row across the top bar.
+func _build_tabs() -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
 	for entry in [["map", "map", "STAR MAP"], ["hangar", "hangar", "HANGAR"], ["rnd", "lab", "R&D"], ["guide", "guide", "GUIDE"], ["records", "prize", "RECORDS"], ["settings", "settings", "SETTINGS"]]:
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(96, 84)
+		button.custom_minimum_size = Vector2(118, 46)
 		button.focus_mode = Control.FOCUS_NONE
 		var page_id: String = entry[0]
 		button.pressed.connect(func():
-			PlayLog.button("Rail: %s" % entry[2])
+			PlayLog.button("Tab: %s" % entry[2])
 			Sound.play("ui")
 			show_page(page_id))
-		var box := VBoxContainer.new()
+		var box := HBoxContainer.new()
 		box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		box.alignment = BoxContainer.ALIGNMENT_CENTER
-		var icon := IconView.make(entry[1], 34, Color(0.6, 0.9, 1.0))
-		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		box.add_theme_constant_override("separation", 6)
+		var icon := IconView.make(entry[1], 22, Color(0.6, 0.9, 1.0))
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		box.add_child(icon)
-		var text := UiKit.label(entry[2], 12, Color(0.7, 0.85, 1.0), "bold")
-		text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var text := UiKit.label(entry[2], 13, Color(0.7, 0.85, 1.0), "bold")
 		text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_child(text)
 		button.add_child(box)
-		column.add_child(button)
-		rail_buttons[page_id] = button
+		row.add_child(button)
+		tab_buttons[page_id] = button
 		if page_id in ["hangar", "rnd"]:
 			var dot := NewDot.new()
 			button.add_child(dot)
-			rail_dots[page_id] = dot
-	return rail
+			tab_dots[page_id] = dot
+	return row
 
 
 ## Green dots (GDD 9C): Hangar while new tech waits to be equipped, R&D while something can be unlocked
 ## or upgraded. Refreshed on every rebuild so they clear the moment you act on them.
-func _refresh_rail_dots() -> void:
-	rail_dots["hangar"].visible = not Save.data["new_unlocks"].is_empty()
-	rail_dots["rnd"].visible = TechData.TECH.keys().any(func(tech_id): return Save.can_upgrade(tech_id))
+func _refresh_tab_dots() -> void:
+	tab_dots["hangar"].visible = not Save.data["new_unlocks"].is_empty()
+	tab_dots["rnd"].visible = TechData.TECH.keys().any(func(tech_id): return Save.can_upgrade(tech_id))
 
 
 func _build_top_bar() -> Control:
 	var bar := PanelContainer.new()
 	bar.add_theme_stylebox_override("panel", UiKit._box(Color(0.04, 0.06, 0.1), Color(0.15, 0.24, 0.35), 0, 0))
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 22)
+	row.add_theme_constant_override("separation", 14)
 	bar.add_child(row)
-	row.add_child(UiKit.label("COMMAND CENTER", 22, Color(0.6, 0.9, 1.0), "title"))
+	row.add_child(UiKit.label("GL", 26, Art.GOLD, "title"))
+	row.add_child(_build_tabs())
 	var filler := Control.new()
 	filler.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(filler)
+	# Who you are and how far you've come, stacked small so the tabs keep their room.
+	var stats := VBoxContainer.new()
+	stats.add_theme_constant_override("separation", -2)
+	stats.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(stats)
 	var frame := FrameData.get_frame(Save.data["frame"])
-	row.add_child(UiKit.label("Frame: %s" % frame["name"], 16, frame["hull"], "bold"))
-	row.add_child(UiKit.label("Planets cleared: %d" % Save.data["cleared"].size(), 16, Color(0.7, 0.85, 1.0)))
 	var total_blueprints := 0
 	for tech_id in Save.data["blueprints"]:
 		total_blueprints += int(Save.data["blueprints"][tech_id])
-	row.add_child(UiKit.label("Blueprints: %d" % total_blueprints, 16, Color(0.5, 0.8, 1.0)))
+	var name_label := UiKit.label("Frame: %s" % frame["name"], 14, frame["hull"], "bold")
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	stats.add_child(name_label)
+	var progress := UiKit.label("Cleared %d  •  Blueprints %d" % [Save.data["cleared"].size(), total_blueprints], 13, Color(0.6, 0.78, 0.95))
+	progress.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	stats.add_child(progress)
 	return bar
 
 
@@ -219,9 +216,9 @@ func show_page(page_id: String) -> void:
 ## Rebuilds the current page from Save, keeping in-page state such as the open slot picker.
 func _rebuild() -> void:
 	var page_id := page
-	for key in rail_buttons:
-		rail_buttons[key].add_theme_stylebox_override("normal", UiKit._box(Color(0.12, 0.2, 0.3) if key == page_id else Color(0.06, 0.09, 0.14), Color(0.5, 0.85, 1.0) if key == page_id else Color(0.2, 0.3, 0.42), 2))
-	_refresh_rail_dots()
+	for key in tab_buttons:
+		tab_buttons[key].add_theme_stylebox_override("normal", UiKit._box(Color(0.12, 0.2, 0.3) if key == page_id else Color(0.06, 0.09, 0.14), Color(0.5, 0.85, 1.0) if key == page_id else Color(0.2, 0.3, 0.42), 2))
+	_refresh_tab_dots()
 	for child in content.get_children():
 		child.queue_free()
 	match page_id:
@@ -236,15 +233,17 @@ func _rebuild() -> void:
 # ---------------------------------------------------------------- star map
 
 var _map_view: StarMapView
-var _info: VBoxContainer
+var _info: HBoxContainer
 
 
+## The map across the full width, and the selected planet's card as a strip underneath it.
 func _build_map_page() -> Control:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 14)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 10)
 	var frame := UiKit.panel(Color(0.02, 0.03, 0.06), Color(0.2, 0.32, 0.46))
 	frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(frame)
+	frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	column.add_child(frame)
 	_map_view = StarMapView.new()
 	_map_view.star_map = star_map
 	_map_view.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -252,21 +251,21 @@ func _build_map_page() -> Control:
 	_map_view.node_selected.connect(_on_node_selected)
 	frame.add_child(_map_view)
 	var info_panel := UiKit.panel()
-	info_panel.custom_minimum_size = Vector2(340, 0)
-	row.add_child(info_panel)
+	info_panel.custom_minimum_size = Vector2(0, 190)
+	column.add_child(info_panel)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(0, 170)
 	info_panel.add_child(scroll)
-	_info = VBoxContainer.new()
+	_info = HBoxContainer.new()
 	_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_info.add_theme_constant_override("separation", 8)
+	_info.add_theme_constant_override("separation", 28)
 	scroll.add_child(_info)
 	if selected_node == "" or star_map.get_node(selected_node).is_empty():
 		selected_node = _frontier_node()
 	_map_view.selected = selected_node
 	_fill_info(selected_node)
-
-	return row
+	return column
 
 
 ## The planet to suggest: the first reachable planet not yet cleared, preferring the main route.
@@ -295,12 +294,16 @@ func _fill_info(node_id: String) -> void:
 	var node := star_map.get_node(node_id)
 	if node.is_empty():
 		return
+	# Three columns: which planet it is, what you'll face there, and what it pays (with LAUNCH).
+	var identity := _info_column(1.25)
+	var threat := _info_column(1.25)
+	var payout := _info_column(0.9)
 	var mission_type: Dictionary = MissionData.TYPES[node["type"]]
 	var region_name: String = star_map.regions[node["region"]]["name"]
-	_info.add_child(UiKit.label(region_name.to_upper(), 13, Color(0.5, 0.65, 0.8), "bold"))
-	_info.add_child(UiKit.label(node["name"], 30, Color(1, 1, 1), "title"))
+	identity.add_child(UiKit.label(region_name.to_upper(), 13, Color(0.5, 0.65, 0.8), "bold"))
+	identity.add_child(UiKit.label(node["name"], 30, Color(1, 1, 1), "title"))
 	if node["branch"] != "":
-		_info.add_child(UiKit.label(node["branch_name"], 16, Art.GOLD, "bold"))
+		identity.add_child(UiKit.label(node["branch_name"], 16, Art.GOLD, "bold"))
 	var type_row := HBoxContainer.new()
 	type_row.add_child(IconView.make(node["type"], 30, Color(0.6, 0.9, 1.0)))
 	var type_text := VBoxContainer.new()
@@ -308,28 +311,28 @@ func _fill_info(node_id: String) -> void:
 	type_text.add_child(UiKit.label(mission_type["name"], 19, Color(0.6, 0.9, 1.0), "bold"))
 	type_text.add_child(UiKit.label("%s  •  %s form" % [mission_type["genre"], mission_type["form"].capitalize()], 13, Color(0.6, 0.7, 0.85)))
 	type_row.add_child(type_text)
-	_info.add_child(type_row)
-	_info.add_child(UiKit.wrapped(node["need"], 16, Color(0.85, 0.9, 1.0)))
+	identity.add_child(type_row)
+	identity.add_child(UiKit.wrapped(node["need"], 16, Color(0.85, 0.9, 1.0)))
 	if node.get("chain", "") != "":
 		var next_type: Dictionary = MissionData.TYPES[node["chain"]]
-		_info.add_child(UiKit.wrapped("CHAINED: partway through, it becomes a %s (%s form)." % [next_type["name"], next_type["form"]], 15, Color(0.6, 1.0, 0.8)))
+		identity.add_child(UiKit.wrapped("CHAINED: partway through, it becomes a %s (%s form)." % [next_type["name"], next_type["form"]], 15, Color(0.6, 1.0, 0.8)))
 	if node.get("hazard", false):
-		_info.add_child(UiKit.label("HAZARD ROUTE", 17, Color(1, 0.4, 0.4), "bold"))
-		_info.add_child(UiKit.wrapped("Much harder than its neighbours, and pays double blueprints. Optional.", 14, Color(1, 0.75, 0.7)))
-	_info.add_child(UiKit.label("You'll face", 14, Color(0.6, 0.7, 0.85)))
+		identity.add_child(UiKit.label("HAZARD ROUTE", 17, Color(1, 0.4, 0.4), "bold"))
+		identity.add_child(UiKit.wrapped("Much harder than its neighbours, and pays double blueprints. Optional.", 14, Color(1, 0.75, 0.7)))
+	threat.add_child(UiKit.label("You'll face", 14, Color(0.6, 0.7, 0.85)))
 	var boss_line := "Boss: %s   Mini-boss: %s" % [GuideData.BOSSES[BossRoster.for_node(node, "boss")][0], GuideData.BOSSES[BossRoster.for_node(node, "miniboss")][0]]
-	_info.add_child(UiKit.wrapped(boss_line, 14, Color(1, 0.6, 0.5)))
+	threat.add_child(UiKit.wrapped(boss_line, 14, Color(1, 0.6, 0.5)))
 	for enemy_trait in MissionData.traits_for(node, Save.data["enemies_unlocked"]):
-		_info.add_child(UiKit.wrapped("- " + enemy_trait, 14, Color(1, 0.8, 0.6)))
+		threat.add_child(UiKit.wrapped("- " + enemy_trait, 14, Color(1, 0.8, 0.6)))
 	var danger_row := HBoxContainer.new()
 	danger_row.add_child(UiKit.label("Danger", 15, Color(0.7, 0.8, 0.9)))
 	for i in 5:
 		danger_row.add_child(IconView.make("danger", 24, Color(1, 0.4, 0.35) if i < node["danger"] else Color(0.25, 0.28, 0.35)))
-	_info.add_child(danger_row)
+	threat.add_child(danger_row)
 	if node["modifier"] != "":
 		var modifier: Dictionary = MissionData.MODIFIERS[node["modifier"]]
-		_info.add_child(UiKit.label("Special condition: " + modifier["name"], 17, Color(1, 0.75, 0.35), "bold"))
-		_info.add_child(UiKit.wrapped(modifier["text"], 14, Color(0.9, 0.8, 0.65)))
+		threat.add_child(UiKit.label("Special condition: " + modifier["name"], 17, Color(1, 0.75, 0.35), "bold"))
+		threat.add_child(UiKit.wrapped(modifier["text"], 14, Color(0.9, 0.8, 0.65)))
 	var reward_row := HBoxContainer.new()
 	reward_row.add_child(IconView.make(node["reward_tech"], 28, TechData.element_color(node["reward_tech"])))
 	var reward_text := VBoxContainer.new()
@@ -337,19 +340,29 @@ func _fill_info(node_id: String) -> void:
 	reward_text.add_child(UiKit.label("Blueprints", 13, Color(0.6, 0.7, 0.85)))
 	reward_text.add_child(UiKit.label(TechData.TECH[node["reward_tech"]]["name"], 17, TechData.element_color(node["reward_tech"]), "bold"))
 	reward_row.add_child(reward_text)
-	_info.add_child(reward_row)
+	payout.add_child(reward_row)
 	if node["prize"] != "":
 		var claimed: bool = Save.data["prizes_claimed"].has(node_id)
-		_info.add_child(UiKit.label("PRIZE" + (" (claimed)" if claimed else ""), 16, Art.GOLD, "bold"))
-		_info.add_child(UiKit.wrapped(node["prize_text"], 15, Color(1, 0.9, 0.7)))
-	_info.add_child(UiKit.spacer(6))
+		payout.add_child(UiKit.label("PRIZE" + (" (claimed)" if claimed else ""), 16, Art.GOLD, "bold"))
+		payout.add_child(UiKit.wrapped(node["prize_text"], 15, Color(1, 0.9, 0.7)))
+	payout.add_child(UiKit.spacer(6))
 	var available := star_map.is_available(node_id, Save.is_cleared)
 	if Save.is_cleared(node_id):
-		_info.add_child(UiKit.label("Cleared — fly it again any time.", 14, Color(0.5, 1.0, 0.65)))
+		payout.add_child(UiKit.label("Cleared — fly it again any time.", 14, Color(0.5, 1.0, 0.65)))
 	if available:
-		_info.add_child(UiKit.button("LAUNCH", func(): _launch(node), "Launch %s" % node_id, true))
+		payout.add_child(UiKit.button("LAUNCH", func(): _launch(node), "Launch %s" % node_id, true))
 	else:
-		_info.add_child(UiKit.wrapped("Out of reach. Clear a planet linked to this one first.", 14, Color(0.65, 0.7, 0.8)))
+		payout.add_child(UiKit.wrapped("Out of reach. Clear a planet linked to this one first.", 14, Color(0.65, 0.7, 0.8)))
+
+
+## One column of the planet card strip; weight sets its share of the width.
+func _info_column(weight: float) -> VBoxContainer:
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.size_flags_stretch_ratio = weight
+	column.add_theme_constant_override("separation", 6)
+	_info.add_child(column)
+	return column
 
 
 # ---------------------------------------------------------------- hangar

@@ -24,6 +24,7 @@ var _last_played := {}
 var _building_track := ""
 var _wanted_track := ""
 var _effects_ready := false
+var _audio_check := 0.0           # seconds until the page's audio state is next checked for the play log
 
 
 func _ready() -> void:
@@ -35,6 +36,17 @@ func _ready() -> void:
 	music = AudioStreamPlayer.new()
 	add_child(music)
 	_build_effects()
+
+
+## Every couple of seconds, anything the browser did to the page's audio goes into the play log, so a sound
+## dropout on the iPad shows up there (Browser.audio_events).
+func _process(delta: float) -> void:
+	_audio_check -= delta
+	if _audio_check > 0.0:
+		return
+	_audio_check = 2.0
+	for event in Browser.audio_events():
+		PlayLog.note("audio", str(event))
 
 
 func _build_effects() -> void:

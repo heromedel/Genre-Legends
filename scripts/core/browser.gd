@@ -1,5 +1,8 @@
 class_name Browser
 ## Talks to the web page around the game (only does anything in the web build).
+## Audio: iPad Safari can suspend or interrupt the page's audio (another app, a call, the screen dimming)
+## and never bring it back. The head include watches the audio context, resumes it on the next tap or key,
+## and keeps a list of what happened for the play log (audio_events).
 ## Full screen: the page itself enters full screen on the player's next tap, because browsers only allow it
 ## from a tap. The script that does it lives in the export's head include (export_presets.cfg).
 
@@ -24,3 +27,12 @@ static func clear_cache_and_reload() -> void:
 static func leave_fullscreen() -> void:
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("(document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document);", true)
+
+
+## What happened to the page's audio since the last call ("audio is now suspended", ...), oldest first.
+static func audio_events() -> Array:
+	if not OS.has_feature("web"):
+		return []
+	var text = JavaScriptBridge.eval("JSON.stringify((window.glAudio && window.glAudio.events.splice(0)) || [])", true)
+	var parsed = JSON.parse_string(str(text)) if text != null else []
+	return parsed if parsed is Array else []

@@ -18,12 +18,17 @@ var _stars := PackedVector2Array()
 
 
 var _centered := false
+## The map is laid out for about this much height; a shorter view zooms out a little so a whole region
+## still fits top to bottom (the planet card sits under the map).
+const FIT_HEIGHT := 620.0
+var zoom := 1.0
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	clip_contents = true
 	resized.connect(func():
+		zoom = clampf(size.y / FIT_HEIGHT, 0.72, 1.0)
 		if not _centered and size.x > 10.0 and selected != "":
 			_centered = true
 			center_on(selected))
@@ -40,12 +45,25 @@ func is_cleared(node_id: String) -> bool:
 func center_on(node_id: String) -> void:
 	if star_map.get_node(node_id).is_empty():
 		return
-	offset = -star_map.position_of(node_id) + Vector2(-size.x * 0.12, 0)
+	# The selected planet sits in the left fifth, with the routes ahead of it filling the rest; vertically the
+	# map's rows are centred, with room above them for the region's name.
+	var top := INF
+	var bottom := -INF
+	for other in star_map.all_node_ids():
+		var y := star_map.position_of(other).y
+		top = minf(top, y)
+		bottom = maxf(bottom, y)
+	offset = Vector2(-star_map.position_of(node_id).x - _view().x * 0.3, -(top + bottom) * 0.5 + 20.0)
 	_clamp_offset()
 
 
+## The view's size in map units: the canvas is drawn zoomed, so everything inside works in these.
+func _view() -> Vector2:
+	return size / zoom
+
+
 func _map_to_screen(at: Vector2) -> Vector2:
-	return size * 0.5 + at + offset
+	return _view() * 0.5 + at + offset
 
 
 func _process(delta: float) -> void:
@@ -54,20 +72,23 @@ func _process(delta: float) -> void:
 
 
 func _gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouse):
+		return
+	var at: Vector2 = event.position / zoom
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			_dragging = true
-			_drag_from = event.position
-			_press_pos = event.position
+			_drag_from = at
+			_press_pos = at
 			_drag_distance = 0.0
 		else:
 			_dragging = false
 			if _drag_distance < 14.0:
-				_tap(event.position)
+				_tap(at)
 	elif event is InputEventMouseMotion and _dragging:
-		offset += event.position - _drag_from
-		_drag_distance += (event.position - _drag_from).length()
-		_drag_from = event.position
+		offset += at - _drag_from
+		_drag_distance += (at - _drag_from).length()
+		_drag_from = at
 		_clamp_offset()
 	elif event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 		offset.x += 60.0 if event.button_index == MOUSE_BUTTON_WHEEL_UP else -60.0
@@ -99,7 +120,8 @@ func _tap(at: Vector2) -> void:
 
 
 func _draw() -> void:
-	var screen := size
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2(zoom, zoom))
+	var screen := _view()
 	draw_rect(Rect2(Vector2.ZERO, screen), Color(0.02, 0.03, 0.07))
 	for star in _stars:
 		var at := Vector2(fposmod(star.x + offset.x * 0.3, screen.x + 100.0) - 50.0, fposmod(star.y + offset.y * 0.3, screen.y + 100.0) - 50.0)
@@ -125,6 +147,10 @@ func _draw_region_names() -> void:
 	for region in star_map.regions.size():
 		var x := region * (StarMap.COLUMNS_PER_REGION + 1) * StarMap.COLUMN_SPACING - 60.0
 		var at := _map_to_screen(Vector2(x, -330))
+		# While the region is in view, its name stays pinned inside the left edge instead of sliding off it.
+		var region_end := _map_to_screen(Vector2(x + StarMap.COLUMNS_PER_REGION * StarMap.COLUMN_SPACING, -330)).x
+		at.x = maxf(at.x, minf(16.0, region_end - 440.0))
+		at.y = maxf(at.y, 40.0)
 		var palette: Dictionary = star_map.regions[region]["palette"]
 		draw_string(font, at, star_map.regions[region]["name"].to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 30, Art.with_alpha(palette["accent"], 0.35))
 		draw_line(at + Vector2(0, 12), at + Vector2(420, 12), Art.with_alpha(palette["accent"], 0.2), 2.0)
@@ -160,7 +186,7 @@ func _dashed_line(from: Vector2, to: Vector2, color: Color, width: float) -> voi
 func _draw_planet(node_id: String) -> void:
 	var node := star_map.get_node(node_id)
 	var at := _map_to_screen(star_map.position_of(node_id))
-	if not Rect2(Vector2(-80, -80), size + Vector2(160, 160)).has_point(at):
+	if not Rect2(Vector2(-80, -80), _view() + Vector2(160, 160)).has_point(at):
 		return
 	var cleared := is_cleared(node_id)
 	var available := star_map.is_available(node_id, is_cleared)

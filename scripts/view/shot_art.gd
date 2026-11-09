@@ -10,7 +10,8 @@ static func draw_player_shot(ci: CanvasItem, shot: Shot, time: float) -> void:
 	match shot.look:
 		"rail":
 			# A real rail: a long straight streak of light with lightning crawling along it.
-			var tail := shot.pos - direction * 380.0
+			# The streak trails back from the tip, but never past the muzzle it left.
+			var tail := shot.pos - direction * minf(380.0, shot.pos.distance_to(shot.origin))
 			ci.draw_line(tail, shot.pos, Art.with_alpha(shot.color, 0.35), 14.0, true)
 			ci.draw_line(tail.lerp(shot.pos, 0.3), shot.pos, Color(1, 1, 1, 0.85), 3.0, true)
 			var side := direction.orthogonal()
