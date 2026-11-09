@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- One of the Twin Aces: a long-nosed duelling fighter with twin tail fins, facing up. Red; the blue twin is the same art recoloured.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<g id="flame"><path d="M-6,22 L-4,32 L-2,22 Z M2,22 L4,32 L6,22 Z" fill="#ffe0a0" opacity="0.9"/></g>
+<path d="M-8,14 L-14,26 L-6,24 Z M8,14 L14,26 L6,24 Z" fill="#2a0712" stroke="#2a0712" stroke-width="2.4"/>
+<path d="M-8,14 L-14,26 L-6,24 Z M8,14 L14,26 L6,24 Z" fill="#b8325a"/>
+<path d="M0,-34 L5,-14 L26,6 L26,12 L8,10 L6,22 L-6,22 L-8,10 L-26,12 L-26,6 L-5,-14 Z" fill="#2a0712" stroke="#2a0712" stroke-width="3"/>
+<path d="M0,-34 L-5,-14 L-26,6 L-26,12 L-8,10 L-6,22 L0,22 Z" fill="#f2507a"/>
+<path d="M0,-34 L5,-14 L26,6 L26,12 L8,10 L6,22 L0,22 Z" fill="#b8325a"/>
+<path d="M-26,8 L-8,6 L-8,10 L-26,12 Z" fill="#8a2040"/>
+<path d="M-0.8,-30 L-5.4,-13 L-24,5" stroke="#ffc2d6" stroke-width="1.4" fill="none"/>
+<path d="M0,-24 C2.6,-19 2.6,-8 0,-3 C-2.6,-8 -2.6,-19 0,-24 Z" fill="#2a0712"/>
+<path d="M0,-22 C1.6,-18 1.6,-9 0,-5 C-1.6,-9 -1.6,-18 0,-22 Z" fill="#fff0c8"/>
+<path d="M-20,8 L-10,6 M20,8 L10,6" stroke="#ffd0e0" stroke-width="1.6"/>
+<circle cx="-14" cy="2" r="2" fill="#ffcc3a"/><circle cx="14" cy="2" r="2" fill="#ffcc3a"/>
+</g>
+</svg>

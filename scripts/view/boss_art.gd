@@ -1,6 +1,11 @@
 class_name BossArt
 ## Draws each boss as one big set piece (GDD 6H proposal) from its parts' live state:
 ## broken bays smoke, armor plates slide open, legs buckle, the king fades between pillars.
+## Redrawn bosses use the five-pass vector art in res://art/bosses: a hull drawn in place around the boss's
+## origin (facing down, game units) and a small piece for each part, drawn where the part is. Ships that fly
+## are authored facing up like the enemies and turned to face down.
+
+const ART := "res://art/bosses/%s.svg"
 
 
 static func draw(ci: CanvasItem, boss: BossBase, time: float) -> void:
@@ -39,60 +44,59 @@ static func draw_glow(ci: CanvasItem, boss: BossBase, time: float) -> void:
 			Art.draw_glow(ci, part.pos, part.radius * 2.2, Art.with_alpha(boss.color, 0.3))
 
 
+## One piece of boss art at a place, turned and scaled, flashing white while its part is hit.
+static func _piece(ci: CanvasItem, art: String, at: Vector2, part: Enemy = null, rotation := 0.0, scale := 1.0, options := {}) -> void:
+	var drawn := options.duplicate()
+	if part != null and part.flash > 0.0:
+		drawn["flash"] = 0.55
+	VectorArt.draw(ci, ART % art, Transform2D(rotation, Vector2(scale, scale), 0.0, at), drawn)
+
+
+## A ship authored facing up, flown facing down: mirrored top to bottom rather than turned around, so its
+## light still falls from the top-left like everything else.
+static func _ship_down(ci: CanvasItem, art: String, at: Vector2, part: Enemy, scale: float, options := {}) -> void:
+	var drawn := options.duplicate()
+	if part != null and part.flash > 0.0:
+		drawn["flash"] = 0.55
+	VectorArt.draw(ci, ART % art, Transform2D(0.0, Vector2(scale, -scale), 0.0, at), drawn)
+
+
+## Smoke rising from a wrecked part.
+static func _smoke(ci: CanvasItem, at: Vector2, time: float) -> void:
+	for s in 3:
+		ci.draw_circle(at + Vector2(sin(time * 3.0 + s * 2.0) * 10.0, -10.0 - fmod(time * 30.0 + s * 12.0, 36.0)), 6.0 + s * 2.0, Color(0.2, 0.2, 0.2, 0.5))
+
+
 static func _flash(part: Enemy, color: Color) -> Color:
 	return color.lerp(Color.WHITE, 0.45) if part != null and part.flash > 0.0 else color
 
 
 static func _hive_carrier(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	var o := boss.origin
-	var hull := PackedVector2Array([
-		Vector2(-330, -40), Vector2(-260, -70), Vector2(-90, -84), Vector2(90, -84), Vector2(260, -70), Vector2(330, -40),
-		Vector2(300, 20), Vector2(170, 60), Vector2(70, 92), Vector2(-70, 92), Vector2(-170, 60), Vector2(-300, 20)])
-	ci.draw_set_transform(o, 0.0, Vector2.ONE)
-	Art.shape(ci, hull, Color(0.16, 0.08, 0.1), Color(1.0, 0.45, 0.4), 3.0)
-	Art.shape(ci, Art.scaled(hull, Vector2(0.82, 0.6)), Color(0.24, 0.12, 0.14), Color(0.7, 0.3, 0.3), 1.5)
-	# Panel lines and running lights.
-	for i in 9:
-		var x := -240.0 + i * 60.0
-		ci.draw_line(Vector2(x, -60), Vector2(x * 0.9, 40), Color(0.4, 0.18, 0.2), 1.0)
-		var blink := 0.4 + 0.6 * float(int(time * 2.0 + i) % 3 == 0)
-		ci.draw_circle(Vector2(x, -70 + absf(x) * 0.05), 2.5, Color(1, 0.5, 0.4, blink))
-	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	# Hangar bays.
+	_piece(ci, "hive_carrier", o)
+	# Hangar bays: glowing doors, or a smoking hole once broken.
 	for i in 4:
 		var bay := boss.part_named("bay%d" % i)
 		if bay == null:
 			continue
 		var at: Vector2 = o + bay.memory["offset"]
 		if bay.dead:
-			ci.draw_rect(Rect2(at - Vector2(26, 14), Vector2(52, 28)), Color(0.05, 0.03, 0.03))
-			for s in 3:
-				ci.draw_circle(at + Vector2(sin(time * 3.0 + s * 2.0) * 10.0, -10.0 - fmod(time * 30.0 + s * 12.0, 36.0)), 6.0 + s * 2.0, Color(0.2, 0.2, 0.2, 0.5))
+			_piece(ci, "hive_bay_broken", at)
+			_smoke(ci, at, time)
 		else:
-			ci.draw_rect(Rect2(at - Vector2(28, 16), Vector2(56, 32)), _flash(bay, Color(0.35, 0.12, 0.12)))
-			ci.draw_rect(Rect2(at - Vector2(22, 8), Vector2(44, 18)), Color(1, 0.35, 0.25, 0.6 + 0.3 * sin(time * 6.0 + i)))
-			ci.draw_rect(Rect2(at - Vector2(28, 16), Vector2(56, 32)), Color(1, 0.55, 0.45), false, 2.0)
+			_piece(ci, "hive_bay", at, bay)
 	# Turrets track you.
 	for i in 2:
 		var turret := boss.part_named("turret%d" % i)
-		if turret == null or turret.dead:
-			continue
-		ci.draw_circle(turret.pos, 16.0, _flash(turret, Color(0.3, 0.15, 0.15)))
-		ci.draw_arc(turret.pos, 16.0, 0, TAU, 18, Color(1, 0.55, 0.45), 2.0, true)
-		var aim := (boss.world.player.pos - turret.pos).angle()
-		ci.draw_line(turret.pos, turret.pos + Vector2.from_angle(aim) * 26.0, Color(1, 0.7, 0.6), 6.0)
+		if turret != null and not turret.dead:
+			_piece(ci, "hive_turret", turret.pos, turret, (boss.world.player.pos - turret.pos).angle() - PI * 0.5)
 	# Core: armor plates slide apart when it opens.
 	var core := boss.part_named("core")
 	if core != null and not core.dead:
-		var open := 0.0 if core.invulnerable else 1.0
-		ci.draw_circle(core.pos, 40.0, _flash(core, Color(0.3, 0.05, 0.08)))
-		ci.draw_circle(core.pos, 26.0 + sin(time * 6.0) * 3.0, Color(1, 0.3, 0.35))
-		ci.draw_circle(core.pos, 12.0, Color(1, 0.9, 0.8))
-		for side in [-1.0, 1.0]:
-			var slide: float = side * (8.0 + 44.0 * open)
-			Art.shape(ci, PackedVector2Array([core.pos + Vector2(slide, -44), core.pos + Vector2(slide + side * 40, -36),
-				core.pos + Vector2(slide + side * 40, 36), core.pos + Vector2(slide, 44)]), Color(0.4, 0.2, 0.2), Color(1, 0.5, 0.45), 2.0)
-
+		var open := 0.0 if core.invulnerable else 44.0
+		_piece(ci, "hive_core", core.pos, core, 0.0, 1.0, {"groups": {
+			"plate_l": Transform2D(0.0, Vector2(-open, 0)), "plate_r": Transform2D(0.0, Vector2(open, 0)),
+			"heart": Transform2D(0.0, Vector2.ONE * (1.0 + sin(time * 6.0) * 0.1), 0.0, Vector2.ZERO)}})
 
 static func _wyrm_engine(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	# Tail first so the head draws on top.
@@ -177,15 +181,7 @@ static func _hollow_king(ci: CanvasItem, boss: BossBase, time: float) -> void:
 
 static func _mirror_dreadnought(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	var o := boss.origin
-	var hull := PackedVector2Array([Vector2(-300, -30), Vector2(-220, -96), Vector2(220, -96), Vector2(300, -30),
-		Vector2(270, 40), Vector2(0, 92), Vector2(-270, 40)])
-	ci.draw_set_transform(o, 0.0, Vector2.ONE)
-	Art.shape(ci, hull, Color(0.1, 0.13, 0.2), Color(0.6, 0.8, 1.0), 3.0)
-	Art.shape(ci, Art.scaled(hull, Vector2(0.8, 0.62)), Color(0.15, 0.2, 0.3), Color(0.45, 0.6, 0.8), 1.5)
-	for i in 7:
-		var x := -210.0 + i * 70.0
-		ci.draw_line(Vector2(x, -80), Vector2(x * 0.92, 30), Color(0.25, 0.32, 0.45), 1.0)
-	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	_piece(ci, "mirror_dreadnought", o)
 	# Vents on its back: glowing grilles, smoking once broken.
 	for i in MirrorDreadnought.VENT_OFFSETS.size():
 		var vent := boss.part_named("vent%d" % i)
@@ -193,47 +189,39 @@ static func _mirror_dreadnought(ci: CanvasItem, boss: BossBase, time: float) -> 
 			continue
 		var at: Vector2 = o + MirrorDreadnought.VENT_OFFSETS[i]
 		if vent.dead:
-			ci.draw_rect(Rect2(at - Vector2(26, 12), Vector2(52, 24)), Color(0.05, 0.04, 0.04))
-			for s in 3:
-				ci.draw_circle(at + Vector2(sin(time * 3.0 + s) * 8.0, -12.0 - fmod(time * 30.0 + s * 12.0, 36.0)), 6.0 + s * 2.0, Color(0.25, 0.25, 0.25, 0.5))
-			continue
-		ci.draw_rect(Rect2(at - Vector2(28, 14), Vector2(56, 28)), _flash(vent, Color(0.3, 0.12, 0.05)))
-		for g in 4:
-			ci.draw_line(at + Vector2(-20 + g * 13, -10), at + Vector2(-20 + g * 13, 10), Color(1, 0.55 + 0.2 * sin(time * 8.0 + g), 0.2), 3.0)
-		ci.draw_rect(Rect2(at - Vector2(28, 14), Vector2(56, 28)), Color(1, 0.6, 0.3), false, 2.0)
+			_piece(ci, "dreadnought_vent_broken", at)
+			_smoke(ci, at, time)
+		else:
+			_piece(ci, "dreadnought_vent", at, vent)
 	# Mirror plates on its underside: bright, with a shine that sweeps across them.
 	for i in MirrorDreadnought.MIRROR_OFFSETS.size():
 		var mirror := boss.part_named("mirror%d" % i)
 		if mirror == null or mirror.dead:
 			continue
 		var at: Vector2 = o + MirrorDreadnought.MIRROR_OFFSETS[i]
-		var plate := PackedVector2Array([at + Vector2(-40, -20), at + Vector2(40, -20), at + Vector2(32, 22), at + Vector2(-32, 22)])
-		Art.shape(ci, plate, Color(0.55, 0.7, 0.85), Color(0.95, 1, 1), 2.0)
+		_piece(ci, "dreadnought_mirror", at, mirror)
 		var sweep := fmod(time * 0.8 + i * 0.2, 1.6) - 0.3
 		if sweep >= 0.0 and sweep <= 1.0:
-			var x := lerpf(-36, 36, sweep)
-			ci.draw_line(at + Vector2(x, -18), at + Vector2(x - 12, 20), Color(1, 1, 1, 0.85), 5.0)
+			var x := lerpf(-34, 34, sweep)
+			ci.draw_line(at + Vector2(x, -18), at + Vector2(x - 10, 20), Color(1, 1, 1, 0.85), 5.0)
+	# The core: a cold blue heart, dark while it's sealed.
 	var core := boss.part_named("core")
 	if core != null and not core.dead:
-		ci.draw_circle(core.pos, 40.0, _flash(core, Color(0.08, 0.12, 0.2)))
-		var lit := Color(0.6, 0.9, 1.0) if not core.invulnerable else Color(0.3, 0.4, 0.5)
-		ci.draw_circle(core.pos, 24.0 + sin(time * 5.0) * 3.0, lit)
-		ci.draw_circle(core.pos, 10.0, Color(1, 1, 1))
-
+		var sealed := {"#5ab4ff": Color(0.16, 0.22, 0.32), "#9ad9ff": Color(0.22, 0.3, 0.42), "#ffffff": Color(0.4, 0.48, 0.6)}
+		_piece(ci, "dreadnought_core", core.pos, core, 0.0, 1.0, {"remap": sealed if core.invulnerable else {},
+			"groups": {"heart": Transform2D(0.0, Vector2.ONE * (1.0 + sin(time * 5.0) * 0.1), 0.0, Vector2.ZERO)}})
 
 static func _twin_aces(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	for ace: Enemy in boss.living_parts("ace"):
 		var red := ace.part == "ace0"
-		var body := Color(1, 0.35, 0.45) if red else Color(0.45, 0.6, 1.0)
-		ci.draw_set_transform(ace.pos, PI * 0.5, Vector2(1.6, 1.6))
-		Art.shape(ci, PackedVector2Array([Vector2(24, 0), Vector2(0, -7), Vector2(-14, -24), Vector2(-8, 0), Vector2(-14, 24), Vector2(0, 7)]),
-			_flash(ace, body.darkened(0.5)), body, 2.0)
-		ci.draw_line(Vector2(-6, 0), Vector2(16, 0), Color(1, 1, 1), 2.0)
-		ci.draw_circle(Vector2(6, 0), 3.0, Color(1, 1, 0.9))
-		ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		# The blue twin is the same fighter in its own colours.
+		var blue := {"#f2507a": Color(0.36, 0.56, 1.0), "#b8325a": Color(0.22, 0.36, 0.76), "#8a2040": Color(0.16, 0.26, 0.58),
+			"#ffc2d6": Color(0.8, 0.88, 1.0), "#ffd0e0": Color(0.82, 0.9, 1.0), "#2a0712": Color(0.04, 0.07, 0.18)}
+		var trail := Color(1, 0.35, 0.45) if red else Color(0.45, 0.6, 1.0)
 		for i in 4:
-			ci.draw_circle(ace.pos - Vector2(0, 14 + i * 9), 4.0 - i * 0.8, Art.with_alpha(body, 0.5 - i * 0.1))
-
+			ci.draw_circle(ace.pos - Vector2(0, 26 + i * 9), 4.0 - i * 0.8, Art.with_alpha(trail, 0.5 - i * 0.1))
+		_ship_down(ci, "twin_ace", ace.pos, ace, 0.8, {"remap": {} if red else blue,
+			"groups": {"flame": VectorArt.about(Vector2(0, 22), 0.0, Vector2(1.0, 1.0 + sin(time * 40.0) * 0.2))}})
 
 static func _turret_fortress(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	var o := boss.origin
@@ -333,14 +321,9 @@ static func _clone_projector(ci: CanvasItem, boss: BossBase, time: float) -> voi
 	if clone != null and not clone.dead:
 		draw_hologram(ci, boss.world.run.frame_id, clone.pos, PI * 0.5, time, clone.flash > 0.0, boss.world.run.loadout)
 	if shell != null and not shell.dead:
-		Art.shape(ci, Transform2D(time * 0.4, shell.pos) * Art.ngon(6, 30.0), _flash(shell, Color(0.12, 0.2, 0.16)), Color(0.6, 1.0, 0.7), 3.0)
-		for i in 6:
-			var a := time * 0.4 + TAU * i / 6.0
-			ci.draw_line(shell.pos + Vector2.from_angle(a) * 18.0, shell.pos + Vector2.from_angle(a) * 28.0, Color(0.4, 0.7, 0.5), 3.0)
-		ci.draw_circle(shell.pos, 10.0 + sin(time * 6.0) * 1.5, Color(0.6, 1.0, 0.7))
+		_piece(ci, "clone_shell", shell.pos, shell, time * 0.4, 1.0, {"groups": {
+			"heart": Transform2D(0.0, Vector2.ONE * (1.0 + sin(time * 6.0) * 0.12), 0.0, Vector2.ZERO)}})
 
-
-## Your frame as a flickering violet hologram (also used for a turned clone fighting beside you).
 static func draw_hologram(ci: CanvasItem, frame_id: String, at: Vector2, facing: float, time: float, hit: bool, loadout: Array = []) -> void:
 	var flicker := 0.75 + 0.25 * sin(time * 23.0)
 	FrameArt.draw_frame(ci, frame_id, "ship", at, facing, time, {"speed": 0.5, "scale": 1.4, "flash": 1.0 if hit else 0.0,
@@ -358,20 +341,11 @@ static func _bounty_ace(ci: CanvasItem, boss: BossBase, time: float) -> void:
 		return
 	for drone: Enemy in boss.living_parts("drone"):
 		ci.draw_line(core.pos, drone.pos, Color(1, 0.8, 0.4, 0.35), 2.0)
-		Art.shape(ci, Transform2D(time * 3.0, drone.pos) * Art.ngon(4, 16.0), _flash(drone, Color(0.25, 0.18, 0.05)), Color(1, 0.8, 0.4), 2.0)
-		ci.draw_circle(drone.pos, 4.0, Color(1, 0.95, 0.7))
+		_piece(ci, "bounty_drone", drone.pos, drone, time * 3.0)
 	# A rival hunter frame, far bigger than yours, with swept blade-wings.
-	ci.draw_set_transform(core.pos, PI * 0.5, Vector2(3.2, 3.2))
-	var half := PackedVector2Array([Vector2(26, 0), Vector2(8, -6), Vector2(-2, -26), Vector2(-10, -24), Vector2(-6, -8), Vector2(-18, -12), Vector2(-14, 0)])
-	var hull := Art.mirrored(half)
-	Art.shape(ci, hull, _flash(core, Color(0.12, 0.1, 0.08)), Color(1, 0.75, 0.3), 2.0)
-	ci.draw_line(Vector2(-4, -22), Vector2(4, -6), Color(1, 0.3, 0.25), 2.0)
-	ci.draw_line(Vector2(-4, 22), Vector2(4, 6), Color(1, 0.3, 0.25), 2.0)
-	ci.draw_colored_polygon(PackedVector2Array([Vector2(14, 0), Vector2(4, -4), Vector2(0, 0), Vector2(4, 4)]), Color(1, 0.4, 0.3))
-	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	_ship_down(ci, "bounty_ace", core.pos, core, 1.0, {"groups": {"flame": VectorArt.about(Vector2(0, 40), 0.0, Vector2(1.0, 1.0 + sin(time * 40.0) * 0.15))}})
 	if core.invulnerable:
-		ci.draw_arc(core.pos, 78.0, 0, TAU, 32, Color(1, 0.8, 0.4, 0.5 + 0.2 * sin(time * 5.0)), 3.0, true)
-
+		ci.draw_arc(core.pos, 84.0, 0, TAU, 32, Color(1, 0.8, 0.4, 0.5 + 0.2 * sin(time * 5.0)), 3.0, true)
 
 static func _crusher_gate(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	var o := boss.origin
@@ -550,24 +524,15 @@ static func _warden(ci: CanvasItem, boss: BossBase, time: float) -> void:
 
 static func _swarm_marshal(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	for escort: Enemy in boss.living_parts("escort"):
-		ci.draw_set_transform(escort.pos, PI * 0.5, Vector2(1.2, 1.2))
-		Art.shape(ci, PackedVector2Array([Vector2(14, 0), Vector2(-6, -10), Vector2(-2, 0), Vector2(-6, 10)]), _flash(escort, Color(0.35, 0.12, 0.08)), Color(1, 0.55, 0.4), 1.5)
-		ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		VectorArt.draw(ci, EnemyArt.ART % "dart", Transform2D(0.0, Vector2(0.9, -0.9), 0.0, escort.pos), {"flash": 0.55 if escort.flash > 0.0 else 0.0})
 	var core := boss.part_named("core")
 	if core == null or core.dead:
 		return
-	# The command ship: a broad flagship with a bridge tower and signal lights.
-	ci.draw_set_transform(core.pos, PI * 0.5, Vector2(2.4, 2.4))
-	var hull := Art.mirrored(PackedVector2Array([Vector2(20, 0), Vector2(10, -8), Vector2(-4, -22), Vector2(-14, -18), Vector2(-10, -6), Vector2(-16, 0)]))
-	Art.shape(ci, hull, _flash(core, Color(0.28, 0.1, 0.06)), Color(1, 0.5, 0.35), 1.6)
-	ci.draw_rect(Rect2(Vector2(-6, -4), Vector2(10, 8)), Color(1, 0.75, 0.4))
-	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	for side in [-1.0, 1.0]:
-		var on := int(time * 4.0 + (0 if side < 0 else 1)) % 2 == 0
-		ci.draw_circle(core.pos + Vector2(side * 40.0, -10), 4.0, Color(1, 0.9, 0.4) if on else Color(0.4, 0.2, 0.1))
+	# The command ship: a broad flagship with a bridge tower and signal lights blinking in turn.
+	var blink := int(time * 4.0) % 2 == 0
+	_ship_down(ci, "swarm_marshal", core.pos, core, 1.0, {"hide": ["light_l"] if blink else ["light_r"]})
 	if core.invulnerable:
-		ci.draw_arc(core.pos, 54.0, 0, TAU, 28, Color(1, 0.55, 0.4, 0.55), 3.0, true)
-
+		ci.draw_arc(core.pos, 58.0, 0, TAU, 28, Color(1, 0.55, 0.4, 0.55), 3.0, true)
 
 static func _salvo_barge(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	var o := boss.origin

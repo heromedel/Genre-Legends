@@ -55,51 +55,46 @@ static func _moving_parts(enemy: Enemy, t: float) -> Dictionary:
 	match enemy.look:
 		"dart", "ace", "barge":
 			var nozzle: float = {"dart": 9.0, "ace": 13.0, "barge": 15.0}[enemy.look]
-			return {"flame": _about(Vector2(0, nozzle), 0.0, Vector2(1.0, flicker))}
+			return {"flame": VectorArt.about(Vector2(0, nozzle), 0.0, Vector2(1.0, flicker))}
 		"drill":
-			return {"flame": _about(Vector2(0, 10), 0.0, Vector2(1.0, flicker)),
+			return {"flame": VectorArt.about(Vector2(0, 10), 0.0, Vector2(1.0, flicker)),
 				"bands": Transform2D(0.0, Vector2(0.0, fmod(t * 24.0, 6.0) - 3.0))}
 		"wasp":
 			var flap := 0.55 + absf(sin(t * 30.0)) * 0.65
-			return {"wing_l": _about(Vector2(-3, -4), 0.0, Vector2(flap, 1.0)), "wing_r": _about(Vector2(3, -4), 0.0, Vector2(flap, 1.0))}
+			return {"wing_l": VectorArt.about(Vector2(-3, -4), 0.0, Vector2(flap, 1.0)), "wing_r": VectorArt.about(Vector2(3, -4), 0.0, Vector2(flap, 1.0))}
 		"splitter":
 			var seam := 0.6 + absf(sin(t * 6.0)) * 1.6
 			return {"half_l": Transform2D(0.0, Vector2(-seam, 0)), "half_r": Transform2D(0.0, Vector2(seam, 0))}
 		"minelayer":
-			return {"core": _about(Vector2(0, 7), 0.0, Vector2.ONE * (1.0 + sin(t * 8.0) * 0.15))}
+			return {"core": VectorArt.about(Vector2(0, 7), 0.0, Vector2.ONE * (1.0 + sin(t * 8.0) * 0.15))}
 		"crawler":
 			var step := sin(t * 18.0) * 0.28
 			return {"legs_a": Transform2D(step, Vector2.ZERO), "legs_b": Transform2D(-step, Vector2.ZERO)}
 		"spitter":
-			return {"sac": _about(Vector2(0, 4), 0.0, Vector2.ONE * (1.0 + sin(t * 4.0) * 0.14))}
+			return {"sac": VectorArt.about(Vector2(0, 4), 0.0, Vector2.ONE * (1.0 + sin(t * 4.0) * 0.14))}
 		"burrower":
 			return {"maw": Transform2D(t * 3.0, Vector2.ZERO)}
 		"nest":
 			return {"core": Transform2D(0.0, Vector2.ONE * (1.0 + sin(t * 5.0) * 0.12), 0.0, Vector2.ZERO)}
 		"warlord":
 			# The banner ripples on its pole.
-			return {"banner": _about(Vector2(-1, -18), 0.0, Vector2(1.0 + sin(t * 4.0) * 0.12, 1.0))}
+			return {"banner": VectorArt.about(Vector2(-1, -18), 0.0, Vector2(1.0 + sin(t * 4.0) * 0.12, 1.0))}
 		"wisp":
-			return {"flame": _about(Vector2(0, 10), 0.0, Vector2(1.0, 1.0 + sin(t * 7.0) * 0.1))}
+			return {"flame": VectorArt.about(Vector2(0, 10), 0.0, Vector2(1.0, 1.0 + sin(t * 7.0) * 0.1))}
 		"pillar_eye":
 			return {"pupil": Transform2D(0.0, Vector2.from_angle(enemy.facing) * 3.0)}
 		"mimic":
 			# The lid lifts and the dark mouth stretches open beneath it.
 			var open := 0.5 + absf(sin(t * 7.0)) * 0.5
-			return {"lid": Transform2D(0.0, Vector2(0, -7.0 * open)), "mouth": _about(Vector2(0, 1), 0.0, Vector2(1.0, 1.0 + open))}
+			return {"lid": Transform2D(0.0, Vector2(0, -7.0 * open)), "mouth": VectorArt.about(Vector2(0, 1), 0.0, Vector2(1.0, 1.0 + open))}
 		"knight":
 			# Knocked aside, the shield hangs off its arm and leaves the front open.
-			return {} if enemy.front_shield else {"shield": _about(Vector2(-13, -12), -1.2, Vector2.ONE) * Transform2D(0.0, Vector2(-2, 14))}
+			return {} if enemy.front_shield else {"shield": VectorArt.about(Vector2(-13, -12), -1.2, Vector2.ONE) * Transform2D(0.0, Vector2(-2, 14))}
 		"cluster_drone":
 			return {"pods": Transform2D(t, Vector2.ZERO)}
 		"centi_segment":
 			return {"legs": Transform2D(sin(t * 14.0) * 0.2, Vector2.ZERO)}
 	return {}
-
-
-## A rotation and scale about a point (a wing's root, a flame's nozzle).
-static func _about(point: Vector2, rotation: float, scale: Vector2) -> Transform2D:
-	return Transform2D(0.0, point) * Transform2D(rotation, scale, 0.0, Vector2.ZERO) * Transform2D(0.0, -point)
 
 
 ## A burrower underground: churned earth circling where it will surface.

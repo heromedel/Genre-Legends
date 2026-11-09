@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Mirror Dreadnought mirror plate: polished, bright, throwing shots back. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M-40,-20 L40,-20 L32,22 L-32,22 Z" fill="#101828" stroke="#101828" stroke-width="4"/>
+<path d="M-40,-20 L40,-20 L32,22 L-32,22 Z" fill="#a8c8e8"/>
+<path d="M2,-20 L40,-20 L32,22 L2,22 Z" fill="#7fa0c4"/>
+<path d="M-36,-14 L32,-14 L28,6 L-30,6 Z" fill="#d8ecff" opacity="0.7"/>
+<path d="M-38,-18 L38,-18" stroke="#ffffff" stroke-width="2"/>
+<path d="M-32,22 L32,22" stroke="#4a6080" stroke-width="2"/>
+</g>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Hive Carrier core: a glowing heart behind two armour plates that slide apart when it opens. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<circle cx="0" cy="0" r="44" fill="#14070a"/>
+<circle cx="0" cy="0" r="40" fill="#3a0d14"/>
+<g id="heart"><circle cx="0" cy="0" r="28" fill="#c8202f"/><circle cx="0" cy="0" r="20" fill="#ff4d5a"/><circle cx="0" cy="0" r="10" fill="#ffd0c0"/><circle cx="-4" cy="-4" r="3.5" fill="#ffffff"/></g>
+<g id="plate_l">
+  <path d="M-8,-46 L-48,-37 L-48,37 L-8,46 Z" fill="#14070a" stroke="#14070a" stroke-width="5"/>
+  <path d="M-8,-46 L-48,-37 L-48,37 L-8,46 Z" fill="#8a4a52"/>
+  <path d="M-48,16 L-48,37 L-8,46 L-8,24 Z" fill="#6a343c"/>
+  <path d="M-10,-44 L-46,-35.5 L-46,10" stroke="#f0b0b6" stroke-width="2.6" fill="none"/>
+  <path d="M-34,-30 L-34,30" stroke="#3a1a22" stroke-width="2"/>
+  <path d="M-12,-30 L-20,-30 M-12,-20 L-20,-20 M-12,20 L-20,20 M-12,30 L-20,30" stroke="#ffcc3a" stroke-width="3"/>
+</g>
+<g id="plate_r">
+  <path d="M8,-46 L48,-37 L48,37 L8,46 Z" fill="#14070a" stroke="#14070a" stroke-width="5"/>
+  <path d="M8,-46 L48,-37 L48,37 L8,46 Z" fill="#5e2e37"/>
+  <path d="M34,-30 L34,30" stroke="#3a1a22" stroke-width="2"/>
+  <path d="M12,-30 L20,-30 M12,-20 L20,-20 M12,20 L20,20 M12,30 L20,30" stroke="#ffcc3a" stroke-width="3"/>
+</g>
+</g>
+</svg>

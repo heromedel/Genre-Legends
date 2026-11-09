@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Mirror Dreadnought back vent, destroyed: a blackened, torn grille. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<rect x="-30" y="-16" width="60" height="32" rx="3" fill="#070b14"/>
+<path d="M-26,-12 L-10,-14 L0,-8 L12,-14 L26,-11 L24,0 L27,11 L10,13 L-2,8 L-14,13 L-27,10 L-24,0 Z" fill="#050302"/>
+<path d="M-15,-10 L-14,-2 M5,-10 L7,-4 M15,4 L16,10" stroke="#3a2a20" stroke-width="3"/>
+<path d="M-16,4 L-6,-2 L4,4 L14,-3" stroke="#ff7a3a" stroke-width="1.6" fill="none" opacity="0.8"/>
+</g>
+</svg>

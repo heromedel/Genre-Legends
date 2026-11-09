@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Mirror Dreadnought core: a cold blue heart in an armoured ring; dark while sealed. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<circle cx="0" cy="0" r="46" fill="#070b14"/>
+<circle cx="0" cy="0" r="42" fill="#2c3850"/>
+<path d="M0,-42 A42,42 0 0 1 0,42 L0,30 A30,30 0 0 0 0,-30 Z" fill="#1e2638"/>
+<path d="M-30,-28 A40,40 0 0 1 -6,-40" stroke="#c4dcff" stroke-width="3" fill="none"/>
+<path d="M-42,0 L-32,0 M42,0 L32,0 M0,-42 L0,-32 M0,42 L0,32" stroke="#9ad9ff" stroke-width="4"/>
+<circle cx="0" cy="0" r="30" fill="#070b14"/>
+<g id="heart"><circle cx="0" cy="0" r="25" fill="#5ab4ff"/><circle cx="0" cy="0" r="17" fill="#9ad9ff"/><circle cx="0" cy="0" r="8" fill="#ffffff"/><circle cx="-4" cy="-4" r="3" fill="#ffffff"/></g>
+</g>
+</svg>

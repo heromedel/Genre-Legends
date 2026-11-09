@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Clone Projector shell: an armoured hexagon around the green projector; break it and grab what is inside. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M0,-32 L28,-16 L28,16 L0,32 L-28,16 L-28,-16 Z" fill="#06140c" stroke="#06140c" stroke-width="4"/>
+<path d="M0,-32 L28,-16 L28,16 L0,32 L-28,16 L-28,-16 Z" fill="#3a6a50"/>
+<path d="M0,-32 L28,-16 L28,16 L0,32 Z" fill="#2a4e3a"/>
+<path d="M-1,-29 L-26,-15 L-26,10" stroke="#b8f0cc" stroke-width="2" fill="none"/>
+<path d="M0,-18 L0,-28 M15.6,-9 L24.2,-14 M15.6,9 L24.2,14 M0,18 L0,28 M-15.6,9 L-24.2,14 M-15.6,-9 L-24.2,-14" stroke="#1a3a28" stroke-width="3"/>
+<circle cx="0" cy="0" r="16" fill="#06140c"/>
+<g id="heart"><circle cx="0" cy="0" r="12" fill="#5aff8c"/><circle cx="0" cy="0" r="6" fill="#d8ffe4"/></g>
+</g>
+</svg>

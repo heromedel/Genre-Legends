@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Mirror Dreadnought back vent: a grille glowing hot, the soft spot homing missiles can reach. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<rect x="-30" y="-16" width="60" height="32" rx="3" fill="#070b14"/>
+<rect x="-28" y="-14" width="56" height="28" rx="2" fill="#3a2010"/>
+<g id="glow"><rect x="-22" y="-9" width="44" height="18" fill="#ff7a2a"/><rect x="-22" y="-9" width="44" height="6" fill="#ffd08a"/></g>
+<path d="M-15,-10 L-15,10 M-5,-10 L-5,10 M5,-10 L5,10 M15,-10 L15,10" stroke="#3a2010" stroke-width="3"/>
+<path d="M-27,-13 L27,-13" stroke="#a8c4ec" stroke-width="1.5"/>
+<path d="M-30,-16 L-22,-16 L-30,-8 Z M30,16 L22,16 L30,8 Z" fill="#ffcc3a"/>
+</g>
+</svg>

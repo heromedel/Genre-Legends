@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">
+<!-- The Bounty Hunter Ace: a rival hunter frame far bigger than yours, black and gold, with swept blade-wings. Facing up.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<g id="flame"><path d="M-12,40 L-8,56 L-4,40 Z M4,40 L8,56 L12,40 Z" fill="#ffb347" opacity="0.9"/><path d="M-10,40 L-8,48 L-6,40 Z M6,40 L8,48 L10,40 Z" fill="#fff1c4"/></g>
+<path d="M0,-80 L12,-38 L36,-20 L84,-56 L74,-20 L42,10 L56,30 L20,26 L14,42 L-14,42 L-20,26 L-56,30 L-42,10 L-74,-20 L-84,-56 L-36,-20 L-12,-38 Z" fill="#0c0904" stroke="#0c0904" stroke-width="5"/>
+<path d="M0,-80 L-12,-38 L-36,-20 L-84,-56 L-74,-20 L-42,10 L-56,30 L-20,26 L-14,42 L0,42 Z" fill="#3a3024"/>
+<path d="M0,-80 L12,-38 L36,-20 L84,-56 L74,-20 L42,10 L56,30 L20,26 L14,42 L0,42 Z" fill="#241d14"/>
+<path d="M-84,-56 L-74,-20 L-42,10 L-48,-6 Z M84,-56 L74,-20 L42,10 L48,-6 Z" fill="#ffc040"/>
+<path d="M-84,-56 L-74,-20 L-60,-34 Z" fill="#ffe08a"/>
+<path d="M-1,-74 L-12,-36 L-34,-19 L-80,-52" stroke="#ffd98a" stroke-width="2.2" fill="none"/>
+<path d="M-30,-6 L-12,-24 M30,-6 L12,-24" stroke="#ff4a3a" stroke-width="3.4"/>
+<path d="M-40,14 L-18,20 M40,14 L18,20" stroke="#ffc040" stroke-width="2.4"/>
+<path d="M0,-52 C6,-42 6,-18 0,-8 C-6,-18 -6,-42 0,-52 Z" fill="#0c0904"/>
+<path d="M0,-48 C4,-40 4,-20 0,-12 C-4,-20 -4,-40 0,-48 Z" fill="#ff5a40"/>
+<path d="M-1.4,-44 C-2.4,-38 -2.4,-30 -1.6,-24" stroke="#ffd0c0" stroke-width="1.4" fill="none"/>
+<circle cx="0" cy="12" r="7" fill="#0c0904"/><circle cx="0" cy="12" r="5" fill="#ffc040"/><circle cx="-1.4" cy="10.6" r="1.6" fill="#fff4c8"/>
+</g>
+</svg>

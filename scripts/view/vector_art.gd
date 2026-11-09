@@ -70,6 +70,11 @@ static func draw(ci: CanvasItem, path: String, xf: Transform2D, options: Diction
 	ci.draw_set_transform_matrix(Transform2D.IDENTITY)
 
 
+## A rotation and scale about a point in the art's own space (a wing's root, a flame's nozzle), for "groups".
+static func about(point: Vector2, rotation: float, scale: Vector2) -> Transform2D:
+	return Transform2D(0.0, point) * Transform2D(rotation, scale, 0.0, Vector2.ZERO) * Transform2D(0.0, -point)
+
+
 ## A file's posed groups: {group id: {pose name: Transform2D}}, in the art's own space.
 static func poses(path: String) -> Dictionary:
 	_load(path)
