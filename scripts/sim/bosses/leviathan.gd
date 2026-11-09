@@ -41,7 +41,7 @@ func behave(dt: float) -> void:
 		var on_screen := battery.pos.y > -10.0 and battery.pos.y < world.bounds.end.y - 60.0
 		battery.facing = (world.player.pos - battery.pos).angle()
 		if on_screen and fmod(time + battery.id * 0.37, 2.0) < dt:
-			world.enemy_aimed(battery.pos, 3, 0.45, 250.0, {"color": Color(0.6, 0.85, 1.0)})
+			world.enemy_aimed(battery.pos, 3, 0.45, 250.0, {"color": Color(1.0, 0.6, 0.35)})
 			world.emit("sound", {"name": "enemy_shot"})
 	if phase == 0:
 		return
@@ -49,9 +49,9 @@ func behave(dt: float) -> void:
 		set_phase(2, "REACTOR BREACH")
 	if fmod(time, 0.12 if phase == 1 else 0.09) < dt:
 		for arm in 2:
-			world.enemy_shot(core.pos, PI * 0.5 + sin(time * 1.3) * 1.2 + (arm * 2 - 1) * 0.35, 210.0, {"color": Color(0.7, 0.9, 1.0)})
+			world.enemy_shot(core.pos, PI * 0.5 + sin(time * 1.3) * 1.2 + (arm * 2 - 1) * 0.35, 210.0, {"color": Color(1.0, 0.7, 0.4)})
 	if fmod(time, 3.0) < dt:
-		world.enemy_ring(core.pos, 18 if phase == 1 else 26, 150.0, time, {"color": Color(0.5, 0.8, 1.0)})
+		world.enemy_ring(core.pos, 18 if phase == 1 else 26, 150.0, time, {"color": Color(1.0, 0.5, 0.45)})
 	if phase == 2 and fmod(time, 5.0) < dt:
 		for side in [-1.0, 1.0]:
 			var drill := world.spawn_enemy("drill", core.pos + Vector2(side * 140.0, 30.0))

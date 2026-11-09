@@ -42,7 +42,7 @@ func behave(dt: float) -> void:
 	# Spiral arms, wheeling.
 	if fmod(time, 0.17 / pace) < dt:
 		for arm in 4:
-			world.enemy_shot(core.pos, time * 0.9 + TAU * arm / 4.0, 170.0, {"color": Color(0.5, 1.0, 0.85)})
+			world.enemy_shot(core.pos, time * 0.9 + TAU * arm / 4.0, 170.0, {"color": Color(1.0, 0.55, 0.8)})
 	# A ring with a gap: find the gap and slip through.
 	if fmod(time, 3.0 / pace) < dt:
 		var count := 28
@@ -50,5 +50,5 @@ func behave(dt: float) -> void:
 		for i in count:
 			if absi(i - gap) <= 1 or absi(i - gap) == count - 1:
 				continue
-			world.enemy_shot(core.pos, TAU * i / count, 140.0, {"color": Color(0.7, 1.0, 0.9), "radius": 7.0})
+			world.enemy_shot(core.pos, TAU * i / count, 140.0, {"color": Color(1.0, 0.85, 0.45), "radius": 7.0})
 		world.emit("sound", {"name": "curtain"})

@@ -7,6 +7,8 @@ extends Control
 
 ## How long a radio line stays up (GDD 9E): long enough to read during the transformation.
 const RADIO_SECONDS := 5.0
+## Boss health bars share one colour, unlike any of the player's own bars.
+const BOSS_BAR_COLOR := Color(0.95, 0.2, 0.42)
 
 var mission: Mission
 var view_rect_world := Rect2()
@@ -153,7 +155,9 @@ func _draw_boss_bar(screen: Vector2) -> void:
 	var at := Vector2((screen.x - width) * 0.5, 14)
 	draw_string_outline(font_title, at + Vector2(0, 16), boss.boss_name.to_upper(), HORIZONTAL_ALIGNMENT_CENTER, width, 16, 5, Color(0, 0, 0, 0.8))
 	draw_string(font_title, at + Vector2(0, 16), boss.boss_name.to_upper(), HORIZONTAL_ALIGNMENT_CENTER, width, 16, boss.color.lightened(0.3))
-	_bar(at + Vector2(0, 24), Vector2(width, 12), boss.hp_fraction(), boss.color, "")
+	# Every boss bar is the same crimson in a dark frame, never your armor's orange or your shield's blue.
+	draw_rect(Rect2(at + Vector2(-5, 19), Vector2(width + 10, 22)), Color(0.35, 0.02, 0.08, 0.85))
+	_bar(at + Vector2(0, 24), Vector2(width, 12), boss.hp_fraction(), BOSS_BAR_COLOR, "")
 	# Ticks for phase thresholds.
 	for threshold in [0.66, 0.33]:
 		draw_line(at + Vector2(width * threshold, 22), at + Vector2(width * threshold, 38), Color(0, 0, 0, 0.6), 2.0)

@@ -621,7 +621,8 @@ static func _blade_wraith(ci: CanvasItem, boss: BossBase, time: float) -> void:
 	var hood := PackedVector2Array()
 	for point in [Vector2(0, -36), Vector2(24, -8), Vector2(18, 30), Vector2(6, 22), Vector2(0, 34), Vector2(-6, 22), Vector2(-18, 30), Vector2(-24, -8)]:
 		hood.append(o + point * 1.5)
-	ci.draw_colored_polygon(hood, Color(0.2, 0.25, 0.35, alpha))
+	Art.draw_glow(ci, o, 70.0, Color(0.6, 0.8, 1.0, 0.25 if not solid else 0.45))
+	ci.draw_colored_polygon(hood, Color(0.42, 0.5, 0.66, alpha))
 	ci.draw_polyline(hood + PackedVector2Array([hood[0]]), Color(0.7, 0.85, 1.0, alpha), 2.5, true)
 	for side in [-1.0, 1.0]:
 		ci.draw_circle(o + Vector2(12 * side, -18), 5.0, Color(0.6, 0.9, 1.0, alpha) if solid else Color(0.4, 0.5, 0.6, alpha))

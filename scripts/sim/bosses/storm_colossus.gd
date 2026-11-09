@@ -40,7 +40,7 @@ func behave(dt: float) -> void:
 	for arm: Enemy in arms:
 		var spin := 1.0 if arm.part == "arm0" else -1.0
 		if fmod(time + arm.id * 0.05, 0.13) < dt:
-			world.enemy_shot(arm.pos, time * 1.5 * spin, 200.0, {"color": Color(0.6, 0.85, 1.0)})
+			world.enemy_shot(arm.pos, time * 1.5 * spin, 200.0, {"color": Color(1.0, 0.9, 0.45)})
 	# Lightning on you and around you.
 	if fmod(time, 3.0 if phase < 2 else 2.0) < dt:
 		for i in 3:
@@ -59,7 +59,7 @@ func behave(dt: float) -> void:
 				"spin": direction * (PI * 0.25) / 1.6, "color": Color(0.6, 0.85, 1.0)})
 		world.emit("sound", {"name": "charge"})
 	if fmod(time, 1.6) < dt:
-		world.enemy_aimed(core.pos, 7, 0.9, 240.0, {"color": Color(0.7, 0.9, 1.0)})
+		world.enemy_aimed(core.pos, 7, 0.9, 240.0, {"color": Color(1.0, 0.85, 0.4)})
 	if phase == 2 and fmod(time, 7.0) < dt:
 		for i in 3:
 			world.spawn_enemy("crawler", core.pos + Vector2.from_angle(TAU * i / 3.0) * 80.0)

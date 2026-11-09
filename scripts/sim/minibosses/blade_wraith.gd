@@ -32,9 +32,11 @@ func behave(dt: float) -> void:
 	var core := part_named("core")
 	var swords := living_parts("sword")
 	memory["timer"] = float(memory["timer"]) - dt
-	# The ghost drifts after you, slowly, staying inside its room.
+	# The ghost keeps its distance, drifting to stay about 260 away from you inside its room; its swords do the work.
 	var walk := room.grow(-80.0)
-	origin = origin.move_toward(world.player.pos, 40.0 * dt).clamp(walk.position, walk.end)
+	var away := (origin - world.player.pos)
+	var keep := world.player.pos + (away.normalized() if away.length() > 1.0 else Vector2.UP) * 260.0
+	origin = origin.move_toward(keep, 60.0 * dt).clamp(walk.position, walk.end)
 	core.pos = origin
 	match memory["state"]:
 		"circle":
@@ -73,7 +75,7 @@ func behave(dt: float) -> void:
 				memory["state"] = "circle"
 				memory["timer"] = 2.6 if hp_fraction() > 0.5 else 1.8
 	if fmod(time, 2.4) < dt:
-		world.enemy_ring(core.pos, 10, 150.0, time, {"color": Color(0.7, 0.85, 1.0)})
+		world.enemy_ring(core.pos, 10, 150.0, time, {"color": Color(0.9, 0.55, 1.0)})
 
 
 func part_lost(part: Enemy) -> void:

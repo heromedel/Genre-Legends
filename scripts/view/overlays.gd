@@ -225,7 +225,8 @@ class CrateReel:
 		var center := rect.get_center()
 		var alpha := 1.0 if landed else 0.55
 		if face == 0:
-			draw_line(center + Vector2(-18, 0), center + Vector2(18, 0), Color(0.55, 0.45, 0.3, alpha), 4.0)
+			# An empty socket: no gem on this reel (a dash would read as a minus sign next to the "+").
+			draw_arc(center, 14.0, 0, TAU, 20, Color(0.55, 0.45, 0.3, alpha), 3.0, true)
 			return
 		for g in face:
 			var at := center + Vector2((g - (face - 1) * 0.5) * 34.0, 0)
