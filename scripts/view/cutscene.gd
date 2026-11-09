@@ -234,11 +234,12 @@ func _draw_return(screen: Vector2, c: Vector2, won: bool) -> void:
 	_dropship(Vector2(c.x, ship_y), 1.0, zoom, PI)
 	var mouth_y := ship_y + 330.0 * zoom
 	if won:
-		# The frame folds into its ship and climbs into the bay.
-		var climb := clampf((time - 0.6) / 1.6, 0.0, 1.0)
+		# The ship climbs into the bay, then unfolds into the mech once it's aboard.
+		var climb := clampf(time / 1.8, 0.0, 1.0)
 		var at := Vector2(c.x, lerpf(screen.y * 0.75, mouth_y, ease(climb, 2.0)))
-		if time < 0.6:
-			_morph(at, -PI * 0.5, time / 0.6, 2.6)
+		var unfold := clampf((time - 1.9) / 0.7, 0.0, 1.0)
+		if unfold > 0.0:
+			_morph(at, -PI * 0.5, 1.0 - unfold, 1.0)
 		else:
 			_frame(at, "ship", -PI * 0.5, lerpf(2.6, 1.0, climb))
 	else:

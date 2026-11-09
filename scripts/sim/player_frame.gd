@@ -35,7 +35,7 @@ var special_cooldown := 0.0
 var special_charges := 1
 var time_brake := 0.0           # seconds of Time Brake left
 var echo_counter := 0
-var afterimages: Array = []     # recent positions: the Tempest's afterimage, Option Pods' trail, the trail art
+var afterimages: Array = []     # recent positions: the Tempest's afterimage, Drone Pods' trail, the trail art
 var dash_time := 0.0            # Thruster Explosion: seconds of dash left
 var dash_dir := Vector2.ZERO
 var since_kill := 0.0           # Blood Pact: seconds since the last kill
@@ -43,7 +43,7 @@ var ion_time := 0.0             # Ion Cannon: seconds of beam left
 
 ## Thruster Explosion's dash speed, in units per second.
 const DASH_SPEED := 1500.0
-## How many recent positions the trail keeps (Option Pods ride it, up to 36 ticks back).
+## How many recent positions the trail keeps (Drone Pods ride it, up to 36 ticks back).
 const TRAIL_LENGTH := 40
 
 

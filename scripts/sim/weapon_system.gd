@@ -18,7 +18,7 @@ var rage_timer := 0.0
 var railstorm_timer := 2.0
 var flare_cooldown := 0.0
 var doom_bell_timer := 8.0
-var pod_positions: Array = []   # Option Pods, where they are now (the view draws them here)
+var pod_positions: Array = []   # Drone Pods, where they are now (the view draws them here)
 var ion_beams: Array = []       # Ion Cannon beams this tick: [from, angle, width] (the view draws them)
 var wisp_dart_timer := 1.4      # Will-o'-Wisps: seconds until a wisp darts out
 var ion_tick := 0.0             # Ion Cannon damages in pulses, ten times a second
@@ -149,7 +149,7 @@ func _update_tech(tech_id: String, dt: float) -> void:
 ## Called by every main weapon volley: heat, echoes and afterimages hang off the main weapon.
 func _main_volley(fire: Callable) -> void:
 	fire.call(player.pos, 1.0)
-	# Option Pods copy every volley from wherever they are.
+	# Drone Pods copy every volley from wherever they are.
 	if run.is_online("option_pods"):
 		var copy := (0.35 + 0.07 * run.level_of("option_pods")) * (1.3 if run.fork_of("option_pods") == "a" else 1.0)
 		for pod: Vector2 in pod_positions:
@@ -492,7 +492,7 @@ func _update_resonance(dt: float) -> void:
 
 # ---------------------------------------------------------------- support: pods and wisps
 
-## Option Pods: two (three at level 4) ride your trail; Formation locks them beside you, Hunter Pods
+## Drone Pods: two (three at level 4) ride your trail; Formation locks them beside you, Hunter Pods
 ## break away to circle the nearest enemies.
 func _option_pods(dt: float) -> void:
 	var level := run.level_of("option_pods")

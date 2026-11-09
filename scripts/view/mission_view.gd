@@ -527,7 +527,7 @@ func _paint_bodies(ci: CanvasItem) -> void:
 		ShotArt.draw_enemy_shot(ci, shot, time)
 
 
-## Option Pods, Soul Lantern wisps and the Ion Cannon's beams: things that fly or fire beside the frame.
+## Drone Pods, Soul Lantern wisps and the Ion Cannon's beams: things that fly or fire beside the frame.
 func _draw_support_companions(ci: CanvasItem) -> void:
 	if mission.run.is_online("option_pods"):
 		for pod: Vector2 in mission.weapons.pod_positions:

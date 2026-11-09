@@ -158,7 +158,7 @@
 
 - **12A. Ai-Generated-Proposal (2026-11-08):** Each mission type has two bosses and (from build 0.3.2) three mini-bosses; a planet's pair is fixed by the map and shown on its card. The first planet always has the classic pair, and the Tempest Run ends on the Bounty Hunter Ace.
 - **12B. Ai-Generated-Proposal (2026-11-08):** Elites with a twist (shielded, splitting, mirrored) appear from planet 2, more each region, doubled by Bounty Hunters. Mirrored elites appear from region 2 on.
-- **12C. Ai-Generated-Proposal (2026-11-08):** New tech: Option Pods and Soul Lantern (support), Ion Cannon and Thruster Explosion (special), with the Starbreaker and Wraith Drive fusions. Thruster Explosion is built from heromedel's Rule of Cool example (1A).
+- **12C. Ai-Generated-Proposal (2026-11-08):** New tech: Option Pods (renamed Drone Pods in 0.5.1, heromedel) and Soul Lantern (support), Ion Cannon and Thruster Explosion (special), with the Starbreaker and Wraith Drive fusions. Thruster Explosion is built from heromedel's Rule of Cool example (1A).
 - **12D. Ai-Generated-Proposal (2026-11-08):** Route events on the way to a planet: a choice with a risk, paying out at once or shaping the mission.
 - **12E. Ai-Generated-Proposal (2026-11-08):** Big moments freeze the action for a heartbeat (boss kills, elites, Resonance tiers, fusions), and each genre has its own instruments.
 

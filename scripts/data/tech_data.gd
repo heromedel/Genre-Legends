@@ -141,8 +141,8 @@ const TECH := {
 		},
 	},
 	"option_pods": {
-		"name": "Option Pods", "slot": "support", "element": "kinetic",
-		"text": "Glowing pods trail your path and fire weaker copies of your main weapon.",
+		"name": "Drone Pods", "slot": "support", "element": "kinetic",
+		"text": "Small drones trail your path and fire weaker copies of your main weapon.",
 		"levels": ["Two pods", "Stronger copies", "Fork", "Third pod", "Strongest copies"],
 		"blueprint_from": ["star_cluster", "corridor"],
 		"forks": {
