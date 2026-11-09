@@ -492,7 +492,7 @@ func _paint_glow(ci: CanvasItem) -> void:
 	# Tractor Beam: a ribbon of light to every drop it is reeling in.
 	if mission.run.field_count("tractor_beam") > 0:
 		for pickup: Pickup in world.pickups:
-			if pickup.magnetized and view.has_point(pickup.pos):
+			if pickup.magnetized and view.has_point(pickup.pos) and pickup.pos.distance_to(world.player.pos) > world.base_pickup_reach():
 				ShotArt.draw_tractor_beam(ci, world.player.pos, pickup.pos, time)
 	for shot: Shot in world.enemy_shots:
 		ShotArt.draw_enemy_shot_glow(ci, shot)

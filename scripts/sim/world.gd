@@ -11,6 +11,8 @@ const DT := 1.0 / 60.0
 const PICKUP_RADIUS := 105.0
 ## Straight shots a mirrored elite can turn away before its mirror cracks.
 const MIRROR_ELITE_HITS := 15
+## How many drops Tractor Beam can reel in at once.
+const TRACTOR_BEAMS := 4
 ## Seconds before the boss's prize starts drifting toward you.
 const PRIZE_DRIFT_DELAY := 3.0
 ## How far a ricocheting shot looks for its next target.
@@ -778,14 +780,25 @@ func _mirror_reflect(shot: Shot) -> void:
 	reflect_shot(shot, damage, run.has_fusion("reflex_blade"), 3 if run.fork_of("mirror_aegis") == "a" else 1)
 
 
-## How far away drops start flying to you. Tractor Beam reaches 3 times as far, 4.5 times when taken twice.
+## How far away drops start flying to you on their own (the frame's own pull).
+func base_pickup_reach() -> float:
+	return PICKUP_RADIUS * (1.7 if player.form == "ship" else 1.0)
+
+
+## Tractor Beam reaches a bit further than that, semi-nearby rather than across the screen (GDD 11D).
 func pickup_reach() -> float:
-	var tractor: float = [1.0, 3.0, 4.5][mini(run.field_count("tractor_beam"), 2)]
-	return PICKUP_RADIUS * tractor * (1.7 if player.form == "ship" else 1.0)
+	var extra: float = [0.0, 160.0, 260.0][mini(run.field_count("tractor_beam"), 2)]
+	return base_pickup_reach() + extra
 
 
 func update_pickups(dt: float) -> void:
 	var reach := pickup_reach()
+	var own_reach := base_pickup_reach()
+	# Tractor Beam holds at most a few beams at once; other drops wait their turn (no screen of beams).
+	var beams := 0
+	for pickup: Pickup in pickups:
+		if pickup.magnetized and not pickup.dead and pickup.pos.distance_to(player.pos) > own_reach:
+			beams += 1
 	for pickup: Pickup in pickups:
 		if pickup.dead:
 			continue
@@ -803,7 +816,10 @@ func update_pickups(dt: float) -> void:
 		if pickup.kind == "prize" and pickup.age > PRIZE_DRIFT_DELAY:
 			pickup.anchored = false
 			pickup.magnetized = true
-		if not pickup.anchored and pickup.age > 0.35 and (distance < reach or pickup.magnetized):
+		var pull := pickup.magnetized or distance < own_reach or (distance < reach and beams < TRACTOR_BEAMS)
+		if not pickup.anchored and pickup.age > 0.35 and pull:
+			if not pickup.magnetized and distance >= own_reach:
+				beams += 1
 			pickup.magnetized = true
 			pickup.vel = to_player.normalized() * maxf(pickup.vel.length() + 1600.0 * dt, 280.0)
 		else:

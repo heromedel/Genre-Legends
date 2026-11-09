@@ -25,7 +25,7 @@ const FIELD := {
 	},
 	"tractor_beam": {
 		"name": "Tractor Beam", "limit": 2, "icon": "magnet", "element": "kinetic",
-		"text": "Beams of light reel in Data Shards and drops from three times as far. Taking it again reaches further.",
+		"text": "Up to four beams of light reel in Data Shards and drops from further away. Taking it again reaches further.",
 	},
 	"field_repair": {
 		"name": "Field Repair", "limit": 2, "icon": "repair", "element": "",
