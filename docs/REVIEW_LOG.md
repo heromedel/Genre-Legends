@@ -7,6 +7,13 @@ a design point).
 
 | Review | Subject | Finding | Status | Note |
 |---|---|---|---|---|
+| Art test (2026-11-09) | Five-pass style vs current | Both cold reviewers (QA and blind playtester) picked the five-pass style for all four pieces without knowing which was new. | **Saved** | Supports the art overhaul (heromedel's idea). The fixes below go into it. |
+| Art test | Mech | Reads as seen from the front (visor and crest look like a face), so only the gun shows the facing. | **Saved** | Redraw from above: shoulders, top of the head, barrel reaching forward past the body. |
+| Art test | All pieces | Dark outlines and maroon hulls fade into dark space. | **Saved** | Add a thin rim light in the side's colour (cyan for the player, red for enemies). |
+| Art test | All pieces | Fine details (wing lights, panel lines, the Dart's nose) turn to noise at real size. | **Saved** | Fewer, bigger details; let outline and silhouette do the work. |
+| Art test | Hive Carrier | Turrets are the same maroon as the hull; the stern engine racks could pass for launch bays. | **Saved** | Contrasting turret colour; make the engines read as engines. |
+| Art test | Dart | Needs a wider, bolder chevron to count quickly in swarms; a white dot on an enemy reads as a bullet. | **Saved** | Wider silhouette; no white centre dots on enemies (the current Dart has one too). |
+| Art test | Comparison sheet | The Hive Carrier's wingtips were cut off by the frame. | **Discarded** | My crop on the sheet, not the art. |
 | 0.4 sweep (2026-11-09) | Boss warnings | The WARNING banner showed "BOSS —" with no name. | **Fixed** (0.4) | Real bug from 0.4's warning-before-the-boss change: bosses got their name only when they spawned. They now name themselves when made; a rules check covers every boss. |
 | 0.4 sweep | Boss warnings | The warning appears after the boss is already named or firing. | **Discarded** | The capture used the debug `boss=1` jump, which starts the boss fight directly. In play, the warning comes 1.6 s before the boss. |
 | 0.4 sweep | Radio | "Weapons fire on their own. Just fly." while you're a walking mech, and in every scenario. | **Fixed** (0.4) | The first-mission line now matches the form ("Just move." for the mech) and the auto-fire setting. It showed everywhere only because every capture runs on a fresh save. |
