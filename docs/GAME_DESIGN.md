@@ -125,6 +125,8 @@
   - **Ai-Generated-Proposal (2026-11-08):** The prize drifts to you after 3 seconds. After the boss falls, levels and crates no longer offer upgrades; each is banked as an extra blueprint of the planet's tech.
 - **11K. Likely (2026-11-09):** Auto-aim for the mech is an accessibility option, off by default: Settings, "Auto-aim (mech): Off > On". Without it the mech faces where you aim, or where you move.
 - **11L. Likely (2026-11-09):** When a mission opens with a radio line, the enemies hold back until it's read. (heromedel's idea: a delay before enemies rush in.)
+- **11M. Likely (2026-11-09):** The frame lives in a Dropship. Each mission opens with it turning into a ship and launching from the bay, then arriving: straight into space, down to a planet and landing as the mech, or walking into a dungeon as the mech. Missions end with it returning to the Dropship. Inspired by The Guardian Legend's transitions, not a copy. (heromedel's idea.)
+  - **Ai-Generated-Proposal (2026-11-09):** Each transition runs 2.5–4.5 s and a tap skips it. Chains get their own (diving down the fissure, bursting up out of the dungeon), and a loss ends with the Dropship towing the wreck aboard: recovered, not dead. Route-event choices show just the action, no hint (heromedel).
 - **11J. Likely (2026-11-08):** Bullets that glow in the dark are an accessibility option, not a rule: Settings, "Bullets glow in the dark: Off > On".
 - **11H. Ai-Generated-Proposal (2026-11-08):** Explosive Resonance III is renamed Wildfire, and burning effects never mention the ground, since many fights are in space.
 
@@ -156,3 +158,4 @@
 | 2026-11-08 | 12A–12E | Build 0.3 content built from the approved list: frame gear, new bosses, elites, new tech, route events, big moments, genre music. |
 | 2026-11-08 | 11E, 11I, 11J | The Clone Projector becomes a rare surprise; the last boss drops a prize you collect before the mission ends; glowing bullets become an accessibility option. |
 | 2026-11-09 | 6G, 11K, 11L | First chained missions built; mech auto-aim becomes an accessibility option; enemies hold back while the opening radio line is read. |
+| 2026-11-09 | 11M | The Dropship and its launch, arrival and return transitions around every mission. |

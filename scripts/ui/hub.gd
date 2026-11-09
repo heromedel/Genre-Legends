@@ -93,8 +93,8 @@ func _launch(node: Dictionary) -> void:
 	for i in choices.size():
 		var choice: Dictionary = choices[i]
 		var affordable: bool = _largest_blueprint_pile() >= int(choice.get("needs_blueprints", 0))
-		var label: String = choice["label"] + ("" if choice["hint"] == "" else "  -  " + choice["hint"])
-		var button := UiKit.button(label, func():
+		# Just the action: what each choice leads to is for the player to learn or intuit.
+		var button := UiKit.button(choice["label"], func():
 			var outcome := RouteEvents.resolve(event_id, i, node["id"], missions_flown, Save.data["map_seed"])
 			_route_outcome(popup, column, node, event, choice, outcome), "Event %s: %s" % [event_id, choice["label"]])
 		button.disabled = not affordable

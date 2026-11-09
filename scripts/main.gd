@@ -47,6 +47,7 @@ func launch_mission(node_id: String, event: Dictionary = {}) -> void:
 	var mission := Mission.new(node, mission_seed, Save.data["frame"], Save.data["loadout"], Save.tech_mk)
 	var view := MissionView.new()
 	view.setup(mission, first_clear)
+	view.skip_cutscenes = _debug_options.has("test") and not _debug_options.has("cutscene")
 	view.finished.connect(func(result): finish_mission(node_id, result))
 	view.abandoned.connect(func():
 		var result := mission.results(false)
@@ -101,7 +102,7 @@ func finish_mission(node_id: String, result: Dictionary) -> void:
 ##   test=<type>  launch a test mission    boss=1   skip to its boss    power=a|b  everything online
 ##   god=1        invulnerable             page=<map|hangar|rnd|guide|records|settings>  open the hub on a page
 ##   frame=<id>   fly a frame              mk=3     all tech unlocked at that Mk
-##   chain=<type>  the test planet chains into that mission type partway
+##   chain=<type>  the test planet chains into that mission type partway       cutscene=1  keep the transitions
 ##   bossid=<id> / minibossid=<id>   pick the test planet's boss or mini-boss (see BossRoster)
 ##   crate=<n>    open n Salvage Crates as soon as play starts      event=<id>  the next launch meets that route event      phase=<n>  with boss=1, the boss starts in phase n
 func _debug_launch() -> bool:

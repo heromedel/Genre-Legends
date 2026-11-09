@@ -13,6 +13,8 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 - **The clone mirrors you:** it wears your gear and fires your own main weapon back, plus your Swarm Pods if they're online.
 - **Boss warnings come first**, then the boss. Thunder Lance fires a real rail. Enemies hold back while the opening radio line is read. Mirrored elites crack eventually.
 - **Settings, Accessibility:** Auto-aim (mech), off by default.
+- **The Dropship:** every mission launches from its bay (the mech folds into a ship and blasts out), arrives in space, on a planet or at a dungeon gate, and ends with the trip home, or with a tow back aboard after a loss. Tap to skip.
+- **Fairer fights from heromedel's log:** boss bodies shove you clear instead of draining you; the Warden's stomps show their reach first.
 
 ## What's new in 0.3.2
 

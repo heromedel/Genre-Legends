@@ -31,7 +31,9 @@ var transform_time := 0.0
 var hit_flash := 0.0
 var tech_online_since := {}      # tech id -> view time it came online, for GearArt's unfold
 var _accumulator := 0.0
-var hitstop := 0.0              # seconds the action freezes on a big moment (view only; no ticks run)
+var hitstop := 0.0
+var cutscene: Cutscene = null   # while a transition plays, the mission waits (no ticks run)
+var skip_cutscenes := false     # debug test launches skip them unless asked (cutscene=1)              # seconds the action freezes on a big moment (view only; no ticks run)
 
 
 class DrawLayer:
@@ -93,6 +95,29 @@ func _ready() -> void:
 		hud.show_radio(line)
 	Sound.play_music(node["type"])
 	_handle_events(mission.drain_events())
+	# The launch from the Dropship and the arrival, by mission type (GDD 5E).
+	var arrival: String = {"planet": "launch_planet", "dungeon": "launch_dungeon"}.get(node["type"], "launch_space")
+	_play_cutscene(arrival, Callable())
+
+
+## Plays a transition over everything; the mission waits until it ends or is skipped.
+func _play_cutscene(kind: String, then: Callable) -> void:
+	if skip_cutscenes:
+		if then.is_valid():
+			then.call()
+		return
+	var scene := Cutscene.new()
+	scene.kind = kind
+	scene.frame_id = mission.run.frame_id
+	scene.gear = _gear()
+	scene.ground = background.palette.get("ground", Color(0.3, 0.4, 0.3))
+	scene.on_done = func():
+		cutscene = null
+		if then.is_valid():
+			then.call()
+	cutscene = scene
+	hud.get_parent().add_child(scene)
+	PlayLog.note("cutscene", kind)
 
 
 func _prepare_background() -> void:
@@ -146,6 +171,8 @@ func _notification(what: int) -> void:
 func _physics_process(delta: float) -> void:
 	if paused or done or mission == null:
 		return
+	if cutscene != null:
+		return
 	# Hit-stop: the world holds still for a heartbeat on big kills. No tick runs, so replays are unaffected.
 	if hitstop > 0.0:
 		hitstop -= delta
@@ -177,7 +204,8 @@ func _physics_process(delta: float) -> void:
 		done = true
 		var result := mission.results(first_clear)
 		PlayLog.end_mission(mission, result)
-		finished.emit(result)
+		# Home to the Dropship (or towed aboard after a loss), then the results.
+		_play_cutscene("return_win" if result["won"] else "return_loss", func(): finished.emit(result))
 
 
 func _handle_events(events: Array) -> void:
@@ -201,6 +229,9 @@ func _handle_events(events: Array) -> void:
 				hit_flash = 0.15
 			"stage_start":
 				transform_time = 0.8
+				# A chained mission handing over: down the fissure, or up out of the dungeon.
+				if mission.stages_played.size() > 1:
+					_play_cutscene("dive" if event["form"] == "ship" else "breakout", Callable())
 				input.form = event["form"]
 				input.clear()
 			"escaped":
@@ -278,7 +309,7 @@ func _process(delta: float) -> void:
 		layer.queue_redraw()
 	hud.view_rect_world = _view_rect()
 	hud.world_to_screen = world_root.transform
-	hud.covered = overlay_kind != ""
+	hud.covered = overlay_kind != "" or cutscene != null
 	hud.tick(delta)
 	var weapons := mission.weapons
 	special_button.visible = mission.run.special_tech() != ""

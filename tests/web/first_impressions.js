@@ -15,6 +15,8 @@ const scenarios = [
   { name: 'boss_prize', query: '?test=star_cluster&god=1&power=a&mk=3&loadout=pulse_driver,arc_blade,swarm_pods,mirror_aegis,ion_cannon&boss=1', shots: [12000, 16000, 20000, 24000, 28000] },
   { name: 'chain_planet_dive', query: '?test=planet&god=1&power=a&mk=3&loadout=thunder_lance,arc_blade,swarm_pods,mirror_aegis,nova_bomb&chain=corridor', shots: [6000, 30000, 60000, 75000] },
   { name: 'dungeon_room_life', query: '?test=dungeon&god=1&power=b&mk=2&loadout=pulse_driver,orbital_halo,starfall,soul_lantern,nova_bomb', shots: [8000, 20000, 35000] },
+  { name: 'cutscene_launch_planet', query: '?test=planet&god=1&cutscene=1', shots: [1200, 2200, 3000, 3800, 4600, 5400] },
+  { name: 'cutscene_launch_dungeon', query: '?test=dungeon&god=1&cutscene=1', shots: [3600, 4300, 5000] },
   { name: 'hub_guide', query: '?page=guide&mk=1', shots: [5000] },
   { name: 'salvage_crate', query: '?test=star_cluster&god=1&crate=3', shots: [5500, 8000] },
   { name: 'hive_carrier_lasers', query: '?test=star_cluster&god=1&boss=1&phase=2', shots: [9000, 11500, 14000] },
