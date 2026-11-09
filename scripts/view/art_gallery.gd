@@ -3,8 +3,8 @@ extends Control
 ## Debug page for art tests: draws one piece of the game's art alone, centred, on a plain background,
 ## at a chosen zoom, so old and new art can be compared at the same size (main.gd: gallery=<subject>&zoom=N).
 ## Subjects: ship, mech, dart, any boss id (hive_carrier, warden, ...), or an SVG drawn through VectorArt
-## (gallery=art/frames/vanguard_ship.svg; add rim=1 for the rim light), or "morph": the transformation looping,
-## without the spin on the left and with it on the right.
+## (gallery=art/test/ship.svg; add rim=1 for the rim light), or "morph": the transformation looping,
+## without the spin on the left and with it on the right. Frames: add frame=tempest (or bulwark).
 
 const SPACE := Color(0.04, 0.05, 0.12)
 const GROUND := Color(0.42, 0.39, 0.29)
@@ -32,7 +32,7 @@ class Stand:
 	func _draw() -> void:
 		match subject:
 			"ship", "mech":
-				FrameArt.draw_frame(self, "vanguard", subject, Vector2.ZERO, -PI * 0.5, time, {})
+				FrameArt.draw_frame(self, Save.data["frame"], subject, Vector2.ZERO, -PI * 0.5, time, {})
 			"dart":
 				EnemyArt.draw(self, enemy, time)
 			"morph":
@@ -40,7 +40,7 @@ class Stand:
 				var cycle := fmod(time, 3.2)
 				var progress := clampf(cycle / 0.8, 0.0, 1.0) if cycle < 1.6 else 1.0 - clampf((cycle - 1.6) / 0.8, 0.0, 1.0)
 				for side in [-1.0, 1.0]:
-					FrameArt.draw_morph(self, "vanguard", Vector2(side * 70.0, 0.0), -PI * 0.5, progress, time, {"spin": side > 0.0})
+					FrameArt.draw_morph(self, Save.data["frame"], Vector2(side * 70.0, 0.0), -PI * 0.5, progress, time, {"spin": side > 0.0})
 					draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 					draw_string(UiKit.font("bold"), Vector2(side * 70.0 - 40.0, 62.0), "spin" if side > 0.0 else "no spin", HORIZONTAL_ALIGNMENT_CENTER, 80, 9, Color(0.8, 0.9, 1.0))
 			_ when subject.ends_with(".svg"):

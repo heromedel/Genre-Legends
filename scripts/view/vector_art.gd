@@ -10,11 +10,15 @@ class_name VectorArt
 ## <path> (M L H V C Q Z, absolute or relative), <polygon>, <circle>, <ellipse>, <rect>, and <use href>.
 ## A closed shape's stroke becomes an outline drawn under its fill, as a true rounded offset of the shape.
 ## Art is authored facing up (-y), in game units; callers rotate it to the facing they need.
+##
+## Poses: a group can carry places to stand, data-pose-<name>="x, y, degrees, scale x, scale y", so one
+## set of parts can be arranged two ways (a frame's mech and ship, GDD 5E). poses() returns them.
 
 ## Shape kinds in the cache.
 enum { FILL, LINE }
 
 static var _cache := {}
+static var _poses := {}         # path -> {group id: {pose name: Transform2D}}
 
 
 ## Draws an SVG file. xf places it (position, rotation, scale). options:
@@ -66,6 +70,12 @@ static func draw(ci: CanvasItem, path: String, xf: Transform2D, options: Diction
 	ci.draw_set_transform_matrix(Transform2D.IDENTITY)
 
 
+## A file's posed groups: {group id: {pose name: Transform2D}}, in the art's own space.
+static func poses(path: String) -> Dictionary:
+	_load(path)
+	return _poses.get(path, {})
+
+
 ## The art's shapes, read from the file the first time and cached after.
 static func _load(path: String) -> Array:
 	if _cache.has(path):
@@ -100,6 +110,16 @@ static func _load(path: String) -> Array:
 		var context: Dictionary = stack[-1]
 		if name == "g":
 			var child := _child_context(context, attributes)
+			if attributes.has("id"):
+				for key in attributes:
+					if String(key).begins_with("data-pose-"):
+						var v := _numbers(attributes[key])
+						var pose := Transform2D(deg_to_rad(v[2]), Vector2(v[3], v[4]), 0.0, Vector2(v[0], v[1]))
+						if not _poses.has(path):
+							_poses[path] = {}
+						if not _poses[path].has(attributes["id"]):
+							_poses[path][attributes["id"]] = {}
+						_poses[path][attributes["id"]][String(key).trim_prefix("data-pose-")] = pose
 			if not parser.is_empty():
 				stack.append(child)
 				if in_defs and attributes.has("id"):

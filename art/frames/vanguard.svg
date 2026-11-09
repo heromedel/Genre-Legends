@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -40 80 80">
+<!-- Vanguard: one set of parts that stands as the mech or folds into the ship, like a transforming robot
+     (GDD 5E). Each part is drawn once around its own origin; data-pose-mech / data-pose-ship place it
+     ("x, y, degrees, scale x, scale y", facing up, game units). The helmet becomes the cockpit, the shoulder
+     plates sweep out into wings, the legs fold back into the engines, the chest stretches into the fuselage.
+     Light from the top-left. Each part: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+
+<!-- Engine flames: only in the ship, hanging from the leg-engines' bells -->
+<g id="flame_l" data-pose-mech="-6.5,22,0,0.01,0.01" data-pose-ship="-6.5,22,0,1,1">
+  <path d="M-2.4,0 L0,11 L2.4,0 Z" fill="#ff9a3c" opacity="0.9"/>
+  <path d="M-1.2,0 L0,6 L1.2,0 Z" fill="#fff1c4"/>
+</g>
+<g id="flame_r" data-pose-mech="6.5,22,0,0.01,0.01" data-pose-ship="6.5,22,0,1,1">
+  <path d="M-2.4,0 L0,11 L2.4,0 Z" fill="#ff9a3c" opacity="0.9"/>
+  <path d="M-1.2,0 L0,6 L1.2,0 Z" fill="#fff1c4"/>
+</g>
+
+<!-- Legs: armoured boots with an engine bell at the heel. Mech: the feet. Ship: the engines. -->
+<g id="leg_l" data-pose-mech="-12.5,1,0,1,1" data-pose-ship="-6.5,12,0,0.8,0.8">
+  <path d="M-3.6,-12 L3.6,-12 L4,9 L-4,9 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2.2"/>
+  <path d="M-3.6,-12 L3.6,-12 L4,9 L-4,9 Z" fill="#2f6f9e"/>
+  <path d="M0.6,-12 L3.6,-12 L4,9 L0.6,9 Z" fill="#1d4a6e"/>
+  <path d="M-3.1,-11.3 L-3.5,8.3" stroke="#8fd3f5" stroke-width="1"/>
+  <rect x="-2.6" y="-10.6" width="4" height="2" rx="0.6" fill="#ffc759"/>
+  <path d="M-3.2,9 L3.2,9 L3.8,13 L-3.8,13 Z" fill="#1a2433" stroke="#0a1628" stroke-width="1"/>
+  <path d="M-2.6,12.4 L2.6,12.4" stroke="#ffb347" stroke-width="1.3"/>
+</g>
+<g id="leg_r" data-pose-mech="12.5,1,0,1,1" data-pose-ship="6.5,12,0,0.8,0.8">
+  <path d="M-3.6,-12 L3.6,-12 L4,9 L-4,9 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2.2"/>
+  <path d="M-3.6,-12 L3.6,-12 L4,9 L-4,9 Z" fill="#26608c"/>
+  <path d="M0.6,-12 L3.6,-12 L4,9 L0.6,9 Z" fill="#1a4262"/>
+  <rect x="-2.6" y="-10.6" width="4" height="2" rx="0.6" fill="#ffc759"/>
+  <path d="M-3.2,9 L3.2,9 L3.8,13 L-3.8,13 Z" fill="#1a2433" stroke="#0a1628" stroke-width="1"/>
+  <path d="M-2.6,12.4 L2.6,12.4" stroke="#ffb347" stroke-width="1.3"/>
+</g>
+
+<!-- Backpack: the mech's thruster pack; folds under as the ship's spine -->
+<g id="backpack" data-pose-mech="0,13,0,1,1" data-pose-ship="0,9,0,0.7,1.3">
+  <path d="M-8,-5 L8,-5 L7,6 L-7,6 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2.2"/>
+  <path d="M-8,-5 L8,-5 L7,6 L-7,6 Z" fill="#3a8cc4"/>
+  <path d="M1,-5 L8,-5 L7,6 L1,6 Z" fill="#2a6ea3"/>
+  <path d="M-7.6,-4.2 L-6.8,5.2" stroke="#9fdcfa" stroke-width="1"/>
+  <path d="M-5.5,-2 L-1.5,-2 M-5.5,0.5 L-1.5,0.5 M1.5,-2 L5.5,-2 M1.5,0.5 L5.5,0.5" stroke="#16314f" stroke-width="1"/>
+</g>
+
+<!-- Stock arms (hidden when gear is fitted): a cannon and a blade emitter. Ship: guns beside the nose. -->
+<g id="arm_r" data-pose-mech="17.5,-12,0,1,1" data-pose-ship="7.5,-10,0,0.6,0.6">
+  <path d="M-2.5,-15 L2.5,-15 L2.5,10 L-2.5,10 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2.2"/>
+  <path d="M-2.5,-15 L2.5,-15 L2.5,10 L-2.5,10 Z" fill="#33536e"/>
+  <path d="M0.3,-15 L2.5,-15 L2.5,10 L0.3,10 Z" fill="#223a50"/>
+  <path d="M-1.8,-14 L-1.8,8" stroke="#8fb9d8" stroke-width="0.9"/>
+  <rect x="-3.3" y="-18" width="6.6" height="3.6" rx="0.8" fill="#1a2433" stroke="#0a1628" stroke-width="1"/>
+  <circle cx="0" cy="-18" r="1.6" fill="#d6fbff"/>
+</g>
+<g id="arm_l" data-pose-mech="-17,-7,0,1,1" data-pose-ship="-7.5,-10,0,0.6,0.6">
+  <path d="M-3,-6 L3,-6 L3,6 L-3,6 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2.2"/>
+  <path d="M-3,-6 L3,-6 L3,6 L-3,6 Z" fill="#3a8cc4"/>
+  <path d="M0.6,-6 L3,-6 L3,6 L0.6,6 Z" fill="#2a6ea3"/>
+  <path d="M-2,-9 L2,-9" stroke="#7ff3ff" stroke-width="2.6"/>
+  <path d="M-1.4,-9 L1.4,-9" stroke="#eaffff" stroke-width="1"/>
+</g>
+
+<!-- Shoulder plates: swept plates trimmed in gold. Mech: pauldrons. Ship: they sweep out into the wings. -->
+<g id="shoulder_l" data-pose-mech="-11,-8,-14,0.85,1.25" data-pose-ship="-4,-2,-4,1.7,1.3">
+  <g transform="scale(-1,1)">
+    <path d="M0,-5 L13,0 L15,9 L1,9 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2.2"/>
+    <path d="M0,-5 L13,0 L15,9 L1,9 Z" fill="#4aaee6"/>
+    <path d="M1,5 L14.2,5.4 L15,9 L1,9 Z" fill="#2e86c2"/>
+    <path d="M0.6,-4.2 L12.6,0.4" stroke="#c4f0ff" stroke-width="1.1"/>
+    <path d="M2,-1.6 L12,2.4" stroke="#ffc759" stroke-width="1.7"/>
+    <circle cx="13.2" cy="6.6" r="1.2" fill="#ff5a5a"/>
+  </g>
+</g>
+<g id="shoulder_r" data-pose-mech="11,-8,14,0.85,1.25" data-pose-ship="4,-2,4,1.7,1.3">
+  <path d="M0,-5 L13,0 L15,9 L1,9 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2.2"/>
+  <path d="M0,-5 L13,0 L15,9 L1,9 Z" fill="#2f7cb6"/>
+  <path d="M1,4 L14,4.4 L15,9 L1,9 Z" fill="#23649d"/>
+  <path d="M2,-1.6 L12,2.4" stroke="#d9a043" stroke-width="1.7"/>
+  <circle cx="13.2" cy="6.6" r="1.2" fill="#5aff9a"/>
+</g>
+
+<!-- Torso: the chest plate. Ship: it narrows and stretches into the fuselage. -->
+<g id="torso" data-pose-mech="0,-1,0,1,1" data-pose-ship="0,-2,0,0.55,1.55">
+  <path d="M0,-12 L11,-6 L10,9 L0,11 L-10,9 L-11,-6 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2.4"/>
+  <path d="M0,-12 L11,-6 L10,9 L0,11 L-10,9 L-11,-6 Z" fill="#56bdf2"/>
+  <path d="M0.8,-11.4 L11,-6 L10,9 L0.8,10.8 Z" fill="#3384c0"/>
+  <path d="M-10,4 L-10,9 L0,11 L10,9 L10,4 L0,6.4 Z" fill="#2a74ad" opacity="0.85"/>
+  <path d="M-1,-10.6 L-10,-5.8 L-9.4,2 L-8,2 L-8.4,-5 Z" fill="#bdeeff"/>
+  <path d="M-9.6,2.5 L9.6,2.5" stroke="#1f5b8e" stroke-width="0.9"/>
+  <path d="M-5,5 L-2.5,8 M5,5 L2.5,8" stroke="#ffc759" stroke-width="1.4"/>
+</g>
+
+<!-- Helmet: visor band on its leading edge, gold crest fins. Ship: it stretches forward into the cockpit. -->
+<g id="helmet" data-pose-mech="0,-4,0,1,1" data-pose-ship="0,-17,0,0.75,1.55">
+  <path d="M0,-7 C4.4,-7 6,-3 6,1 C6,6 3.5,8 0,8 C-3.5,8 -6,6 -6,1 C-6,-3 -4.4,-7 0,-7 Z" fill="#0a1628" stroke="#0a1628" stroke-width="2"/>
+  <path d="M0,-7 C4.4,-7 6,-3 6,1 C6,6 3.5,8 0,8 C-3.5,8 -6,6 -6,1 C-6,-3 -4.4,-7 0,-7 Z" fill="#4fb4ea"/>
+  <path d="M0.6,-6.9 C4.6,-6.6 6,-3 6,1 C6,6 3.5,8 0.6,8 Z" fill="#2f7cb6"/>
+  <path d="M-4.6,-1 C-4.4,-4 -3,-5.6 -0.8,-6" stroke="#d4f4ff" stroke-width="1.2" fill="none"/>
+  <path d="M-4.6,-4.6 C-2.4,-6.4 2.4,-6.4 4.6,-4.6 L4,-3 C2,-4.4 -2,-4.4 -4,-3 Z" fill="#9ff6ff"/>
+  <path d="M0,-4 L-5.5,3 L-4,3.8 L0,-1.4 L4,3.8 L5.5,3 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.2"/>
+  <path d="M0,-4 L-5.5,3 L-4,3.8 L0,-1.4 Z" fill="#ffc759"/>
+  <path d="M0,-4 L5.5,3 L4,3.8 L0,-1.4 Z" fill="#d9a043"/>
+</g>
+
+</g>
+</svg>

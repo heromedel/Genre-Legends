@@ -129,4 +129,4 @@ review, GDD 4E) and the wording checker (player-facing text against the code, GD
 
 Debug launches: add `?test=planet&boss=1&power=a&god=1` to the page URL (or use Settings → Debug Console).
 Art: `?gallery=ship&zoom=4` draws one piece of art alone (`mech`, `dart`, a boss id, or an SVG path such as
-`art/frames/vanguard_ship.svg`, with `&rim=1` for the rim light).
+`art/test/ship.svg`, with `&rim=1` for the rim light; `morph` loops the transformation; `&frame=tempest` picks the frame).

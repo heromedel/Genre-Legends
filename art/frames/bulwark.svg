@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -40 80 80">
+<!-- Bulwark: one set of parts that stands as a slab-armoured mech or folds into a broad gunship (GDD 5E). Each
+     part is drawn once around its own origin; data-pose-mech / data-pose-ship place it ("x, y, degrees,
+     scale x, scale y", facing up, game units). The huge shoulder slabs swing out into block wings, the shield
+     plate becomes the armoured prow, the treads fold back into engine pods. Light from the top-left.
+     Each part: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+
+<g id="flame_l" data-pose-mech="-7.5,22,0,0.01,0.01" data-pose-ship="-7.5,22,0,1,1">
+  <path d="M-2.6,0 L0,10 L2.6,0 Z" fill="#ff9a3c" opacity="0.9"/>
+  <path d="M-1.4,0 L0,5.5 L1.4,0 Z" fill="#fff1c4"/>
+</g>
+<g id="flame_r" data-pose-mech="7.5,22,0,0.01,0.01" data-pose-ship="7.5,22,0,1,1">
+  <path d="M-2.6,0 L0,10 L2.6,0 Z" fill="#ff9a3c" opacity="0.9"/>
+  <path d="M-1.4,0 L0,5.5 L1.4,0 Z" fill="#fff1c4"/>
+</g>
+
+<!-- Legs: wide treads with an exhaust at the heel. Ship: the engine pods. -->
+<g id="leg_l" data-pose-mech="-14.5,0,0,1,1" data-pose-ship="-7.5,12,0,0.8,0.75">
+  <path d="M-4.5,-14 L4.5,-14 L4.5,10 L-4.5,10 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2.4"/>
+  <path d="M-4.5,-14 L4.5,-14 L4.5,10 L-4.5,10 Z" fill="#a8541d"/>
+  <path d="M0.5,-14 L4.5,-14 L4.5,10 L0.5,10 Z" fill="#7a3a12"/>
+  <path d="M-4.1,-10 L4.1,-10 M-4.1,-6 L4.1,-6" stroke="#5a2a0c" stroke-width="1.2"/>
+  <rect x="-3.3" y="-13" width="5" height="2" rx="0.6" fill="#99d9ff"/>
+  <path d="M-3.8,10 L3.8,10 L4.4,13.5 L-4.4,13.5 Z" fill="#241a14" stroke="#2a1206" stroke-width="1"/>
+  <path d="M-3,13 L3,13" stroke="#ffb347" stroke-width="1.3"/>
+</g>
+<g id="leg_r" data-pose-mech="14.5,0,0,1,1" data-pose-ship="7.5,12,0,0.8,0.75">
+  <path d="M-4.5,-14 L4.5,-14 L4.5,10 L-4.5,10 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2.4"/>
+  <path d="M-4.5,-14 L4.5,-14 L4.5,10 L-4.5,10 Z" fill="#94491a"/>
+  <path d="M0.5,-14 L4.5,-14 L4.5,10 L0.5,10 Z" fill="#6a3210"/>
+  <path d="M-4.1,-10 L4.1,-10 M-4.1,-6 L4.1,-6" stroke="#5a2a0c" stroke-width="1.2"/>
+  <rect x="-3.3" y="-13" width="5" height="2" rx="0.6" fill="#99d9ff"/>
+  <path d="M-3.8,10 L3.8,10 L4.4,13.5 L-4.4,13.5 Z" fill="#241a14" stroke="#2a1206" stroke-width="1"/>
+  <path d="M-3,13 L3,13" stroke="#ffb347" stroke-width="1.3"/>
+</g>
+
+<!-- Backpack: a big reactor block; the gunship's rear hull -->
+<g id="backpack" data-pose-mech="0,14,0,1,1" data-pose-ship="0,9,0,0.85,1.2">
+  <path d="M-11,-6 L11,-6 L10,6 L-10,6 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2.4"/>
+  <path d="M-11,-6 L11,-6 L10,6 L-10,6 Z" fill="#d97a34"/>
+  <path d="M1,-6 L11,-6 L10,6 L1,6 Z" fill="#a8541d"/>
+  <path d="M-10.4,-5 L-9.6,5" stroke="#ffc58f" stroke-width="1"/>
+  <circle cx="-4.5" cy="0" r="2.6" fill="#241a14"/><circle cx="4.5" cy="0" r="2.6" fill="#241a14"/>
+  <circle cx="-4.5" cy="0" r="1.4" fill="#99d9ff"/><circle cx="4.5" cy="0" r="1.4" fill="#6fa8cc"/>
+</g>
+
+<!-- Stock arms: a short heavy cannon and a fist; the gunship's nose guns -->
+<g id="arm_r" data-pose-mech="17.5,-12,0,1,1" data-pose-ship="8,-11,0,0.65,0.6">
+  <path d="M-3.2,-12 L3.2,-12 L3.2,10 L-3.2,10 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2.4"/>
+  <path d="M-3.2,-12 L3.2,-12 L3.2,10 L-3.2,10 Z" fill="#5a4436"/>
+  <path d="M0.3,-12 L3.2,-12 L3.2,10 L0.3,10 Z" fill="#3e2e24"/>
+  <rect x="-4.2" y="-15" width="8.4" height="4" rx="1" fill="#241a14" stroke="#2a1206" stroke-width="1"/>
+  <circle cx="0" cy="-15" r="1.8" fill="#d6fbff"/>
+</g>
+<g id="arm_l" data-pose-mech="-17.5,-7,0,1,1" data-pose-ship="-8,-11,0,0.65,0.6">
+  <path d="M-3.5,-5.5 L3.5,-5.5 L3.5,5.5 L-3.5,5.5 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2.4"/>
+  <path d="M-3.5,-5.5 L3.5,-5.5 L3.5,5.5 L-3.5,5.5 Z" fill="#d97a34"/>
+  <path d="M0.5,-5.5 L3.5,-5.5 L3.5,5.5 L0.5,5.5 Z" fill="#a8541d"/>
+</g>
+
+<!-- Shoulder slabs: huge armour plates. Ship: they swing out into the block wings. -->
+<g id="shoulder_l" data-pose-mech="-12,-11,0,1,1" data-pose-ship="-9,-6,0,1.35,1.3">
+  <g transform="scale(-1,1)">
+    <path d="M0,0 L12,2 L12,17 L0,19 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2.6"/>
+    <path d="M0,0 L12,2 L12,17 L0,19 Z" fill="#f08a3c"/>
+    <path d="M0,13 L12,13 L12,17 L0,19 Z" fill="#b85e22"/>
+    <path d="M0.6,0.6 L11.4,2.4 L11.4,11" stroke="#ffd2a6" stroke-width="1.3" fill="none"/>
+    <path d="M2,6 L10,7" stroke="#99d9ff" stroke-width="2"/>
+  </g>
+</g>
+<g id="shoulder_r" data-pose-mech="12,-11,0,1,1" data-pose-ship="9,-6,0,1.35,1.3">
+  <path d="M0,0 L12,2 L12,17 L0,19 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2.6"/>
+  <path d="M0,0 L12,2 L12,17 L0,19 Z" fill="#b85e22"/>
+  <path d="M0,12 L12,12 L12,17 L0,19 Z" fill="#8a4316"/>
+  <path d="M2,6 L10,7" stroke="#6fa8cc" stroke-width="2"/>
+</g>
+
+<!-- Torso: a wide slab. Ship: the gunship's broad hull. -->
+<g id="torso" data-pose-mech="0,0,0,1,1" data-pose-ship="0,-2,0,0.75,1.5">
+  <path d="M-13,-9 L13,-9 L13,9 L0,12 L-13,9 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2.6"/>
+  <path d="M-13,-9 L13,-9 L13,9 L0,12 L-13,9 Z" fill="#ff9e4d"/>
+  <path d="M1,-9 L13,-9 L13,9 L1,11.8 Z" fill="#c9692a"/>
+  <path d="M-12.6,-8.4 L-12.6,2" stroke="#ffd8b0" stroke-width="1.3"/>
+  <path d="M-12.6,2 L12.6,2" stroke="#8a4316" stroke-width="1"/>
+  <circle cx="-8" cy="6" r="1.2" fill="#7a3a12"/><circle cx="8" cy="6" r="1.2" fill="#5a2a0c"/>
+</g>
+
+<!-- Shield plate: the curved slab carried ahead of the chest. Ship: the armoured prow. -->
+<g id="shield" data-pose-mech="0,-15,0,1,1" data-pose-ship="0,-20,0,0.8,1.4">
+  <path d="M-13,0 C-6,-6 6,-6 13,0 L11,4 C5,-1 -5,-1 -11,4 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2.4"/>
+  <path d="M-13,0 C-6,-6 6,-6 13,0 L11,4 C5,-1 -5,-1 -11,4 Z" fill="#ffb26b"/>
+  <path d="M0.5,-4.5 C6,-4.2 10,-2.4 13,0 L11,4 C8,1.4 4.4,-0.2 0.5,-0.8 Z" fill="#d97a34"/>
+  <path d="M-12,-0.2 C-6,-5 -1,-5.2 0,-5.2" stroke="#ffe3c7" stroke-width="1.2" fill="none"/>
+  <path d="M-6,0.4 L0,-4 L6,0.4" stroke="#2a1206" stroke-width="3.6" fill="none"/>
+  <path d="M-6,0.4 L0,-4 L6,0.4" stroke="#99d9ff" stroke-width="2" fill="none"/>
+</g>
+
+<!-- Helmet: low and armoured with a narrow visor slit. Ship: the cockpit slit. -->
+<g id="helmet" data-pose-mech="0,-5,0,1,1" data-pose-ship="0,-9,0,0.75,0.9">
+  <path d="M-5.5,-4 L5.5,-4 L6,4 L-6,4 Z" fill="#2a1206" stroke="#2a1206" stroke-width="2"/>
+  <path d="M-5.5,-4 L5.5,-4 L6,4 L-6,4 Z" fill="#e08840"/>
+  <path d="M0.5,-4 L5.5,-4 L6,4 L0.5,4 Z" fill="#a8541d"/>
+  <path d="M-4.6,-3 L4.6,-3" stroke="#9ff6ff" stroke-width="2.4"/>
+</g>
+
+</g>
+</svg>
