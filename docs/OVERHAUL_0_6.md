@@ -4,8 +4,8 @@
 reviewed, the agreed points move into the GDD as section 13 with their tags, and this file becomes the build plan.
 Every point is Ai-Generated-Proposal unless it names heromedel's words and carries their tag.
 
-Based on: 23 points. 1 agreed (the two new slots, Likely), 6 proposals (heromedel's Proposed direction), 16 filled
-in here (4% / 26% / 70%).
+Based on: 27 points. 2 agreed (the two new slots, the Armor name), 11 proposals (heromedel's Proposed direction),
+14 filled in here (7% / 41% / 52%).
 
 ## Why
 
@@ -63,12 +63,13 @@ in here (4% / 26% / 70%).
 
 - **13A. Proposed (2026-11-09):** Health is a hidden fine-grained number, not pips, so multipliers and stacking
   still work. A typical hit is 10, so 60 HP is "six hits" but can still take a 5, a 15 or a +10%. (heromedel.)
+  - **Likely (2026-11-09):** The pool is called **Armor**: the mech is power armor, and the name reminds you someone
+    is inside it. (heromedel.) The old armor and shield pools merge into it.
   - **Ai-Generated-Proposal:**
-    - The pool is called **Hull**, and the old armor and shield pools are merged into it.
     - The bar has a tick every 10, so you read it as hits.
     - A hit flashes the ticks it took away.
 - **13B. Proposed (2026-11-09):** The starter frame has no shield and about 6 hits. (heromedel.)
-  - **Ai-Generated-Proposal:** Vanguard has 60 Hull. Planet 1 Standard's bullets do 7, so the starter can take about
+  - **Ai-Generated-Proposal:** Vanguard has 60 Armor. Planet 1 Standard's bullets do 7, so the starter can take about
     8 hits there and about 6 by the region gate.
 - **13C. Ai-Generated-Proposal: one damage scale.**
 
@@ -84,7 +85,7 @@ in here (4% / 26% / 70%).
   - The hazards that ignore scaling today (acid, wall scrape, Brood Queen acid) start scaling with the planet like
     everything else.
 - **13D. Ai-Generated-Proposal: harder means bigger hits.** As in Isaac's Womb, later regions make hits bigger in
-  steps: region 0 ×1.0, region 1 ×1.3, region 2 ×1.6. Frame upgrades (13N) grow the pool to keep pace.
+  steps: region 0 ×1.0, region 1 ×1.3, region 2 ×1.6. Frame upgrades (13O) grow the pool to keep pace.
   - Danger, Hazard routes and Threat keep scaling hits as they do now: Casual ×0.65, Veteran ×1.3.
   - Nothing shrinks the pool.
 - **13E. Ai-Generated-Proposal: immunity after a hit.**
@@ -92,28 +93,22 @@ in here (4% / 26% / 70%).
     recovery time.
   - The frame blinks the whole time.
   - With six hits, this keeps one bad volley from taking three of them at once.
-- **13F. Ai-Generated-Proposal: a smaller hitbox.**
-  - The hitbox shrinks: the ship from radius 12 to 8, the mech from 15 to 10.
-  - A bright core dot shows it while bullets are close.
-  - A 6-hit budget is only fair if a shot that clips the art's edge misses.
+- **13F. Ai-Generated-Proposal: a smaller hitbox.** The hitbox shrinks: the ship from radius 12 to 8, the mech from
+  15 to 10. A 6-hit budget is only fair if a shot that clips the art's edge misses.
 - **13G. Proposed (2026-11-09):** Repairs come less often. (heromedel.)
   - **Ai-Generated-Proposal:**
-    - A repair is +15 Hull, a hit and a half.
+    - A repair is +15 Armor, a hit and a half.
     - Planet missions place 2. Dungeon rooms drop one 15% of the time (Isaac's rate), plus the shrine.
     - Clearing a mini-boss always drops one.
     - Field Repair and Salvage Cache are scaled to the new pool.
     - Blood Pact and Vampiric Plating are retuned so they heal in fractions of a tick.
-- **13H. Ai-Generated-Proposal: Flawless.** Clean play is rewarded with power, not healing (Isaac, Gungeon).
-  - Beat a mini-boss without being hit: +10 max Hull for the rest of the mission.
-  - Beat the boss without being hit: an extra blueprint of the planet's tech.
-  - A small "FLAWLESS" splash shows when it happens.
 
 ### Slots
 
-- **13I. Likely (2026-11-09):** Two new component slots: **Generator** (not only shields; the Arc Blade or Mawjig
+- **13H. Likely (2026-11-09):** Two new component slots: **Generator** (not only shields; the Arc Blade or Mawjig
   devices could go here) and **Plating**. (heromedel: "I am ok if we add one more new component slots".)
   - **Ai-Generated-Proposal:** Seven slots: main, weapon, weapon, support, special, generator, plating.
-- **13J. Ai-Generated-Proposal: the Generator slot.** It holds the parts whose job is staying alive or holding
+- **13I. Ai-Generated-Proposal: the Generator slot.** It holds the parts whose job is staying alive or holding
   ground, so that kind of defence competes for one slot:
 
   | Generator part | What it does |
@@ -124,32 +119,38 @@ in here (4% / 26% / 70%).
   | Soul Lantern (moves from support) | The Mawjig device: wisps that swallow bullets. |
 
   - The weapon slots keep Swarm Pods, Orbital Halo and Starfall.
-  - The support slot keeps Graze Engine, Overheat Core and Option Pods, and gains the cooling parts (13M).
+  - The support slot keeps Graze Engine, Overheat Core and Option Pods, and gains the cooling parts (13N).
   - The planet 3 lesson (GDD 9C) teaches the Generator slot. A starter with no shield finally makes the lesson
     matter.
-- **13K. Proposed (2026-11-09):** Plating can be heavy and slow, or fast and light; light plating might add a dash
+- **13J. Proposed (2026-11-09):** Plating can be heavy and slow, or fast and light; light plating might add a dash
   burst. (heromedel.)
   - **Ai-Generated-Proposal:**
 
-    | Plating | Hull | Speed | Other |
+    | Plating | Armor | Speed | Other |
     |---|---|---|---|
     | Standard Plating (starter) | ±0 | ±0 | None |
     | Heavy Plating | +30 | −12% | Heavy |
     | Light Plating | −10 | +12% | Flick the steering finger to dash a short way, leaving a burst that hurts what it passes |
     | Ablative Plating | ±0 | ±0 | Three plates. Each takes one hit of any size and breaks with a small Blank (Gungeon's armor). They don't come back during the mission. |
 
-  - Plating levels up in the mission like tech, adding Hull per level.
+  - Plating levels up in the mission like tech, adding Armor per level.
   - If any part ever reduces damage by a percentage, it uses Risk of Rain's armor / (armor + 100) form, and reductions
     from the same family never add together.
-- **13L. Ai-Generated-Proposal: defence that is also offence, beyond the Generator slot.**
+- **13K. Ai-Generated-Proposal: defence that is also offence, beyond the Generator slot.**
   - Orbital Halo's saws still eat bullets, but each saw shatters after eating 3 and regrows 3 s later.
   - Specials keep clearing bullets. They're the Blanks of this game: one per cooldown, a decision every time.
   - Graze Engine's Adrenal Mend fork heals in fractions of a tick.
-  - Elite and boss bodies hurt (20), so meleeing a boss costs real Hull unless you dodge out after each swing.
+  - Elite and boss bodies hurt (20), so meleeing a boss costs real Armor unless you dodge out after each swing.
+- **13L. Proposed (2026-11-09):** Ricochet shots go. (heromedel: "I think the ricochet shots are dumb".) This
+  replaces his own example in GDD 7F and drops 11P.
+  - **Ai-Generated-Proposal:** Pulse Driver's fork A becomes **Chain Bolts**: a bolt that kills jumps to the next
+    enemy in reach, up to three times, as a visible arc. It keeps fork A as the single-target fork, and nothing flies
+    off screen.
+- **13M. Proposed (2026-11-09):** Option Pods are renamed, e.g. **Drone Pods**. (heromedel.)
 
 ### Load, Mawjig Output and heat
 
-- **13M. Proposed (2026-11-09):** Frames have a **Max Load** and a **Mawjig Output**. Parts weigh something, and
+- **13N. Proposed (2026-11-09):** Frames have a **Max Load** and a **Mawjig Output**. Parts weigh something, and
   powered parts draw output wherever they're fitted. Heat only matters when you go over your output on purpose
   (overclocking). Optional coolers add room to overclock, and auxiliary generators add output, in a different slot.
   (heromedel.)
@@ -162,12 +163,14 @@ in here (4% / 26% / 70%).
     - Steps:
       - At 70% heat, a warning.
       - At 100%, the frame **vents**: powered parts go offline for 3 s and heat drops to 40%.
-      - Hull is never lost to heat, so an overheat costs tempo, not your life (attrition).
+      - Armor is never lost to heat, so an overheat costs tempo, not your life (attrition).
     - Weight and draw are fixed per part and Mk, never by in-mission level, so an upgrade you pick never breaks the
       build.
     - Support-slot parts:
       - **Coolant Loop:** cools faster.
       - **Auxiliary Generator:** adds output and weighs a lot.
+    - **Proposed (2026-11-09):** With overheating in the game, auto-fire is off by default (Settings, "Auto-fire:
+      Off > On"). (heromedel.)
     - **Overheat Core** becomes the overclocker's tech. Its vent fires on every overheat and grows with the heat you
       had built up. That way the name finally means what it says.
   - **Ai-Generated-Proposal: sample numbers** (in tons and Mawjigs, Mj), to show the shape:
@@ -192,24 +195,25 @@ in here (4% / 26% / 70%).
 
 ### Frames
 
-- **13N. Proposed (2026-11-09):** Frames differ in what they can carry: high output, high load, high speed, or a
+- **13O. Proposed (2026-11-09):** Frames differ in what they can carry: high output, high load, high speed, or a
   built-in feature such as mini missiles. They improve through frame upgrades, or a bigger frame raises the limits.
   The starter's death protection is a bit boring. (heromedel.)
   - **Ai-Generated-Proposal:**
 
-    | Frame | Hull | Load | Output | Speed | Identity |
+    | Frame | Armor | Load | Output | Speed | Identity |
     |---|---|---|---|---|---|
-    | Vanguard (starter) | 60 | 90 t | 100 Mj | 300 | Balanced. Second Wind is replaced (Q1). |
+    | Vanguard (starter) | 60, +20 built in | 90 t | 100 Mj | 300 | A simple beginner build: built-in extra plating worth 2 more hits, replacing Second Wind (heromedel, Proposed). |
     | Tempest | 40 | 70 t | 130 Mj | 370 | Fast and fragile, the energy frame: overclocks easily. Afterimage stays. |
     | Bulwark | 90 | 140 t | 80 Mj | 250 | Carries anything but powers little: heavy plating and kinetic weapons. Fortress Field reflects a quarter of the bullets that hit its front, with no shield needed. |
-    | Later frames | | | | | One with a built-in shoulder missile rack that uses none of its own load, one built to overclock (high cooling), and so on. |
+    | Later frames | | | | | **Proposed (heromedel):** a built-in Arc Blade, a built-in shield, or built-in mini missiles, using none of the frame's own load. **Ai-Generated-Proposal:** one built to overclock, with high cooling. |
 
-  - **Frame upgrades:** Hull, Max Load, Mawjig Output and Cooling, bought in the Hangar with spare blueprints of any
-    tech (Q2). Blueprints past a tech's last Mk then have a second use.
+  - **Proposed (2026-11-09):** Frame upgrades use **frame blueprints**. (heromedel.)
+    - **Ai-Generated-Proposal:** Frame blueprints drop like tech blueprints, from planets that show one on the card,
+      and each frame upgrade (Armor, Max Load, Mawjig Output, Cooling) costs a rising number of them.
 
 ### Difficulty targets
 
-- **13O. Ai-Generated-Proposal:** GDD 9A's targets are rewritten in hits, for an average player on Standard:
+- **13P. Ai-Generated-Proposal:** GDD 9A's targets are rewritten in hits, for an average player on Standard:
 
   | Planets | Hits taken | Notes |
   |---|---|---|
@@ -223,8 +227,8 @@ in here (4% / 26% / 70%).
 ## Build plan (once approved)
 
 1. **Damage model:**
-   - Hull with ticks, the damage scale, immunity after a hit, the hitbox and its core dot.
-   - Repairs and Flawless.
+   - Armor with ticks, the damage scale, immunity after a hit, the smaller hitbox.
+   - Repairs.
    - Every damage value is moved to the new steps.
 2. **Seven slots:**
    - Generator and Plating, the Shield Generator and the four platings.
@@ -232,9 +236,10 @@ in here (4% / 26% / 70%).
    - **Save migration:** old 5-slot loadouts move into the 7-slot layout. Blueprints and Mk levels are kept.
 3. **Load, Output and heat:** weights and draws, the Hangar's two meters and launch rule, overclock heat and venting,
    the Coolant Loop and Auxiliary Generator, and the Overheat Core rework.
-4. **Frames:** new stats and identities, frame upgrades, and Vanguard's new trait.
+4. **Frames:** new stats and identities, frame blueprints and upgrades, Vanguard's built-in plating.
+   Ricochet becomes Chain Bolts, Option Pods become Drone Pods, auto-fire is off by default.
 5. **Retune:** boss health, healing cards, Blood Pact, the Orbital Halo saws.
-   - The average-player bot and difficulty report are re-targeted to 13O.
+   - The average-player bot and difficulty report are re-targeted to 13P.
    - The rules tests are updated: Capacitor Discharge, Blood Pact, resume.
 6. **Text:** the Guide to Guardians, tech and frame text, and Hangar wording, all checked by the wording checker.
 7. **Testers:** a focused cold review of the Hangar and of one planet-3 run, with no full sweep. This is a major
@@ -242,9 +247,5 @@ in here (4% / 26% / 70%).
 
 ## Questions
 
-- **Q1.** Vanguard's new trait, replacing Second Wind. Candidates:
-  - (a) Built-in shoulder mini missiles. It would need the planet 6 lesson to change, since Swarm Pods is the missile
-    tech you earn there.
-  - (b) Transform Burst: changing form, or a flick, pushes bullets away around you once per stage.
-  - (c) Something you'd rather have.
-- **Q2.** Should frame upgrades cost spare blueprints of any tech, or something else?
+- **Q1.** Answered: Vanguard gets built-in extra plating, 2 hits (13O).
+- **Q2.** Answered: frame upgrades use frame blueprints (13O).
