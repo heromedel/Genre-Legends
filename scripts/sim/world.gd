@@ -18,11 +18,11 @@ const PRIZE_DRIFT_DELAY := 3.0
 ## Chain Reaction (Explosive II): how long each link waits, and how many links a cascade can run.
 const CHAIN_REACTION_DELAY := 0.12
 const CHAIN_REACTION_GENERATIONS := 3
-## How far a ricocheting shot looks for its next target.
 ## How far a ricocheting shot flies out of view before it glances back (kept inside shot_bounds), and how
 ## far it can turn when it does.
 const RICOCHET_OUT_OF_VIEW := Vector2(25.0, 90.0)
 const RICOCHET_TURN := 0.8
+## How far a ricocheting shot looks for its next target.
 const RICOCHET_RANGE := 420.0
 ## Meteors (Starfall, Doom Bell) streak in from the upper left; Comet Trail fires lie along that path.
 const METEOR_FROM := Vector2(-0.5, -0.866)
