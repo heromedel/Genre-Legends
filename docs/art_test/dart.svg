@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -40 80 80">
+<!-- Dart enemy, facing down (toward the player). Game units. Light from the top-left.
+     1 outline, 2 fill, 3 shading, 4 highlights, 5 details, per component. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+
+<!-- Engine glow in the tail notch -->
+<path d="M-3,-5 L0,-11 L3,-5 Z" fill="#ff9a3c" opacity="0.85"/>
+
+<!-- Blades: two swept fins -->
+<g>
+  <path d="M0,17 L-14,-11 L-7,-8 L-2,-3 Z M0,17 L14,-11 L7,-8 L2,-3 Z" fill="#2a0b0b" stroke="#2a0b0b" stroke-width="2.4"/>
+  <path d="M0,17 L-14,-11 L-7,-8 L-2,-3 Z" fill="#d9473a"/>
+  <path d="M0,17 L14,-11 L7,-8 L2,-3 Z" fill="#a8352b"/>
+  <path d="M-2,-3 L-7,-8 L-14,-11 L-9.5,-3 Z" fill="#b23a2f"/>
+  <path d="M2,-3 L7,-8 L14,-11 L9.5,-3 Z" fill="#7c241d"/>
+  <path d="M-0.6,15 L-13.2,-10.2" stroke="#ff9a85" stroke-width="1"/>
+  <path d="M-4,4 L-8.6,-4.6 M4,4 L8.6,-4.6" stroke="#5c1712" stroke-width="0.6"/>
+  <circle cx="-12" cy="-9" r="0.9" fill="#ffd0c0"/>
+</g>
+
+<!-- Spine: the armoured body down the middle -->
+<g>
+  <path d="M0,19 L-3.6,4 L-3,-7 L3,-7 L3.6,4 Z" fill="#2a0b0b" stroke="#2a0b0b" stroke-width="2"/>
+  <path d="M0,19 L-3.6,4 L-3,-7 L3,-7 L3.6,4 Z" fill="#e8584a"/>
+  <path d="M0.5,18 L3.6,4 L3,-7 L0.5,-7 Z" fill="#a63328"/>
+  <path d="M-0.6,16 L-2.8,4 L-2.4,-5" stroke="#ffb3a3" stroke-width="0.8" fill="none"/>
+  <path d="M-3,-2 L3,-2" stroke="#5c1712" stroke-width="0.6"/>
+</g>
+
+<!-- The eye: a hot core that tracks you -->
+<g>
+  <circle cx="0" cy="6" r="3.4" fill="#2a0b0b"/>
+  <circle cx="0" cy="6" r="2.6" fill="#ff5a40"/>
+  <circle cx="0" cy="6.4" r="1.5" fill="#ffe9d0"/>
+  <circle cx="-0.7" cy="5.3" r="0.55" fill="#ffffff"/>
+</g>
+
+</g>
+</svg>

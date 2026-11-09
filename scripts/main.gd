@@ -151,6 +151,13 @@ func _debug_launch() -> bool:
 	if options.has("page"):
 		show_hub(options["page"])
 		return true
+	# Art tests: one piece of art alone at a set zoom (ArtGallery).
+	if options.has("gallery"):
+		var gallery := ArtGallery.new()
+		gallery.subject = options["gallery"]
+		gallery.zoom = float(options.get("zoom", "3"))
+		_set_screen(gallery)
+		return true
 	return false
 
 

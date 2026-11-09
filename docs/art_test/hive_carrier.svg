@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-350 -350 700 700">
+<!-- Hive Carrier boss, facing down (toward the player). Game units, same hull and part positions as the game.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+
+<!-- Engines along the stern (the top edge, since it faces down) -->
+<g>
+  <path d="M-220,-80 L-220,-100 L-150,-100 L-150,-80 Z M-70,-86 L-70,-108 L70,-108 L70,-86 Z M150,-80 L150,-100 L220,-100 L220,-80 Z" fill="#14070a" stroke="#14070a" stroke-width="6"/>
+  <path d="M-218,-82 L-218,-98 L-152,-98 L-152,-82 Z M-68,-88 L-68,-106 L68,-106 L68,-88 Z M152,-82 L152,-98 L218,-98 L218,-82 Z" fill="#3a2128"/>
+  <path d="M-185,-82 L-185,-98 L-152,-98 L-152,-82 Z M0,-88 L0,-106 L68,-106 L68,-88 Z M185,-82 L185,-98 L218,-98 L218,-82 Z" fill="#26131a"/>
+  <path d="M-216,-97 L-154,-97 M-66,-105 L66,-105 M154,-97 L216,-97" stroke="#7a4248" stroke-width="2"/>
+  <path d="M-205,-101 L-205,-104 M-185,-101 L-185,-104 M-165,-101 L-165,-104 M-50,-109 L-50,-113 M-25,-109 L-25,-113 M0,-109 L0,-113 M25,-109 L25,-113 M50,-109 L50,-113 M165,-101 L165,-104 M185,-101 L185,-104 M205,-101 L205,-104" stroke="#ff9a3c" stroke-width="5"/>
+</g>
+
+<!-- Outer hull -->
+<g>
+  <!-- 1 outline -->
+  <path d="M-330,-40 L-260,-70 L-90,-84 L90,-84 L260,-70 L330,-40 L300,20 L170,60 L70,92 L-70,92 L-170,60 L-300,20 Z" fill="#14070a" stroke="#14070a" stroke-width="7"/>
+  <!-- 2 fill -->
+  <path d="M-330,-40 L-260,-70 L-90,-84 L90,-84 L260,-70 L330,-40 L300,20 L170,60 L70,92 L-70,92 L-170,60 L-300,20 Z" fill="#5a2a32"/>
+  <!-- 3 shading: the right half and the underside band fall into shadow -->
+  <path d="M10,-84 L90,-84 L260,-70 L330,-40 L300,20 L170,60 L70,92 L10,92 Z" fill="#45202a"/>
+  <path d="M-300,20 L-170,60 L-70,92 L70,92 L170,60 L300,20 L292,4 L165,44 L66,74 L-66,74 L-165,44 L-292,4 Z" fill="#2c1218"/>
+  <!-- 4 highlights: the upper-left rim -->
+  <path d="M-326,-40 L-258,-67 L-90,-80 L0,-80" stroke="#c4767a" stroke-width="4" fill="none"/>
+  <path d="M-322,-36 L-298,14" stroke="#9a5258" stroke-width="2.5" fill="none"/>
+  <!-- 5 details: armour seams, rivet rows, hazard chevrons, running lights -->
+  <path d="M-240,-66 L-226,40 M-160,-76 L-150,60 M160,-76 L150,60 M240,-66 L226,40" stroke="#2c1218" stroke-width="2.5"/>
+  <path d="M-310,-20 L310,-20" stroke="#2c1218" stroke-width="2"/>
+  <g fill="#7a4248">
+    <circle cx="-290" cy="-28" r="2.4"/><circle cx="-270" cy="-30" r="2.4"/><circle cx="-250" cy="-32" r="2.4"/><circle cx="-230" cy="-33" r="2.4"/>
+    <circle cx="230" cy="-33" r="2.4"/><circle cx="250" cy="-32" r="2.4"/><circle cx="270" cy="-30" r="2.4"/><circle cx="290" cy="-28" r="2.4"/>
+  </g>
+  <g fill="#ffcc3a">
+    <path d="M-318,-30 L-306,-30 L-296,-10 L-308,-10 Z"/><path d="M-298,-30 L-286,-30 L-276,-10 L-288,-10 Z"/>
+    <path d="M306,-30 L318,-30 L308,-10 L296,-10 Z"/><path d="M286,-30 L298,-30 L288,-10 L276,-10 Z"/>
+  </g>
+  <g fill="#ff6a50">
+    <circle cx="-300" cy="8" r="4"/><circle cx="300" cy="8" r="4"/><circle cx="-60" cy="86" r="3.5"/><circle cx="60" cy="86" r="3.5"/>
+  </g>
+</g>
+
+<!-- Raised inner deck -->
+<g>
+  <path d="M-270,-24 L-213,-42 L-74,-50 L74,-50 L213,-42 L270,-24 L246,12 L139,36 L57,55 L-57,55 L-139,36 L-246,12 Z" fill="#14070a" stroke="#14070a" stroke-width="5"/>
+  <path d="M-270,-24 L-213,-42 L-74,-50 L74,-50 L213,-42 L270,-24 L246,12 L139,36 L57,55 L-57,55 L-139,36 L-246,12 Z" fill="#6e3640"/>
+  <path d="M10,-50 L74,-50 L213,-42 L270,-24 L246,12 L139,36 L57,55 L10,55 Z" fill="#552a33"/>
+  <path d="M-246,12 L-139,36 L-57,55 L57,55 L139,36 L246,12 L240,2 L135,25 L55,43 L-55,43 L-135,25 L-240,2 Z" fill="#3a1a22"/>
+  <path d="M-266,-24 L-212,-39 L-74,-46 L0,-46" stroke="#d89096" stroke-width="3" fill="none"/>
+  <path d="M-200,-38 L-190,30 M-100,-47 L-96,48 M100,-47 L96,48 M200,-38 L190,30" stroke="#3a1a22" stroke-width="2"/>
+</g>
+
+<!-- Hangar bays: recessed doors glowing from inside, hazard-striped frames -->
+<g>
+  <g id="bay">
+    <rect x="-30" y="-18" width="60" height="36" rx="3" fill="#14070a"/>
+    <rect x="-28" y="-16" width="56" height="32" rx="2" fill="#2a1016"/>
+    <rect x="-22" y="-9" width="44" height="18" fill="#ff4a32"/>
+    <rect x="-22" y="-9" width="44" height="7" fill="#ffb08a"/>
+    <path d="M-22,-9 L22,-9 L22,9 L-22,9 Z" fill="none" stroke="#14070a" stroke-width="2"/>
+    <path d="M-28,-16 L-20,-16 L-28,-8 Z M-14,-16 L-6,-16 L-14,-8 Z" fill="#ffcc3a"/>
+    <path d="M28,16 L20,16 L28,8 Z M14,16 L6,16 L14,8 Z" fill="#ffcc3a"/>
+    <path d="M-27,-15 L27,-15" stroke="#c4767a" stroke-width="1.5"/>
+  </g>
+  <use href="#bay" x="-250" y="6"/><use href="#bay" x="-125" y="36"/><use href="#bay" x="125" y="36"/><use href="#bay" x="250" y="6"/>
+</g>
+
+<!-- Command bridge behind the core -->
+<g>
+  <path d="M-40,-80 L40,-80 L34,-52 L-34,-52 Z" fill="#14070a" stroke="#14070a" stroke-width="5"/>
+  <path d="M-40,-80 L40,-80 L34,-52 L-34,-52 Z" fill="#7a3e48"/>
+  <path d="M2,-80 L40,-80 L34,-52 L2,-52 Z" fill="#5a2c35"/>
+  <path d="M-38,-78 L0,-78" stroke="#e4a0a6" stroke-width="2.5"/>
+  <g fill="#ffd58a"><rect x="-28" y="-72" width="8" height="4" rx="1"/><rect x="-14" y="-72" width="8" height="4" rx="1"/><rect x="6" y="-72" width="8" height="4" rx="1"/><rect x="20" y="-72" width="8" height="4" rx="1"/></g>
+</g>
+
+<!-- Turrets: domes with twin barrels, aimed down at you -->
+<g>
+  <g id="turret">
+    <rect x="-7" y="2" width="5" height="26" rx="1" fill="#14070a"/><rect x="2" y="2" width="5" height="26" rx="1" fill="#14070a"/>
+    <rect x="-6" y="3" width="3" height="24" fill="#8a5a5e"/><rect x="3" y="3" width="3" height="24" fill="#5a3a3e"/>
+    <circle cx="0" cy="0" r="18" fill="#14070a"/>
+    <circle cx="0" cy="0" r="15.5" fill="#6e3640"/>
+    <path d="M2,-15.4 A15.5,15.5 0 0 1 2,15.4 A15.5,15.5 0 0 0 2,-15.4 Z" fill="#4a222b"/>
+    <path d="M1,-15.4 A15.5,15.5 0 0 1 15.5,0 L5,0 A5,5 0 0 0 1,-5 Z" fill="#4a222b"/>
+    <path d="M-11,-8 A13,13 0 0 1 -2,-13" stroke="#e4a0a6" stroke-width="2.4" fill="none"/>
+    <circle cx="0" cy="0" r="5" fill="#2a1016"/><circle cx="0" cy="0" r="2.4" fill="#ff6a50"/>
+  </g>
+  <use href="#turret" x="-70" y="48"/><use href="#turret" x="70" y="48"/>
+</g>
+
+<!-- The core: a glowing heart behind two armour plates, closed until its bays fall -->
+<g transform="translate(0,-10)">
+  <circle cx="0" cy="0" r="44" fill="#14070a"/>
+  <circle cx="0" cy="0" r="40" fill="#3a0d14"/>
+  <circle cx="0" cy="0" r="28" fill="#c8202f"/>
+  <circle cx="0" cy="0" r="20" fill="#ff4d5a"/>
+  <circle cx="0" cy="0" r="10" fill="#ffd0c0"/>
+  <circle cx="-4" cy="-4" r="3.5" fill="#ffffff"/>
+  <g>
+    <path d="M-8,-46 L-48,-37 L-48,37 L-8,46 Z M8,-46 L48,-37 L48,37 L8,46 Z" fill="#14070a" stroke="#14070a" stroke-width="5"/>
+    <path d="M-8,-46 L-48,-37 L-48,37 L-8,46 Z" fill="#8a4a52"/>
+    <path d="M8,-46 L48,-37 L48,37 L8,46 Z" fill="#5e2e37"/>
+    <path d="M-48,16 L-48,37 L-8,46 L-8,24 Z" fill="#6a343c"/>
+    <path d="M-10,-44 L-46,-35.5 L-46,10" stroke="#f0b0b6" stroke-width="2.6" fill="none"/>
+    <path d="M-34,-30 L-34,30 M34,-30 L34,30" stroke="#3a1a22" stroke-width="2"/>
+    <path d="M-12,-30 L-20,-30 M-12,-20 L-20,-20 M-12,20 L-20,20 M-12,30 L-20,30 M12,-30 L20,-30 M12,-20 L20,-20 M12,20 L20,20 M12,30 L20,30" stroke="#ffcc3a" stroke-width="3"/>
+    <rect x="-9" y="-46" width="18" height="92" fill="#ff4d5a" opacity="0.35"/>
+  </g>
+</g>
+
+</g>
+</svg>
