@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
-<!-- Wasp: a striped weaver with buzzing wings. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+<!-- Wasp: a striped weaver with big buzzing wings. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
      Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
 <g stroke-linejoin="round" stroke-linecap="round">
-<g id="wing_l"><path d="M-3,-2 L-17,-8 L-15,4 Z" fill="#ffffff" opacity="0.35" stroke="#fff6cc" stroke-width="0.8"/></g>
-<g id="wing_r"><path d="M3,-2 L17,-8 L15,4 Z" fill="#ffffff" opacity="0.3" stroke="#fff6cc" stroke-width="0.8"/></g>
+<g id="wing_l"><path d="M-3,-4 L-21,-12 L-22,-2 L-13,5 Z" fill="#e8f6ff" opacity="0.5" stroke="#fff6cc" stroke-width="1"/><path d="M-5,-3 L-19,-8" stroke="#ffffff" stroke-width="0.8" opacity="0.7"/></g>
+<g id="wing_r"><path d="M3,-4 L21,-12 L22,-2 L13,5 Z" fill="#e8f6ff" opacity="0.42" stroke="#fff6cc" stroke-width="1"/><path d="M5,-3 L19,-8" stroke="#ffffff" stroke-width="0.8" opacity="0.6"/></g>
 <path d="M0,-15 C6,-15 9,-8 9,0 C9,9 5,15 0,17 C-5,15 -9,9 -9,0 C-9,-8 -6,-15 0,-15 Z" fill="#2a1f05" stroke="#2a1f05" stroke-width="2.4"/>
 <path d="M0,-15 C6,-15 9,-8 9,0 C9,9 5,15 0,17 C-5,15 -9,9 -9,0 C-9,-8 -6,-15 0,-15 Z" fill="#ffd94d"/>
 <path d="M0.6,-15 C6,-15 9,-8 9,0 C9,9 5,15 0.6,17 Z" fill="#d9a92b"/>

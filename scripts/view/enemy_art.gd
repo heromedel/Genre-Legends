@@ -33,6 +33,7 @@ static func draw(ci: CanvasItem, enemy: Enemy, time: float) -> void:
 		VectorArt.draw(ci, file, Transform2D(turn, size, 0.0, enemy.pos), {
 			"flash": 1.0 if enemy.flash > 0.0 else 0.0,
 			"alpha": 0.9 if enemy.look == "wisp" else 1.0,
+			"rim": Art.with_alpha(enemy.color, 0.45),
 			"groups": _moving_parts(enemy, t)})
 	if enemy.hex_marked:
 		Art.dashed_circle(ci, enemy.pos, enemy.radius + 8.0, Color(0.85, 0.45, 1.0, 0.8), 2.0, 6, time * 2.0)
@@ -53,13 +54,14 @@ static func _moving_parts(enemy: Enemy, t: float) -> Dictionary:
 	var flicker := 1.0 + sin(t * 40.0) * 0.18
 	match enemy.look:
 		"dart", "ace", "barge":
-			return {"flame": _about(Vector2(0, 9), 0.0, Vector2(1.0, flicker))}
+			var nozzle: float = {"dart": 9.0, "ace": 13.0, "barge": 15.0}[enemy.look]
+			return {"flame": _about(Vector2(0, nozzle), 0.0, Vector2(1.0, flicker))}
 		"drill":
 			return {"flame": _about(Vector2(0, 10), 0.0, Vector2(1.0, flicker)),
 				"bands": Transform2D(0.0, Vector2(0.0, fmod(t * 24.0, 6.0) - 3.0))}
 		"wasp":
 			var flap := 0.55 + absf(sin(t * 30.0)) * 0.65
-			return {"wing_l": _about(Vector2(-3, -2), 0.0, Vector2(flap, 1.0)), "wing_r": _about(Vector2(3, -2), 0.0, Vector2(flap, 1.0))}
+			return {"wing_l": _about(Vector2(-3, -4), 0.0, Vector2(flap, 1.0)), "wing_r": _about(Vector2(3, -4), 0.0, Vector2(flap, 1.0))}
 		"splitter":
 			var seam := 0.6 + absf(sin(t * 6.0)) * 1.6
 			return {"half_l": Transform2D(0.0, Vector2(-seam, 0)), "half_r": Transform2D(0.0, Vector2(seam, 0))}
@@ -75,14 +77,16 @@ static func _moving_parts(enemy: Enemy, t: float) -> Dictionary:
 		"nest":
 			return {"core": Transform2D(0.0, Vector2.ONE * (1.0 + sin(t * 5.0) * 0.12), 0.0, Vector2.ZERO)}
 		"warlord":
-			return {"blade": _about(Vector2(17, 6), sin(t * 2.0) * 0.08, Vector2.ONE)}
+			# The banner ripples on its pole.
+			return {"banner": _about(Vector2(-1, -18), 0.0, Vector2(1.0 + sin(t * 4.0) * 0.12, 1.0))}
 		"wisp":
 			return {"flame": _about(Vector2(0, 10), 0.0, Vector2(1.0, 1.0 + sin(t * 7.0) * 0.1))}
 		"pillar_eye":
 			return {"pupil": Transform2D(0.0, Vector2.from_angle(enemy.facing) * 3.0)}
 		"mimic":
+			# The lid lifts and the dark mouth stretches open beneath it.
 			var open := 0.5 + absf(sin(t * 7.0)) * 0.5
-			return {"lid": Transform2D(0.0, Vector2(0, -7.0 * open))}
+			return {"lid": Transform2D(0.0, Vector2(0, -7.0 * open)), "mouth": _about(Vector2(0, 1), 0.0, Vector2(1.0, 1.0 + open))}
 		"knight":
 			# Knocked aside, the shield hangs off its arm and leaves the front open.
 			return {} if enemy.front_shield else {"shield": _about(Vector2(-13, -12), -1.2, Vector2.ONE) * Transform2D(0.0, Vector2(-2, 14))}

@@ -5,10 +5,14 @@ extends Control
 ## Subjects: ship, mech, dart, "enemies" (every regular enemy in a grid, named), any boss id (hive_carrier, warden, ...), or an SVG drawn through VectorArt
 ## (gallery=art/test/ship.svg; add rim=1 for the rim light), or "morph": the transformation looping,
 ## without the spin on the left and with it on the right, or "cutscene:<kind>": one of the Dropship
-## transitions on a loop (cutscene:return_win, cutscene:launch_planet, ...). Frames: add frame=tempest (or bulwark).
+## transitions on a loop. Add bg=ground or bg=floor to see the art on a planet or a dungeon floor; (cutscene:return_win, cutscene:launch_planet, ...). Frames: add frame=tempest (or bulwark).
 
 const SPACE := Color(0.04, 0.05, 0.12)
 const GROUND := Color(0.42, 0.39, 0.29)
+const FLOOR := Color(0.27, 0.26, 0.29)      # a dungeon's stone floor
+
+## What's behind the art: "space", "ground" (a planet) or "floor" (a dungeon). The mech stands on ground.
+var backdrop := ""
 
 var subject := "ship"
 var zoom := 3.0
@@ -103,4 +107,5 @@ func _loop_cutscene() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, size), GROUND if subject == "mech" else SPACE)
+	var behind := backdrop if backdrop != "" else ("ground" if subject == "mech" else "space")
+	draw_rect(Rect2(Vector2.ZERO, size), {"ground": GROUND, "floor": FLOOR}.get(behind, SPACE))

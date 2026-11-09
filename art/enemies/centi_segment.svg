@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
-<!-- Centi-Mech segment: an armoured link with a pair of scuttling legs. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+<!-- Centi-Mech segment: a rounded armoured link with ridges and a pair of scuttling legs. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
      Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
 <g stroke-linejoin="round" stroke-linecap="round">
-<g id="legs"><path d="M-8,0 L-19,-3 M8,0 L19,-3" stroke="#5a3010" stroke-width="2.6" fill="none"/></g>
-<path d="M-6,-12 L6,-12 L12,-4 L12,4 L6,12 L-6,12 L-12,4 L-12,-4 Z" fill="#2a1505" stroke="#2a1505" stroke-width="2.4"/>
-<path d="M-6,-12 L6,-12 L12,-4 L12,4 L6,12 L-6,12 L-12,4 L-12,-4 Z" fill="#e08a3a"/>
-<path d="M0.6,-12 L6,-12 L12,-4 L12,4 L6,12 L0.6,12 Z" fill="#ad6424"/>
-<path d="M-5.6,-11 L-11,-4 L-11,3" stroke="#ffe0b8" stroke-width="1" fill="none"/>
-<path d="M-11,0 L11,0" stroke="#6e3a10" stroke-width="1"/>
+<g id="legs"><path d="M-9,0 L-19,-5 L-20,2 M9,0 L19,-5 L20,2" stroke="#3a1c05" stroke-width="2.8" fill="none"/></g>
+<path d="M0,-11 C8,-11 13,-6 13,0 C13,6 8,11 0,11 C-8,11 -13,6 -13,0 C-13,-6 -8,-11 0,-11 Z" fill="#2a1505" stroke="#2a1505" stroke-width="2.4"/>
+<path d="M0,-11 C8,-11 13,-6 13,0 C13,6 8,11 0,11 C-8,11 -13,6 -13,0 C-13,-6 -8,-11 0,-11 Z" fill="#e08a3a"/>
+<path d="M0.6,-11 C8,-11 13,-6 13,0 C13,6 8,11 0.6,11 Z" fill="#ad6424"/>
+<path d="M-11,-5 C-6,-8 6,-8 11,-5 M-12.6,0 C-6,-3 6,-3 12.6,0 M-11,5 C-6,2 6,2 11,5" stroke="#6e3a10" stroke-width="1.2" fill="none"/>
+<path d="M-9,-7.6 C-10.8,-6 -12,-3.4 -12.2,-1" stroke="#ffe0b8" stroke-width="1" fill="none"/>
 </g>
 </svg>

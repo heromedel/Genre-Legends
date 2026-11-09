@@ -186,6 +186,7 @@ func _debug_launch() -> bool:
 		gallery.subject = options["gallery"]
 		gallery.zoom = float(options.get("zoom", "3"))
 		gallery.rim = options.has("rim")
+		gallery.backdrop = options.get("bg", "")
 		_set_screen(gallery)
 		return true
 	return false

@@ -1,14 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
-<!-- Minelayer: a boxy hauler with a hot mine glowing in its open bay. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+<!-- Minelayer: a round-backed hauler with side pods, a hot mine glowing in its open rear bay. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
      Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
 <g stroke-linejoin="round" stroke-linecap="round">
-<path d="M-12,-13 L12,-13 L13,11 L-13,11 Z" fill="#2a0f0a" stroke="#2a0f0a" stroke-width="2.4"/>
-<path d="M-12,-13 L12,-13 L13,11 L-13,11 Z" fill="#e8705a"/>
-<path d="M1,-13 L12,-13 L13,11 L1,11 Z" fill="#b04c3a"/>
-<path d="M-11.4,-12 L-12.2,10" stroke="#ffcfc2" stroke-width="1"/>
-<path d="M-7,3 L7,3 L7.6,11 L-7.6,11 Z" fill="#1a0806"/>
-<g id="core"><circle cx="0" cy="7" r="3.8" fill="#ff8040"/><circle cx="0" cy="7" r="2" fill="#fff1c4"/></g>
-<path d="M-9,-8 L9,-8 M-9,-4 L9,-4" stroke="#7a3226" stroke-width="1"/>
-<rect x="-4" y="-17" width="8" height="5" rx="1" fill="#2a0f0a"/><rect x="-3" y="-16" width="6" height="3" rx="0.8" fill="#ffd27a"/>
+<path d="M-12,-6 L-17,-2 L-17,8 L-12,10 Z M12,-6 L17,-2 L17,8 L12,10 Z" fill="#2a0f0a" stroke="#2a0f0a" stroke-width="2"/>
+<path d="M-12,-6 L-17,-2 L-17,8 L-12,10 Z M12,-6 L17,-2 L17,8 L12,10 Z" fill="#c45a46"/>
+<path d="M0,-17 C8,-17 12,-11 12,-3 L12,12 L-12,12 L-12,-3 C-12,-11 -8,-17 0,-17 Z" fill="#2a0f0a" stroke="#2a0f0a" stroke-width="2.4"/>
+<path d="M0,-17 C8,-17 12,-11 12,-3 L12,12 L-12,12 L-12,-3 C-12,-11 -8,-17 0,-17 Z" fill="#e8705a"/>
+<path d="M0.6,-17 C8,-17 12,-11 12,-3 L12,12 L0.6,12 Z" fill="#b04c3a"/>
+<path d="M-9,-12 C-10.8,-9 -11.2,-6 -11.2,-3" stroke="#ffcfc2" stroke-width="1" fill="none"/>
+<path d="M-4,-14 C-2,-15 2,-15 4,-14 L3,-10 L-3,-10 Z" fill="#2a0f0a"/><path d="M-2.6,-13.4 L2.6,-13.4 L2,-11 L-2,-11 Z" fill="#ffd27a"/>
+<path d="M-8,2 L8,2 L8,12 L-8,12 Z" fill="#1a0806"/>
+<g id="core"><circle cx="0" cy="7" r="4" fill="#ff8040"/><circle cx="0" cy="7" r="2" fill="#fff1c4"/>
+<path d="M0,1.6 L0,3 M0,11 L0,12.4 M-5.4,7 L-4,7 M4,7 L5.4,7" stroke="#ff8040" stroke-width="1.2"/></g>
 </g>
 </svg>
