@@ -200,6 +200,9 @@ static func _draw_warning(ci: CanvasItem, zone: Zone, time: float) -> void:
 			ci.draw_line(zone.pos, end, Art.with_alpha(color, blink), 2.0, true)
 		"ring":
 			Art.dashed_circle(ci, zone.pos, zone.radius * 0.25, Art.with_alpha(color, 0.6), 2.0, 10, time * 3.0)
+		"enemy_ring":
+			# A shockwave's full reach, shown before it rolls out: be outside the line when it does.
+			Art.dashed_circle(ci, zone.pos, zone.radius, Art.with_alpha(color, 0.85), 3.0, 24, time * 2.0)
 		"meteor":
 			# The target circle, plus the meteor itself streaking in toward it.
 			Art.dashed_circle(ci, zone.pos, zone.radius, Art.with_alpha(color, 0.85), 2.5, 12, time * 2.0)

@@ -4,6 +4,9 @@ extends BossBase
 ## The flail can't be hurt and blocks shots. Break the shackles and the Warden breaks free: its core is
 ## exposed, it stalks you, the flail swings wider, and its stomps send shockwaves through the room.
 
+## How far the Warden's stomp shockwaves reach (shown before each one lands).
+const STOMP_RADIUS := 320.0
+
 var room: Rect2
 
 
@@ -41,7 +44,7 @@ func behave(dt: float) -> void:
 	if phase == 0 and shackles.is_empty():
 		core.invulnerable = false
 		set_phase(1, "THE WARDEN BREAKS FREE")
-		world.add_zone("enemy_ring", origin, 460.0, 0.9, 16.0 * world.enemy_damage_scale, true, {"color": Color(0.9, 0.7, 0.45)})
+		world.add_zone("enemy_ring", origin, STOMP_RADIUS, 0.9, 16.0 * world.enemy_damage_scale, true, {"warn": 0.8, "color": Color(0.9, 0.7, 0.45)})
 	if phase == 1 and hp_fraction() < 0.35:
 		set_phase(2, "LOCKDOWN")
 	# Chained: it stays put. Free: it stalks you across the room.
@@ -60,7 +63,8 @@ func behave(dt: float) -> void:
 			var guard := world.spawn_enemy("skullbot", origin + Vector2(side * 90.0, 60.0))
 			guard.memory["awake"] = true
 	if phase >= 1 and fmod(time, 4.0) < dt:
-		world.add_zone("enemy_ring", origin, 420.0, 0.9, 14.0 * world.enemy_damage_scale, true, {"color": Color(0.9, 0.7, 0.45)})
+		# Each stomp shows its reach first; step outside the line and it can't touch you.
+		world.add_zone("enemy_ring", origin, STOMP_RADIUS, 0.9, 14.0 * world.enemy_damage_scale, true, {"warn": 0.8, "color": Color(0.9, 0.7, 0.45)})
 		world.emit("shake", {"amount": 9.0})
 		world.emit("sound", {"name": "door_slam"})
 	if phase == 2 and fmod(time, 3.0) < dt:

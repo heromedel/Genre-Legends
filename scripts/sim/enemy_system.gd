@@ -5,6 +5,9 @@ extends RefCounted
 ## Patterns lean on their genre's tropes (GDD 1B): formation fighters peel off and dive, a Mimic is a
 ## treasure chest until you get close, burrowers erupt under your feet, knights must be flanked.
 
+## Seconds of grace after a boss's body hits you (ordinary hits give FrameData.HIT_GRACE).
+const BOSS_CONTACT_GRACE := 1.0
+
 var world: World
 var stage = null        # the current Stage, for room bounds and scrolling
 
@@ -74,6 +77,11 @@ func _contact(enemy: Enemy, player: PlayerFrame) -> void:
 		world.damage_player(enemy.contact * 0.5, enemy.kind)
 	else:
 		world.damage_player(enemy.contact, enemy.kind)
+	# A boss's body shoves you clear and gives you a moment, so you're never pinned and drained.
+	if enemy.boss != null:
+		var away := (player.pos - enemy.pos)
+		player.pos = enemy.pos + (away.normalized() if away.length() > 1.0 else Vector2.DOWN) * (reach + 30.0)
+		player.grace = maxf(player.grace, BOSS_CONTACT_GRACE)
 
 
 func _aim_angle(enemy: Enemy) -> float:
