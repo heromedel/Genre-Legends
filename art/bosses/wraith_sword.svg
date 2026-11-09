@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -80 160 160">
+<!-- Blade Wraith sword: a spectral blade pointing up, gold guard, leather grip. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M0,-52 L7,-12 L0,-6 L-7,-12 Z" fill="#0a1020" stroke="#0a1020" stroke-width="3"/>
+<path d="M0,-52 L-7,-12 L0,-6 Z" fill="#e8f2ff"/>
+<path d="M0,-52 L7,-12 L0,-6 Z" fill="#a8bcd8"/>
+<path d="M-0.6,-46 L-5,-14" stroke="#ffffff" stroke-width="1.4"/>
+<path d="M-15,-10 L15,-10" stroke="#0a1020" stroke-width="6"/><path d="M-14,-10 L14,-10" stroke="#ffcc4d" stroke-width="3.4"/>
+<path d="M0,-8 L0,12" stroke="#0a1020" stroke-width="7"/><path d="M0,-8 L0,11" stroke="#7a4a2a" stroke-width="4"/>
+<circle cx="0" cy="14" r="4" fill="#0a1020"/><circle cx="0" cy="14" r="2.6" fill="#ffcc4d"/>
+</g>
+</svg>

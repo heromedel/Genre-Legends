@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -80 160 160">
+<!-- The Blade Wraith: a hooded ghost, faint while untouchable and solid while its swords are out.
+     Centred on the core.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M0,-54 C20,-50 36,-30 36,-12 L27,45 L9,33 L0,51 L-9,33 L-27,45 L-36,-12 C-36,-30 -20,-50 0,-54 Z" fill="#0a1020" stroke="#0a1020" stroke-width="4"/>
+<path d="M0,-54 C20,-50 36,-30 36,-12 L27,45 L9,33 L0,51 L-9,33 L-27,45 L-36,-12 C-36,-30 -20,-50 0,-54 Z" fill="#6a7ca0"/>
+<path d="M2,-54 C20,-50 36,-30 36,-12 L27,45 L9,33 L2,46 Z" fill="#4e5e80"/>
+<path d="M-2,-50 C-18,-46 -32,-30 -33,-12" stroke="#d8e8ff" stroke-width="2.6" fill="none"/>
+<path d="M-18,-20 L-14,30 M0,-6 L0,40 M18,-20 L14,30" stroke="#3a4866" stroke-width="2"/>
+<path d="M0,-44 C14,-42 22,-30 22,-20 C22,-10 12,-6 0,-6 C-12,-6 -22,-10 -22,-20 C-22,-30 -14,-42 0,-44 Z" fill="#0a1020"/>
+<g id="eyes"><circle cx="-9" cy="-24" r="4.6" fill="#9ae6ff"/><circle cx="9" cy="-24" r="4.6" fill="#9ae6ff"/><circle cx="-9" cy="-24" r="2" fill="#ffffff"/><circle cx="9" cy="-24" r="2" fill="#ffffff"/></g>
+</g>
+</svg>

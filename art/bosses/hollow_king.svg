@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -80 160 160">
+<!-- The Hollow King: a ragged violet robe around an empty hood, a gold crown and two cold eyes, seen from above.
+     The robe turns slowly. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<g id="robe">
+<path d="M0,-48 L12,-30 L34,-36 L30,-14 L48,-4 L30,8 L38,30 L16,26 L6,46 L-6,28 L-26,40 L-24,18 L-46,10 L-30,-6 L-40,-28 L-16,-26 Z" fill="#0c0414" stroke="#0c0414" stroke-width="4"/>
+<path d="M0,-48 L12,-30 L34,-36 L30,-14 L48,-4 L30,8 L38,30 L16,26 L6,46 L-6,28 L-26,40 L-24,18 L-46,10 L-30,-6 L-40,-28 L-16,-26 Z" fill="#4a2a78"/>
+<path d="M2,-44 L12,-30 L34,-36 L30,-14 L48,-4 L30,8 L38,30 L16,26 L6,46 L2,30 Z" fill="#36205a"/>
+<path d="M-2,-44 L-16,-24 L-38,-26" stroke="#b898f0" stroke-width="2.2" fill="none"/>
+</g>
+<circle cx="0" cy="0" r="27" fill="#0c0414"/>
+<circle cx="0" cy="0" r="24" fill="#1c0e2e"/>
+<path d="M0,-24 A24,24 0 0 1 0,24 A18,24 0 0 0 0,-24 Z" fill="#120822"/>
+<g fill="#0c0414"><path d="M-14,-20 L-12,-38 L-6,-24 L0,-42 L6,-24 L12,-38 L14,-20 Z"/></g>
+<path d="M-12,-21 L-11,-35 L-6,-25 L0,-39 L6,-25 L11,-35 L12,-21 Z" fill="#ffcc4d"/>
+<path d="M0,-39 L6,-25 L11,-35 L12,-21 L0,-21 Z" fill="#d9a020"/>
+<circle cx="0" cy="-28" r="2.2" fill="#ff5a8c"/>
+<g id="eyes"><circle cx="-8" cy="-2" r="4.6" fill="#e8f0ff"/><circle cx="8" cy="-2" r="4.6" fill="#e8f0ff"/><circle cx="-8" cy="-2" r="2" fill="#8ab4ff"/><circle cx="8" cy="-2" r="2" fill="#8ab4ff"/></g>
+</g>
+</svg>

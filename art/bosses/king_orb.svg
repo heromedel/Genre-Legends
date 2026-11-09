@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -80 160 160">
+<!-- Hollow King orb: a violet sphere with a turning crystal inside. Centred on the part.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<circle cx="0" cy="0" r="17" fill="#0c0414"/>
+<circle cx="0" cy="0" r="15" fill="#6a40b0"/>
+<path d="M0,-15 A15,15 0 0 1 0,15 A11,15 0 0 0 0,-15 Z" fill="#4a2a88"/>
+<path d="M-10,-8 A13,13 0 0 1 -2,-13" stroke="#e0d0ff" stroke-width="2" fill="none"/>
+<g id="crystal"><path d="M0,-11 L8,0 L0,11 L-8,0 Z" fill="#e8dcff"/><path d="M0,-11 L8,0 L0,11 Z" fill="#b8a0f0"/></g>
+</g>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-120 -120 240 240">
+<!-- The Warden: the jailer, huge pauldrons, a horned helm with burning eyes, a chest barred like a cell door.
+     Centred on the core.
+     Light from the top-left. Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M20,-66 L52,-104 L34,-60 Z M-20,-66 L-52,-104 L-34,-60 Z" fill="#14100c" stroke="#14100c" stroke-width="3"/>
+<path d="M20,-66 L52,-104 L34,-60 Z M-20,-66 L-52,-104 L-34,-60 Z" fill="#e8dcc4"/>
+<path d="M20,-66 L52,-104 L38,-62 Z" fill="#b8aa90"/>
+<path d="M36,-40 L78,-52 L86,-10 L44,6 Z M-36,-40 L-78,-52 L-86,-10 L-44,6 Z" fill="#14100c" stroke="#14100c" stroke-width="4"/>
+<path d="M-36,-40 L-78,-52 L-86,-10 L-44,6 Z" fill="#7a6a58"/>
+<path d="M36,-40 L78,-52 L86,-10 L44,6 Z" fill="#5a4c3e"/>
+<path d="M-38,-38 L-76,-49 L-82,-14" stroke="#e8d4b0" stroke-width="2.4" fill="none"/>
+<path d="M-70,-40 L-50,-34 M70,-40 L50,-34" stroke="#ffcc4d" stroke-width="3"/>
+<path d="M-46,-46 L46,-46 L54,30 L30,62 L-30,62 L-54,30 Z" fill="#14100c" stroke="#14100c" stroke-width="4"/>
+<path d="M-46,-46 L46,-46 L54,30 L30,62 L-30,62 L-54,30 Z" fill="#5e5244"/>
+<path d="M2,-46 L46,-46 L54,30 L30,62 L2,62 Z" fill="#4a4034"/>
+<path d="M-44,-43 L-51,28" stroke="#d8c4a0" stroke-width="2.4"/>
+<rect x="-34" y="-14" width="68" height="68" rx="3" fill="#14100c"/>
+<rect x="-31" y="-11" width="62" height="62" rx="2" fill="#2a0e04"/>
+<g id="cell"><rect x="-26" y="-6" width="52" height="52" fill="#ff7a2a" opacity="0.55"/></g>
+<path d="M-24,-11 L-24,51 M-8,-11 L-8,51 M8,-11 L8,51 M24,-11 L24,51" stroke="#14100c" stroke-width="6"/>
+<path d="M-24,-11 L-24,51 M-8,-11 L-8,51 M8,-11 L8,51 M24,-11 L24,51" stroke="#a89880" stroke-width="3.4"/>
+<path d="M-31,20 L31,20" stroke="#14100c" stroke-width="5"/><path d="M-31,20 L31,20" stroke="#a89880" stroke-width="2.4"/>
+<path d="M-13,-82 L13,-82 L26,-60 L13,-38 L-13,-38 L-26,-60 Z" fill="#14100c" stroke="#14100c" stroke-width="4"/>
+<path d="M-13,-82 L13,-82 L26,-60 L13,-38 L-13,-38 L-26,-60 Z" fill="#6e604e"/>
+<path d="M1,-82 L13,-82 L26,-60 L13,-38 L1,-38 Z" fill="#52463a"/>
+<path d="M-12,-79 L-23,-60" stroke="#e8d4b0" stroke-width="2.2"/>
+<rect x="-18" y="-64" width="36" height="8" rx="2" fill="#14100c"/>
+<g id="eyes"><circle cx="-9" cy="-60" r="4.4" fill="#ff8a2a"/><circle cx="9" cy="-60" r="4.4" fill="#ff8a2a"/><circle cx="-9" cy="-60" r="2" fill="#fff1c4"/><circle cx="9" cy="-60" r="2" fill="#fff1c4"/></g>
+</g>
+</svg>
