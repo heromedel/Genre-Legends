@@ -103,7 +103,7 @@ const FUSIONS := {
 	},
 	"starbreaker": {
 		"name": "Starbreaker", "needs": ["ion_cannon", "option_pods"],
-		"text": "Every drone fires its own ion beam alongside yours.",
+		"text": "Every pod fires its own ion beam alongside yours.",
 	},
 	"wraith_drive": {
 		"name": "Wraith Drive", "needs": ["thruster_explosion", "soul_lantern"],

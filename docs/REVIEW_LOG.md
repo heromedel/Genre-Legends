@@ -53,3 +53,6 @@ a design point).
 | 0.4 sweep | Settings | Debug console and "-dirty" build strings are visible to players. | **Discarded** | Intentional: heromedel uses the console and version stamp while testing (GDD 3, Game Project Standards: more admin commands). |
 | 0.4 sweep | Settings | Threat is ordered Standard, Veteran, Casual. | **Discarded** | Intentional: the default comes first (Labelling Guide 5). |
 | 0.4 sweep | Pause, Build tab | The Build view of pause lacks the sliders the pause menu has. | **Discarded** | That capture was taken before the pause options were added; `pause_menu_0012s` shows the current screen. |
+| 0.5.1 wording | Drone Pods | The new description and Starbreaker text said "drones" while the name and forks say "pods". | **Acted on** | "Two pods trail your path..." and "Every pod fires its own ion beam alongside yours." |
+| 0.5.1 wording | Drone Pods forks | Suggested "fire 30% harder" for Formation and a reworded Hunter Pods. | **Discarded** | Both were already accurate and read fine; the change would only add a number the card doesn't need. |
+| 0.5.1 wording | Guide | Enemy text uses "drone" (Cluster Drones, Salvo Barge) near the tech's name. | **Discarded** | Enemies being drones is accurate; descriptions call the tech's units "pods", so they don't collide. |
