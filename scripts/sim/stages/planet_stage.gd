@@ -82,7 +82,8 @@ func _place_rocks(start: Vector2) -> void:
 
 
 func _place_loot() -> void:
-	for i in 3:
+	# Two repairs on the whole planet: healing is paced, so every hit counts (GDD 13G).
+	for i in 2:
 		var repair := world.drop_pickup("repair", Vector2(world.rng.randf_range(300, WORLD_SIZE.x - 300), world.rng.randf_range(300, WORLD_SIZE.y - 300)))
 		repair.vel = Vector2.ZERO
 		repair.anchored = true
@@ -131,7 +132,7 @@ func _update_supply_pods(dt: float) -> void:
 		if pod_timer <= 0.0:
 			pod_timer = world.rng.randf_range(38.0, 50.0)
 			var at := (mission.player.pos + Vector2.from_angle(world.rng.randf() * TAU) * world.rng.randf_range(220.0, 360.0)).clamp(Vector2(200, 200), WORLD_SIZE - Vector2(200, 200))
-			world.add_zone("bomb_warning", at, 70.0, 0.1, 12.0 * world.enemy_damage_scale, true, {"warn": 1.5, "color": Color(1, 0.8, 0.4)})
+			world.add_zone("bomb_warning", at, 70.0, 0.1, MissionData.HIT_LARGE * world.enemy_damage_scale, true, {"warn": 1.5, "color": Color(1, 0.8, 0.4)})
 			world.emit("banner", {"text": "SUPPLY POD INCOMING", "style": "gold"})
 			pending_pods.append({"pos": at, "time": 1.5})
 	for pod: Dictionary in pending_pods:

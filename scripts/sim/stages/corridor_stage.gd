@@ -129,7 +129,7 @@ func after_player_moved() -> void:
 	if player.pos.x - player.radius <= left + 2.0 or player.pos.x + player.radius >= right - 2.0:
 		if scrape_timer <= 0.0:
 			scrape_timer = 0.35
-			world.damage_player(2.5, "wall scrape")
+			world.damage_player(MissionData.HIT_CHIP * world.enemy_damage_scale, "wall scrape")
 			world.emit("spark", {"pos": player.pos, "color": Color(1, 0.8, 0.5)})
 
 

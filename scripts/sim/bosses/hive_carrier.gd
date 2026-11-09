@@ -81,7 +81,7 @@ func _laser_sweep() -> void:
 		var from := 1.2 if not outward else 0.08
 		var to := 0.35 if not outward else 0.6
 		var duration := 2.0
-		world.add_zone("laser", core.pos, 0.0, duration, 22.0 * world.enemy_damage_scale, true,
+		world.add_zone("laser", core.pos, 0.0, duration, MissionData.HIT_HEAVY * world.enemy_damage_scale, true,
 			{"warn": 1.0, "angle": PI * 0.5 + side * from, "length": 1100.0, "width": 26.0,
 			"spin": side * (to - from) / duration, "color": Color(1, 0.3, 0.4)})
 	world.emit("sound", {"name": "charge"})

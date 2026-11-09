@@ -71,7 +71,7 @@ func _contact(enemy: Enemy, player: PlayerFrame) -> void:
 	var reach := enemy.radius + player.radius - 3.0
 	if enemy.pos.distance_squared_to(player.pos) > reach * reach:
 		return
-	var servos := world.run.field_count("overclocked_servos")
+	var servos := world.run.field_count("juggernaut_servos")
 	if servos > 0 and enemy.boss == null:
 		world.hurt_enemy(enemy, 25.0 * servos, "ram")
 		world.damage_player(enemy.contact * 0.5, enemy.kind)
@@ -299,7 +299,7 @@ func _lobber(enemy: Enemy, dt: float) -> void:
 	if enemy.fire_timer <= 0.0 and distance < 620.0:
 		enemy.fire_timer = world.rng.randf_range(2.4, 3.2)
 		var target := world.player.pos + world.player.vel * 0.5
-		var warning := world.add_zone("acid_warning", target, 46.0, 0.1, 8.0, true, {"warn": 0.9, "color": Color(0.5, 1.0, 0.4)})
+		var warning := world.add_zone("acid_warning", target, 46.0, 0.1, MissionData.HIT_CHIP * world.enemy_damage_scale, true, {"warn": 0.9, "color": Color(0.5, 1.0, 0.4)})
 		warning.hit_ids = {"from": enemy.pos}
 		world.emit("lob", {"from": enemy.pos, "to": target, "time": 0.9})
 		world.emit("sound", {"name": "lob"})

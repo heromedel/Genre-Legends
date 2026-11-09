@@ -193,7 +193,10 @@ func apply(card: Dictionary) -> void:
 			_apply_field_now(card["field"])
 		"cache":
 			run.rerolls += 1
-			player.repair(15.0)
+			player.repair(10.0)
+	# Plating levels add Armor the moment they're taken (GDD 13L).
+	if card["tech"] != "" and TechData.TECH[card["tech"]]["slot"] == "plating":
+		world.refresh_plate_armor()
 	world.emit("sound", {"name": "upgrade"})
 	_announce_resonance(tiers_before)
 
@@ -203,10 +206,11 @@ func _apply_field_now(upgrade_id: String) -> void:
 	var player := world.player
 	match upgrade_id:
 		"field_repair":
-			player.repair(player.max_armor * 0.4)
+			player.repair(30.0)
 		"glass_reactor":
-			player.max_shield = 0.0
-			player.shield = 0.0
+			# Its own price (11T): a third of your max Armor, gone for the mission.
+			player.max_armor *= 2.0 / 3.0
+			player.armor = minf(player.armor, player.max_armor)
 		"adrenaline_junkie":
 			world.bullet_speed_scale *= 1.15
 

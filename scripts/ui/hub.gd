@@ -428,9 +428,9 @@ func _build_hangar_page() -> Control:
 	for frame_id in FrameData.FRAMES:
 		frames_row.add_child(_frame_card(frame_id))
 	column.add_child(UiKit.label("LOADOUT", 20, Color(0.6, 0.9, 1.0), "title"))
-	column.add_child(UiKit.wrapped("Only the main weapon is online when a mission starts. Level-ups and Salvage Crates bring the rest online.", 14, Color(0.65, 0.75, 0.88)))
+	column.add_child(UiKit.wrapped("Your main weapon and plating are ready when a mission starts. Level-ups and Salvage Crates bring the rest online. The Generator slot holds what keeps you alive: a shield, a blade, a mirror or a lantern, one at a time.", 14, Color(0.65, 0.75, 0.88)))
 	var slots_row := HBoxContainer.new()
-	slots_row.add_theme_constant_override("separation", 10)
+	slots_row.add_theme_constant_override("separation", 8)
 	column.add_child(slots_row)
 	for slot_index in TechData.SLOTS.size():
 		slots_row.add_child(_slot_card(slot_index))
@@ -466,7 +466,8 @@ func _frame_card(frame_id: String) -> Control:
 	column.add_child(art)
 	column.add_child(UiKit.label(data["name"], 22, data["hull"] if unlocked else Color(0.5, 0.55, 0.65), "title"))
 	column.add_child(UiKit.wrapped(data["tagline"], 13, Color(0.7, 0.8, 0.9)))
-	column.add_child(UiKit.label("Armor %d   Shield %d   Speed %d" % [data["armor"], data["shield"], data["speed"]], 13, Color(0.6, 0.75, 0.9)))
+	var armor: float = data["armor"] + data.get("built_in_armor", 0.0)
+	column.add_child(UiKit.label("Armor %d (%d hits)   Speed %d" % [armor, int(armor / MissionData.HIT_SMALL), data["speed"]], 13, Color(0.6, 0.75, 0.9)))
 	column.add_child(UiKit.label(data["trait_name"], 15, Art.GOLD, "bold"))
 	column.add_child(UiKit.wrapped(data["trait_text"], 13, Color(0.85, 0.8, 0.65)))
 	if not unlocked:
@@ -485,7 +486,7 @@ func _slot_card(slot_index: int) -> Control:
 	var tech_id: String = Save.data["loadout"][slot_index]
 	var button := Button.new()
 	button.focus_mode = Control.FOCUS_NONE
-	button.custom_minimum_size = Vector2(150, 150)
+	button.custom_minimum_size = Vector2(118, 150)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if picker_slot == slot_index:
 		button.add_theme_stylebox_override("normal", UiKit._box(Color(0.12, 0.2, 0.3), Color(0.6, 0.95, 1.0), 3))

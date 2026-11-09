@@ -26,7 +26,9 @@ var stage: Stage
 
 ## Blood Pact: seconds without a kill before armor starts bleeding, and how fast it bleeds per second.
 const BLOOD_PACT_GRACE := 2.0
-const BLOOD_PACT_BLEED := 2.5
+const BLOOD_PACT_BLEED := 2.0
+## A repair pickup: a hit and a half (GDD 13G).
+const REPAIR_ARMOR := 15.0
 
 var state := "intro"            # intro, play, offer, crate, won, lost
 var state_timer := 0.0
@@ -55,6 +57,7 @@ func _init(map_node: Dictionary, mission_seed: int, frame_id: String, loadout: A
 	player = PlayerFrame.new()
 	world.player = player
 	player.setup(frame_id, MissionData.TYPES[node["type"]]["form"])
+	world.refresh_plate_armor()
 	_apply_difficulty()
 	weapons = WeaponSystem.new(world)
 	enemy_system = EnemySystem.new(world)
@@ -92,8 +95,12 @@ func _apply_difficulty() -> void:
 	var difficulty: float = node.get("difficulty", 1.0)
 	var modifier: Dictionary = MissionData.MODIFIERS.get(node.get("modifier", ""), {})
 	var threat: Dictionary = MissionData.THREAT.get(node.get("threat", "standard"), MissionData.THREAT["standard"])
-	# The first region is hand-set (GDD 9A); past it, a formula grows from the gate's level.
-	var base := {"enemy_hp": 1.0 + 0.55 * (difficulty - 1.0), "damage": 1.0 + 0.22 * (difficulty - 1.0),
+	# The first region is hand-set (GDD 9A). Past it, enemies grow tougher and busier from the gate's level, and
+	# hits grow in region steps (GDD 13D): within a region they climb from 0.85 at its first planet to about 1.1
+	# at its last, branches and Hazards push them a little further, and the region's step multiplies it all.
+	var region: int = node.get("region", 0)
+	var within_region := difficulty - (1.0 + 0.3 * region)
+	var base := {"enemy_hp": 1.0 + 0.55 * (difficulty - 1.0), "damage": region_hits(region) * (0.85 + 0.8 * within_region),
 		"fire": 1.0 + 0.1 * (difficulty - 1.0), "bullet_speed": 0.95 + 0.08 * (difficulty - 1.0)}
 	var column: int = node.get("baseline", -1)
 	if column >= 0:
@@ -117,13 +124,20 @@ func _apply_difficulty() -> void:
 	if modifier.get("elite_blueprints", false):
 		world.elite_blueprint_tech = node.get("reward_tech", "")
 	# Elites with a twist: none on the first planet, a few more each region, doubled by Bounty Hunters.
-	var region: int = node.get("region", 0)
 	world.elite_chance = 0.0 if world.gentle else (0.025 + 0.01 * region) * modifier.get("elites", 1.0)
 	world.elite_mods = ["shielded", "splitting"] + (["mirrored"] if region >= 1 else [])
 	world.reward_tech = node.get("reward_tech", "")
 	# Missions launched from the game carry the player's setting; tests and old logs keep auto-aim.
 	world.auto_aim = node.get("auto_aim", true)
 	world.autofire = node.get("autofire", true)
+
+
+## How much bigger hits are in a region than in the first (GDD 13D).
+static func region_hits(region: int) -> float:
+	var steps: Array = MissionData.REGION_HITS
+	if region < steps.size():
+		return steps[region]
+	return steps[-1] + MissionData.REGION_HITS_STEP * (region - steps.size() + 1)
 
 
 ## Starts a stage. Also used for mid-mission hand-offs: the frame transforms to the new stage's form.
@@ -134,6 +148,7 @@ func start_stage(new_stage: Stage) -> void:
 	world.walls = []
 	world.enemy_shots.clear()
 	world.zones.clear()
+	world.siphoned_this_stage = 0.0
 	world.blades.clear()
 	stage.setup()
 	player.set_form(stage.form)
@@ -189,10 +204,9 @@ func _update_world(input: InputFrame, player_active: bool) -> void:
 	for element in world.resonance:
 		run.max_resonance = maxi(run.max_resonance, int(world.resonance[element]))
 	if player_active and player.alive:
-		player.move(input, DT, 1.0 + 0.15 * run.field_count("overclocked_servos"))
+		player.move(input, DT, 1.0 + 0.15 * run.field_count("juggernaut_servos"))
 		_keep_player_in_bounds()
-		var shield_regen := 1.6 if FrameData.get_frame(run.frame_id)["trait"] == "fortress_field" else 1.0
-		player.tick_timers(DT, shield_regen)
+		player.tick_timers(DT)
 		if run.field_count("blood_pact") > 0:
 			_blood_pact_bleed()
 		weapons.update(input, DT)
@@ -349,8 +363,10 @@ func _on_collect(kind: String, value: float, tech: String) -> void:
 			world.emit("floating_text", {"pos": player.pos, "text": "+1 %s blueprint" % TechData.TECH[tech]["name"], "color": Color(0.5, 0.9, 1.0)})
 			world.emit("sound", {"name": "blueprint"})
 		"repair":
-			player.repair(25.0)
-			world.emit("floating_text", {"pos": player.pos, "text": "+25 armor", "color": Color(0.5, 1.0, 0.6)})
+			# A repair is a hit and a half (GDD 13G); DSP-1's Field Patches make it count for more.
+			var amount := REPAIR_ARMOR + (5.0 if run.plating() == "dsp1_plate" and run.fork_of("dsp1_plate") == "b" else 0.0)
+			player.repair(amount)
+			world.emit("floating_text", {"pos": player.pos, "text": "+%d Armor" % amount, "color": Color(0.5, 1.0, 0.6)})
 			world.emit("sound", {"name": "repair"})
 		"pedestal":
 			pending_pedestals += 1

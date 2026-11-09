@@ -69,12 +69,12 @@ func add_part(part_name: String, offset: Vector2, hp: float, radius: float, opti
 	var part := world.spawn_enemy("boss_part", origin + offset)
 	part.boss = self
 	part.part = part_name
-	part.max_hp = hp * 1.3 * world.enemy_hp_scale
+	part.max_hp = hp * 1.3 * MissionData.BOSS_HEALTH * world.enemy_hp_scale
 	part.hp = part.max_hp
 	part.radius = radius
 	part.look = look
 	part.color = color
-	part.contact = 18.0 * world.enemy_damage_scale
+	part.contact = MissionData.HIT_BODY * world.enemy_damage_scale
 	part.xp = 0
 	part.memory["offset"] = offset
 	for key in options:
@@ -152,7 +152,9 @@ func defeat() -> void:
 		prize.anchored = true
 		world.prize_waiting = true
 	else:
+		# A mini-boss always leaves a repair (GDD 13G) along with its crate.
 		world.drop_pickup("crate", origin)
+		world.drop_pickup("repair", origin + Vector2(-30, 0))
 	var reward_tech: String = world.elite_blueprint_tech
 	if reward_tech == "":
 		var ids := TechData.TECH.keys()

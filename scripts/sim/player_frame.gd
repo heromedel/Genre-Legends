@@ -1,11 +1,12 @@
 class_name PlayerFrame
 extends RefCounted
-## The player's frame inside a mission: where it is, which form it's in, its armor and shield,
-## and the meters its support tech fills. How it moves and how it takes hits live here;
+## The player's frame inside a mission: where it is, which form it's in, its Armor (one pool, read as hits,
+## GDD 13A) and the Shield Generator's charges, and the meters its support tech fills. How it moves and how it takes hits live here;
 ## what it fires lives in WeaponSystem.
 
-const SHIP_RADIUS := 12.0
-const MECH_RADIUS := 15.0
+## Hitboxes are smaller than the art (GDD 13F): with a six-hit budget, a shot that clips a wingtip should miss.
+const SHIP_RADIUS := 8.0
+const MECH_RADIUS := 10.0
 ## Ship form follows the finger, but no faster than this, so it can't teleport through bullets.
 const SHIP_MAX_DRAG_PER_TICK := 30.0
 
@@ -17,14 +18,13 @@ var facing := -PI * 0.5         # aim angle in radians
 var radius := SHIP_RADIUS
 var speed := 300.0
 
-var armor := 100.0
-var max_armor := 100.0
-var shield := 40.0
-var max_shield := 40.0
-var shield_delay := 0.0         # seconds until the shield starts recharging
+var armor := 80.0
+var max_armor := 80.0
+var shield_charges := 0         # Shield Generator: hits it will block before it needs to recharge (GDD 13K)
+var max_shield_charges := 0
+var shield_recharge := 0.0      # seconds until the next charge comes back
 var grace := 0.0                # seconds of hit immunity left
 var alive := true
-var second_wind_used := false
 
 # Support tech meters
 var graze := 0.0
@@ -50,10 +50,8 @@ const TRAIL_LENGTH := 40
 func setup(frame: String, stage_form: String) -> void:
 	frame_id = frame
 	var data := FrameData.get_frame(frame)
-	max_armor = data["armor"]
+	max_armor = data["armor"] + data.get("built_in_armor", 0.0)
 	armor = max_armor
-	max_shield = data["shield"]
-	shield = max_shield
 	speed = data["speed"]
 	set_form(stage_form)
 
@@ -89,34 +87,34 @@ func move(input: InputFrame, dt: float, speed_multiplier: float) -> void:
 		afterimages.pop_back()
 
 
-## Recharges the shield after a quiet spell and counts down timers.
-func tick_timers(dt: float, shield_regen_multiplier: float) -> void:
+## Counts down timers.
+func tick_timers(dt: float) -> void:
 	grace = maxf(grace - dt, 0.0)
 	overdrive = maxf(overdrive - dt, 0.0)
 	mirror_time = maxf(mirror_time - dt, 0.0)
 	time_brake = maxf(time_brake - dt, 0.0)
 	ion_time = maxf(ion_time - dt, 0.0)
-	if shield_delay > 0.0:
-		shield_delay -= dt
-	elif shield < max_shield:
-		shield = minf(max_shield, shield + FrameData.SHIELD_REGEN_PER_SECOND * shield_regen_multiplier * dt)
 
 
-## Applies a hit. Shield soaks first, then armor. Returns the damage actually taken.
-## Loss is by attrition (Game Design Philosophy): a short grace window follows every hit.
+## Applies a hit to Armor and returns the damage taken. Loss is by attrition (Game Design Philosophy): a
+## window of immunity follows every hit, longer after a big one, so one bad volley costs one hit (GDD 13E).
 func take_hit(amount: float) -> float:
 	if not alive or grace > 0.0 or amount <= 0.0:
 		return 0.0
-	var taken := amount
-	shield_delay = FrameData.SHIELD_DELAY
-	grace = FrameData.HIT_GRACE
-	var soaked := minf(shield, amount)
-	shield -= soaked
-	armor -= amount - soaked
+	grace = FrameData.HEAVY_HIT_GRACE if amount >= FrameData.HEAVY_HIT else FrameData.HIT_GRACE
+	armor -= amount
 	if armor <= 0.0:
 		armor = 0.0
 		alive = false
-	return taken
+	return amount
+
+
+## The Shield Generator takes the hit instead: one charge gone, a moment of immunity, and the recharge starts.
+func block_with_shield(recharge_seconds: float) -> void:
+	shield_charges -= 1
+	grace = FrameData.HIT_GRACE
+	if shield_recharge <= 0.0:
+		shield_recharge = recharge_seconds
 
 
 func repair(amount: float) -> void:

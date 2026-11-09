@@ -46,6 +46,18 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 			ci.draw_arc(c, s * 0.8, -2.3, 2.3, 20, color, w * 1.4, true)
 			ci.draw_line(p.call(-0.8, 0.0), p.call(0.1, 0.0), color, w, true)
 			ci.draw_line(p.call(0.1, 0.0), p.call(-0.4, -0.5), color, w, true)
+		"shield_generator":
+			# A bubble over a small emitter.
+			ci.draw_arc(p.call(0, 0.2), s * 0.85, PI * 1.05, TAU - PI * 0.05, 18, color, w * 1.3, true)
+			ci.draw_colored_polygon(PackedVector2Array([p.call(-0.35, 0.75), p.call(0.35, 0.75), p.call(0.25, 0.35), p.call(-0.25, 0.35)]), color)
+			ci.draw_circle(p.call(0, 0.2), s * 0.18, Color(1, 1, 1, 0.9))
+		"dsp1_plate":
+			# An armour plate with its rivets.
+			var plate := PackedVector2Array([p.call(-0.7, -0.6), p.call(0.7, -0.6), p.call(0.6, 0.7), p.call(-0.6, 0.7)])
+			ci.draw_colored_polygon(plate, Art.with_alpha(color, 0.35))
+			ci.draw_polyline(plate + PackedVector2Array([plate[0]]), color, w, true)
+			for corner in [p.call(-0.45, -0.38), p.call(0.45, -0.38), p.call(-0.4, 0.48), p.call(0.4, 0.48)]:
+				ci.draw_circle(corner, w * 0.8, color)
 		"graze_engine":
 			ci.draw_circle(c, s * 0.25, color)
 			for i in 6:
@@ -157,7 +169,7 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 		"echo_chamber":
 			for i in 3:
 				ci.draw_arc(p.call(-0.6, 0), s * (0.4 + i * 0.3), -0.7, 0.7, 12, Art.with_alpha(color, 1.0 - i * 0.25), w, true)
-		"vampiric_plating":
+		"mawjig_siphon":
 			ci.draw_colored_polygon(PackedVector2Array([p.call(0, -0.8), p.call(0.6, -0.3), p.call(0, 0.85), p.call(-0.6, -0.3)]), Art.with_alpha(color, 0.3))
 			ci.draw_colored_polygon(PackedVector2Array([p.call(-0.25, -0.2), p.call(-0.12, 0.3), p.call(0, -0.2)]), color)
 			ci.draw_colored_polygon(PackedVector2Array([p.call(0.25, -0.2), p.call(0.12, 0.3), p.call(0, -0.2)]), color)
@@ -170,7 +182,7 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 				var a := TAU * i / 8.0
 				ci.draw_line(c + Vector2.from_angle(a) * s * 0.3, c + Vector2.from_angle(a) * s * 0.9, color, w, true)
 			ci.draw_circle(c, s * 0.25, Art.with_alpha(color, 0.5))
-		"overclocked_servos":
+		"juggernaut_servos":
 			for i in 3:
 				ci.draw_polyline(PackedVector2Array([p.call(-0.7 + i * 0.5, -0.6), p.call(-0.3 + i * 0.5, 0), p.call(-0.7 + i * 0.5, 0.6)]), color, w * 1.3, true)
 		"tractor_beam":

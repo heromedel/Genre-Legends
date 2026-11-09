@@ -59,7 +59,7 @@ func behave(dt: float) -> void:
 	if phase >= 1 and fmod(time, 4.0) < dt:
 		# The sniper line: shown first, then one fast, heavy shot along it.
 		var aim := (world.player.pos - core.pos).angle()
-		world.add_zone("laser", core.pos, 0.0, 0.25, 20.0 * world.enemy_damage_scale, true,
+		world.add_zone("laser", core.pos, 0.0, 0.25, MissionData.HIT_HEAVY * world.enemy_damage_scale, true,
 			{"warn": 0.9, "angle": aim, "length": 1100.0, "width": 14.0, "color": Color(1, 0.75, 0.3)})
 		world.emit("sound", {"name": "charge"})
 	if phase == 2 and fmod(time, 5.0) < dt:

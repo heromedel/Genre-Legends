@@ -208,7 +208,7 @@ func observe(mission: Mission, frame: InputFrame, events: Array) -> void:
 			"player_hit":
 				_hit_times.append(time)
 				note("hit", "took %d from %s (armor %d/%d, shield %d)" % [
-					event["amount"], event["source"], player.armor, player.max_armor, player.shield])
+					event["amount"], event["source"], player.armor, player.max_armor, player.shield_charges])
 			"boss_warning":
 				note("mission", "Boss: %s" % event["name"])
 			"boss_defeated":
@@ -224,7 +224,7 @@ func observe(mission: Mission, frame: InputFrame, events: Array) -> void:
 				note("mission", "entered %s room %s" % [event["kind"], str(event["room"])])
 	if mission.tick % 60 == 0:
 		var snapshot := "t=%ds pos=(%d,%d) armor=%d shield=%d lvl=%d enemies=%d bullets=%d state=%s" % [
-			mission.tick / 60, player.pos.x, player.pos.y, player.armor, player.shield, mission.run.level,
+			mission.tick / 60, player.pos.x, player.pos.y, player.armor, player.shield_charges, mission.run.level,
 			mission.world.enemies.size(), mission.world.enemy_shots.size(), mission.state]
 		record["snapshots"].append(snapshot)
 	_watch_for_panic(time, frame, player)

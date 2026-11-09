@@ -28,6 +28,7 @@ func _init() -> void:
 	_resume()
 	_dungeon_needles()
 	_aim_hold()
+	_hits_that_matter()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -43,11 +44,18 @@ func _tech_data() -> void:
 		var tech_id: String = TechData.STARTING_LOADOUT[slot_index]
 		if tech_id != "":
 			check(TechData.TECH[tech_id]["slot"] == TechData.SLOTS[slot_index], "starting %s fits slot %d" % [tech_id, slot_index])
-	check(not TechData.STARTING_UNLOCKS.has("mirror_aegis") and not TechData.STARTING_UNLOCKS.has("swarm_pods"), "lesson tech is held back (GDD 9C)")
+	check(not TechData.STARTING_UNLOCKS.has("shield_generator") and not TechData.STARTING_UNLOCKS.has("swarm_pods"), "lesson tech is held back (GDD 9C)")
 	for element in UpgradeData.ELEMENTS:
 		check(UpgradeData.RESONANCE[element]["tiers"].size() == UpgradeData.RESONANCE_THRESHOLDS.size(), "%s resonance describes every tier" % element)
 	for tech_id in TechData.TECH:
-		check(UpgradeData.ELEMENTS.has(TechData.TECH[tech_id]["element"]), "%s has a resonance element" % tech_id)
+		# Plating is armour, outside the elements (it never feeds Resonance).
+		var plating: bool = TechData.TECH[tech_id]["slot"] == "plating"
+		check(UpgradeData.ELEMENTS.has(TechData.TECH[tech_id]["element"]) != plating, "%s has a resonance element, unless it's plating" % tech_id)
+	# Fusions pair parts that can be fitted together: never two parts for the same slot (GDD 13O).
+	for fusion_id in UpgradeData.FUSIONS:
+		var needs: Array = UpgradeData.FUSIONS[fusion_id]["needs"]
+		var slots: Array = needs.map(func(t): return TechData.TECH[t]["slot"])
+		check(slots[0] != slots[1] or slots[0] == "weapon", "%s fuses parts from slots that can both be fitted" % fusion_id)
 	for fusion_id in UpgradeData.FUSIONS:
 		for needed in UpgradeData.FUSIONS[fusion_id]["needs"]:
 			check(TechData.TECH.has(needed), "fusion %s needs real tech %s" % [fusion_id, needed])
@@ -195,17 +203,18 @@ func _build_022() -> void:
 		world.update_zones(World.DT)
 		world.player.grace = maxf(world.player.grace - World.DT, 0.0)
 	check(mission.run.hits_taken == 1, "a laser hits once per pass (took %d)" % mission.run.hits_taken)
-	# Ricochet shots fly out of view, glance off something out there and come back in, weaker.
-	var shot := world.player_shot(Vector2(world.bounds.end.x - 2.0, 300.0), Vector2(900, 0), 5.0, "pulse_driver", "bolt", Color.WHITE)
-	shot.bounces = 2
-	var went_out := false
-	var came_back := false
-	for i in 40:
-		world.update_player_shots(World.DT)
-		went_out = went_out or not world.bounds.has_point(shot.pos)
-		came_back = came_back or (went_out and shot.bounces == 1 and world.bounds.has_point(shot.pos))
-	check(went_out and came_back and not shot.dead and shot.vel.x < 0.0 and shot.damage < 5.0,
-		"ricochet leaves the screen and glances back in, weaker")
+	# Chain Bolts: a bolt that kills arcs on to the next enemy, and stops when a jump doesn't kill.
+	world.enemies.clear()
+	var first := world.spawn_enemy("dart", Vector2(600, 300))
+	var second := world.spawn_enemy("dart", Vector2(700, 300))
+	var third := world.spawn_enemy("dart", Vector2(800, 300))
+	first.hp = 1.0
+	second.hp = 1.0
+	third.hp = 9999.0
+	var shot := world.player_shot(Vector2(590, 300), Vector2(600, 0), 20.0, "pulse_driver", "bolt", Color.WHITE)
+	shot.chains = 3
+	world.update_player_shots(World.DT)
+	check(first.dead and second.dead and third.hp < 9999.0, "Chain Bolts arc from kill to kill")
 	# Tractor Beam pulls from three times as far, not across the whole field.
 	var base_reach := world.pickup_reach()
 	mission.run.field["tractor_beam"] = 1
@@ -354,9 +363,8 @@ func _resonance_tiers() -> void:
 	world.resonance["energy"] = 2
 	var near := world.spawn_enemy("splitter", world.player.pos + Vector2(120, 0))
 	var near_hp := near.hp
-	world.player.shield = 5.0
 	world.damage_player(20.0, "test")
-	check(near.hp < near_hp, "Capacitor Discharge strikes when the shield breaks")
+	check(near.hp < near_hp, "Capacitor Discharge strikes whenever you're hit")
 
 
 ## Blood Pact: no kills for a while bleeds armor, but never below a third; it no longer touches the shield.
@@ -371,10 +379,6 @@ func _blood_pact() -> void:
 	var armor_before := player.armor
 	mission._blood_pact_bleed()
 	check(player.armor == armor_before, "Blood Pact doesn't bleed right after a kill")
-	player.shield = 0.0
-	player.shield_delay = 0.0
-	mission._update_world(InputFrame.new(), true)
-	check(player.shield > 0.0, "Blood Pact leaves the shield recharging")
 
 
 ## The reworked fusions do what their cards say.
@@ -494,3 +498,52 @@ func _aim_hold() -> void:
 	for i in 40:
 		weapons._update_facing(walking)
 	check(is_equal_approx(mission.player.facing, -PI * 0.5), "then it turns back to where it's walking")
+
+
+## Build 0.6, hits that matter (GDD 13A-13W): one Armor pool read as hits, a Shield Generator that takes a
+## whole hit, plating that grows, and the rules that keep defence a choice.
+func _hits_that_matter() -> void:
+	var mission := _test_mission("star_cluster")
+	var world := mission.world
+	var player := mission.player
+	check(is_equal_approx(player.max_armor, 80.0), "the Vanguard has 60 Armor plus 20 built in (%.0f)" % player.max_armor)
+	check(player.radius <= 8.0, "the ship's hitbox is smaller than its art")
+	world.damage_player(10.0, "test")
+	check(is_equal_approx(player.grace, FrameData.HIT_GRACE), "a hit buys a second of immunity")
+	player.grace = 0.0
+	world.damage_player(25.0, "test")
+	check(is_equal_approx(player.grace, FrameData.HEAVY_HIT_GRACE), "a big hit buys a little longer")
+	check(is_equal_approx(player.armor, 45.0), "hits come straight off Armor (%.0f)" % player.armor)
+	# Shield Generator: blocks one hit of any size, then recharges.
+	mission = _test_mission("star_cluster")
+	world = mission.world
+	player = mission.player
+	mission.run.loadout[5] = "shield_generator"
+	mission.run.tech_level["shield_generator"] = 1
+	mission.weapons._shield_generator(World.DT)
+	check(player.shield_charges == 1, "a Shield Generator comes online charged")
+	var armor_before := player.armor
+	world.damage_player(25.0, "test")
+	check(player.armor == armor_before and player.shield_charges == 0, "the shield takes a whole heavy hit")
+	for i in int(13.0 / World.DT):
+		mission.weapons._shield_generator(World.DT)
+	check(player.shield_charges == 1, "the shield comes back 12 s after it breaks")
+	# DSP-1 Drop Plate: each level adds Armor at once.
+	var max_before := player.max_armor
+	mission.offers.apply({"kind": "upgrade", "tech": "dsp1_plate", "fork": "", "fusion": "", "field": ""})
+	check(is_equal_approx(player.max_armor, max_before + 10.0), "a plating level adds 10 Armor")
+	# Field Repair is a fixed three hits, and only once.
+	check(UpgradeData.FIELD["field_repair"]["limit"] == 1, "Field Repair can only be taken once")
+	# Orbital Halo: a saw breaks after eating three bullets.
+	mission.run.loadout[1] = "orbital_halo"
+	mission.run.tech_level["orbital_halo"] = 1
+	world.enemy_shots.clear()
+	mission.weapons._orbital_halo(0.0)
+	var saw: Vector2 = player.pos + Vector2.from_angle(mission.weapons.halo_angle) * 88.0
+	for i in 3:
+		world.enemy_shot(saw, 0.0, 0.0)
+		mission.weapons._orbital_halo(0.0)
+	check(mission.weapons.halo_broken_until.size() == 1, "an Orbital Halo saw breaks after eating three bullets")
+	# Harder means bigger hits past the first region; boss parts have less health than before.
+	check(Mission.region_hits(1) > 1.0 and Mission.region_hits(3) > Mission.region_hits(2), "hits grow region by region")
+	check(MissionData.BOSS_HEALTH < 1.0, "bosses are shorter fights now that hits matter")

@@ -6,17 +6,19 @@ class_name GuideData
 const LORE := [
 	["Mawjig", "Materials Worth of Jigawatts. A measurement of matter and energy used in advanced or physics bending technology. Mawjig tech hexes, bends and calls things down from nowhere."],
 	["Frames", "Your frame is one machine with many forms. It flies as a ship through star clusters and corridors and walks as a mech on planets and in dungeons, shifting as each mission starts."],
-	["Realms", "Star systems sit in star clusters, in regions of the galaxy. A realm is something else: another dimension, a plane, a pocket of space folded shut. A Jig Drive can't reach one. Some say a temporal variant could, and old rumors speak of a relic called the Orb of Chulak."],
+	["Realms", "Star systems sit in star clusters, in regions of the galaxy. A realm is something else: another dimension, a plane, a pocket of space folded shut. A Jig Drive only jumps through space and can't reach one. Old stories tell of ancient Chulak relics that could, and of a Jig Phase Drive that phases a ship out of this dimension altogether."],
 ]
 
 const HOW_IT_WORKS := [
+	["Armor", "Your frame's Armor is one pool, and the bar reads as hits: each small tick is a bullet, each tall one three. Big hits take more, and after any hit you can't be hit again for a moment. Repairs are rare, so every hit counts."],
+	["Loadout", "Seven slots: a main weapon, two weapons, a support, a special, a generator and your plating. The generator slot holds what keeps you alive, a shield, a blade, a mirror or a lantern, one at a time. Plating is your outer armour and is worn from the start of every mission."],
 	["Level-ups", "Data Shards fill your level bar. Each level-up offers cards: bring tech online, level it, or take a field upgrade. Two rerolls per mission."],
 	["Forks", "At level 3 every tech forks into one of two paths that change how it behaves. You choose; crates never choose for you."],
 	["Resonance", "Levels of online tech of one element add up (field upgrades count 2). At 5, 10 and 15 points that element unlocks its next tier."],
 	["Fusions", "Two specific pieces of tech, both at level 5 (only Mk 3 tech gets there), fuse into something new. Both keep working."],
 	["Salvage Crates", "Three reels add up to how many upgrades you get, from 1 to 6. Most crates give 1 to 3; a 6 is a true jackpot. Lucky Salvage improves the odds."],
 	["Blueprints and Mk", "Missions pay blueprints, even when you lose. About 3 unlock a tech; more raise its Mk, which lets it level higher in missions and hit harder."],
-	["Risky cards", "Big power with a real cost, like losing your shield. Taking one is a bet on how you play."],
+	["Risky cards", "Big power with a real cost, like losing a third of your Armor. Taking one is a bet on how you play."],
 	["Elites", "Some enemies arrive as elites with a twist. Shielded: break the barrier first. Splitting: breaks in two. Mirrored: throws straight shots back until enough hits crack it; homing shots, blades, blasts and meteors get through. Elites are worth more and sometimes carry blueprints."],
 	["Route events", "Things happen on the way to a planet: derelicts, distress calls, traders, ambushes, Mawjig beacons. Each is a choice, and some choices change the mission you're flying into."],
 ]

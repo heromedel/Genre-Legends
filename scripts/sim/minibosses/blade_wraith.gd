@@ -25,7 +25,7 @@ func spawn() -> void:
 	origin = room.get_center() + Vector2(0, -60)
 	add_part("core", Vector2.ZERO, 1200, 36, {"invulnerable": true})
 	for i in 3:
-		var sword := add_part("sword%d" % i, Vector2.from_angle(TAU * i / 3.0) * 90.0, 1, 24, {"invulnerable": true, "contact": 16.0 * world.enemy_damage_scale})
+		var sword := add_part("sword%d" % i, Vector2.from_angle(TAU * i / 3.0) * 90.0, 1, 24, {"invulnerable": true, "contact": MissionData.HIT_BODY * world.enemy_damage_scale})
 		sword.memory["unbreakable"] = true
 	place_parts()
 	memory["state"] = "circle"

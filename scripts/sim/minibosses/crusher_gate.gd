@@ -60,6 +60,6 @@ func _slam(pistons: Array) -> void:
 		var reach := (gap_center - 75.0 - left) if from_left else (right - gap_center - 75.0)
 		if pistons.size() == 1:
 			reach = half_width * 2.0 - 150.0
-		world.add_zone("laser", start, 0.0, 0.35, 18.0 * world.enemy_damage_scale, true,
+		world.add_zone("laser", start, 0.0, 0.35, MissionData.HIT_HEAVY * world.enemy_damage_scale, true,
 			{"warn": 0.85, "angle": 0.0 if from_left else PI, "length": maxf(reach, 40.0), "width": 54.0, "color": Color(1, 0.75, 0.3)})
 	world.emit("sound", {"name": "door_slam"})

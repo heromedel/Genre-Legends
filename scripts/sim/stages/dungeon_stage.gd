@@ -381,7 +381,7 @@ func step(dt: float) -> void:
 		if trap_timer <= 0.0:
 			trap_timer = 3.5
 			for trap: Vector2 in room["traps"]:
-				world.add_zone("bomb_warning", trap, 80.0, 0.1, 14.0 * world.enemy_damage_scale, true, {"warn": 1.0, "color": Color(0.85, 0.45, 1.0)})
+				world.add_zone("bomb_warning", trap, 80.0, 0.1, MissionData.HIT_LARGE * world.enemy_damage_scale, true, {"warn": 1.0, "color": Color(0.85, 0.45, 1.0)})
 	if room["kind"] == "miniboss" and room["state"] == "active" and miniboss != null and miniboss.finished:
 		_room_cleared(room)
 	elif room["state"] == "active" and boss == null and room["kind"] != "miniboss" and spawn_delay <= 0.0:
@@ -402,7 +402,8 @@ func _room_cleared(room: Dictionary) -> void:
 		key.vel = Vector2.ZERO
 		key.anchored = true
 		world.emit("banner", {"text": "THE BOSS KEY", "style": "gold"})
-	elif world.rng.randf() < 0.3:
+	elif world.rng.randf() < 0.15:
+		# About one cleared room in seven leaves a repair, as in Isaac (GDD 13G).
 		world.drop_pickup("repair", room_rect(current).get_center())
 
 

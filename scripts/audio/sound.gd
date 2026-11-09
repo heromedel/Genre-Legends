@@ -9,7 +9,7 @@ const EFFECT_NAMES := ["shot", "rail", "hex", "slash", "missiles", "explode", "e
 	"key", "repair", "warning", "phase", "boss_down", "victory", "nova", "black_hole", "time_brake", "shatter",
 	"mirror", "vent", "overdrive", "meteor", "transform", "dive", "charge", "spawn", "door_slam", "door_open",
 	"secret", "mimic", "pedestal", "block", "lob", "splat", "burrow", "mortar", "bounce", "blink", "curtain",
-	"laser", "ui", "radio"]
+	"laser", "ui", "radio", "shield_break", "shield_up"]
 const POLYPHONY := 14
 ## Quieter or rarer effects get a minimum gap so a hundred bullets don't make a hundred clicks.
 const MIN_GAP := {"shot": 0.06, "enemy_shot": 0.09, "pickup": 0.05, "explode": 0.05, "block": 0.08, "hex": 0.12, "rail": 0.08}

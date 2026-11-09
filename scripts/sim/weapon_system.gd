@@ -13,6 +13,11 @@ var run: RunState
 var player: PlayerFrame
 var halo_angle := 0.0
 var halo_pulse := 0.0
+var halo_eaten := {}            # Orbital Halo: bullets each saw has eaten since it last broke
+var halo_broken_until := {}     # and when a broken saw grows back
+## An Orbital Halo saw breaks after eating this many bullets, and regrows this many seconds later.
+const HALO_SAW_BULLETS := 3
+const HALO_SAW_REGROW := 3.0
 var vent_echo := 0.0          # Chain Vent's delayed second blast
 var rage_timer := 0.0
 var railstorm_timer := 2.0
@@ -142,6 +147,8 @@ func _update_tech(tech_id: String, dt: float) -> void:
 		"graze_engine": pass    # driven by World's graze callback
 		"option_pods": _option_pods(dt)
 		"soul_lantern": _soul_lantern()
+		"shield_generator": _shield_generator(dt)
+		"dsp1_plate": pass      # worn armour: World adds its Armor as it levels
 
 
 # ---------------------------------------------------------------- main weapons
@@ -195,9 +202,8 @@ func _pulse_driver() -> void:
 					shot.pierce = 3
 					shot.radius = 8.0
 				if fork == "a":
-					# Now that misses bounce off the field's edges, every bounce lands; 1 at the fork, 2 at level 5.
-					shot.bounces = 1 + (level - 3) / 2
-					shot.bounce_bonus = 0.18
+					# Chain Bolts: a kill arcs on, twice at the fork, three times at level 5.
+					shot.chains = 2 if level < 5 else 3
 				elif fork == "b":
 					shot.split_after = 0.2
 					shot.split_count = 3 if level < 5 else 5
@@ -322,8 +328,16 @@ func _orbital_halo(dt: float) -> void:
 	var saws := []
 	for i in count:
 		saws.append(player.pos + Vector2.from_angle(halo_angle + TAU * i / count) * radius)
-	world.emit("halo", {"saws": saws, "radius": radius})
+	# A saw that has eaten three bullets breaks and regrows 3 s later (GDD 13N): the Halo still guards you, but
+	# it can be overwhelmed, so it doesn't replace the Generator slot's defence.
+	var broken := []
 	for saw_index in saws.size():
+		if world.time < float(halo_broken_until.get(saw_index, 0.0)):
+			broken.append(saw_index)
+	world.emit("halo", {"saws": saws, "radius": radius, "broken": broken})
+	for saw_index in saws.size():
+		if broken.has(saw_index):
+			continue
 		var saw: Vector2 = saws[saw_index]
 		for enemy: Enemy in world.enemies.duplicate():
 			if enemy.dead or enemy.hidden:
@@ -343,6 +357,12 @@ func _orbital_halo(dt: float) -> void:
 			if not shot.dead and saw.distance_to(shot.pos) < 16.0:
 				shot.dead = true
 				world.emit("spark", {"pos": shot.pos, "color": Color(1, 0.9, 0.6)})
+				halo_eaten[saw_index] = int(halo_eaten.get(saw_index, 0)) + 1
+				if halo_eaten[saw_index] >= HALO_SAW_BULLETS:
+					halo_eaten[saw_index] = 0
+					halo_broken_until[saw_index] = world.time + HALO_SAW_REGROW
+					world.emit("shield_break", {"pos": saw})
+					break
 	# Storm Halo: lightning links each saw to the next, a moving electric fence that shocks enemies and erases
 	# bullets crossing it.
 	if storm and saws.size() >= 2:
@@ -386,6 +406,27 @@ func _starfall() -> void:
 
 
 # ---------------------------------------------------------------- support
+
+## Shield Generator (GDD 13K): a bubble that takes one hit of any size (World.damage_player spends a charge),
+## and comes back a while after it breaks. Twin Cell holds two charges; it comes online full.
+func _shield_generator(dt: float) -> void:
+	var charges := 2 if run.fork_of("shield_generator") == "a" else 1
+	if player.max_shield_charges < charges:
+		player.shield_charges += charges - player.max_shield_charges
+		player.max_shield_charges = charges
+	if player.shield_charges >= player.max_shield_charges:
+		player.shield_recharge = 0.0
+		return
+	if player.shield_recharge <= 0.0:
+		player.shield_recharge = world.shield_recharge_seconds()
+	player.shield_recharge -= dt
+	if player.shield_recharge <= 0.0:
+		player.shield_charges += 1
+		world.emit("shield_up", {"pos": player.pos})
+		world.emit("sound", {"name": "shield_up"})
+		if player.shield_charges < player.max_shield_charges:
+			player.shield_recharge = world.shield_recharge_seconds()
+
 
 func _mirror_aegis() -> void:
 	var level := run.level_of("mirror_aegis")
@@ -433,8 +474,6 @@ func on_graze() -> void:
 	var level := run.level_of("graze_engine")
 	player.graze += 1.0
 	world.emit("graze", {"pos": player.pos})
-	if run.fork_of("graze_engine") == "a":
-		player.shield = minf(player.max_shield, player.shield + (1.0 if level < 5 else 2.0))
 	var needed := (30.0 - 3.0 * level) * (0.5 if run.has_fusion("phoenix_driver") else 1.0)
 	if player.graze >= needed:
 		player.graze = 0.0
@@ -442,7 +481,7 @@ func on_graze() -> void:
 		world.emit("banner", {"text": "OVERDRIVE", "style": "gold"})
 		world.emit("sound", {"name": "overdrive"})
 		if run.fork_of("graze_engine") == "a":
-			player.repair(10.0)
+			player.repair(5.0)
 
 
 func graze_needed() -> float:

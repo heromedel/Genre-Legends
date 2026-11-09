@@ -8,7 +8,9 @@ const SAVE_PATH := "user://save.json"
 const BACKUP_PATH := "user://save_backup.json"
 ## A mission in progress, saved every few seconds so it can be resumed after the browser closes (MissionView).
 const CHECKPOINT_PATH := "user://mission_checkpoint.json"
-const VERSION := 1
+## Bumped when a build changes the game so much that old progress no longer fits. Build 0.6 (hits that matter,
+## GDD 13V) starts everyone fresh: heromedel would reset anyway, and nothing can carry over wrong.
+const VERSION := 2
 
 signal changed
 
@@ -39,13 +41,14 @@ func fresh_data() -> Dictionary:
 		"frame": FrameData.STARTING_FRAME,
 		"frames_unlocked": [FrameData.STARTING_FRAME],
 		"prizes_claimed": [],
-		"settings": {"music": 0.6, "sfx": 0.8, "play_log": true, "screen_shake": true, "fullscreen": true, "threat": "standard", "bullet_glow": false, "auto_aim": false, "autofire": true, "transform_spin": true, "double_tap_special": true},
+		"settings": {"music": 0.6, "sfx": 0.8, "play_log": true, "screen_shake": true, "fullscreen": true, "threat": "standard", "bullet_glow": false, "auto_aim": false, "autofire": false, "transform_spin": true, "double_tap_special": true},
 		"stats": {"missions": 0, "wins": 0, "kills": 0, "play_seconds": 0.0},
 		"new_unlocks": [],
 		"radio_queue": [],
 		"milestones": {},
 		"counters": {},
 		"enemies_unlocked": [],
+		"notice": "",     # a one-time message for the title screen (a fresh start after a big update)
 	}
 
 
@@ -97,6 +100,12 @@ func clear_checkpoint() -> void:
 func repair(raw: Dictionary) -> Dictionary:
 	var clean := fresh_data()
 	if raw.is_empty():
+		return clean
+	if int(raw.get("version", 0)) < VERSION:
+		# A save from before the last big change starts over, and the title screen says why.
+		clear_checkpoint()
+		clean["notice"] = "Build 0.6 changes how damage, armour and loadouts work, so this is a fresh start."
+		_log("save", "Save from version %d: starting fresh for version %d." % [int(raw.get("version", 0)), VERSION])
 		return clean
 	for key in clean:
 		if raw.has(key) and typeof(raw[key]) == typeof(clean[key]):
@@ -154,6 +163,9 @@ func _repair_loadout(loadout: Array, tech_mk: Dictionary) -> Array:
 		result.append(tech_id)
 	if result[0] == "":
 		result[0] = TechData.STARTING_LOADOUT[0]
+	# A frame always wears some plating.
+	if result[6] == "":
+		result[6] = TechData.STARTING_LOADOUT[6]
 	return result
 
 

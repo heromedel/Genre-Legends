@@ -49,7 +49,7 @@ func behave(dt: float) -> void:
 	if fmod(time, 3.0 if phase < 2 else 2.0) < dt:
 		for i in 3:
 			var at := world.player.pos + (Vector2.ZERO if i == 0 else Vector2.from_angle(world.rng.randf() * TAU) * world.rng.randf_range(90.0, 200.0))
-			world.add_zone("bomb_warning", at, 60.0, 0.1, 16.0 * world.enemy_damage_scale, true, {"warn": 1.0, "color": Color(0.6, 0.85, 1.0)})
+			world.add_zone("bomb_warning", at, 60.0, 0.1, MissionData.HIT_HEAVY * world.enemy_damage_scale, true, {"warn": 1.0, "color": Color(0.6, 0.85, 1.0)})
 		world.emit("sound", {"name": "mortar"})
 	if phase == 0:
 		return
@@ -58,7 +58,7 @@ func behave(dt: float) -> void:
 		var start := world.rng.randf() * TAU
 		var direction := 1.0 if world.rng.randf() < 0.5 else -1.0
 		for i in 4:
-			world.add_zone("laser", core.pos, 0.0, 1.6, 20.0 * world.enemy_damage_scale, true,
+			world.add_zone("laser", core.pos, 0.0, 1.6, MissionData.HIT_HEAVY * world.enemy_damage_scale, true,
 				{"warn": 1.2, "angle": start + TAU * i / 4.0, "length": 900.0, "width": 24.0,
 				"spin": direction * (PI * 0.25) / 1.6, "color": Color(0.6, 0.85, 1.0)})
 		world.emit("sound", {"name": "charge"})

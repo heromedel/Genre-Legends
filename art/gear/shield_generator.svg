@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32">
+<!-- Shield Generator: a squat emitter with a glowing dome lens that projects the bubble. Twin Cell adds a second
+     cell beside it; Breaker Pulse rings the lens with vents.
+     Gear part, facing up (forward), about 12 units across. Five passes: outline, fill, shading, highlights, details.
+     "#39ff14" is the tech's glow (swapped for its element colour); groups named fork_a / fork_b show with that fork. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+  <path d="M-5,-1 L5,-1 L6,6 L-6,6 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.4"/>
+  <path d="M-5,-1 L5,-1 L6,6 L-6,6 Z" fill="#55697d"/>
+  <path d="M0.4,-1 L5,-1 L6,6 L0.4,6 Z" fill="#3a4a5a"/>
+  <path d="M-4.5,5.4 L-4.3,-0.4 L0,-0.4" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <g id="fork_a">
+    <path d="M6,1 L10,1 L10,6 L6,6 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.2"/>
+    <path d="M6,1 L10,1 L10,6 L6,6 Z" fill="#3a4a5a"/>
+    <circle cx="8" cy="3.5" r="1.2" fill="#39ff14"/>
+  </g>
+  <circle cx="0" cy="-1.5" r="4.6" fill="#0a1628"/>
+  <circle cx="0" cy="-1.5" r="3.6" fill="#39ff14"/>
+  <circle cx="-1" cy="-2.6" r="1.3" fill="#d8ffcc"/>
+  <g id="fork_b">
+    <path d="M-6,-5 L-4,-7 M6,-5 L4,-7 M0,-8 L0,-10" stroke="#0a1628" stroke-width="2.2"/>
+    <path d="M-6,-5 L-4,-7 M6,-5 L4,-7 M0,-8 L0,-10" stroke="#39ff14" stroke-width="1"/>
+  </g>
+</g>
+</svg>

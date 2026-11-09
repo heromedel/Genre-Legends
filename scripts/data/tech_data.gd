@@ -5,13 +5,17 @@ class_name TechData
 ## it starts offline in a mission (except the main weapon) and is levelled up in the mission,
 ## and at the fork level the player picks one of two very different behaviours.
 
-## Loadout slots, in order. Index 0 is always the main weapon, the only tech online at mission start.
-const SLOTS := ["main", "weapon", "weapon", "support", "special"]
+## Loadout slots, in order. Index 0 is always the main weapon, online at mission start like the plating (the
+## frame's outer armour is worn, not switched on). The Generator slot holds the parts that keep you alive, so
+## that kind of defence is one choice rather than a stack (GDD 13J, 13K).
+const SLOTS := ["main", "weapon", "weapon", "support", "special", "generator", "plating"]
 const SLOT_NAMES := {
 	"main": "Main Weapon",
 	"weapon": "Weapon",
 	"support": "Support",
 	"special": "Special",
+	"generator": "Generator",
+	"plating": "Plating",
 }
 
 ## In-mission levels run 1..MAX_LEVEL. Reaching FORK_LEVEL asks the player to choose a fork.
@@ -40,11 +44,11 @@ const TECH := {
 	# ---- Main weapons: fire on their own from the moment the mission starts.
 	"pulse_driver": {
 		"name": "Pulse Driver", "slot": "main", "element": "energy",
-		"text": "Rapid energy bolts. Its forks make them ricochet between enemies or burst into fans.",
+		"text": "Rapid energy bolts. Its forks make kills arc on through a crowd, or bolts burst into fans.",
 		"levels": ["Rapid bolts", "Twin bolts", "Fork", "Triple fan", "Overcharged bolts: faster fire"],
 		"blueprint_from": ["star_cluster", "corridor"],
 		"forks": {
-			"a": {"name": "Ricochet Rounds", "text": "Bolts bounce to another enemy and hit harder each time. Misses fly off screen and glance back in."},
+			"a": {"name": "Chain Bolts", "text": "A bolt that kills arcs as lightning to the next enemy, and keeps going while it keeps killing: twice, three times at level 5."},
 			"b": {"name": "Splitfire", "text": "Every bolt bursts into a fan of smaller bolts mid-flight."},
 		},
 	},
@@ -70,7 +74,7 @@ const TECH := {
 	},
 	# ---- Weapons: start offline, brought online by level-ups and Salvage Crates.
 	"arc_blade": {
-		"name": "Arc Blade", "slot": "weapon", "element": "energy",
+		"name": "Arc Blade", "slot": "generator", "element": "energy",
 		"text": "A huge energy sword sweeps around the frame and cuts bullets out of the air.",
 		"levels": ["Blade sweep", "Longer reach", "Fork", "Wider sweep", "Master's edge: longer, harder sweeps"],
 		"blueprint_from": ["dungeon", "planet"],
@@ -111,7 +115,7 @@ const TECH := {
 	},
 	# ---- Support: passive systems that change how the frame plays.
 	"mirror_aegis": {
-		"name": "Mirror Aegis", "slot": "support", "element": "energy",
+		"name": "Mirror Aegis", "slot": "generator", "element": "energy",
 		"text": "A mirror bubble flickers on and fires enemy bullets back at them.",
 		"levels": ["Mirror pulse", "Longer pulse", "Fork", "Faster pulse", "Perfect mirror: longer, more frequent pulses"],
 		"blueprint_from": ["star_cluster", "dungeon"],
@@ -126,7 +130,7 @@ const TECH := {
 		"levels": ["Graze charge", "Faster charge", "Fork", "Longer Overdrive", "Adrenaline: Overdrive charges faster, lasts longer"],
 		"blueprint_from": ["star_cluster", "corridor"],
 		"forks": {
-			"a": {"name": "Adrenal Mend", "text": "Grazes restore your shield, and Overdrive patches armor."},
+			"a": {"name": "Adrenal Mend", "text": "Every Overdrive repairs 5 Armor."},
 			"b": {"name": "Rage Engine", "text": "During Overdrive, afterimages burst into rings of bolts."},
 		},
 	},
@@ -151,13 +155,35 @@ const TECH := {
 		},
 	},
 	"soul_lantern": {
-		"name": "Soul Lantern", "slot": "support", "element": "mawjig",
+		"name": "Soul Lantern", "slot": "generator", "element": "mawjig",
 		"text": "Enemies you destroy leave Mawjig wisps that circle you. Each wisp swallows one enemy bullet.",
 		"levels": ["Two wisps", "Three wisps", "Fork", "Five wisps", "Soul storm: six wisps"],
 		"blueprint_from": ["planet", "dungeon"],
 		"forks": {
 			"a": {"name": "Will-o'-Wisps", "text": "Wisps dart out at enemies on their own."},
-			"b": {"name": "Lantern Ward", "text": "Three more wisps, and every swallowed bullet restores shield."},
+			"b": {"name": "Lantern Ward", "text": "Three more wisps, and when a hit gets through, a wisp throws itself in front and takes half."},
+		},
+	},
+	# ---- Generator: what keeps you alive (GDD 13K). Arc Blade, Mirror Aegis and Soul Lantern live here too.
+	"shield_generator": {
+		"name": "Shield Generator", "slot": "generator", "element": "energy",
+		"text": "A bubble that takes one hit of any size, then recharges.",
+		"levels": ["One charge, back 12 s after it breaks", "Back in 11 s", "Fork", "Back in 9 s", "Hardened bubble: back in 8 s"],
+		"blueprint_from": ["planet", "dungeon", "star_cluster"],
+		"forks": {
+			"a": {"name": "Twin Cell", "text": "Holds two charges."},
+			"b": {"name": "Breaker Pulse", "text": "A breaking bubble blasts the bullets around you away."},
+		},
+	},
+	# ---- Plating: the frame's outer armour, worn from the start of every mission (GDD 13L).
+	"dsp1_plate": {
+		"name": "DSP-1 Drop Plate", "slot": "plating", "element": "none",
+		"text": "Dropship Standard Plating, version 1: what your own Dropship prints. Reinforce it as you level up.",
+		"levels": ["Standard plating", "+10 Armor", "Fork", "+10 Armor", "+10 Armor"],
+		"blueprint_from": ["star_cluster", "corridor", "planet", "dungeon"],
+		"forks": {
+			"a": {"name": "Spaced Armor", "text": "+10 Armor, and hits of 20 or more do 5 less."},
+			"b": {"name": "Field Patches", "text": "+10 Armor, and every repair you pick up restores 5 more."},
 		},
 	},
 	# ---- Specials: fired with the special button, on a cooldown.
@@ -203,10 +229,11 @@ const TECH := {
 	},
 }
 
-## Starting kit: interesting from minute one (GDD 1C). Starters are unlocked at Mk 1.
-## Two slots start empty on purpose: Mirror Aegis and Swarm Pods are earned at the lesson planets (GDD 9C).
-const STARTING_LOADOUT := ["pulse_driver", "arc_blade", "", "", "nova_bomb"]
-const STARTING_UNLOCKS := ["pulse_driver", "arc_blade", "nova_bomb"]
+## Starting kit: interesting from minute one (GDD 1C). Starters are unlocked at Mk 1. Both weapon slots and the
+## support slot start empty: the lesson planets hand out the Shield Generator and Swarm Pods (GDD 9C, 13T), and
+## everything else is found. The Arc Blade starts in the Generator slot, so the first frame has no shield (13B).
+const STARTING_LOADOUT := ["pulse_driver", "", "", "", "nova_bomb", "arc_blade", "dsp1_plate"]
+const STARTING_UNLOCKS := ["pulse_driver", "arc_blade", "nova_bomb", "dsp1_plate"]
 
 
 static func get_tech(tech_id: String) -> Dictionary:

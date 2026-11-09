@@ -46,8 +46,8 @@ func setup(frame: String, equipped: Array, mk_lookup: Callable) -> void:
 		var mk: int = maxi(1, mk_lookup.call(tech_id))
 		tech_mk[tech_id] = mk
 		tech_cap[tech_id] = TechData.MK_LEVEL_CAP[mk]
-		# GDD 7D: only the main weapon starts online.
-		tech_level[tech_id] = 1 if slot_index == 0 else 0
+		# GDD 7D: only the main weapon starts online, and the plating: armour is worn, not switched on.
+		tech_level[tech_id] = 1 if slot_index == 0 or TechData.TECH[tech_id]["slot"] == "plating" else 0
 		tech_timer[tech_id] = 0.0
 
 
@@ -57,6 +57,19 @@ func main_weapon() -> String:
 
 func special_tech() -> String:
 	return loadout[4] if loadout.size() > 4 else ""
+
+
+func plating() -> String:
+	return loadout[6] if loadout.size() > 6 else ""
+
+
+## The Armor the plating adds right now: its base, plus whatever its levels and fork add (GDD 13L).
+func plate_armor() -> float:
+	var plate := plating()
+	if plate == "dsp1_plate":
+		# Plain reinforcement, +10 a level; the fork level adds its own +10.
+		return 10.0 * maxi(level_of(plate) - 1, 0)
+	return 0.0
 
 
 func level_of(tech_id: String) -> int:

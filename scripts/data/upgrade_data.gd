@@ -7,9 +7,9 @@ const FIELD := {
 		"name": "Echo Chamber", "limit": 2, "icon": "echo", "element": "energy",
 		"text": "Every 4th main weapon volley fires twice. Taking it again makes it every 3rd.",
 	},
-	"vampiric_plating": {
-		"name": "Vampiric Plating", "limit": 2, "icon": "vampire", "element": "mawjig",
-		"text": "Every kill patches a little armor.",
+	"mawjig_siphon": {
+		"name": "Mawjig Siphon", "limit": 2, "icon": "mawjig_siphon", "element": "mawjig",
+		"text": "Every kill siphons 1 Armor back into your frame, up to 10 each stage.",
 	},
 	"last_stand": {
 		"name": "Last Stand", "limit": 1, "icon": "last_stand", "element": "explosive",
@@ -19,8 +19,8 @@ const FIELD := {
 		"name": "Shrapnel Skin", "limit": 2, "icon": "shrapnel", "element": "kinetic",
 		"text": "Getting hit blasts a ring of shrapnel out of your hull.",
 	},
-	"overclocked_servos": {
-		"name": "Overclocked Servos", "limit": 2, "icon": "servos", "element": "kinetic",
+	"juggernaut_servos": {
+		"name": "Juggernaut Servos", "limit": 2, "icon": "juggernaut_servos", "element": "kinetic",
 		"text": "Move 15% faster, and ramming enemies hurts them more than you.",
 	},
 	"tractor_beam": {
@@ -28,8 +28,8 @@ const FIELD := {
 		"text": "Up to four beams of light reel in Data Shards and drops from further away. Taking it again reaches further.",
 	},
 	"field_repair": {
-		"name": "Field Repair", "limit": 2, "icon": "repair", "element": "",
-		"text": "Repair 40% of your armor right now.",
+		"name": "Field Repair", "limit": 1, "icon": "repair", "element": "",
+		"text": "Repair 30 Armor right now: three hits' worth.",
 	},
 	"lucky_salvage": {
 		"name": "Lucky Salvage", "limit": 1, "icon": "crate", "element": "",
@@ -42,15 +42,15 @@ const RISKY := ["glass_reactor", "adrenaline_junkie", "blood_pact"]
 const RISKY_FIELD := {
 	"glass_reactor": {
 		"name": "Glass Reactor", "limit": 1, "icon": "last_stand", "element": "explosive",
-		"text": "+50% damage. Your shield is gone for the rest of the mission.",
+		"text": "+50% damage. A third of your max Armor is gone for the rest of the mission.",
 	},
 	"adrenaline_junkie": {
-		"name": "Adrenaline Junkie", "limit": 1, "icon": "overclocked_servos", "element": "kinetic",
+		"name": "Adrenaline Junkie", "limit": 1, "icon": "juggernaut_servos", "element": "kinetic",
 		"text": "Bullets that barely miss you give Data Shards. Enemy bullets fly 15% faster.",
 	},
 	"blood_pact": {
-		"name": "Blood Pact", "limit": 1, "icon": "vampiric_plating", "element": "mawjig",
-		"text": "Every kill repairs armor. Go two seconds without a kill and your armor bleeds away, down to a third.",
+		"name": "Blood Pact", "limit": 1, "icon": "mawjig_siphon", "element": "mawjig",
+		"text": "Every kill repairs Armor. Go two seconds without a kill and your Armor bleeds away, down to a third.",
 	},
 }
 
@@ -62,7 +62,7 @@ const ELEMENTS := ["energy", "explosive", "kinetic", "mawjig"]
 const RESONANCE := {
 	"energy": {"name": "Energy", "tiers": [
 		["Static Charge", "Every 4th hit arcs lightning to another enemy."],
-		["Capacitor Discharge", "When your shield breaks, it lets go in a lightning nova that strikes up to six enemies and erases nearby bullets."],
+		["Capacitor Discharge", "Whenever you take a hit, or your Shield Generator breaks, you let go a lightning nova that strikes up to six enemies and erases nearby bullets."],
 		["Storm Front", "Every 2nd hit arcs, and the lightning chains twice."]]},
 	"explosive": {"name": "Explosive", "tiers": [
 		["Volatile", "Kills have a 1 in 3 chance to explode."],
@@ -82,8 +82,8 @@ const RESONANCE := {
 ## The fusion keeps both techs working and adds the "effect" flag WeaponSystem reads.
 const FUSIONS := {
 	"reflex_blade": {
-		"name": "Reflex Blade", "needs": ["arc_blade", "mirror_aegis"],
-		"text": "Blade sweeps catch bullets and hurl them back as homing blades.",
+		"name": "Reflex Blade", "needs": ["arc_blade", "graze_engine"],
+		"text": "Blade sweeps catch bullets and hurl them back as homing blades, and every bullet the blade catches counts as a graze.",
 	},
 	"armageddon_protocol": {
 		"name": "Armageddon Protocol", "needs": ["swarm_pods", "starfall"],

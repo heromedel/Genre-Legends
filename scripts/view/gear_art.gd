@@ -4,13 +4,15 @@ class_name GearArt
 ## gains detail as it levels, changes shape with its fork, and a fusion links its two parts with gold.
 ## Parts are drawn in the frame's local space (facing +x), at its mount, before FrameArt's rotation ends.
 
-## Where each loadout slot mounts, per form: [position, rotation]. Slots: main, weapon, weapon, support, special.
+## Where each loadout slot mounts, per form: [position, rotation]. Slots: main, weapon, weapon, support, special,
+## generator. The plating is the frame's own armour, so it has no part of its own to mount.
 const SHIP_MOUNTS := [
 	[Vector2(24, 0), 0.0],          # main: under the nose
 	[Vector2(-6, -17), 0.0],        # weapon: left wing pylon
 	[Vector2(-6, 17), 0.0],         # weapon: right wing pylon
 	[Vector2(-15, 0), PI],          # support: on the spine, facing back
 	[Vector2(-4, 0), 0.0],          # special: the core on the spine, just behind the canopy (not over it)
+	[Vector2(8, 13), 0.0],          # generator: under the right wing root
 ]
 const MECH_MOUNTS := [
 	[Vector2(6, 17), 0.0],          # main: the right arm
@@ -18,6 +20,7 @@ const MECH_MOUNTS := [
 	[Vector2(-3, 20), 0.0],         # weapon: right shoulder
 	[Vector2(-19, 0), PI],          # support: the backpack
 	[Vector2(-11, 0), 0.0],         # special: on the back, between cockpit and backpack (not over the face)
+	[Vector2(6, -17), 0.0],         # generator: the left arm, like a shield arm
 ]
 ## The colours the gear art writes for its glow and the glow's hot core; swapped for the tech's element colour.
 const GLOW_TOKEN := "#39ff14"
@@ -39,7 +42,7 @@ static func draw_gear(ci: CanvasItem, frame: Transform2D, form: String, gear: Ar
 	var placed := {}
 	for slot in gear.size():
 		var part: Dictionary = gear[slot]
-		if part.get("tech", "") == "":
+		if part.get("tech", "") == "" or slot >= mounts.size():
 			continue
 		var mount: Array = mounts[slot]
 		var at: Vector2 = mount[0] * size_scale

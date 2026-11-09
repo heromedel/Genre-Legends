@@ -121,6 +121,12 @@ func make_effect(effect: String) -> AudioStreamWAV:
 			b = blank(0.5); voice(b, 0, 0.2, 880, 880, "triangle", 0.2); voice(b, 0.12, 0.35, 1320, 1320, "triangle", 0.2)
 		"repair":
 			b = blank(0.4); voice(b, 0, 0.4, 400, 900, "sine", 0.25)
+		"shield_break":
+			# Glass going: a bright crack that falls away.
+			b = blank(0.45); voice(b, 0, 0.12, 3200, 1800, "noise", 0.3); voice(b, 0, 0.45, 1400, 300, "triangle", 0.25, 0.002, 0.3)
+		"shield_up":
+			# A bubble humming back on.
+			b = blank(0.35); voice(b, 0, 0.35, 300, 760, "sine", 0.22, 0.02, 0.4); voice(b, 0.05, 0.3, 900, 1500, "triangle", 0.08)
 		"warning":
 			b = blank(1.6)
 			for i in 4:

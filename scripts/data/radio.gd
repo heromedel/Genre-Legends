@@ -53,10 +53,10 @@ static func came_prepared_line(tech_id: String) -> String:
 ## What the officer says after a lesson planet hands over its tech (win or lose).
 static func lesson_line(tech_id: String, won: bool) -> String:
 	match tech_id:
-		"mirror_aegis":
+		"shield_generator":
 			if won:
-				return "You beat the swarm the hard way. We salvaged a Mirror Aegis from the debris; it's in the Hangar."
-			return "Those needles need a shield that fights back. We salvaged a Mirror Aegis; it's in the Hangar."
+				return "You beat the swarm the hard way. We salvaged a Shield Generator from the debris; it's in the Hangar."
+			return "Those needles needed a shield. We salvaged a Shield Generator from the debris; it's in the Hangar."
 		"swarm_pods":
 			if won:
 				return "Gate's down. We pulled homing Swarm Pods from the wreck; they're in the Hangar."

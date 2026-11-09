@@ -13,7 +13,7 @@ const COLUMNS_PER_REGION := 5  # plus one gate column
 ## Lesson planets (GDD 9C): built to beat you without one tech, which unlocks win or lose.
 ## Keyed by region and column ("r0c2") or a region's gate ("r0gate").
 const LESSONS := {
-	"r0c2": {"lesson": "needles", "tech": "mirror_aegis",
+	"r0c2": {"lesson": "needles", "tech": "shield_generator",
 		"traits": ["Needle swarms"], "need": "Needle swarms are shredding everything that flies here."},
 	"r0gate": {"lesson": "mirror", "tech": "swarm_pods", "type": "star_cluster", "boss": "mirror_dreadnought",
 		"traits": ["Mirrored hull"], "need": "A mirror-hulled dreadnought holds the gate. Straight shots bounce right back."},

@@ -47,7 +47,7 @@ func behave(dt: float) -> void:
 		var lead := world.player.pos + world.player.vel * 0.7
 		for i in (2 if phase == 0 else 4):
 			var at := lead + Vector2.from_angle(world.rng.randf() * TAU) * world.rng.randf_range(0.0, 90.0)
-			world.add_zone("acid_warning", at, 50.0, 0.1, 9.0, true, {"warn": 0.9, "color": Color(0.5, 1.0, 0.4)})
+			world.add_zone("acid_warning", at, 50.0, 0.1, MissionData.HIT_CHIP * world.enemy_damage_scale, true, {"warn": 0.9, "color": Color(0.5, 1.0, 0.4)})
 		world.emit("sound", {"name": "lob"})
 	if phase == 1 and fmod(time, 1.6) < dt:
 		world.enemy_aimed(core.pos, 7, 1.0, 230.0, {"color": Color(0.7, 1.0, 0.4)})

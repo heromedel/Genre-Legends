@@ -39,7 +39,7 @@ func behave(dt: float) -> void:
 				memory["state"] = "rising"
 				memory["timer"] = 1.0
 				memory["target"] = world.player.pos
-				world.add_zone("bomb_warning", world.player.pos, 95.0, 0.1, 22.0 * world.enemy_damage_scale, true,
+				world.add_zone("bomb_warning", world.player.pos, 95.0, 0.1, MissionData.HIT_HEAVY * world.enemy_damage_scale, true,
 					{"warn": 1.0, "color": Color(1, 0.75, 0.4)})
 				world.emit("sound", {"name": "burrow"})
 		"rising":

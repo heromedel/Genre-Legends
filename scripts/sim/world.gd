@@ -18,12 +18,9 @@ const PRIZE_DRIFT_DELAY := 3.0
 ## Chain Reaction (Explosive II): how long each link waits, and how many links a cascade can run.
 const CHAIN_REACTION_DELAY := 0.12
 const CHAIN_REACTION_GENERATIONS := 3
-## How far a ricocheting shot flies out of view before it glances back (kept inside shot_bounds), and how
-## far it can turn when it does.
-const RICOCHET_OUT_OF_VIEW := Vector2(25.0, 90.0)
-const RICOCHET_TURN := 0.8
-## How far a ricocheting shot looks for its next target.
-const RICOCHET_RANGE := 420.0
+## How far a Chain Bolt's kill arcs to find the next enemy, and how much of the bolt each jump keeps (GDD 13W).
+const CHAIN_RANGE := 260.0
+const CHAIN_KEEPS := 0.8
 ## Meteors (Starfall, Doom Bell) streak in from the upper left; Comet Trail fires lie along that path.
 const METEOR_FROM := Vector2(-0.5, -0.866)
 const GRAZE_MARGIN := 26.0
@@ -45,6 +42,8 @@ var autofire := true             # weapons fire on their own (Settings); off: on
 var auto_aim := true             # the mech turns to the nearest enemy when you aren't aiming (Settings)
 var prize_waiting := false      # the last boss's prize is on the field; the mission ends once it's taken
 var wisps := 0                  # Soul Lantern: wisps circling the frame, each good for one bullet
+var _plate_armor_applied := 0.0 # how much Armor the plating has added to the frame so far
+var siphoned_this_stage := 0.0  # Mawjig Siphon's repairs this stage (it caps per stage)
 var allies: Array = []          # {pos, fire_timer, look}: things fighting on your side, like a turned clone
 var events: Array = []          # things that happened this tick, for art and sound
 
@@ -141,6 +140,8 @@ func _maybe_promote(enemy: Enemy, data: Dictionary) -> void:
 	enemy.max_hp *= 2.2
 	enemy.hp = enemy.max_hp
 	enemy.radius *= 1.25
+	# An elite's body hits as hard as a boss's (GDD 13C).
+	enemy.contact = maxf(enemy.contact, MissionData.HIT_BODY * enemy_damage_scale)
 	enemy.xp *= 3
 	match enemy.elite_mod:
 		"shielded":
@@ -343,7 +344,8 @@ func _splinter(shot: Shot) -> void:
 		fragment.hit_ids = shot.hit_ids.duplicate()
 
 
-## Energy resonance II (Capacitor Discharge): a shield that breaks lets go in a lightning nova.
+## Energy resonance II (Capacitor Discharge): every hit you take, or a Shield Generator charge breaking, lets go
+## in a lightning nova (GDD 13P), so it works for every build, shield or not.
 func _capacitor_discharge() -> void:
 	clear_bullets(player.pos, 200.0)
 	var struck := {}
@@ -423,16 +425,18 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 	if tech != "resonance" and resonance["explosive"] >= 1 and rng.randf() < 0.34:
 		explode(enemy.pos, 80.0, 26.0 + 6.0 * resonance["explosive"], "resonance", Color(1.0, 0.55, 0.25))
 	if run.field_count("blood_pact") > 0:
-		player.repair(2.0)
+		player.repair(1.5)
 		player.since_kill = 0.0
 	if run.is_online("soul_lantern"):
 		wisps = mini(wisps + 1, max_wisps())
 	# Hexplosion fork, or Mawjig resonance II: hexed enemies burst and spread the hex.
 	if enemy.hex_marked and (run.fork_of("hex_repeater") == "a" or resonance["mawjig"] >= 2) and tech != "resonance":
 		explode(enemy.pos, 95.0, 34.0 * run.damage_multiplier("hex_repeater", player.armor_fraction()), "hex_repeater", Color(0.85, 0.45, 1.0), true)
-	var vampiric := run.field_count("vampiric_plating")
-	if vampiric > 0:
-		player.repair(0.7 * vampiric)
+	# Mawjig Siphon: 1 Armor a kill per stack, at most 10 a stage per stack, so killing never replaces dodging.
+	var siphon := run.field_count("mawjig_siphon")
+	if siphon > 0 and siphoned_this_stage < 10.0 * siphon:
+		player.repair(1.0)
+		siphoned_this_stage += 1.0
 
 
 ## Soul Lantern's wisps: 1 + level of them (3 more with Lantern Ward), circling the frame.
@@ -529,15 +533,49 @@ func reflect_shot(shot: Shot, damage: float, homing: bool, splits: int) -> void:
 	emit("spark", {"pos": shot.pos, "color": Color(0.7, 1.0, 1.0)})
 
 
-## Every hit on the player goes through here: traits, field upgrades and the tally.
+## Seconds a Shield Generator charge takes to come back: 12 at level 1, one less each level (GDD 13K).
+func shield_recharge_seconds() -> float:
+	return 13.0 - maxi(run.level_of("shield_generator"), 1)
+
+
+## Sets max Armor to the frame's plus what the plating adds now, keeping the damage already taken.
+func refresh_plate_armor() -> void:
+	var bonus := run.plate_armor()
+	var gained := bonus - _plate_armor_applied
+	player.max_armor += gained
+	player.armor = clampf(player.armor + maxf(gained, 0.0), 0.0, player.max_armor)
+	_plate_armor_applied = bonus
+
+
+## Every hit on the player goes through here: the Shield Generator, plating, Lantern Ward, Resonance, field
+## upgrades and the tally.
 func damage_player(amount: float, source: String) -> void:
-	if not player.alive or player.grace > 0.0:
+	if not player.alive or player.grace > 0.0 or amount <= 0.0:
 		return
-	var had_shield := player.shield > 0.0
+	# A Shield Generator charge takes the whole hit, whatever its size (GDD 13K).
+	if player.shield_charges > 0:
+		player.block_with_shield(shield_recharge_seconds())
+		emit("player_shield_break", {"pos": player.pos})
+		emit("sound", {"name": "shield_break"})
+		if run.fork_of("shield_generator") == "b":
+			# Breaker Pulse: the breaking bubble blasts the bullets around you away.
+			clear_bullets(player.pos, 230.0)
+			emit("explosion", {"pos": player.pos, "size": 230.0, "color": Color(0.5, 0.85, 1.0), "ring": true})
+		if resonance["energy"] >= 2:
+			_capacitor_discharge()
+		return
+	# DSP-1 Spaced Armor: a big hit loses some of its punch in the gap between the plates.
+	if run.plating() == "dsp1_plate" and run.fork_of("dsp1_plate") == "a" and amount >= FrameData.HEAVY_HIT:
+		amount -= 5.0
+	# Lantern Ward: a wisp throws itself in front of the hit and takes half of it.
+	if run.fork_of("soul_lantern") == "b" and wisps > 0:
+		wisps -= 1
+		amount *= 0.5
+		emit("spark", {"pos": player.pos, "color": Color(0.85, 0.6, 1.0)})
 	var taken := player.take_hit(amount)
 	if taken <= 0.0:
 		return
-	if had_shield and player.shield <= 0.0 and resonance["energy"] >= 2:
+	if resonance["energy"] >= 2:
 		_capacitor_discharge()
 	run.damage_taken += taken
 	run.hits_taken += 1
@@ -549,16 +587,6 @@ func damage_player(amount: float, source: String) -> void:
 		for i in 10 * shrapnel:
 			var shot := player_shot(player.pos, Vector2.from_angle(TAU * i / (10.0 * shrapnel)) * 620.0, 14.0, "shrapnel", "shard", Color(1, 0.8, 0.5))
 			shot.life = 0.7
-	if not player.alive and FrameData.get_frame(run.frame_id)["trait"] == "second_wind" and not player.second_wind_used:
-		player.second_wind_used = true
-		player.alive = true
-		player.armor = 1.0
-		player.grace = 1.5
-		clear_bullets(player.pos, 2000.0)
-		explode(player.pos, 380.0, 120.0, "second_wind", Color(1.0, 0.9, 0.5))
-		emit("banner", {"text": "SECOND WIND", "style": "gold"})
-		emit("flash", {"color": Color(1, 0.95, 0.7), "amount": 0.8})
-		emit("sound", {"name": "nova"})
 	if on_player_hurt.is_valid():
 		on_player_hurt.call(taken, source)
 
@@ -598,16 +626,12 @@ func update_player_shots(dt: float) -> void:
 			_split_shot(shot)
 			continue
 		if not walls.is_empty() and point_in_wall(shot.pos):
-			if shot.bounces > 0:
-				_bounce_off_wall(shot)
+			shot.dead = true
+			if shot.splash > 0.0:
+				_on_shot_impact(shot, null)
 			else:
-				shot.dead = true
-				if shot.splash > 0.0:
-					_on_shot_impact(shot, null)
-				else:
-					emit("spark", {"pos": shot.pos, "color": shot.color})
-				continue
-		_ricochet_off_screen(shot, dt)
+				emit("spark", {"pos": shot.pos, "color": shot.color})
+			continue
 		if not shot_bounds.has_point(shot.pos):
 			shot.dead = true
 			continue
@@ -637,7 +661,7 @@ func update_player_shots(dt: float) -> void:
 				if ready:
 					enemy.memory["last_reflect"] = time
 					enemy_shot(shot.pos, (player.pos - shot.pos).angle() + rng.randf_range(-0.2, 0.2), 320.0,
-						{"damage": 6.0, "radius": 5.0, "color": Color(1.0, 0.55, 0.85)})
+						{"damage": MissionData.HIT_CHIP, "radius": 5.0, "color": Color(1.0, 0.55, 0.85)})
 				emit("spark", {"pos": shot.pos, "color": Color(0.85, 0.95, 1.0), "blocked": true})
 				break
 			if enemy.front_shield and _hits_front(enemy, shot) and shot.splash <= 0.0:
@@ -655,16 +679,9 @@ func update_player_shots(dt: float) -> void:
 			if resonance["kinetic"] >= 2 and shot.age > 0.3 and not shot.splintered and shot.tech != "splinter":
 				_splinter(shot)
 			_on_shot_impact(shot, enemy)
-			if shot.bounces > 0:
-				shot.bounces -= 1
-				shot.damage *= 1.0 + shot.bounce_bonus
-				# With nobody close enough to bounce to, the shot flies on and can still find someone.
-				var next := nearest_enemy(shot.pos, RICOCHET_RANGE, shot.hit_ids)
-				if next != null:
-					shot.vel = (next.pos - shot.pos).normalized() * shot.vel.length()
-					shot.life = maxf(shot.life, 0.6)
-					emit("ricochet", {"pos": shot.pos})
-			elif shot.pierce > 0:
+			if shot.chains > 0 and enemy.dead:
+				_chain_bolt(enemy, shot.damage, shot.chains)
+			if shot.pierce > 0:
 				shot.pierce -= 1
 			else:
 				shot.dead = true
@@ -704,40 +721,23 @@ func _split_shot(shot: Shot) -> void:
 	emit("spark", {"pos": shot.pos, "color": shot.color})
 
 
-## Ricochet past the edge: a shot with bounces left flies on out of view for a random distance,
-## glances off something out there and comes back in at an angle, a little weaker, so space doesn't
-## feel like a box. Walls inside the field still bounce it where you can see (_bounce_off_wall).
-func _ricochet_off_screen(shot: Shot, dt: float) -> void:
-	if shot.coming_back:
-		if bounds.has_point(shot.pos):
-			shot.coming_back = false
-	elif shot.out_of_view_for > 0.0:
-		shot.out_of_view_for -= shot.vel.length() * dt
-		if shot.out_of_view_for <= 0.0:
-			shot.bounces -= 1
-			# Back the way it came, turned up to about 45 degrees, as if off a round rock out there.
-			shot.vel = -shot.vel.rotated(rng.randf_range(-RICOCHET_TURN, RICOCHET_TURN))
-			shot.damage *= 0.7
-			shot.coming_back = true
-	elif shot.bounces > 0 and not bounds.has_point(shot.pos):
-		shot.out_of_view_for = rng.randf_range(RICOCHET_OUT_OF_VIEW.x, RICOCHET_OUT_OF_VIEW.y)
-		shot.life = maxf(shot.life, 1.6)
+## Chain Bolts (GDD 13W): a kill arcs as lightning to the next enemy in reach, a little weaker each jump, and
+## carries on only while it keeps killing, so a good shot through a crowd clears it in a crackling chain.
+func _chain_bolt(from: Enemy, damage: float, jumps: int) -> void:
+	var struck := {from.id: true}
+	var at := from.pos
+	for jump in jumps:
+		var next := nearest_enemy(at, CHAIN_RANGE, struck)
+		if next == null:
+			return
+		damage *= CHAIN_KEEPS
+		struck[next.id] = true
+		emit("lightning", {"from": at, "to": next.pos})
+		hurt_enemy(next, damage, "pulse_driver")
+		if not next.dead:
+			return
+		at = next.pos
 
-
-func _bounce_off_wall(shot: Shot) -> void:
-	shot.bounces -= 1
-	var back := shot.pos - shot.vel * DT
-	var probe_x := Vector2(shot.pos.x, back.y)
-	if point_in_wall(probe_x):
-		shot.vel.x = -shot.vel.x
-	else:
-		shot.vel.y = -shot.vel.y
-	shot.pos = back
-	shot.damage *= 1.0 + shot.bounce_bonus
-	emit("ricochet", {"pos": shot.pos})
-
-
-## Event Horizon's black hole collapsing: a burst that hexes everything in it. Once per orb.
 func _collapse_horizon(shot: Shot) -> void:
 	shot.devours = false
 	shot.dead = true
@@ -797,7 +797,6 @@ func update_enemy_shots(dt: float) -> void:
 	var mirror_up := player.mirror_time > 0.0
 	var bastion := run.fork_of("mirror_aegis") == "b" and run.is_online("mirror_aegis")
 	var wisp_spots: Array = wisp_positions()
-	var ward := run.fork_of("soul_lantern") == "b"
 	for shot: Shot in enemy_shots:
 		if shot.dead:
 			continue
@@ -836,8 +835,6 @@ func update_enemy_shots(dt: float) -> void:
 				wisps -= 1
 				wisp_spots = wisp_positions()
 				emit("spark", {"pos": shot.pos, "color": Color(0.85, 0.6, 1.0)})
-				if ward:
-					player.shield = minf(player.max_shield, player.shield + 3.0)
 				continue
 		if mirror_up and distance < MIRROR_RADIUS:
 			_mirror_reflect(shot)
@@ -846,7 +843,9 @@ func update_enemy_shots(dt: float) -> void:
 			_mirror_reflect(shot)
 			continue
 		if distance < player.radius + shot.radius:
-			if FrameData.get_frame(run.frame_id)["trait"] == "fortress_field" and player.shield > 0.0 and rng.randf() < 0.25:
+			# Bulwark's Fortress Field: its armoured front throws back a quarter of what hits it.
+			if FrameData.get_frame(run.frame_id)["trait"] == "fortress_field" \
+					and absf(angle_difference(player.facing, (shot.pos - player.pos).angle())) < FrameData.FORTRESS_FRONT and rng.randf() < 0.25:
 				reflect_shot(shot, 18.0, false, 1)
 				continue
 			shot.dead = true
@@ -1050,6 +1049,9 @@ func update_blades(dt: float) -> void:
 			if offset.length() < blade["radius"] + 8.0 and _angle_in_sweep(offset.angle(), low, high):
 				if blade["reflect"]:
 					reflect_shot(shot, blade["damage"] * 0.4, true, 1)
+					# Reflex Blade: every bullet the blade catches feeds the Graze Engine too.
+					if run.has_fusion("reflex_blade") and on_collect.is_valid():
+						on_collect.call("graze", 1.0, "")
 				else:
 					shot.dead = true
 					emit("spark", {"pos": shot.pos, "color": Color(0.6, 1.0, 1.0)})

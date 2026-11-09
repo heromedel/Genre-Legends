@@ -23,7 +23,7 @@ func spawn() -> void:
 	for i in LEG_OFFSETS.size():
 		add_part("leg%d" % i, LEG_OFFSETS[i], 420, 24)
 	place_parts()
-	world.add_zone("enemy_ring", origin, 340.0, 0.8, 14.0 * world.enemy_damage_scale, true, {"color": Color(1, 0.6, 0.3)})
+	world.add_zone("enemy_ring", origin, 340.0, 0.8, MissionData.HIT_BODY * world.enemy_damage_scale, true, {"color": Color(1, 0.6, 0.3)})
 	world.emit("shake", {"amount": 16.0})
 	memory["landing"] = 1.2
 
@@ -44,7 +44,7 @@ func behave(dt: float) -> void:
 		core.invulnerable = false
 		for leg: Enemy in legs:
 			world.kill_enemy(leg)
-		world.add_zone("enemy_ring", origin, 420.0, 0.9, 16.0 * world.enemy_damage_scale, true, {"color": Color(1, 0.6, 0.3)})
+		world.add_zone("enemy_ring", origin, 420.0, 0.9, MissionData.HIT_BODY * world.enemy_damage_scale, true, {"color": Color(1, 0.6, 0.3)})
 		set_phase(1, "THE CRAWLER COLLAPSES - STRIKE ITS CORE")
 	if phase == 1 and hp_fraction() < 0.35:
 		set_phase(2, "ITS REACTOR IS MELTING DOWN")
@@ -61,7 +61,7 @@ func behave(dt: float) -> void:
 	if fmod(time, 3.0) < dt:
 		for i in 5:
 			var at := world.player.pos + (Vector2.ZERO if i == 0 else Vector2.from_angle(world.rng.randf() * TAU) * world.rng.randf_range(80, 220))
-			world.add_zone("bomb_warning", at, 70.0, 0.1, 18.0 * world.enemy_damage_scale, true, {"warn": 1.1, "color": Color(1, 0.45, 0.3)})
+			world.add_zone("bomb_warning", at, 70.0, 0.1, MissionData.HIT_HEAVY * world.enemy_damage_scale, true, {"warn": 1.1, "color": Color(1, 0.45, 0.3)})
 		world.emit("sound", {"name": "mortar"})
 	var spiral_every := 0.13 if phase == 1 else 0.09
 	if fmod(time, spiral_every) < dt:

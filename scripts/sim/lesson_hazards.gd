@@ -1,12 +1,13 @@
 class_name LessonHazards
 extends RefCounted
 ## The threats that make a lesson planet a lesson (GDD 9C). Needle swarms: volleys of tiny, fast,
-## gently homing needles from off screen, weak alone and deadly in numbers. Shields that reflect them
-## (Mirror Aegis) turn the swarm around; a blade can cut them; dodging well survives them.
+## gently homing needles from off screen, weak alone and deadly in numbers. A Shield Generator answers them:
+## a volley costs at most one hit (immunity after a hit, GDD 13E), and a level 1 generator is back for every
+## other volley. A blade can cut them, Mirror Aegis turns them around, and dodging well survives them.
 ## In a dungeon they come out of vents in the room's own walls, glowing first, and only while the room still
 ## has enemies: never out of nowhere, through walls, or in a room already cleared (heromedel).
 
-const NEEDLE_EVERY := 3.2
+const NEEDLE_EVERY := 5.0
 const NEEDLES_PER_VOLLEY := 12
 
 var world: World
@@ -61,7 +62,7 @@ func _volley(origin: Vector2) -> void:
 	for i in NEEDLES_PER_VOLLEY:
 		var start := (origin + Vector2.from_angle(toward + PI * 0.5) * (i - NEEDLES_PER_VOLLEY * 0.5) * 22.0).clamp(room.position, room.end)
 		var needle := world.enemy_shot(start, toward + world.rng.randf_range(-0.12, 0.12), 300.0,
-			{"radius": 3.0, "damage": 6.0, "look": "needle", "color": Color(0.85, 1.0, 0.45), "life": 4.0})
+			{"radius": 3.0, "damage": 5.0, "look": "needle", "color": Color(0.85, 1.0, 0.45), "life": 4.0})
 		needle.homing = 1.5
 	world.emit("needle_volley", {"from": origin})
 	world.emit("sound", {"name": "dive"})

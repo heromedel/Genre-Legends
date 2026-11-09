@@ -30,6 +30,7 @@ var flash_color := Color.WHITE
 var flash_amount := 0.0
 var damage_vignette := 0.0
 var time := 0.0
+var armor_trail := -1.0         # the Armor bar's flash: where the bar was before the last hit, draining away
 
 ## How long a banner stays up: long enough to read comfortably, longer for longer lines (heromedel: 1.2 s
 ## was too fast even for a fast reader).
@@ -85,6 +86,10 @@ func tick(delta: float) -> void:
 	flash_amount = maxf(flash_amount - delta * 2.5, 0.0)
 	damage_vignette = maxf(damage_vignette - delta * 2.0, 0.0)
 	warning_time = maxf(warning_time - delta, 0.0)
+	if mission != null:
+		# The ticks a hit took flash, then drain down to the bar over half a second.
+		var armor := mission.player.armor
+		armor_trail = armor if armor_trail < armor else move_toward(armor_trail, armor, delta * mission.player.max_armor * 0.5)
 	queue_redraw()
 	# While a card or crate screen is up, the radio and banners wait underneath, unseen and unspent.
 	if covered:
@@ -110,12 +115,11 @@ func _draw() -> void:
 	var run := mission.run
 	_draw_vignette(screen)
 	_draw_objective_arrows(screen)
-	# Armor and shield.
+	# Armor, read as hits (GDD 13A), and the Shield Generator's charges.
 	var x := 18.0
 	var y := 16.0
-	_bar(Vector2(x, y), Vector2(250, 16), player.armor / player.max_armor, Color(1.0, 0.62, 0.25), "ARMOR %d" % ceili(player.armor))
-	_bar(Vector2(x, y + 22), Vector2(250, 10), player.shield / player.max_shield, Color(0.4, 0.85, 1.0), "")
-	draw_string(font_body, Vector2(x + 256, y + 32), "SHIELD", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.5, 0.85, 1.0))
+	_armor_bar(Vector2(x, y), Vector2(250, 18), player)
+	_shield_cells(Vector2(x, y + 24), player)
 	# Level and XP.
 	var level_at := Vector2(x, y + 44)
 	draw_string(font_bold, level_at + Vector2(0, 16), "LV %d" % run.level, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(0.6, 1.0, 0.85))
@@ -156,6 +160,45 @@ func _draw() -> void:
 	_draw_radio(screen)
 	if flash_amount > 0.0:
 		draw_rect(Rect2(Vector2.ZERO, screen), Color(flash_color.r, flash_color.g, flash_color.b, flash_amount * 0.6))
+
+
+## The Armor bar: a tick every 10 Armor (one bullet) and a taller one every 30, so it reads as hits in threes.
+## The part a hit just took flashes white and drains away.
+func _armor_bar(at: Vector2, size: Vector2, player: PlayerFrame) -> void:
+	var maximum := maxf(player.max_armor, 1.0)
+	var low := player.armor / maximum < 0.34
+	var color := Color(1.0, 0.62, 0.25) if not low else Color(1.0, 0.35, 0.25).lerp(Color(1.0, 0.62, 0.25), 0.5 + 0.5 * sin(time * 8.0))
+	_bar(at, size, player.armor / maximum, color, "")
+	if armor_trail > player.armor:
+		var from := at.x + size.x * player.armor / maximum
+		var width := size.x * (armor_trail - player.armor) / maximum
+		draw_rect(Rect2(Vector2(from, at.y), Vector2(width, size.y)), Color(1, 1, 1, 0.85))
+	var tick := 10.0
+	while tick < maximum - 0.5:
+		var tick_x := at.x + size.x * tick / maximum
+		var tall := int(round(tick)) % 30 == 0
+		draw_line(Vector2(tick_x, at.y - (3.0 if tall else 0.0)), Vector2(tick_x, at.y + size.y * (1.0 if tall else 0.55)), Color(0.08, 0.04, 0.0, 0.9), 2.0 if tall else 1.4)
+		tick += 10.0
+	draw_string_outline(font_bold, at + Vector2(size.x + 8, size.y - 3), "ARMOR %d" % ceili(player.armor), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, 4, Color(0, 0, 0, 0.7))
+	draw_string(font_bold, at + Vector2(size.x + 8, size.y - 3), "ARMOR %d" % ceili(player.armor), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color.lightened(0.2))
+
+
+## Shield Generator charges as glowing cells; an empty one fills back up as it recharges.
+func _shield_cells(at: Vector2, player: PlayerFrame) -> void:
+	if player.max_shield_charges <= 0:
+		return
+	var recharge_total := mission.world.shield_recharge_seconds()
+	for i in player.max_shield_charges:
+		var cell := Rect2(at + Vector2(i * 30, 0), Vector2(24, 9))
+		draw_rect(cell.grow(2), Color(0, 0, 0, 0.55))
+		if i < player.shield_charges:
+			draw_rect(cell, Color(0.45, 0.88, 1.0))
+			draw_rect(Rect2(cell.position, Vector2(cell.size.x, 3)), Color(1, 1, 1, 0.4))
+		else:
+			draw_rect(cell, Color(0.1, 0.18, 0.25))
+			var filled := 1.0 - clampf(player.shield_recharge / recharge_total, 0.0, 1.0) if i == player.shield_charges else 0.0
+			draw_rect(Rect2(cell.position, Vector2(cell.size.x * filled, cell.size.y)), Color(0.3, 0.6, 0.8))
+	draw_string(font_body, at + Vector2(player.max_shield_charges * 30 + 4, 9), "SHIELD", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.5, 0.85, 1.0))
 
 
 func _bar(at: Vector2, size: Vector2, fraction: float, color: Color, text: String) -> void:

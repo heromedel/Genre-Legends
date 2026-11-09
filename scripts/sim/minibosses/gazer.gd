@@ -69,7 +69,7 @@ func _open_next(eyes: Array) -> void:
 	memory["open"] = next.part
 	memory["timer"] = 3.2 if phase == 0 else 4.2
 	var aim := (world.player.pos - next.pos).angle()
-	world.add_zone("laser", next.pos, 0.0, 0.5, 18.0 * world.enemy_damage_scale, true,
+	world.add_zone("laser", next.pos, 0.0, 0.5, MissionData.HIT_HEAVY * world.enemy_damage_scale, true,
 		{"warn": 1.0, "angle": aim, "length": 1100.0, "width": 26.0, "color": Color(1, 0.45, 0.6)})
 	if phase == 1:
 		world.add_zone("laser", next.pos, 0.0, 0.5, 18.0 * world.enemy_damage_scale, true,

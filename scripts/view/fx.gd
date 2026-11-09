@@ -38,13 +38,17 @@ func handle(event: Dictionary, world: World) -> void:
 			sparks(event["pos"], event["color"], 5 if not event.get("blocked", false) else 8, 220.0)
 		"slash_hit":
 			sparks(event["pos"], Color(0.7, 1, 1), 6, 260.0)
-		"ricochet":
-			sparks(event["pos"], Color(0.6, 0.95, 1), 4, 180.0)
 		"lightning":
 			lightning(event["from"], event["to"])
 		"player_hit":
 			sparks(event["pos"], Color(1, 0.6, 0.4), 12, 260.0)
 			ring(event["pos"], 40.0, 0.25, Color(1, 0.5, 0.4), 3.0)
+		"player_shield_break":
+			# The bubble shatters: a bright ring flying outward and a spray of glassy sparks.
+			ring(event["pos"], 70.0, 0.35, Color(0.6, 0.95, 1.0), 4.0)
+			sparks(event["pos"], Color(0.75, 0.97, 1.0), 16, 320.0)
+		"shield_up":
+			ring(event["pos"], 34.0, 0.3, Color(0.5, 0.9, 1.0), 2.5)
 		"graze":
 			sparks(event["pos"] + Vector2(rng.randf_range(-14, 14), rng.randf_range(-14, 14)), Color(1, 0.9, 0.5), 2, 120.0)
 		"floating_text":

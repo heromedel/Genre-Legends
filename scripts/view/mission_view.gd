@@ -523,6 +523,12 @@ func _paint_bodies(ci: CanvasItem) -> void:
 			FrameArt.draw_frame(ci, mission.run.frame_id, player.form, player.pos, player.facing, time,
 				{"speed": speed, "flash": 1.0 if flicker else hit_flash, "gear": _gear(), "fusions": mission.run.fusions,
 				"resonance": _top_resonance(), "alpha": 0.45 if wraith else 1.0})
+		# The Shield Generator's bubble while it holds a charge: a thin shimmering shell, brighter with two.
+		if player.shield_charges > 0:
+			var bubble := (34.0 if player.form == "ship" else 40.0) + sin(time * 5.0) * 1.5
+			Art.draw_glow(ci, player.pos, bubble * 1.4, Color(0.4, 0.85, 1.0, 0.12 * player.shield_charges))
+			ci.draw_arc(player.pos, bubble, 0, TAU, 40, Color(0.55, 0.92, 1.0, 0.35 + 0.2 * player.shield_charges), 2.0, true)
+			ci.draw_arc(player.pos, bubble, time * 2.0, time * 2.0 + 1.1, 12, Color(0.9, 1.0, 1.0, 0.8), 2.5, true)
 	for shot: Shot in world.enemy_shots:
 		ShotArt.draw_enemy_shot(ci, shot, time)
 
@@ -562,7 +568,13 @@ func _draw_halo_saws(ci: CanvasItem) -> void:
 			bolt.append(to)
 			ci.draw_polyline(bolt, Color(0.5, 0.85, 1.0, 0.55), 6.0, true)
 			ci.draw_polyline(bolt, Color(0.92, 0.98, 1.0, 0.95), 2.0, true)
-	for saw: Vector2 in fx.halo["saws"]:
+	var broken: Array = fx.halo.get("broken", [])
+	for saw_index in saws.size():
+		var saw: Vector2 = saws[saw_index]
+		if broken.has(saw_index):
+			# A broken saw: a dim stub regrowing in place.
+			ci.draw_arc(saw, 9.0, 0, TAU, 12, Color(0.6, 0.55, 0.45, 0.5), 2.0, true)
+			continue
 		ci.draw_set_transform(saw, time * 14.0, Vector2.ONE)
 		var teeth := PackedVector2Array()
 		for i in 12:

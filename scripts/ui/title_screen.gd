@@ -30,6 +30,9 @@ func _gui_input(event: InputEvent) -> void:
 	if tapped and time > 0.6:
 		accept_event()
 		PlayLog.button("Title: tap to start")
+		if Save.data.get("notice", "") != "":
+			Save.data["notice"] = ""
+			Save.write()
 		Sound.play("transform")
 		Sound.play_music("hub")
 		started.emit()
@@ -82,3 +85,7 @@ func _draw() -> void:
 	var blink := 0.45 + 0.55 * absf(sin(time * 2.2))
 	draw_string(UiKit.font("bold"), Vector2(0, screen.y - 60), "TAP TO START", HORIZONTAL_ALIGNMENT_CENTER, screen.x, 26, Color(1, 1, 1, blink))
 	draw_string(UiKit.font("body"), Vector2(0, screen.y - 22), BuildInfo.label(), HORIZONTAL_ALIGNMENT_RIGHT, screen.x - 16, 13, Color(0.5, 0.6, 0.7))
+	# A one-time notice from the save, such as a fresh start after a big update.
+	var notice: String = Save.data.get("notice", "")
+	if notice != "":
+		draw_string(UiKit.font("bold"), Vector2(0, screen.y - 104), notice, HORIZONTAL_ALIGNMENT_CENTER, screen.x, 17, Color(1.0, 0.85, 0.5))
