@@ -7,6 +7,7 @@ a design point).
 
 | Review | Subject | Finding | Status | Note |
 |---|---|---|---|---|
+| heromedel (2026-11-09) | Level-up cards | A level-up vanished without a pick after a long finger hold. | **Fixed** (0.5) | Cards (and the crate summary) picked on any release, even of a finger already down when they appeared. Now a pick is a tap that starts and ends on the card. |
 | heromedel (2026-11-09) | Build panel, cards | The pause screen lists fusions that can't happen this mission (every tech capped below level 5). | **Fixed** (0.5) | The Build panel and "Toward fusion" hints only mention fusions this mission can reach (RunState.can_fuse). |
 | heromedel (2026-11-09) | Boss banners | "SHIELD DOWN - HE'S EXPOSED" is bad and boring wording; nine bosses said "X EXPOSED" in some form. | **Fixed** (0.5) | Every phase banner rewritten to say what that boss does ("THE ACE'S SHIELD SHATTERS", "THE CRUSHER JAMS OPEN"...); the Bulkhead Fortress no longer shares the Crusher Gate's line. |
 | heromedel | Twin Rails | "Fires two rails in a V, then three." unclear (three needs level 5, so Mk 3). | **Fixed** (0.5) | "Fires two rails in a V. Three at level 5." (heromedel's wording). |

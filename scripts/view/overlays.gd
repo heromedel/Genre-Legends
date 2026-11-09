@@ -45,6 +45,7 @@ class Card:
 	var card: Dictionary
 	var on_pick: Callable
 	var appear := 0.0
+	var touched := false          # the finger came down on this card after it appeared
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
@@ -55,9 +56,12 @@ class Card:
 		queue_redraw()
 
 	func _gui_input(event: InputEvent) -> void:
-		var pressed: bool = (event is InputEventScreenTouch and not event.pressed) or \
-			(event is InputEventMouseButton and not event.pressed and event.button_index == MOUSE_BUTTON_LEFT and event.device != InputEvent.DEVICE_ID_EMULATION)
-		if pressed and appear >= 1.0 and on_pick.is_valid():
+		# A pick is a tap that starts and ends on the card: a finger already down when the cards appeared
+		# (still steering) that lifts over one doesn't pick it (heromedel lost an upgrade that way).
+		if Overlays.is_tap_down(event):
+			touched = appear >= 1.0
+		elif Overlays.is_tap_up(event) and touched and on_pick.is_valid():
+			touched = false
 			on_pick.call()
 			accept_event()
 
@@ -121,6 +125,18 @@ class Card:
 		lines.append(current)
 		for i in lines.size():
 			draw_string(font, at + Vector2(0, i * (font_size + 4)), lines[i], HORIZONTAL_ALIGNMENT_CENTER, width, font_size, color)
+
+
+## A finger or the mouse coming down (the emulated mouse copy of a touch is ignored).
+static func is_tap_down(event: InputEvent) -> bool:
+	return (event is InputEventScreenTouch and event.pressed) or \
+		(event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and event.device != InputEvent.DEVICE_ID_EMULATION)
+
+
+## A finger or the mouse lifting.
+static func is_tap_up(event: InputEvent) -> bool:
+	return (event is InputEventScreenTouch and not event.pressed) or \
+		(event is InputEventMouseButton and not event.pressed and event.button_index == MOUSE_BUTTON_LEFT and event.device != InputEvent.DEVICE_ID_EMULATION)
 
 
 static func build_offer(cards: Array, source: String, on_pick: Callable, run: RunState, on_reroll: Callable) -> Control:
@@ -200,6 +216,7 @@ static func _floating(panel: Control) -> Control:
 ## per gem. Then every upgrade it landed on is listed with what it does.
 class CrateReel:
 	extends Control
+	var touched := false          # the finger came down here after the reels stopped
 	var cards: Array = []
 	var faces: Array = []          # what each reel landed on
 	var reels: Array = []          # every face each reel can show while spinning
@@ -225,9 +242,11 @@ class CrateReel:
 		queue_redraw()
 
 	func _gui_input(event: InputEvent) -> void:
-		var released: bool = (event is InputEventScreenTouch and not event.pressed) or \
-			(event is InputEventMouseButton and not event.pressed and event.button_index == MOUSE_BUTTON_LEFT and event.device != InputEvent.DEVICE_ID_EMULATION)
-		if released and time > spin_seconds + 0.4 and on_done.is_valid():
+		# Like a card: only a tap that starts here once the reels have stopped closes it.
+		if Overlays.is_tap_down(event):
+			touched = time > spin_seconds + 0.4
+		elif Overlays.is_tap_up(event) and touched and on_done.is_valid():
+			touched = false
 			on_done.call()
 			accept_event()
 
