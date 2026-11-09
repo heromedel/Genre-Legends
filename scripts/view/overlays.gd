@@ -359,5 +359,9 @@ static func build_pause(on_resume: Callable, on_abandon: Callable, run: RunState
 	column.add_child(SettingsControls.slider("Sound effects", "sfx"))
 	column.add_child(SettingsControls.toggle("Screen shake", "screen_shake"))
 	column.add_child(SettingsControls.toggle("Bullets glow in the dark", "bullet_glow"))
+	# Saving the play log mid-mission, without leaving it (heromedel): it includes the mission so far.
+	var log_button := UiKit.button("Save play log file", func(): pass, "Pause: save play log")
+	log_button.pressed.connect(func(): log_button.text = "Saved: %s" % PlayLog.save_file().get_file())
+	column.add_child(log_button)
 	column.add_child(UiKit.button("Abandon mission", on_abandon, "Pause: Abandon"))
 	return root

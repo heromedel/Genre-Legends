@@ -293,6 +293,16 @@ func export_text() -> String:
 		var replay := last_record.duplicate()
 		replay.erase("snapshots")
 		out.append("REPLAY " + JSON.stringify(replay))
+	# Saved mid-mission (from the pause menu): the mission so far, with a replay up to this moment.
+	if recording:
+		out.append("")
+		out.append("== CURRENT MISSION (in progress) ==")
+		out.append_array(record.get("snapshots", []))
+		var current := record.duplicate()
+		current.erase("snapshots")
+		current["inputs"] = _encode_runs()
+		current["result"] = {"won": false, "seconds": 0.0, "ticks": 0, "unfinished": true}
+		out.append("REPLAY " + JSON.stringify(current))
 	if not previous.is_empty():
 		out.append("")
 		out.append("== PREVIOUS SESSION (%s) ==" % previous.get("version", "?"))

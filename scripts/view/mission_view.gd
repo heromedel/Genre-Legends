@@ -326,6 +326,10 @@ func _handle_events(events: Array) -> void:
 				_big_moment(mission.player.pos, event["color"], float(event["size"]), 0.12 * float(event["size"]))
 			"resonance":
 				pending_splashes.append(event)
+			"needle_warning":
+				# A needle vent in the dungeon wall lights up just before it fires.
+				fx.ring(event["pos"], 46.0, LessonHazards.VENT_WARNING_SECONDS, Color(0.85, 1.0, 0.45), 5.0)
+				fx.sparks(event["pos"], Color(0.85, 1.0, 0.45), 10, 140.0)
 			"wave":
 				# Mid-fight, a wave count is just noise over the boss (0.4 cold review).
 				if event["index"] > 1 and mission.stage.active_boss() == null:

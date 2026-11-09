@@ -7,6 +7,9 @@ a design point).
 
 | Review | Subject | Finding | Status | Note |
 |---|---|---|---|---|
+| heromedel (2026-11-09) | Needle lesson dungeon | Needles fly in cleared rooms and from no visible enemy. | **Fixed** (0.5) | They came from a point 560 units away, usually behind a wall. In dungeons they now come from a vent in the room's own wall that glows first, and only while the room has enemies. |
+| heromedel (2026-11-09) | Skullbots | Still hiding in corners. | **Fixed** (0.5) | Exact 45-degree bounces shuttled them between two corners, under the HUD. They now turn back 110 units from the walls and each bounce varies the angle. |
+| heromedel (2026-11-09) | Pause menu | Wanted to save the play log mid-mission. | **Fixed** (0.5) | "Save play log file" on the pause menu; the export includes the mission so far, with its replay. |
 | heromedel (2026-11-09) | Level-up cards | A finger slipping on the screen sometimes picks an upgrade by accident. | **Fixed** (0.5) | Cards ignore taps for their first half second, and a touch that slides more than 24 px isn't a pick. |
 | Wording check (2026-11-09) | Storm Halo, Wraith Drive, Event Horizon | Storm Halo left out its arcing hits; Wraith Drive ran on; Event Horizon undersold eating bullets. | **Fixed** (0.5) | The checker's rewrites. |
 | heromedel (2026-11-09) | Level-up cards | A level-up vanished without a pick after a long finger hold. | **Fixed** (0.5) | Cards (and the crate summary) picked on any release, even of a finger already down when they appeared. Now a pick is a tap that starts and ends on the card. |

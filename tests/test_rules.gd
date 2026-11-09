@@ -26,6 +26,7 @@ func _init() -> void:
 	_blood_pact()
 	_fusions()
 	_resume()
+	_dungeon_needles()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -440,3 +441,24 @@ func _resume() -> void:
 		again.step(frame)
 	check(again.tick == first.tick and again.player.pos.is_equal_approx(first.player.pos) and again.run.kills == first.run.kills
 		and is_equal_approx(again.player.armor, first.player.armor), "a saved mission replays to exactly where it was left")
+
+
+## In a dungeon, needle swarms come out of the room's walls (warning first), and never in a cleared room.
+func _dungeon_needles() -> void:
+	var mission := _test_mission("dungeon")
+	mission.lesson_hazards.lesson = "needles"
+	var hazards := mission.lesson_hazards
+	var stage := mission.stage as DungeonStage
+	stage.room_enemies = []
+	for i in 600:
+		hazards.update(World.DT)
+	check(mission.world.enemy_shots.filter(func(s): return s.look == "needle").is_empty(), "no needles in a cleared dungeon room")
+	var guard := mission.world.spawn_enemy("skullbot", stage.room_rect(stage.current).get_center())
+	stage.room_enemies = [guard.id]
+	mission.world.events.clear()
+	for i in 300:
+		hazards.update(World.DT)
+	var warned := mission.world.events.any(func(e): return e["type"] == "needle_warning")
+	var room := stage.room_rect(stage.current).grow(20.0)
+	var needles := mission.world.enemy_shots.filter(func(s): return s.look == "needle")
+	check(warned and not needles.is_empty() and needles.all(func(s): return room.has_point(s.pos)), "a dungeon room's needles come from its own walls, after a warning")

@@ -130,6 +130,7 @@ func _apply_difficulty() -> void:
 func start_stage(new_stage: Stage) -> void:
 	stage = new_stage
 	enemy_system.stage = stage
+	lesson_hazards.stage = stage
 	world.walls = []
 	world.enemy_shots.clear()
 	world.zones.clear()

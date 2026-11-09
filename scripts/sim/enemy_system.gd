@@ -409,19 +409,31 @@ func _warlord(enemy: Enemy, dt: float) -> void:
 # ---------------------------------------------------------------- dungeon brains
 
 ## Skullbots ricochet around the room like a screensaver and fire every time they hit a wall.
+## How far inside a room's walls the bouncing skullbots turn back: clear of the corners and the HUD.
+const BOUNCER_MARGIN := 110.0
+
+
 func _bouncer(enemy: Enemy, dt: float) -> void:
 	if enemy.vel == Vector2.ZERO:
 		var diagonal: Vector2 = [Vector2(1, 1), Vector2(-1, 1), Vector2(1, -1), Vector2(-1, -1)][world.rng.randi() % 4]
 		enemy.vel = diagonal.normalized() * _speed(enemy)
 	var next := enemy.pos + enemy.vel * dt
 	var bounced := false
-	var area: Rect2 = stage.room_rect(enemy.room).grow(-50.0) if stage != null and stage.has_method("room_rect") else world.bounds
+	# They keep well clear of the walls, so they never sit in a corner under the HUD (heromedel).
+	var area: Rect2 = stage.room_rect(enemy.room).grow(-BOUNCER_MARGIN) if stage != null and stage.has_method("room_rect") else world.bounds
 	if next.x < area.position.x or next.x > area.end.x or world.point_in_wall(Vector2(next.x, enemy.pos.y)):
 		enemy.vel.x = -enemy.vel.x
 		bounced = true
 	if next.y < area.position.y or next.y > area.end.y or world.point_in_wall(Vector2(enemy.pos.x, next.y)):
 		enemy.vel.y = -enemy.vel.y
 		bounced = true
+	# Each bounce turns them a little, so their path sweeps the room instead of shuttling along one diagonal
+	# between two corners; never so flat that they run along a wall.
+	if bounced:
+		var angle := enemy.vel.angle() + world.rng.randf_range(-0.3, 0.3)
+		var direction := Vector2.from_angle(angle)
+		direction = Vector2(signf(direction.x) * maxf(absf(direction.x), 0.4), signf(direction.y) * maxf(absf(direction.y), 0.4)).normalized()
+		enemy.vel = direction * _speed(enemy)
 	enemy.pos += enemy.vel * dt
 	# Never wedged in a corner: knocked outside the room's inner area (walls push things around), it
 	# turns back toward the middle on a fresh diagonal.
