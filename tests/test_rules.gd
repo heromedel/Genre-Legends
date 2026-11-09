@@ -24,6 +24,7 @@ func _init() -> void:
 	_build_03()
 	_resonance_tiers()
 	_blood_pact()
+	_fusions()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -371,3 +372,46 @@ func _blood_pact() -> void:
 	player.shield_delay = 0.0
 	mission._update_world(InputFrame.new(), true)
 	check(player.shield > 0.0, "Blood Pact leaves the shield recharging")
+
+
+## The reworked fusions do what their cards say.
+func _fusions() -> void:
+	# Storm Halo: a bullet crossing the fence between two saws is erased.
+	var mission := _test_mission("planet")
+	var world := mission.world
+	mission.run.tech_level["orbital_halo"] = 5
+	mission.run.fusions.append("storm_halo")
+	world.enemies.clear()
+	mission.weapons._orbital_halo(0.0)
+	var saws: Array = world.events.filter(func(e): return e["type"] == "halo")[-1]["saws"]
+	var bullet := world.enemy_shot((saws[0] + saws[1]) * 0.5, 0.0, 0.0)
+	mission.weapons._orbital_halo(0.0)
+	check(bullet.dead, "Storm Halo's fence erases a bullet between two saws")
+	# Event Horizon: a hex orb drags a small enemy toward it, then collapses in a burst.
+	mission = _test_mission("planet")
+	world = mission.world
+	world.enemies.clear()
+	var drifter := world.spawn_enemy("dart", Vector2(700, 400))
+	drifter.hp = 9999.0
+	var orb := world.player_shot(Vector2(620, 400), Vector2.ZERO, 10.0, "hex_repeater", "hex", Color.WHITE)
+	orb.devours = true
+	orb.life = 1.0
+	var before := drifter.pos.distance_to(orb.pos)
+	for i in 30:
+		world.update_player_shots(World.DT)
+	check(drifter.pos.distance_to(orb.pos) < before, "Event Horizon drags enemies toward the orb")
+	for i in 60:
+		world.update_player_shots(World.DT)
+	check(orb.dead and drifter.hex_marked, "Event Horizon collapses in a burst that hexes what's around it")
+	# Wraith Drive: dashing through an enemy hurts it and lets loose a spirit.
+	mission = _test_mission("planet")
+	world = mission.world
+	world.enemies.clear()
+	mission.run.fusions.append("wraith_drive")
+	var target := world.spawn_enemy("splitter", mission.player.pos + Vector2(20, 0))
+	target.hp = 9999.0
+	mission.weapons._thruster_explosion()
+	var shots_before := world.player_shots.size()
+	var hp_before := target.hp
+	mission.weapons._update_dash(World.DT)
+	check(target.hp < hp_before and world.player_shots.size() > shots_before, "Wraith Drive tears through an enemy and releases a spirit")

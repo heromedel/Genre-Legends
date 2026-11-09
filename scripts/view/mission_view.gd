@@ -435,9 +435,13 @@ func _paint_bodies(ci: CanvasItem) -> void:
 			var toward_ship := 1.0 - transform_time / TRANSFORM_SECONDS
 			FrameArt.draw_morph(ci, mission.run.frame_id, player.pos, player.facing, toward_ship if player.form == "ship" else 1.0 - toward_ship, time, {})
 		else:
+			# Wraith Drive: mid-dash the frame is a ghost, half there, trailing violet.
+			var wraith := player.dash_time > 0.0 and mission.run.has_fusion("wraith_drive")
+			if wraith:
+				Art.draw_glow(ci, player.pos, 70.0, Color(0.7, 0.4, 1.0, 0.6))
 			FrameArt.draw_frame(ci, mission.run.frame_id, player.form, player.pos, player.facing, time,
 				{"speed": speed, "flash": 1.0 if flicker else hit_flash, "gear": _gear(), "fusions": mission.run.fusions,
-				"resonance": _top_resonance()})
+				"resonance": _top_resonance(), "alpha": 0.45 if wraith else 1.0})
 	for shot: Shot in world.enemy_shots:
 		ShotArt.draw_enemy_shot(ci, shot, time)
 
@@ -464,6 +468,19 @@ func _draw_support_companions(ci: CanvasItem) -> void:
 func _draw_halo_saws(ci: CanvasItem) -> void:
 	if fx.halo.is_empty() or not mission.run.is_online("orbital_halo"):
 		return
+	# Storm Halo: crackling lightning between neighbouring saws, the fence that shocks and erases bullets.
+	var saws: Array = fx.halo["saws"]
+	if mission.run.has_fusion("storm_halo") and saws.size() >= 2:
+		for i in saws.size():
+			var from: Vector2 = saws[i]
+			var to: Vector2 = saws[(i + 1) % saws.size()]
+			var bolt := PackedVector2Array([from])
+			var side := (to - from).orthogonal().normalized()
+			for step in range(1, 6):
+				bolt.append(from.lerp(to, step / 6.0) + side * randf_range(-7.0, 7.0))
+			bolt.append(to)
+			ci.draw_polyline(bolt, Color(0.5, 0.85, 1.0, 0.55), 6.0, true)
+			ci.draw_polyline(bolt, Color(0.92, 0.98, 1.0, 0.95), 2.0, true)
 	for saw: Vector2 in fx.halo["saws"]:
 		ci.draw_set_transform(saw, time * 14.0, Vector2.ONE)
 		var teeth := PackedVector2Array()

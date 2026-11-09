@@ -30,6 +30,14 @@ static func draw_player_shot(ci: CanvasItem, shot: Shot, time: float) -> void:
 			ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 			Art.draw_glow(ci, shot.pos - direction * 6.0, 10.0, Color(1, 0.5, 0.2, 0.8))
 		"hex", "orb_small":
+			if shot.devours:
+				# Event Horizon: a small black hole, its accretion ring spinning around a dark core.
+				Art.draw_glow(ci, shot.pos, 34.0, Color(0.55, 0.25, 1.0, 0.6))
+				ci.draw_circle(shot.pos, 9.0, Color(0.02, 0.0, 0.05))
+				for i in 3:
+					var spin := time * (5.0 + i) + i * 2.1
+					ci.draw_arc(shot.pos, 12.0 + i * 4.0, spin, spin + 2.4, 12, Color(0.75, 0.45, 1.0, 0.8 - i * 0.2), 2.5 - i * 0.6, true)
+				return
 			var size := 7.0 if shot.look == "hex" else 4.5
 			Art.draw_glow(ci, shot.pos, size * 3.0, Art.with_alpha(shot.color, 0.7))
 			ci.draw_set_transform(shot.pos, time * 6.0, Vector2.ONE)
@@ -41,11 +49,18 @@ static func draw_player_shot(ci: CanvasItem, shot: Shot, time: float) -> void:
 			ci.draw_arc(Vector2(-14, 0), 30.0, -1.1, 1.1, 14, Color(1, 1, 1, 0.9), 3.0, true)
 			ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 		"phoenix":
-			Art.draw_glow(ci, shot.pos, 22.0, Color(1, 0.5, 0.15, 0.8))
+			# A firebird: swept wings that beat, a bright head, and a long tail of flame.
+			Art.draw_glow(ci, shot.pos, 34.0, Color(1, 0.5, 0.15, 0.85))
 			ci.draw_set_transform(shot.pos, angle, Vector2.ONE)
-			var flap := sin(time * 30.0 + shot.pos.x) * 4.0
-			ci.draw_colored_polygon(PackedVector2Array([Vector2(10, 0), Vector2(-6, -10 - flap), Vector2(-2, 0), Vector2(-6, 10 + flap)]), Color(1, 0.75, 0.3))
-			ci.draw_line(Vector2(-2, 0), Vector2(-18, 0), Color(1, 0.4, 0.1, 0.7), 4.0)
+			var flap := sin(time * 26.0 + shot.pos.x * 0.05) * 6.0
+			for side in [-1.0, 1.0]:
+				ci.draw_colored_polygon(PackedVector2Array([Vector2(6, 0), Vector2(-4, side * (16.0 + flap)), Vector2(-14, side * (12.0 + flap * 0.6)), Vector2(-4, side * 3.0)]),
+					Color(1, 0.55, 0.15))
+				ci.draw_colored_polygon(PackedVector2Array([Vector2(4, 0), Vector2(-4, side * (10.0 + flap * 0.7)), Vector2(-8, side * 3.0)]), Color(1, 0.85, 0.4))
+			for i in 4:
+				var wave := sin(time * 20.0 + i * 1.3) * 3.0
+				ci.draw_line(Vector2(-6 - i * 6, wave), Vector2(-12 - i * 6, -wave), Color(1, 0.45 + i * 0.05, 0.1, 0.75 - i * 0.15), 5.0 - i, true)
+			ci.draw_colored_polygon(PackedVector2Array([Vector2(13, 0), Vector2(5, -4), Vector2(3, 0), Vector2(5, 4)]), Color(1, 0.97, 0.8))
 			ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 		"reflect":
 			Art.draw_glow(ci, shot.pos, 14.0, Color(0.6, 1, 1, 0.8))

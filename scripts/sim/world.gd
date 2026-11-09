@@ -581,11 +581,18 @@ func update_player_shots(dt: float) -> void:
 		if shot.accel > 0.0:
 			shot.vel = shot.vel.normalized() * minf(shot.vel.length() + shot.accel * dt, shot.max_speed)
 		if shot.devours:
+			# Event Horizon: each hex orb is a small black hole. It drags in bullets (and eats them) and
+			# smaller enemies, then collapses in a burst that hexes everything around it.
 			for enemy_bullet in enemy_shots:
-				if not enemy_bullet.dead and shot.pos.distance_to(enemy_bullet.pos) < 70.0:
+				if not enemy_bullet.dead and shot.pos.distance_to(enemy_bullet.pos) < 90.0:
 					enemy_bullet.vel = enemy_bullet.vel.lerp((shot.pos - enemy_bullet.pos) * 4.0, 0.2)
 					if shot.pos.distance_to(enemy_bullet.pos) < 16.0:
 						enemy_bullet.dead = true
+			for enemy: Enemy in enemies:
+				if not enemy.dead and enemy.boss == null and not enemy.elite and shot.pos.distance_to(enemy.pos) < 110.0:
+					enemy.pos = enemy.pos.move_toward(shot.pos, 140.0 * dt)
+			if shot.life <= 0.2:
+				_collapse_horizon(shot)
 		shot.pos += shot.vel * dt
 		if shot.split_after > 0.0 and shot.age >= shot.split_after:
 			_split_shot(shot)
@@ -730,8 +737,19 @@ func _bounce_off_wall(shot: Shot) -> void:
 	emit("ricochet", {"pos": shot.pos})
 
 
+## Event Horizon's black hole collapsing: a burst that hexes everything in it. Once per orb.
+func _collapse_horizon(shot: Shot) -> void:
+	shot.devours = false
+	shot.dead = true
+	explode(shot.pos, 100.0, shot.damage * 1.5, "hex_repeater", Color(0.6, 0.3, 1.0), true)
+	emit("sound", {"name": "black_hole"})
+
+
 ## On-hit effects carried by the shot: splash, cluster bomblets, chain lightning, hexes, meteors.
 func _on_shot_impact(shot: Shot, enemy: Enemy) -> void:
+	if shot.devours:
+		_collapse_horizon(shot)
+		return
 	if shot.splash > 0.0:
 		explode(shot.pos, shot.splash, shot.damage * 0.6, shot.tech, shot.color)
 		emit("sound", {"name": "explode"})

@@ -23,6 +23,7 @@ var ion_beams: Array = []       # Ion Cannon beams this tick: [from, angle, widt
 var wisp_dart_timer := 1.4      # Will-o'-Wisps: seconds until a wisp darts out
 var ion_tick := 0.0             # Ion Cannon damages in pulses, ten times a second
 var dash_blast_timer := 0.0     # Thruster Explosion: seconds until the next blast along the dash
+var wraith_hits := {}           # Wraith Drive: enemies already torn through on this dash
 
 
 func _init(target_world: World) -> void:
@@ -331,6 +332,23 @@ func _orbital_halo(dt: float) -> void:
 			if not shot.dead and saw.distance_to(shot.pos) < 16.0:
 				shot.dead = true
 				world.emit("spark", {"pos": shot.pos, "color": Color(1, 0.9, 0.6)})
+	# Storm Halo: lightning links each saw to the next, a moving electric fence that shocks enemies and erases
+	# bullets crossing it.
+	if storm and saws.size() >= 2:
+		for i in saws.size():
+			var from: Vector2 = saws[i]
+			var to: Vector2 = saws[(i + 1) % saws.size()]
+			for enemy: Enemy in world.enemies.duplicate():
+				if enemy.dead or enemy.hidden:
+					continue
+				if enemy.pos.distance_to(Geometry2D.get_closest_point_to_segment(enemy.pos, from, to)) < enemy.radius + 8.0:
+					var key := "fence%d" % i
+					if world.time >= float(enemy.orbit_hits.get(key, 0.0)):
+						enemy.orbit_hits[key] = world.time + 0.25
+						world.hurt_enemy(enemy, damage * 0.6, "orbital_halo")
+			for shot: Shot in world.enemy_shots:
+				if not shot.dead and shot.pos.distance_to(Geometry2D.get_closest_point_to_segment(shot.pos, from, to)) < 9.0:
+					shot.dead = true
 
 
 func _starfall() -> void:
@@ -617,6 +635,7 @@ func _thruster_explosion() -> void:
 	if run.has_fusion("wraith_drive"):
 		_launch_wisps(world.wisps)
 		world.wisps = world.max_wisps()
+		wraith_hits.clear()
 	world.emit("shake", {"amount": 8.0})
 	world.emit("sound", {"name": "explode_big"})
 
@@ -631,6 +650,21 @@ func _update_dash(dt: float) -> void:
 				var ring := world.add_zone("ring", player.pos, 260.0, 0.4, _damage("thruster_explosion", 40.0, 0.2), false, {"color": Color(1, 0.85, 0.5), "clears_bullets": true})
 				ring.hit_ids = {}
 		return
+	# Wraith Drive: untouchable for the dash, you pass through enemies, tearing at each one, and every enemy
+	# you pass through lets loose a spirit that hunts the next.
+	if run.has_fusion("wraith_drive"):
+		for enemy: Enemy in world.enemies.duplicate():
+			if enemy.dead or enemy.hidden or wraith_hits.has(enemy.id):
+				continue
+			if enemy.pos.distance_to(player.pos) < enemy.radius + 34.0:
+				wraith_hits[enemy.id] = true
+				world.hurt_enemy(enemy, _damage("thruster_explosion", 60.0, 0.2), "wraith_drive")
+				var spirit := world.player_shot(enemy.pos, Vector2.from_angle(world.rng.randf() * TAU) * 260.0, _damage("soul_lantern", 30.0, 0.15), "soul_lantern", "orb", Color(0.85, 0.6, 1.0))
+				spirit.homing = 7.0
+				spirit.accel = 700.0
+				spirit.max_speed = 620.0
+				spirit.life = 2.0
+				spirit.hit_ids[enemy.id] = true
 	dash_blast_timer -= dt
 	if dash_blast_timer > 0.0:
 		return

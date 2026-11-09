@@ -49,6 +49,7 @@ static func draw_frame(ci: CanvasItem, frame_id: String, form: String, at: Vecto
 	VectorArt.draw(ci, "res://art/frames/%s_%s.svg" % [frame_id, form], body, {
 		"remap": {"#" + data["trim"].to_html(false): trim},
 		"flash": 0.7 if state.get("flash", 0.0) > 0.0 else 0.0,
+		"alpha": state.get("alpha", 1.0),
 		"rim": PLAYER_RIM,
 		"groups": groups,
 		"hide": hide,

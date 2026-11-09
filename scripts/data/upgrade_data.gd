@@ -99,7 +99,7 @@ const FUSIONS := {
 	},
 	"storm_halo": {
 		"name": "Storm Halo", "needs": ["orbital_halo", "thunder_lance"],
-		"text": "Halo saws crackle with lightning that leaps to nearby enemies.",
+		"text": "Lightning links each halo saw to the next: a moving electric fence that shocks enemies and erases bullets crossing it.",
 	},
 	"starbreaker": {
 		"name": "Starbreaker", "needs": ["ion_cannon", "option_pods"],
@@ -107,11 +107,11 @@ const FUSIONS := {
 	},
 	"wraith_drive": {
 		"name": "Wraith Drive", "needs": ["thruster_explosion", "soul_lantern"],
-		"text": "Each Thruster Explosion launches your wisps as homing spirits, then refills the lantern.",
+		"text": "Each dash turns you into a wraith: you pass through enemies, tearing at them, and each one lets loose a spirit that hunts the next. Your wisps launch too, and the lantern refills.",
 	},
 	"event_horizon": {
 		"name": "Event Horizon", "needs": ["hex_repeater", "time_brake"],
-		"text": "Hex orbs pull in nearby enemy bullets and devour them.",
+		"text": "Hex orbs become small black holes: they drag in bullets and smaller enemies, then collapse in a burst that hexes everything around them.",
 	},
 }
 
