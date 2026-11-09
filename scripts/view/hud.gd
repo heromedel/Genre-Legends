@@ -131,7 +131,9 @@ func _draw() -> void:
 		var heat_max := 60.0 - 4.0 * run.level_of("overheat_core")
 		_bar(Vector2(x, meter_y), Vector2(150, 7), player.heat / heat_max, Color(1, 0.45, 0.25), "")
 		draw_string(font_body, Vector2(x + 158, meter_y + 8), "HEAT", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(1, 0.6, 0.4))
-	# Objective, top centre.
+		meter_y += 14.0
+	# Objective, in the HUD column under the bars: top centre is where a dungeon room's top door is
+	# (heromedel couldn't see the doorways under it), and the boss bar takes that spot in a fight anyway.
 	var objective := "COLLECT THE SALVAGE" if mission.world.prize_waiting else mission.stage.objective_text()
 	if mission.state in ["won", "lost"]:
 		objective = ""
@@ -139,10 +141,11 @@ func _draw() -> void:
 	if shown_boss == null or shown_boss.entering:
 		# A dark plate behind it, so over a boss's hull it still reads as HUD, not as part of the boss.
 		if objective != "":
-			var text_width := font_bold.get_string_size(objective.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x
-			draw_rect(Rect2(Vector2((screen.x - text_width) * 0.5 - 14, 10), Vector2(text_width + 28, 28)), Color(0.02, 0.04, 0.08, 0.6))
-		draw_string_outline(font_bold, Vector2(0, 30), objective.to_upper(), HORIZONTAL_ALIGNMENT_CENTER, screen.x, 20, 5, Color(0, 0, 0, 0.7))
-		draw_string(font_bold, Vector2(0, 30), objective.to_upper(), HORIZONTAL_ALIGNMENT_CENTER, screen.x, 20, Color(0.9, 0.95, 1.0))
+			var objective_at := Vector2(x, meter_y + 20.0)
+			var text_width := font_bold.get_string_size(objective.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
+			draw_rect(Rect2(objective_at + Vector2(-8, -19), Vector2(text_width + 16, 26)), Color(0.02, 0.04, 0.08, 0.6))
+			draw_string_outline(font_bold, objective_at, objective.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, 5, Color(0, 0, 0, 0.7))
+			draw_string(font_bold, objective_at, objective.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.9, 0.95, 1.0))
 	else:
 		_draw_boss_bar(screen)
 	_draw_tech_chips(screen)
@@ -290,7 +293,7 @@ func _draw_banner(screen: Vector2) -> void:
 ## In a boss fight they take whichever band, upper or lower, is further from both the boss and you,
 ## so they never cut through either (0.4 cold review).
 func _banner_height(screen: Vector2) -> float:
-	var upper := maxf(screen.y * 0.3, 220.0)
+	var upper := maxf(screen.y * 0.3, 250.0)
 	var boss := mission.stage.active_boss()
 	if boss == null:
 		return upper
@@ -326,7 +329,7 @@ func _draw_radio(screen: Vector2) -> void:
 		return
 	var fade := clampf(radio_time / 0.4, 0.0, 1.0) * clampf((RADIO_SECONDS - radio_time) / 0.3, 0.0, 1.0)
 	var width := minf(screen.x * 0.42, 480.0)
-	var box := Rect2(Vector2(16, 112), Vector2(width, 78))
+	var box := Rect2(Vector2(16, 136), Vector2(width, 78))
 	draw_rect(box, Color(0.02, 0.06, 0.1, 0.7 * fade))
 	draw_rect(box, Color(0.4, 0.85, 1.0, 0.9 * fade), false, 2.5)
 	# A blinking "on air" light and the officer's name.

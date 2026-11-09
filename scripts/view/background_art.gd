@@ -329,19 +329,15 @@ func _draw_doors(ci: CanvasItem, stage: DungeonStage, key: Vector2i, time: float
 				ci.draw_line(p - dir * 22.0, p + dir * 22.0, Color(0.85, 0.4, 1.0, 0.75 + 0.25 * sin(time * 10.0 + i)), 4.0)
 
 
-## Each room gets its own clutter from its seed (rubble, bones, a rug, a rune circle), and rigged rooms
-## show their rune traps.
+## Each room gets its own clutter from its seed (rubble, bones, sometimes a rug), and rigged rooms show
+## their rune traps. Nothing decorative looks like a zone or a trap: the only circles on a dungeon floor are
+## real rune traps, and a rug is drawn as a rug (heromedel took a translucent rug and a rune circle for hazards).
 func _draw_room_dressing(ci: CanvasItem, room: Dictionary, rect: Rect2, time: float) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(room["seed"])
 	var center := rect.get_center()
-	match rng.randi() % 4:
-		0:
-			ci.draw_rect(Rect2(center - Vector2(150, 90), Vector2(300, 180)), Color(0.35, 0.08, 0.1, 0.45))
-			ci.draw_rect(Rect2(center - Vector2(150, 90), Vector2(300, 180)), Color(0.75, 0.55, 0.25, 0.4), false, 4.0)
-		1:
-			Art.dashed_circle(ci, center, 120.0, Color(0.5, 0.4, 0.8, 0.25), 3.0, 16, time * 0.2)
-			ci.draw_arc(center, 90.0, 0, TAU, 24, Color(0.5, 0.4, 0.8, 0.18), 2.0, true)
+	if rng.randi() % 3 == 0:
+		_draw_rug(ci, Rect2(center - Vector2(130, 75), Vector2(260, 150)))
 	for i in 6:
 		var spot := Vector2(rng.randf_range(rect.position.x + 90, rect.end.x - 90), rng.randf_range(rect.position.y + 80, rect.end.y - 80))
 		if rng.randf() < 0.5:
@@ -353,6 +349,27 @@ func _draw_room_dressing(ci: CanvasItem, room: Dictionary, rect: Rect2, time: fl
 	for trap: Vector2 in room.get("traps", []):
 		Art.dashed_circle(ci, trap, 80.0, Color(0.85, 0.45, 1.0, 0.55), 3.0, 12, -time * 0.8)
 		ci.draw_circle(trap, 10.0, Color(0.85, 0.45, 1.0, 0.4 + 0.3 * sin(time * 4.0)))
+
+
+## A woven rug: solid, patterned, fringed at the ends, so it reads as cloth on the floor, not an area marker.
+func _draw_rug(ci: CanvasItem, rug: Rect2) -> void:
+	ci.draw_rect(Rect2(rug.position + Vector2(5, 6), rug.size), Color(0, 0, 0, 0.35))
+	ci.draw_rect(rug, Color(0.3, 0.12, 0.1))
+	ci.draw_rect(rug.grow(-10.0), Color(0.42, 0.2, 0.12))
+	ci.draw_rect(rug.grow(-18.0), Color(0.26, 0.1, 0.09))
+	# Woven diamonds down the middle.
+	var center := rug.get_center()
+	for i in 5:
+		var at := center + Vector2((i - 2) * 44.0, 0)
+		ci.draw_colored_polygon(PackedVector2Array([at + Vector2(0, -26), at + Vector2(18, 0), at + Vector2(0, 26), at + Vector2(-18, 0)]), Color(0.55, 0.36, 0.16))
+		ci.draw_colored_polygon(PackedVector2Array([at + Vector2(0, -12), at + Vector2(8, 0), at + Vector2(0, 12), at + Vector2(-8, 0)]), Color(0.3, 0.12, 0.1))
+	# Fringe on the short ends.
+	for side in [rug.position.x, rug.end.x]:
+		var out := -1.0 if side == rug.position.x else 1.0
+		var y := rug.position.y + 8.0
+		while y < rug.end.y - 4.0:
+			ci.draw_line(Vector2(side, y), Vector2(side + out * 10.0, y), Color(0.62, 0.5, 0.32), 2.0)
+			y += 9.0
 
 
 func _draw_torches(ci: CanvasItem, rect: Rect2, time: float) -> void:
