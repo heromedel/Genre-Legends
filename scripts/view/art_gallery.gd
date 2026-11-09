@@ -4,7 +4,8 @@ extends Control
 ## at a chosen zoom, so old and new art can be compared at the same size (main.gd: gallery=<subject>&zoom=N).
 ## Subjects: ship, mech, dart, any boss id (hive_carrier, warden, ...), or an SVG drawn through VectorArt
 ## (gallery=art/test/ship.svg; add rim=1 for the rim light), or "morph": the transformation looping,
-## without the spin on the left and with it on the right. Frames: add frame=tempest (or bulwark).
+## without the spin on the left and with it on the right, or "cutscene:<kind>": one of the Dropship
+## transitions on a loop (cutscene:return_win, cutscene:launch_planet, ...). Frames: add frame=tempest (or bulwark).
 
 const SPACE := Color(0.04, 0.05, 0.12)
 const GROUND := Color(0.42, 0.39, 0.29)
@@ -51,6 +52,9 @@ class Stand:
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	if subject.begins_with("cutscene:"):
+		_loop_cutscene()
+		return
 	var node := {"id": "gallery", "name": "Gallery", "region": 0, "column": 1, "row": 0.0, "type": "star_cluster", "need": "",
 		"difficulty": 1.0, "danger": 1, "modifier": "", "reward_tech": "", "prize": "", "prize_text": ""}
 	var mission := Mission.new(node, 1, "vanguard", ["pulse_driver"], func(_t): return 1)
@@ -71,7 +75,17 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	_stage.position = size * 0.5
+	if _stage:
+		_stage.position = size * 0.5
+
+
+## Plays the transition, then plays it again (a tap skips to the next loop, as in a mission).
+func _loop_cutscene() -> void:
+	var scene := Cutscene.new()
+	scene.kind = subject.trim_prefix("cutscene:")
+	scene.frame_id = Save.data["frame"]
+	scene.on_done = func(): _loop_cutscene.call_deferred()
+	add_child(scene)
 
 
 func _draw() -> void:
