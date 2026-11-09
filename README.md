@@ -6,6 +6,19 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
+## What's new in 0.5.2 (on Claude's branch)
+
+- **Every enemy redrawn** in the same five-pass style as the frames: wasps buzz, crawlers scuttle, spitters' acid sacs swell, the Pillar Eye follows you, the Mimic's lid gapes over its teeth, and every enemy has a thin rim of its own colour so the small ones stand out.
+- **Every boss and mini-boss redrawn:** hulls drawn as set pieces, and each part you can shoot (bays, turrets, vents, pods, legs, fists, sacs, crystals, cores) is its own piece that glows, opens or breaks. Cores slide open when they can be hurt. The Clone Projector's hologram is clearly violet and see-through.
+- Gallery: `?gallery=enemies` shows every enemy at once, `&bg=ground` or `&bg=floor` puts art on a planet or dungeon floor, `?gallery=cutscene:return_win` loops a Dropship transition.
+
+## What's new in 0.5.1
+
+- Waves no longer stall: a dart that dived off the top of the screen now comes back.
+- The return to the Dropship: you fly in as a ship and unfold into the mech in the bay.
+- Option Pods are now Drone Pods.
+- The play log notes page reloads, focus and memory, so a refresh can be traced.
+
 ## What's new in 0.5
 
 - **New art for the frames and gear:** five-pass vector art (outline, fill, shading, highlights, details), with a rim of light so your frame always stands out. Every piece of gear is redrawn to match.

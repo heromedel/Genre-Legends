@@ -80,6 +80,10 @@
 
 (Note) Built 2026-11-09: the vector art painter and art pass 1 (frames, gear, the Dropship transitions), transforming frames (GDD 5E), fusion reworks (7G), mission autosave and resume (11U), deliberate upgrade picks (11V), boss banner and wording fixes, the wording checker (4F). Next art passes: enemies, bosses, backgrounds and HUD.
 
+## Build 0.5.1 and 0.5.2 (2026-11-09)
+
+(Note) 0.5.1, on playtest: diving darts return from the top edge, the return transition, Drone Pods, page and memory logging. 0.5.2, on Claude's branch: art pass 2, every enemy and boss redrawn in the five-pass style with moving parts, each through a cold review. Next art passes: backgrounds, HUD, the Hangar.
+
 ## Plan C: Defense and tanks
 
 1. Planetary Defense and Tank Assault, sharing the tank form.
