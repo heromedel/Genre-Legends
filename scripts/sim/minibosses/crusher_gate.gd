@@ -36,7 +36,7 @@ func behave(dt: float) -> void:
 	var pistons := living_parts("piston")
 	if phase == 0 and pistons.size() < 2:
 		core.invulnerable = false
-		set_phase(1, "GATE CORE EXPOSED")
+		set_phase(1, "THE CRUSHER JAMS OPEN")
 	if fmod(time, 3.2 if phase == 0 else 2.6) < dt and not pistons.is_empty():
 		_slam(pistons)
 	for piston: Enemy in pistons:

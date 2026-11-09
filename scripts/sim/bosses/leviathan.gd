@@ -36,7 +36,7 @@ func behave(dt: float) -> void:
 		origin.y += (70.0 if not living_parts("battery").is_empty() else 170.0) * dt
 	elif phase == 0:
 		core.invulnerable = false
-		set_phase(1, "ENGINE CORE EXPOSED")
+		set_phase(1, "THE LEVIATHAN'S HEART IS OPEN")
 	place_parts()
 	# The fight (and its health bar) starts as the first battery comes into view.
 	if entering and origin.y > 80.0:
@@ -50,7 +50,7 @@ func behave(dt: float) -> void:
 	if phase == 0:
 		return
 	if phase == 1 and hp_fraction() < 0.35:
-		set_phase(2, "REACTOR BREACH")
+		set_phase(2, "ITS REACTOR BLEEDS FIRE")
 	if fmod(time, 0.12 if phase == 1 else 0.09) < dt:
 		for arm in 2:
 			world.enemy_shot(core.pos, PI * 0.5 + sin(time * 1.3) * 1.2 + (arm * 2 - 1) * 0.35, 210.0, {"color": Color(1.0, 0.7, 0.4)})

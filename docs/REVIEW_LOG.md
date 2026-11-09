@@ -7,6 +7,8 @@ a design point).
 
 | Review | Subject | Finding | Status | Note |
 |---|---|---|---|---|
+| heromedel (2026-11-09) | Boss banners | "SHIELD DOWN - HE'S EXPOSED" is bad and boring wording; nine bosses said "X EXPOSED" in some form. | **Fixed** (0.5) | Every phase banner rewritten to say what that boss does ("THE ACE'S SHIELD SHATTERS", "THE CRUSHER JAMS OPEN"...); the Bulkhead Fortress no longer shares the Crusher Gate's line. |
+| heromedel | Twin Rails | "Fires two rails in a V, then three." unclear (three needs level 5, so Mk 3). | **Fixed** (0.5) | "Fires two rails in a V. Three at level 5." (heromedel's wording). |
 | Frames review (2026-11-09) | Player frames, new art | Vanguard strongest; the cyan rim reads as "player"; ship and mech read as the same machine. | **Saved** | Keep: the rim and the chevron as facing marker. |
 | Frames review | Gear on the frames | Pale, flat, pasted-on parts; an arrow-like weapon, a nose clamp, a star that reads as a hit spark; grey ghost copies. | **Fixed** (0.5) | Ghosts were a misfiring outline trick, removed; every part redrawn in the frames' style (next commit). |
 | Frames review | Bulwark mech | Reads as a crate with no front; close to the loot chest's colour. | **Fixed** (0.5) | A chevron on the shield plate and a bolder visor. |

@@ -45,9 +45,9 @@ func behave(dt: float) -> void:
 		for leg: Enemy in legs:
 			world.kill_enemy(leg)
 		world.add_zone("enemy_ring", origin, 420.0, 0.9, 16.0 * world.enemy_damage_scale, true, {"color": Color(1, 0.6, 0.3)})
-		set_phase(1, "IT'S DOWN - HIT THE CORE")
+		set_phase(1, "THE CRAWLER COLLAPSES - STRIKE ITS CORE")
 	if phase == 1 and hp_fraction() < 0.35:
-		set_phase(2, "REACTOR UNSTABLE")
+		set_phase(2, "ITS REACTOR IS MELTING DOWN")
 	# Legs: staggered aimed bursts.
 	for leg: Enemy in legs:
 		if fmod(time + float(leg.part.right(1)) * 0.6, 2.5) < dt:

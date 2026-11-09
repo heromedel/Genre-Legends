@@ -46,4 +46,4 @@ func part_lost(part: Enemy) -> void:
 		defeat()
 	elif not angry:
 		angry = true
-		world.emit("banner", {"text": "THE SURVIVOR IS FURIOUS", "style": "red"})
+		world.emit("banner", {"text": "ONE ACE DOWN - THE OTHER WANTS REVENGE", "style": "red"})

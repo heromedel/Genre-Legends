@@ -37,7 +37,7 @@ func behave(dt: float) -> void:
 	var turrets := living_parts("turret")
 	if phase == 0 and turrets.is_empty():
 		core.invulnerable = false
-		set_phase(1, "GATE CORE EXPOSED")
+		set_phase(1, "THE FORTRESS GUNS FALL SILENT")
 	for turret: Enemy in turrets:
 		turret.facing = (world.player.pos - turret.pos).angle()
 		if fmod(time + turret.id * 0.4, 1.6) < dt:

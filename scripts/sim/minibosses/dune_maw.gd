@@ -73,4 +73,4 @@ func behave(dt: float) -> void:
 						var brood := world.spawn_enemy("crawler", origin + Vector2.from_angle(TAU * i / 3.0) * 50.0)
 						brood.memory["awake"] = true
 	if phase == 0 and hp_fraction() < 0.5:
-		set_phase(1, "THE MAW IS FURIOUS")
+		set_phase(1, "THE MAW CALLS UP ITS BROOD")

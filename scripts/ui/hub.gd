@@ -66,6 +66,27 @@ func _show_radio_queue() -> void:
 	add_child(popup)
 
 
+## A pop-up that asks before doing something you can't take back: a title, what will happen, and two buttons.
+func _confirm(title: String, text: String, confirm_label: String, on_confirm: Callable) -> void:
+	var box := UiKit.panel(Color(0.03, 0.07, 0.12, 0.98), Color(1.0, 0.75, 0.35))
+	var column := VBoxContainer.new()
+	column.custom_minimum_size = Vector2(520, 0)
+	column.add_theme_constant_override("separation", 12)
+	box.add_child(column)
+	column.add_child(UiKit.label(title, 22, Color(1.0, 0.8, 0.45), "title"))
+	column.add_child(UiKit.wrapped(text, 17, Color(1, 1, 1)))
+	var popup := Overlays._floating(box)
+	var buttons := HBoxContainer.new()
+	buttons.add_theme_constant_override("separation", 12)
+	buttons.alignment = BoxContainer.ALIGNMENT_END
+	column.add_child(buttons)
+	buttons.add_child(UiKit.button("Cancel", func(): popup.queue_free(), "%s: cancel" % title))
+	buttons.add_child(UiKit.button(confirm_label, func():
+		popup.queue_free()
+		on_confirm.call(), "%s: %s" % [title, confirm_label], true))
+	add_child(popup)
+
+
 ## On the way to a planet something may happen (RouteEvents): a choice, its outcome, then the launch.
 func _launch(node: Dictionary) -> void:
 	var missions_flown: int = Save.data["stats"]["missions"]
@@ -251,11 +272,13 @@ func _build_map_page() -> Control:
 	_map_view.node_selected.connect(_on_node_selected)
 	frame.add_child(_map_view)
 	var info_panel := UiKit.panel()
-	info_panel.custom_minimum_size = Vector2(0, 190)
+	info_panel.custom_minimum_size = Vector2(0, 204)
 	column.add_child(info_panel)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size = Vector2(0, 170)
+	# Most planets fit; the rare one with more to say still scrolls, without a bar eating the width.
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	scroll.custom_minimum_size = Vector2(0, 184)
 	info_panel.add_child(scroll)
 	_info = HBoxContainer.new()
 	_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -301,7 +324,7 @@ func _fill_info(node_id: String) -> void:
 	var mission_type: Dictionary = MissionData.TYPES[node["type"]]
 	var region_name: String = star_map.regions[node["region"]]["name"]
 	identity.add_child(UiKit.label(region_name.to_upper(), 13, Color(0.5, 0.65, 0.8), "bold"))
-	identity.add_child(UiKit.label(node["name"], 30, Color(1, 1, 1), "title"))
+	identity.add_child(UiKit.label(node["name"], 25, Color(1, 1, 1), "title"))
 	if node["branch"] != "":
 		identity.add_child(UiKit.label(node["branch_name"], 16, Art.GOLD, "bold"))
 	var type_row := HBoxContainer.new()
@@ -331,7 +354,7 @@ func _fill_info(node_id: String) -> void:
 	threat.add_child(danger_row)
 	if node["modifier"] != "":
 		var modifier: Dictionary = MissionData.MODIFIERS[node["modifier"]]
-		threat.add_child(UiKit.label("Special condition: " + modifier["name"], 17, Color(1, 0.75, 0.35), "bold"))
+		threat.add_child(UiKit.label("Special condition: " + modifier["name"], 15, Color(1, 0.75, 0.35), "bold"))
 		threat.add_child(UiKit.wrapped(modifier["text"], 14, Color(0.9, 0.8, 0.65)))
 	var reward_row := HBoxContainer.new()
 	reward_row.add_child(IconView.make(node["reward_tech"], 28, TechData.element_color(node["reward_tech"])))
@@ -360,7 +383,7 @@ func _info_column(weight: float) -> VBoxContainer:
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	column.size_flags_stretch_ratio = weight
-	column.add_theme_constant_override("separation", 6)
+	column.add_theme_constant_override("separation", 3)
 	_info.add_child(column)
 	return column
 
@@ -745,10 +768,11 @@ func _build_settings_page() -> Control:
 	var update_note := UiKit.wrapped("Clears the offline copy and reloads the newest build. Your save is kept.", 13, Color(0.6, 0.7, 0.85))
 	update_note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	update_row.add_child(UiKit.button("Get the latest version", func():
-		PlayLog.note("update", "Cleared the offline copy and reloaded (was %s)" % BuildInfo.label())
-		Save.write()
-		update_note.text = "Reloading..."
-		Browser.clear_cache_and_reload(), "Settings: get the latest version"))
+		_confirm("Get the latest version?", "The game reloads with the newest build. Your progress is kept.", "Reload", func():
+			PlayLog.note("update", "Cleared the offline copy and reloaded (was %s)" % BuildInfo.label())
+			Save.write()
+			update_note.text = "Reloading..."
+			Browser.clear_cache_and_reload()), "Settings: get the latest version"))
 	update_row.add_child(update_note)
 	column.add_child(update_row)
 	column.add_child(UiKit.label("DEBUG CONSOLE", 18, Color(1, 0.75, 0.35), "title"))

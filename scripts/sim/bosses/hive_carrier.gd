@@ -39,9 +39,9 @@ func behave(dt: float) -> void:
 	var bays := living_parts("bay")
 	if phase == 0 and bays.size() <= 2:
 		core.invulnerable = false
-		set_phase(1, "CORE EXPOSED")
+		set_phase(1, "THE CARRIER CRACKS OPEN")
 	if phase == 1 and hp_fraction() < 0.3:
-		set_phase(2, "CARRIER CRITICAL")
+		set_phase(2, "THE CARRIER IS GOING DOWN SWINGING")
 	# Hangar bays launch fighters that swoop at you.
 	if fmod(time, 5.0) < dt:
 		for bay: Enemy in bays:

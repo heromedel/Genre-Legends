@@ -37,7 +37,7 @@ func behave(dt: float) -> void:
 	var pods := living_parts("pod")
 	if phase == 0 and pods.is_empty():
 		core.invulnerable = false
-		set_phase(1, "BARGE CORE EXPOSED")
+		set_phase(1, "THE BARGE'S HOLD SPLITS OPEN")
 	# Salvos: each pod launches homing drones you can shoot down.
 	if fmod(time, 3.2) < dt:
 		for pod: Enemy in pods:

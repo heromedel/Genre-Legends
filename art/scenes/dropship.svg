@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-460 -480 920 960">
+<!-- The Dropship (GDD 11M), seen from above, bow up: a carrier whose launch bay runs down its middle.
+     Units match the cutscene's bay (480 x 600 at zoom 1). Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details.
+     Groups: "door_l" / "door_r" slide apart to open the bay; the bay's guide lights are drawn live. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+
+<!-- Engines along the stern -->
+<g>
+  <path d="M-260,400 L-170,400 L-180,452 L-250,452 Z M-80,410 L80,410 L70,466 L-70,466 Z M170,400 L260,400 L250,452 L180,452 Z" fill="#070b12" stroke="#070b12" stroke-width="10"/>
+  <path d="M-260,400 L-170,400 L-180,452 L-250,452 Z M-80,410 L80,410 L70,466 L-70,466 Z M170,400 L260,400 L250,452 L180,452 Z" fill="#2a3341"/>
+  <path d="M-215,400 L-170,400 L-180,452 L-215,452 Z M0,410 L80,410 L70,466 L0,466 Z M215,400 L260,400 L250,452 L215,452 Z" fill="#1c232e"/>
+  <path d="M-245,448 L-185,448 M-62,462 L62,462 M185,448 L245,448" stroke="#ff9a3c" stroke-width="7"/>
+</g>
+
+<!-- Hull -->
+<g>
+  <path d="M-340,-420 L340,-420 L420,260 L260,420 L-260,420 L-420,260 Z" fill="#070b12" stroke="#070b12" stroke-width="12"/>
+  <path d="M-340,-420 L340,-420 L420,260 L260,420 L-260,420 L-420,260 Z" fill="#33445a"/>
+  <path d="M10,-420 L340,-420 L420,260 L260,420 L10,420 Z" fill="#26344a"/>
+  <path d="M-420,260 L-260,420 L260,420 L420,260 L404,236 L250,392 L-250,392 L-404,236 Z" fill="#1b2636"/>
+  <path d="M-334,-412 L0,-412 M-334,-412 L-410,256" stroke="#7d98b8" stroke-width="7" fill="none"/>
+  <!-- armour seams and rivet rows -->
+  <path d="M-300,-200 L-380,200 M300,-200 L380,200 M-330,-300 L330,-300 M-260,330 L260,330" stroke="#1b2636" stroke-width="5"/>
+  <g fill="#5d7694">
+    <circle cx="-340" cy="-120" r="5"/><circle cx="-350" cy="-60" r="5"/><circle cx="-360" cy="0" r="5"/><circle cx="-370" cy="60" r="5"/><circle cx="-380" cy="120" r="5"/>
+  </g>
+  <!-- running lights at the corners -->
+  <circle cx="-410" cy="250" r="9" fill="#ff5a5a"/><circle cx="410" cy="250" r="9" fill="#5aff9a"/>
+  <circle cx="-330" cy="-410" r="8" fill="#ffffff"/><circle cx="330" cy="-410" r="8" fill="#ffffff"/>
+</g>
+
+<!-- Command island, starboard -->
+<g>
+  <path d="M300,-140 L380,-120 L390,110 L300,130 Z" fill="#070b12" stroke="#070b12" stroke-width="10"/>
+  <path d="M300,-140 L380,-120 L390,110 L300,130 Z" fill="#3e5370"/>
+  <path d="M345,-130 L380,-120 L390,110 L345,120 Z" fill="#2c3c52"/>
+  <path d="M304,-134 L376,-116" stroke="#9db8d6" stroke-width="5"/>
+  <g fill="#ffd58a"><rect x="318" y="-100" width="40" height="12" rx="3"/><rect x="318" y="-70" width="40" height="12" rx="3"/></g>
+  <circle cx="345" cy="40" r="18" fill="#070b12"/><circle cx="345" cy="40" r="13" fill="#5d7694"/><path d="M345,40 L345,18" stroke="#9db8d6" stroke-width="5"/>
+</g>
+
+<!-- The launch bay: a long dark recess down the middle, deck plating, two catapult rails -->
+<g>
+  <path d="M-240,-300 L240,-300 L240,300 L-240,300 Z" fill="#070b12" stroke="#070b12" stroke-width="12"/>
+  <path d="M-240,-300 L240,-300 L240,300 L-240,300 Z" fill="#1a2029"/>
+  <path d="M-240,-300 L-200,-300 L-200,300 L-240,300 Z M200,-300 L240,-300 L240,300 L200,300 Z" fill="#141a22"/>
+  <path d="M-200,-214 L200,-214 M-200,-128 L200,-128 M-200,-42 L200,-42 M-200,44 L200,44 M-200,130 L200,130 M-200,216 L200,216" stroke="#232b37" stroke-width="5"/>
+  <path d="M-46,-300 L-46,300 M46,-300 L46,300" stroke="#070b12" stroke-width="14"/>
+  <path d="M-46,-300 L-46,300 M46,-300 L46,300" stroke="#4a5d74" stroke-width="7"/>
+  <path d="M-49,-300 L-49,300 M43,-300 L43,300" stroke="#8aa4c2" stroke-width="2"/>
+  <!-- hazard chevrons at the bay mouth -->
+  <g fill="#ffcc3a">
+    <path d="M-200,-292 L-170,-292 L-150,-262 L-180,-262 Z"/><path d="M-140,-292 L-110,-292 L-90,-262 L-120,-262 Z"/>
+    <path d="M110,-292 L140,-292 L120,-262 L90,-262 Z"/><path d="M170,-292 L200,-292 L180,-262 L150,-262 Z"/>
+  </g>
+</g>
+
+<!-- Bay doors over the mouth: they slide out sideways to open -->
+<g id="door_l">
+  <path d="M-240,-420 L0,-420 L0,-300 L-240,-300 Z" fill="#070b12" stroke="#070b12" stroke-width="10"/>
+  <path d="M-240,-420 L0,-420 L0,-300 L-240,-300 Z" fill="#4a5d74"/>
+  <path d="M-236,-414 L-4,-414" stroke="#9db8d6" stroke-width="5"/>
+  <path d="M-200,-400 L-200,-320 M-140,-400 L-140,-320 M-80,-400 L-80,-320" stroke="#33445a" stroke-width="6"/>
+  <path d="M-30,-410 L-10,-410 L-10,-310 L-30,-310 Z" fill="#ffcc3a"/>
+</g>
+<g id="door_r">
+  <path d="M0,-420 L240,-420 L240,-300 L0,-300 Z" fill="#070b12" stroke="#070b12" stroke-width="10"/>
+  <path d="M0,-420 L240,-420 L240,-300 L0,-300 Z" fill="#3a4b60"/>
+  <path d="M80,-400 L80,-320 M140,-400 L140,-320 M200,-400 L200,-320" stroke="#26344a" stroke-width="6"/>
+  <path d="M10,-410 L30,-410 L30,-310 L10,-310 Z" fill="#d9a92a"/>
+</g>
+
+</g>
+</svg>

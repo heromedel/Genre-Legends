@@ -87,7 +87,7 @@ func part_lost(part: Enemy) -> void:
 			var device := world.drop_pickup("projector", part.pos)
 			device.vel = Vector2.ZERO
 			device.anchored = true
-			set_phase(1, "PROJECTOR EXPOSED - GRAB IT")
+			set_phase(1, "THE PROJECTOR BREAKS LOOSE - GRAB IT")
 
 
 func pickup_taken(kind: String) -> void:

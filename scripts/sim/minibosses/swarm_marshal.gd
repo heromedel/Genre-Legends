@@ -37,7 +37,7 @@ func behave(dt: float) -> void:
 	_place_escorts(dt)
 	if phase == 0 and escorts.size() <= ESCORTS / 2:
 		core.invulnerable = false
-		set_phase(1, "THE MARSHAL IS EXPOSED")
+		set_phase(1, "THE MARSHAL HAS NO ESCORT LEFT")
 	if entering:
 		return
 	# One escort peels off and dives at you, Galaga style.

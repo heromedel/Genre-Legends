@@ -48,7 +48,7 @@ func behave(dt: float) -> void:
 			mirror.invulnerable = false
 			world.kill_enemy(mirror)
 	if phase == 1 and hp_fraction() < 0.3:
-		set_phase(2, "DREADNOUGHT OVERLOAD")
+		set_phase(2, "THE DREADNOUGHT OVERLOADS")
 	match phase:
 		0:
 			if fmod(time, 2.3) < dt:

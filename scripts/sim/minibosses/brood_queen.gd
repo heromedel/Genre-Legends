@@ -37,7 +37,7 @@ func behave(dt: float) -> void:
 	var sacs := living_parts("sac")
 	if phase == 0 and sacs.is_empty():
 		core.invulnerable = false
-		set_phase(1, "THE QUEEN IS EXPOSED")
+		set_phase(1, "THE QUEEN STANDS UNGUARDED")
 	if fmod(time, 3.0) < dt:
 		for sac: Enemy in sacs:
 			for i in 2:

@@ -55,7 +55,7 @@ const TECH := {
 		"blueprint_from": ["corridor", "planet"],
 		"forks": {
 			"a": {"name": "Chain Storm", "text": "Every hit arcs lightning into the enemies around it."},
-			"b": {"name": "Twin Rails", "text": "Fires two rails in a V, then three."},
+			"b": {"name": "Twin Rails", "text": "Fires two rails in a V. Three at level 5."},
 		},
 	},
 	"hex_repeater": {

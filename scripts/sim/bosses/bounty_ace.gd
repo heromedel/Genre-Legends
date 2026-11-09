@@ -44,9 +44,9 @@ func behave(dt: float) -> void:
 	_place_drones(drones)
 	if phase == 0 and drones.is_empty():
 		core.invulnerable = false
-		set_phase(1, "SHIELD DOWN - HE'S EXPOSED")
+		set_phase(1, "THE ACE'S SHIELD SHATTERS")
 	if phase == 1 and hp_fraction() < 0.4:
-		set_phase(2, "BOUNTY CALLED IN")
+		set_phase(2, "THE ACE CALLS IN HUNTERS")
 		for i in 2:
 			var hunter := world.spawn_enemy("ace", Vector2(center.x + (i * 2 - 1) * 300.0, -40))
 			hunter.memory["no_formation"] = true

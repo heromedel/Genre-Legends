@@ -50,9 +50,9 @@ func behave(dt: float) -> void:
 	_place()
 	if phase == 0 and segments.size() <= SEGMENTS / 2:
 		head.invulnerable = false
-		set_phase(1, "HEAD EXPOSED")
+		set_phase(1, "THE WYRM'S HEAD IS BARE")
 	if phase == 1 and hp_fraction() < 0.25:
-		set_phase(2, "THE WYRM IS ENRAGED")
+		set_phase(2, "THE WYRM THRASHES")
 	# Segments fire in a rolling wave down the body.
 	if fmod(time, 2.6) < dt:
 		var start := int(time / 2.6) % 3
