@@ -19,4 +19,4 @@ Follow these in every session:
 - All art and audio are generated in code (`scripts/view/*_art.gd`, `scripts/audio/synth.gd`).
 - Testers: see README. Run the ones a change touches; the first-impressions review is done cold by a separate agent from screenshots only.
 - Cold reviews (GDD 4E): one subject per review (`first_impressions.js <out> <filter>`), several small ones rather than
-  one sweep. Triage every finding into `docs/REVIEW_LOG.md`: acted on, saved for later, or discarded with why.
+  one sweep; long playtests and full sweeps only for major overhauls, not every build. Triage every finding into `docs/REVIEW_LOG.md`: acted on, saved for later, or discarded with why.
