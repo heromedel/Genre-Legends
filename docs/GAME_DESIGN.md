@@ -13,6 +13,7 @@
   - **Realism is never the reason to cut a cool idea.** Things that make no physical sense, like ricochet shots or sound in space, are fine when they make the game cooler.
 - **1B. Likely (2026-11-08):** The game leans heavily into its genres' tropes.
 - **1C. Likely (2026-11-08):** Power-ups are interesting and change how the game plays. Plain stat or utility upgrades such as a dash or more energy are not enough, even for beginner equipment.
+- **1D. Decided (2026-11-09):** When options are offered side by side as alternatives (two forks, two parts for one slot, a pair of choices), they must not be the same kind of ability. If one is a dash, the other can't also be a dash. This rules out only duplicates between alternatives: a dash, a ram or any other ability is fine on its own. (heromedel: "If one is a dash the alternative cannot also be a dash".)
 
 ## 2. Platform & Build
 
@@ -193,3 +194,4 @@
 | 2026-11-09 | 4F | A wording checker for player-facing text. |
 | 2026-11-09 | 4E | Cold reviews in small, focused batches; every finding triaged into the review log. |
 | 2026-11-09 | 10E | A Jig Drive only jumps through space; crossing realms is ancient Chulak tech or a Jig Phase Drive. |
+| 2026-11-09 | 1D | Alternatives offered side by side are never the same kind of ability; a dash or ram on its own is fine. |

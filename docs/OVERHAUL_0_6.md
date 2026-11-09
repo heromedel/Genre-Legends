@@ -161,8 +161,12 @@ Based on: 33 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
     | Rare | **Jig Phase Plate** | A hit drains in over 3 s; half of it fades if no other hit lands meanwhile | Salvage from a Jig Phase Drive (10E): hits phase partly out of this dimension and arrive late (heromedel liked the idea) |
     | Rare | **Last Legend Plate** | Below a third of your Armor, weapons fire faster; less Armor overall | The Guardian Legend, and our own title (heromedel: "interesting") |
 
-  - **Ai-Generated-Proposal (revised):** Plates don't level up during a mission. "+10 Armor" cards would be exactly
-    the plain stat upgrades 1C rules out; a plate improves only through its Mk (blueprints), between missions.
+  - **Proposed (2026-11-09):** Each plate levels up during a mission in its own way, over several levels, not one
+    upgrade. Plain "+Armor" levels are fine for the starter plate. (heromedel.)
+    - **Ai-Generated-Proposal:** DSP-1: +10 Armor a level. QRF Shell: faster each level. Jig-Weave Composite: shrugs
+      off one more chip hit (5 or less) per stage each level. Lunarium Bulk Plate: work-hardens, each hit survived
+      adds 1 max Armor for the mission, and each level raises that cap. Uncommon and rare plates: their twist grows
+      each level (Mirrorwork halves beams, then blocks them outright for a moment after a hit, and so on).
 
 - **13K. Ai-Generated-Proposal: defence that is also offence, beyond the Generator slot.**
   - Orbital Halo's saws still eat bullets, but each saw shatters after eating 3 and regrows 3 s later.
@@ -310,18 +314,17 @@ Based on: 33 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
   2. **Vampiric Plating** heals per kill. Against a six-hit pool that's a lot of healing from killing, the
      defence-from-offence we're cutting. It's renamed (it isn't a plate) and heals a tenth of a hit per kill, at most
      one hit per stage.
-  3. **Overclocked Servos** clashes twice: "overclocked" now means running past your Output, and its ramming is
-     defence turned into offence. It becomes **Servo Tuning**: move 15% faster, nothing else.
+  3. **Overclocked Servos** keeps what it does (faster, and ramming hurts enemies more than you). Only the name
+     changes, since "overclocked" will mean running past your Output: **Juggernaut Servos**, after the
+     unstoppable-charge trope. (Ramming is fine; see GDD 1D.)
   4. **Field Repair** heals 40% of max Armor, two and a half hits from 60. Kept, but it can't be taken twice in one
      mission.
   5. **Blood Pact** and **Shrapnel Skin** are kept and retuned to the new numbers.
 - **13U. Boss length.** With six hits instead of twenty, boss fights at today's 40–120 s would be gruelling. Boss and
   mini-boss health comes down about 30% to start, tuned with the average-player bot until a planet-1 boss runs
   30–45 s and a gate boss 60–90 s.
-- **13V. Save migration.** heromedel's save keeps every blueprint and Mk level. Old loadouts move into the seven
-  slots: Arc Blade, Mirror Aegis and Soul Lantern move to Generator (if two are fitted, the second goes back to the
-  hangar), DSP-1 Drop Plate is fitted, and anyone who owns Mirror Aegis also gets the Shield Generator blueprints
-  the planet 3 lesson would have given.
+- **13V. Proposed (2026-11-09): saves start fresh.** heromedel would reset anyway, so there's no migration: 0.6
+  starts a new save and says so on the title screen, and a mission checkpoint from an older build is cleared.
 
 ## Build plan (once approved)
 
@@ -338,7 +341,7 @@ the bigger Hangar systems sit on top of it.
 4. **Frames' new Armor and Vanguard's built-in plate**, without Load and Output yet. Chain Bolts; auto-fire off by
    default.
 5. **Retune** (13P, 13U): boss health and the average-player bot re-targeted to hits.
-6. **Save migration** (13V), the Guide and every changed text through the wording checker, rules tests updated.
+6. **A fresh save** (13V), the Guide and every changed text through the wording checker, rules tests updated.
 7. **Testers:** cold reviews of the Hangar and one planet-3 run; one longer blind playtest, since it's a major change.
 
 ### Plan B: build 0.6.1, building a frame
