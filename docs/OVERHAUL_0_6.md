@@ -151,7 +151,7 @@ Based on: 33 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
 
     | Tier | Plate | What it does | Why the name |
     |---|---|---|---|
-    | Starter | **DSP-1 Drop Plate** | Plain armour, weight 2 | Dropship DSP-1 Drop Plate, version 1: what your own Dropship prints (11M) |
+    | Starter | **DSP-1 Drop Plate** | Plain armour, weight 2 | Dropship Standard Plating, version 1: what your own Dropship prints (11M) |
     | Basic | **QRF Shell** | −10 Armor, weight 1, a little faster | Quick Reaction Force: the unit sent in first and fast |
     | Basic | **Jig-Weave Composite** | +15 Armor, weight 3 | Jigawatt-powered fibres woven through the armour (Infall) |
     | Basic | **Lunarium Bulk Plate** | +30 Armor, weight 4, a little slower | Mecha anime's wonder-alloys (heromedel: "sounds cool") |
@@ -161,7 +161,8 @@ Based on: 33 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
     | Rare | **Jig Phase Plate** | A hit drains in over 3 s; half of it fades if no other hit lands meanwhile | Salvage from a Jig Phase Drive (10E): hits phase partly out of this dimension and arrive late (heromedel liked the idea) |
     | Rare | **Last Legend Plate** | Below a third of your Armor, weapons fire faster; less Armor overall | The Guardian Legend, and our own title (heromedel: "interesting") |
 
-  - Plating levels up in the mission like tech, adding Armor per level.
+  - **Ai-Generated-Proposal (revised):** Plates don't level up during a mission. "+10 Armor" cards would be exactly
+    the plain stat upgrades 1C rules out; a plate improves only through its Mk (blueprints), between missions.
 
 - **13K. Ai-Generated-Proposal: defence that is also offence, beyond the Generator slot.**
   - Orbital Halo's saws still eat bullets, but each saw shatters after eating 3 and regrows 3 s later.
@@ -282,28 +283,75 @@ Based on: 33 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
 
   - Boss health comes down as fights get deadlier: about −30% at first, tuned with the average-player bot.
 
+## What the overhaul breaks, and how to mend it
+
+(Note) Planning pass, 2026-11-09, from reading the upgrade cards, Resonance tiers and fusions in the code
+(scripts/data/upgrade_data.gd). All Ai-Generated-Proposal unless a line says otherwise.
+
+- **13Q. Where the new parts come from.**
+  1. The planet 3 lesson (GDD 9C, Likely: "Shields on planet 3") gives the **Shield Generator** instead of Mirror
+     Aegis. That's what the lesson always meant, and with no shield on the starter it finally matters. Mirror Aegis
+     becomes a find on a later planet like other tech.
+  2. Plates and generator parts are blueprints like all tech (GDD 7A). The starter plate is in the kit; the basic
+     plates drop from ordinary planets; each uncommon plate comes from the boss it's named after (Mirrorwork from
+     the Mirror Dreadnought, Crusher-Rated from the Crusher Gate); the rare ones are themed-branch prizes.
+  3. Starting kit: Pulse Driver (main), Arc Blade (generator), Nova Bomb (special), DSP-1 Drop Plate (plating).
+     Both weapon slots and the support slot start empty, as two of them do now.
+- **13R. Fusions that the new slots break.** Reflex Blade fuses Arc Blade with Mirror Aegis, and both now live in
+  the Generator slot, so it could never be built. Proposal: Reflex Blade fuses Arc Blade with **Graze Engine**
+  instead (a blade that lives on near misses), keeping its effect. Every other fusion still pairs parts from
+  different slots.
+- **13S. Resonance with no shield.** Capacitor Discharge (Energy II) fires "when your shield breaks", and most
+  builds will have no shield. Proposal: it fires when **you're hit**, or when a Shield Generator breaks, so it works
+  for everyone and stays a moment worth having.
+- **13T. Upgrade cards that the new rules break or make too strong.**
+  1. **Glass Reactor** costs your shield, which most builds no longer have. New price: your plate's Armor bonus is
+     gone for the mission.
+  2. **Vampiric Plating** heals per kill. Against a six-hit pool that's a lot of healing from killing, the
+     defence-from-offence we're cutting. It's renamed (it isn't a plate) and heals a tenth of a hit per kill, at most
+     one hit per stage.
+  3. **Overclocked Servos** clashes twice: "overclocked" now means running past your Output, and its ramming is
+     defence turned into offence. It becomes **Servo Tuning**: move 15% faster, nothing else.
+  4. **Field Repair** heals 40% of max Armor, two and a half hits from 60. Kept, but it can't be taken twice in one
+     mission.
+  5. **Blood Pact** and **Shrapnel Skin** are kept and retuned to the new numbers.
+- **13U. Boss length.** With six hits instead of twenty, boss fights at today's 40–120 s would be gruelling. Boss and
+  mini-boss health comes down about 30% to start, tuned with the average-player bot until a planet-1 boss runs
+  30–45 s and a gate boss 60–90 s.
+- **13V. Save migration.** heromedel's save keeps every blueprint and Mk level. Old loadouts move into the seven
+  slots: Arc Blade, Mirror Aegis and Soul Lantern move to Generator (if two are fitted, the second goes back to the
+  hangar), DSP-1 Drop Plate is fitted, and anyone who owns Mirror Aegis also gets the Shield Generator blueprints
+  the planet 3 lesson would have given.
+
 ## Build plan (once approved)
 
-1. **Damage model:**
-   - Armor with ticks, the damage scale, immunity after a hit, the smaller hitbox.
-   - Repairs.
-   - Every damage value is moved to the new steps.
-2. **Seven slots:**
-   - Generator and Plating, the Shield Generator and the four platings.
-   - Arc Blade, Mirror Aegis and Soul Lantern move.
-   - **Save migration:** old 5-slot loadouts move into the 7-slot layout. Blueprints and Mk levels are kept.
-3. **Load, Output and heat:** weights and draws, the Hangar's two meters and launch rule, overclock heat and venting,
-   the Coolant Loop and Auxiliary Generator, and the Overheat Core rework.
-4. **Frames:** new stats and identities, frame blueprints and upgrades, Vanguard's built-in plating.
-   Ricochet becomes Chain Bolts, Option Pods become Drone Pods, auto-fire is off by default.
-5. **Retune:** boss health, healing cards, Blood Pact, the Orbital Halo saws.
-   - The average-player bot and difficulty report are re-targeted to 13P.
-   - The rules tests are updated: Capacitor Discharge, Blood Pact, resume.
-6. **Text:** the Guide to Guardians, tech and frame text, and Hangar wording, all checked by the wording checker.
-7. **Testers:** a focused cold review of the Hangar and of one planet-3 run, with no full sweep. This is a major
-   overhaul, so one longer blind playtest at the end.
+(Note) Ai-Generated-Proposal: two builds rather than one, so the new damage model can be played and tuned before
+the bigger Hangar systems sit on top of it.
+
+### Plan A: build 0.6, hits that matter
+
+1. **Damage model** (13A–13G): Armor as one pool with hit ticks, the damage scale, immunity after a hit, the smaller
+   hitbox, rarer repairs.
+2. **Generator and Plating slots** (13H–13J): the Shield Generator, the four basic plates, Arc Blade, Mirror Aegis
+   and Soul Lantern moved, the planet 3 lesson giving the Shield Generator (13Q).
+3. **What it breaks** (13K, 13R–13T): Orbital Halo saws, Reflex Blade, Capacitor Discharge, the cards.
+4. **Frames' new Armor and Vanguard's built-in plate**, without Load and Output yet. Chain Bolts; auto-fire off by
+   default.
+5. **Retune** (13P, 13U): boss health and the average-player bot re-targeted to hits.
+6. **Save migration** (13V), the Guide and every changed text through the wording checker, rules tests updated.
+7. **Testers:** cold reviews of the Hangar and one planet-3 run; one longer blind playtest, since it's a major change.
+
+### Plan B: build 0.6.1, building a frame
+
+1. **Load and Mawjig Output** in pips, the Hangar's two rows and the launch rule (13N).
+2. **Overclock heat**, venting, the Coolant Loop and Auxiliary Generator, the Overheat Core rework.
+3. **Frame identities**: Load, Output and speed per frame, frame blueprints and upgrade tiers (13O).
+4. **Uncommon and rare plates** (13J) as boss prizes and themed-branch rewards.
+5. Tested the same way, with a cold review of the Hangar's two meters.
 
 ## Questions
+
+- **Q3.** Build it in two steps (0.6: hits that matter; 0.6.1: building a frame), or all at once as 0.6?
 
 - **Q1.** Answered: Vanguard gets built-in extra plating, 2 hits (13O).
 - **Q2.** Answered: frame upgrades use frame blueprints (13O).
