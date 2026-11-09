@@ -142,20 +142,27 @@ Based on: 33 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
   - The support slot keeps Graze Engine, Overheat Core and Option Pods, and gains the cooling parts (13N).
   - The planet 3 lesson (GDD 9C) teaches the Generator slot. A starter with no shield finally makes the lesson
     matter.
-- **13J. Proposed (2026-11-09):** Plating can be heavy and slow, or fast and light; light plating might add a dash
-  burst. (heromedel.)
-  - **Ai-Generated-Proposal:**
+- **13J. Proposed (2026-11-09):** Plating is just the frame's outer armour. Most plates are basic, trading Armor
+  against weight and speed, like light and heavy, but with better names and occasionally better thought. A few
+  rare ones can be strange and game-changing, and only rare or carefully balanced ones may touch attack (most
+  defensive parts should not also be offence). Names are chosen with intent: an acronym that means something, a
+  nod to another genre or to Infall, or a meaning inside this game. No dash, no ram. (heromedel.)
+  - **Ai-Generated-Proposal (numbers are placeholders):**
 
-    | Plating | Armor | Speed | Other |
+    | Tier | Plate | What it does | Why the name |
     |---|---|---|---|
-    | Standard Plating (starter) | ±0 | ±0 | None |
-    | Heavy Plating | +30 | −12% | Heavy |
-    | Light Plating | −10 | +12% | Flick the steering finger to dash a short way, leaving a burst that hurts what it passes |
-    | Ablative Plating | ±0 | ±0 | Three plates. Each takes one hit of any size and breaks with a small Blank (Gungeon's armor). They don't come back during the mission. |
+    | Starter | **DSP-1 Drop Plate** | Plain armour, weight 2 | Dropship DSP-1 Drop Plate, version 1: what your own Dropship prints (11M) |
+    | Basic | **QRF Shell** | −10 Armor, weight 1, a little faster | Quick Reaction Force: the unit sent in first and fast |
+    | Basic | **Jig-Weave Composite** | +15 Armor, weight 3 | Jigawatt-powered fibres woven through the armour (Infall) |
+    | Basic | **Lunarium Bulk Plate** | +30 Armor, weight 4, a little slower | Mecha anime's wonder-alloys (heromedel: "sounds cool") |
+    | Uncommon | **Mirrorwork Half Plate** | Lasers and beams do half | Cut from the Mirror Dreadnought's plates; could be its prize |
+    | Uncommon | **Crusher-Rated Plate** | Blasts and shockwaves do half | Rated to survive the Crusher Gate |
+    | Uncommon | **Jigawatt-Lined Plate** | Strong for its weight, draws 1 Output | Charged armour, which is why it costs power. (heromedel: "a bit boring but close to decent"; name to improve.) |
+    | Rare | **Jig Phase Plate** | A hit drains in over 3 s; half of it fades if no other hit lands meanwhile | Salvage from a Jig Phase Drive (10E): hits phase partly out of this dimension and arrive late (heromedel liked the idea) |
+    | Rare | **Last Legend Plate** | Below a third of your Armor, weapons fire faster; less Armor overall | The Guardian Legend, and our own title (heromedel: "interesting") |
 
   - Plating levels up in the mission like tech, adding Armor per level.
-  - If any part ever reduces damage by a percentage, it uses Risk of Rain's armor / (armor + 100) form, and reductions
-    from the same family never add together.
+
 - **13K. Ai-Generated-Proposal: defence that is also offence, beyond the Generator slot.**
   - Orbital Halo's saws still eat bullets, but each saw shatters after eating 3 and regrows 3 s later.
   - Specials keep clearing bullets. They're the Blanks of this game: one per cooldown, a decision every time.
@@ -213,14 +220,14 @@ Based on: 33 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
     | Graze Engine / Overheat Core / Drone Pods | K / X / K | 1 / 2 / 2 | 0 / 0 / 1 |
     | Coolant Loop / Auxiliary Generator | none | 2 / 3 | 0 / adds 3 |
     | Nova Bomb / Time Brake / Ion Cannon / Thruster Explosion | X / M / E / K | 2 / 1 / 2 / 2 | 0 / 3 / 3 / 0 |
-    | Standard / Heavy / Light / Ablative Plating | none | 2 / 4 / 1 / 3 | 0 |
+    | DSP-1 Drop Plate / QRF Shell / Jig-Weave Composite / Lunarium Bulk Plate | none | 2 / 1 / 3 / 4 | 0 |
 
-    - The starter build (Pulse Driver, Arc Blade, Nova Bomb, Standard Plating) is 6 Load and 3 Output on a
+    - The starter build (Pulse Driver, Arc Blade, Nova Bomb, DSP-1 Drop Plate) is 6 Load and 3 Output on a
       12 / 9 Vanguard: room to grow.
     - A greedy mid-game build (Thunder Lance, Swarm Pods, Orbital Halo, Shield Generator, Drone Pods, Ion Cannon,
-      Heavy Plating) is 15 Load and 11 Output.
+      Lunarium Bulk Plate) is 15 Load and 11 Output.
       - Over Load, so it can't launch.
-      - With Standard Plating it's 13: still over by one. Swap the Halo for Starfall and it fits at 12, but now it
+      - With DSP-1 Drop Plate it's 13: still over by one. Swap the Halo for Starfall and it fits at 12, but now it
         draws 13 of 9 Output: four pips overclocked.
       - From there: drop a powered part, trade Drone Pods for an Auxiliary Generator, move to the Tempest, or run hot.
   - **Ai-Generated-Proposal: heat, in numbers to start tuning from.**
@@ -248,14 +255,10 @@ Based on: 33 points. 2 agreed (the two new slots, the Armor name), 11 proposals 
     | Bulwark | 90 | 16 | 6 | 250 | Carries anything but powers little: the Kinetic and Explosive frame. Fortress Field reflects a quarter of the bullets that hit its front, with no shield needed. |
     | Later frames | | | | | **Proposed (heromedel):** a built-in Arc Blade, a built-in shield, or built-in mini missiles. **Ai-Generated-Proposal:** one built to overclock, with high cooling. |
 
-  - **Ai-Generated-Proposal: a built-in part fills a slot for good.** A frame with a built-in Arc Blade has its
-    Generator slot taken by the blade, costing no Load or Output, and you can't change it. Identity from what you
-    can't change is what makes FTL's Stealth cruiser (no shields, a cloak instead) and MechWarrior's fixed hardpoints
-    memorable; percentage bonuses read as patches. Vanguard's built-in plating is the exception: it's extra Armor on
-    top of its plating slot, which keeps the starter simple.
-  - **Ai-Generated-Proposal: a part changes how you move, not only a number** (Armored Core 6's legs). Light Plating
-    adds the flick dash; Heavy Plating lets you **ram**: small enemies you run into take heavy damage and you take
-    half the contact damage. Each plating is then a different way to play, not a bigger or smaller number.
+  - **Proposed (2026-11-09):** A built-in part is a bonus on top of the frame's slots, costing no Load or Output,
+    paid for by the frame's other numbers, its rarity or how hard it is to get. Vanguard's built-in plating is the
+    first example. (heromedel: "probably".) Each new frame trades something for its built-in part, so frames don't
+    creep upward in power.
   - **Proposed (2026-11-09):** Frame upgrades use **frame blueprints**. (heromedel.)
     - **Ai-Generated-Proposal:**
       - Frame blueprints drop like tech blueprints, from planets that show one on the card.

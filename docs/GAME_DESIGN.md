@@ -112,6 +112,7 @@
 - **10C. Likely (2026-11-08):** Infall is at most a different realm or galaxy, not the same place. Tie-ins and nods are fine, and things can occasionally be borrowed.
 - **10D. Likely (2026-11-08):** Mawjig (from Infall: Materials Worth of Jigawatts) is explained in game as "A measurement of matter and energy used in advanced or physics bending technology." The game also gives the full name, Materials Worth of Jigawatts.
 - **10E. Proposed (2026-11-08):** A regular Jig Drive isn't built to jump dimensions; a temporal variant might be. In Infall, rumours said an ancient relic, the Orb of Chulak (a Stargate SG-1 nod), could open a wormhole to another dimension.
+  - **Likely (2026-11-09):** A Jig Drive is a jump drive for travelling through space, never between realms. Crossing into another dimension is ancient Chulak tech (the SG-1 nod), or needs its own name, such as a **Jig Phase Drive** (phasing into a different dimension). Jigawatt-powered tech in general is just Jigawatt-powered, not Jig Drive. (heromedel.)
   - **Ai-Generated-Proposal (2026-11-08):** Reaching a realm is a big, rare event (a relic, a temporal drive), and each realm plays by its own rules, so the late game can feel like a different game.
 
 ## 11. Playtest Refinements (builds 0.2.2 and 0.3)
@@ -191,3 +192,4 @@
 | 2026-11-09 | 5E, 7G | A real transformation between forms (spin as a setting while it's compared); fusions stay at max level if they're impressive enough. |
 | 2026-11-09 | 4F | A wording checker for player-facing text. |
 | 2026-11-09 | 4E | Cold reviews in small, focused batches; every finding triaged into the review log. |
+| 2026-11-09 | 10E | A Jig Drive only jumps through space; crossing realms is ancient Chulak tech or a Jig Phase Drive. |
