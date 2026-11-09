@@ -19,6 +19,16 @@ var overlay: Control = null
 var overlay_kind := ""
 var shown_offer_serial := -1
 var paused := false
+## Resuming after the browser closed: the mission is rebuilt and fast-forwarded through the inputs it had.
+var checkpoint_launch: Dictionary = {}   # how main launched it, saved with the inputs so it can be rebuilt
+var resume_frames: Array = []            # inputs to fast-forward through before play resumes
+var abandon_after_restore := false       # the player chose to abandon it: settle it once it's caught up
+var _restored := 0                       # how many of them have run
+var _restore_screen: Label
+var _inputs := InputRecording.new()      # every input so far, for the checkpoint
+var _checkpoint_timer := CHECKPOINT_SECONDS
+## How often a mission in progress is saved, so closing the browser mid-mission loses at most this much.
+const CHECKPOINT_SECONDS := 5.0
 var done := false
 
 var world_root: Node2D
@@ -99,6 +109,9 @@ func _ready() -> void:
 		hud.show_radio(line)
 	Sound.play_music(node["type"])
 	_handle_events(mission.drain_events())
+	if not resume_frames.is_empty():
+		_begin_restore()
+		return
 	# The launch from the Dropship and the arrival, by mission type (GDD 5E).
 	var arrival: String = {"planet": "launch_planet", "dungeon": "launch_dungeon"}.get(node["type"], "launch_space")
 	_play_cutscene(arrival, Callable())
@@ -164,16 +177,75 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _notification(what: int) -> void:
-	# Going to the background (home button, app switch) pauses the mission.
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED:
+	# Going to the background (home button, app switch, closing the tab) saves and pauses the mission.
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
+		_write_checkpoint()
 		if not paused and not done and mission != null and mission.state in ["play", "intro"]:
 			set_paused(true)
+
+
+# ---------------------------------------------------------------- saving and resuming
+
+## Saves the mission in progress: how it was launched and every input so far.
+func _write_checkpoint() -> void:
+	if done or checkpoint_launch.is_empty() or _restored < resume_frames.size():
+		return
+	Save.write_checkpoint({"launch": checkpoint_launch, "inputs": _inputs.encode(), "ticks": _inputs.ticks})
+
+
+func _begin_restore() -> void:
+	_restore_screen = UiKit.label("", 26, Color(0.7, 0.9, 1.0), "title")
+	_restore_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_restore_screen.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_restore_screen.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var backdrop := ColorRect.new()
+	backdrop.color = Color(0.01, 0.02, 0.05, 0.97)
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	backdrop.add_child(_restore_screen)
+	hud.get_parent().add_child(backdrop)
+
+
+## Runs as many of the saved inputs as fit in a frame, exactly as they first ran, then hands back control,
+## paused, so the player can get ready.
+func _continue_restore() -> void:
+	var started := Time.get_ticks_msec()
+	while _restored < resume_frames.size() and Time.get_ticks_msec() - started < RESTORE_MSEC_PER_FRAME:
+		var frame: InputFrame = resume_frames[_restored]
+		_restored += 1
+		PlayLog.record_input(frame)
+		_inputs.add(frame)
+		mission.step(frame)
+		if AdminConsole.god_mode:
+			mission.player.armor = mission.player.max_armor
+			mission.player.alive = true
+		mission.drain_events()
+	_restore_screen.text = "Restoring your mission  %d%%" % int(100.0 * _restored / resume_frames.size())
+	if _restored >= resume_frames.size():
+		_restore_screen.get_parent().queue_free()
+		input.form = mission.player.form
+		camera_center = mission.player.pos
+		PlayLog.note("mission", "Resumed at %s" % _clock_text())
+		if abandon_after_restore:
+			_abandon()
+		else:
+			set_paused(true)
+
+
+## Fast-forwarding takes this much of each frame, so the restore screen stays responsive.
+const RESTORE_MSEC_PER_FRAME := 40
+
+
+func _clock_text() -> String:
+	return "%d:%02d" % [int(mission.world.time) / 60, int(mission.world.time) % 60]
 
 
 # ---------------------------------------------------------------- stepping
 
 func _physics_process(delta: float) -> void:
 	if paused or done or mission == null:
+		return
+	if _restored < resume_frames.size():
+		_continue_restore()
 		return
 	if cutscene != null or splash != null:
 		return
@@ -199,6 +271,7 @@ func _physics_process(delta: float) -> void:
 		elif frame.choice < mission.offer_cards.size():
 			PlayLog.record_choice(mission.offer_cards[frame.choice], mission.offer_cards)
 	PlayLog.record_input(frame)
+	_inputs.add(frame)
 	mission.step(frame)
 	if AdminConsole.god_mode:
 		mission.player.armor = mission.player.max_armor
@@ -322,6 +395,10 @@ func _close_overlay() -> void:
 # ---------------------------------------------------------------- camera and drawing
 
 func _process(delta: float) -> void:
+	_checkpoint_timer -= delta
+	if _checkpoint_timer <= 0.0:
+		_checkpoint_timer = CHECKPOINT_SECONDS
+		_write_checkpoint()
 	if mission == null:
 		return
 	time += delta

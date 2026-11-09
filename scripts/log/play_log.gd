@@ -28,7 +28,7 @@ var _start_msec := 0
 var recording := false
 var record: Dictionary = {}
 var last_record: Dictionary = {}
-var _input_runs: Array = []        # [encoded input, repeat count]
+var _inputs := InputRecording.new()   # this mission's inputs, for tests/replay_log.gd
 var _reversals: Array = []         # times the move stick flipped direction, for panic hints
 var _last_move := Vector2.ZERO
 var _hit_times: Array = []
@@ -142,7 +142,7 @@ func _read_session() -> Dictionary:
 
 func begin_mission(mission: Mission, loadout: Array, mk: Dictionary) -> void:
 	recording = true
-	_input_runs = []
+	_inputs.clear()
 	_reversals = []
 	_hit_times = []
 	_stuck_since = 0.0
@@ -167,11 +167,7 @@ func begin_mission(mission: Mission, loadout: Array, mk: Dictionary) -> void:
 func record_input(frame: InputFrame) -> void:
 	if not recording:
 		return
-	var encoded := frame.encode()
-	if not _input_runs.is_empty() and _input_runs[_input_runs.size() - 1][0] == encoded:
-		_input_runs[_input_runs.size() - 1][1] += 1
-	else:
-		_input_runs.append([encoded, 1])
+	_inputs.add(frame)
 
 
 ## Called once per tick after the mission steps: snapshots, hit tracking and hints.
@@ -269,10 +265,7 @@ func abandon_mission(mission: Mission) -> void:
 
 
 func _encode_runs() -> String:
-	var parts := []
-	for run in _input_runs:
-		parts.append(run[0] if run[1] == 1 else "%s*%d" % [run[0], run[1]])
-	return ";".join(parts)
+	return _inputs.encode()
 
 
 # ---------------------------------------------------------------- export

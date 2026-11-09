@@ -25,6 +25,7 @@ func _init() -> void:
 	_resonance_tiers()
 	_blood_pact()
 	_fusions()
+	_resume()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -415,3 +416,27 @@ func _fusions() -> void:
 	var hp_before := target.hp
 	mission.weapons._update_dash(World.DT)
 	check(target.hp < hp_before and world.player_shots.size() > shots_before, "Wraith Drive tears through an enemy and releases a spirit")
+
+
+## A mission saved mid-play (its launch through the save file's format, plus its inputs) and replayed lands in
+## exactly the state it was left in: what resuming after the browser closes relies on.
+func _resume() -> void:
+	var node := {"id": "t", "name": "T", "region": 0, "column": 1, "row": 0.0, "type": "planet", "need": "x",
+		"difficulty": 1.0, "danger": 2, "modifier": "", "reward_tech": "arc_blade", "prize": "", "prize_text": ""}
+	var launch := {"node": node, "seed": 4242, "frame": "vanguard", "loadout": ["pulse_driver", "arc_blade", "", "", "nova_bomb"], "mk": {"pulse_driver": 2}}
+	var first := Mission.new(launch["node"], launch["seed"], launch["frame"], launch["loadout"], func(t): return int(launch["mk"].get(t, 1)))
+	var recording := InputRecording.new()
+	for i in 1500:
+		var frame := InputFrame.new()
+		frame.move = Vector2.from_angle(i * 0.01) * 0.8
+		frame.choice = 0 if first.state in ["offer", "crate"] else -1
+		frame = frame.quantized()
+		recording.add(frame)
+		first.step(frame)
+	var saved: Dictionary = str_to_var(var_to_str({"launch": launch, "inputs": recording.encode()}))
+	var again_launch: Dictionary = saved["launch"]
+	var again := Mission.new(again_launch["node"], again_launch["seed"], again_launch["frame"], again_launch["loadout"], func(t): return int(again_launch["mk"].get(t, 1)))
+	for frame in InputFrame.decode_runs(saved["inputs"]):
+		again.step(frame)
+	check(again.tick == first.tick and again.player.pos.is_equal_approx(first.player.pos) and again.run.kills == first.run.kills
+		and is_equal_approx(again.player.armor, first.player.armor), "a saved mission replays to exactly where it was left")

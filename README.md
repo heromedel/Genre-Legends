@@ -6,6 +6,17 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
+## What's new in 0.5
+
+- **New art for the frames and gear:** five-pass vector art (outline, fill, shading, highlights, details), with a rim of light so your frame always stands out. Every piece of gear is redrawn to match.
+- **Real transformations:** each frame is one set of parts that stands as the mech or folds into the ship. The helmet becomes the cockpit, the shoulders sweep out into wings, the legs fold into engines. Settings: "Transformation spin".
+- **The Dropship transitions redrawn:** the launch bay is the Dropship itself, planet landings come down from above with your shadow closing in, dungeons have a torch-lit stone gate.
+- **Fusions worth the wait:** Storm Halo's saws form an electric fence, Wraith Drive turns your dash into a wraith that tears through enemies, Event Horizon's orbs are small black holes, and Phoenix Driver fires real firebirds. Only fusions you can reach are mentioned.
+- **Missions autosave:** close the browser mid-mission and the next start offers to continue right where you were.
+- **No accidental upgrade picks:** a pick has to be a deliberate tap on the card.
+- **Clearer words:** every boss phase banner rewritten, a wording check fixed a dozen descriptions that promised more than the game did, and homing shots now hit mirrored elites as the Guide says.
+- "Get the latest version" asks first; the planet strip fits without a scroll bar.
+
 ## What's new in 0.4.2
 
 - **A wider star map:** the command center's pages are tabs along the top and the planet card is a strip under the map, so the map gets the full width. The region's name no longer slides off the edge.

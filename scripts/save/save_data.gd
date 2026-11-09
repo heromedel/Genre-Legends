@@ -6,6 +6,8 @@ extends Node
 
 const SAVE_PATH := "user://save.json"
 const BACKUP_PATH := "user://save_backup.json"
+## A mission in progress, saved every few seconds so it can be resumed after the browser closes (MissionView).
+const CHECKPOINT_PATH := "user://mission_checkpoint.json"
 const VERSION := 1
 
 signal changed
@@ -64,6 +66,31 @@ func write() -> void:
 			file.store_string(text)
 			file.close()
 	changed.emit()
+
+
+## The mission in progress: how it was launched and every input so far (InputRecording). Replaying the
+## inputs through a Mission built from the same launch puts it back exactly where it was.
+func write_checkpoint(checkpoint: Dictionary) -> void:
+	var file := FileAccess.open(CHECKPOINT_PATH, FileAccess.WRITE)
+	if file:
+		# Godot's own text format, not JSON: the mission is rebuilt from it, so its numbers must keep their types.
+		file.store_string(var_to_str(checkpoint))
+		file.close()
+
+
+## The saved mission in progress, or {} if there isn't one.
+func read_checkpoint() -> Dictionary:
+	if not FileAccess.file_exists(CHECKPOINT_PATH):
+		return {}
+	var file := FileAccess.open(CHECKPOINT_PATH, FileAccess.READ)
+	var parsed = str_to_var(file.get_as_text()) if file else null
+	return parsed if parsed is Dictionary else {}
+
+
+## Forgets the mission in progress: it finished, was abandoned, or was resumed and is being saved anew.
+func clear_checkpoint() -> void:
+	if FileAccess.file_exists(CHECKPOINT_PATH):
+		DirAccess.remove_absolute(CHECKPOINT_PATH)
 
 
 ## Makes any save, old or damaged, safe to use: missing keys get defaults, wrong types are replaced.

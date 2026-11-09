@@ -32,6 +32,7 @@ func show_hub(page: String) -> void:
 	star_map.ensure_generated(Save.is_cleared)
 	var hub := Hub.new(star_map, page)
 	hub.launch_requested.connect(launch_mission)
+	hub.resume_requested.connect(resume_saved_mission)
 	_set_screen(hub)
 
 
@@ -43,19 +44,47 @@ func launch_mission(node_id: String, event: Dictionary = {}) -> void:
 	node["autofire"] = Save.setting("autofire")
 	node["radio"] = Radio.mission_start_line(node, int(Save.data["stats"]["missions"]))
 	node["arrivals"] = Save.data["enemies_unlocked"].duplicate()
-	var first_clear := not Save.is_cleared(node_id)
-	var mission_seed := randi()
-	var mission := Mission.new(node, mission_seed, Save.data["frame"], Save.data["loadout"], Save.tech_mk)
+	# Everything that decides how the mission plays, so it can be rebuilt exactly to resume it (Save checkpoint).
+	var mk := {}
+	for tech_id in Save.data["loadout"]:
+		if tech_id != "":
+			mk[tech_id] = Save.tech_mk(tech_id)
+	var launch := {"build": BuildInfo.label(), "node_id": node_id, "node": node, "seed": randi(), "frame": Save.data["frame"],
+		"loadout": Save.data["loadout"].duplicate(), "mk": mk, "first_clear": not Save.is_cleared(node_id)}
+	Save.data["stats"]["missions"] += 1
+	_start_mission(launch, "")
+
+
+## Builds the mission from its launch and opens it. With saved inputs it resumes: the mission is rebuilt and
+## fast-forwarded through them to exactly where it was (the simulation is deterministic).
+func _start_mission(launch: Dictionary, inputs: String, abandon_after_restore: bool = false) -> void:
+	var node_id: String = launch["node_id"]
+	var mk: Dictionary = launch["mk"]
+	var mission := Mission.new(launch["node"], launch["seed"], launch["frame"], launch["loadout"], func(tech_id): return int(mk.get(tech_id, 1)))
 	var view := MissionView.new()
-	view.setup(mission, first_clear)
+	view.setup(mission, launch["first_clear"])
+	view.checkpoint_launch = launch
+	view.resume_frames = InputFrame.decode_runs(inputs)
+	view.abandon_after_restore = abandon_after_restore
 	view.skip_cutscenes = _debug_options.has("test") and not _debug_options.has("cutscene")
-	view.finished.connect(func(result): finish_mission(node_id, result))
+	view.finished.connect(func(result):
+		Save.clear_checkpoint()
+		finish_mission(node_id, result))
 	view.abandoned.connect(func():
+		Save.clear_checkpoint()
 		var result := mission.results(false)
 		result["abandoned"] = true
 		finish_mission(node_id, result))
-	Save.data["stats"]["missions"] += 1
 	_set_screen(view, false)
+
+
+## A mission the browser closed on: resumable on the same build, otherwise only something to tell the player.
+func resume_saved_mission(abandon: bool) -> void:
+	var checkpoint := Save.read_checkpoint()
+	if checkpoint.is_empty():
+		return
+	PlayLog.note("mission", "%s a saved mission (%d inputs)" % ["Abandoning" if abandon else "Resuming", int(checkpoint.get("ticks", 0))])
+	_start_mission(checkpoint["launch"], checkpoint["inputs"], abandon)
 
 
 ## Banks rewards in Save, then shows the results screen.

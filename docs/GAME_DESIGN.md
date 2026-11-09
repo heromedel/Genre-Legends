@@ -144,6 +144,10 @@
 - **11S. Likely (2026-11-09):** Banners stay up long enough to read comfortably: 1.2 s was too fast even for a fast reader. (heromedel.)
   - **Ai-Generated-Proposal (2026-11-09):** 2 s plus a little per letter, at most 3.2 s.
 - **11T. Ai-Generated-Proposal (2026-11-09):** Each risky card has its own price, so taking one never makes another free (heromedel spotted Glass Reactor and Blood Pact both costing the shield). Blood Pact: kills repair armor, but two seconds without a kill bleeds armor away, never below a third.
+- **11U. Likely (2026-11-09):** A mission in progress autosaves every few seconds, and if the browser closes mid-mission, the next start offers to continue it. (heromedel.)
+  - **Ai-Generated-Proposal (2026-11-09):** Every 5 s (and when the tab loses focus) the checkpoint saves how the mission was launched and every input so far; continuing rebuilds the mission and fast-forwards the deterministic simulation through the inputs, then resumes paused. Abandoning settles it like the pause menu's abandon, so a loss still pays. A checkpoint from an older build can't be replayed, and the player is told so.
+- **11V. Likely (2026-11-09):** Upgrade cards can't be picked by accident. (heromedel.)
+  - **Ai-Generated-Proposal (2026-11-09):** A pick is a deliberate tap: it starts on the card, at least half a second after the cards appear, and doesn't slide more than a little.
 - **11J. Likely (2026-11-08):** Bullets that glow in the dark are an accessibility option, not a rule: Settings, "Bullets glow in the dark: Off > On".
 - **11H. Ai-Generated-Proposal (2026-11-08):** Explosive Resonance III is renamed Wildfire, and burning effects never mention the ground, since many fights are in space.
 
@@ -179,6 +183,7 @@
 | 2026-11-09 | 11N to 11Q | Auto-fire becomes an option in every mode; options on the pause menu; Ricochet comes back from off screen; a boss that falls as you do counts as a win. |
 | 2026-11-09 | 9H | Resonance tiers made obvious (card badge, splash on pick, frame glow) and the flat tiers reworked into visible effects. |
 | 2026-11-09 | 11R to 11T | Tabs on top and the planet card under a full-width star map; banners that stay up long enough to read; risky cards with their own prices. |
+| 2026-11-09 | 11U, 11V | Missions autosave and can be continued after the browser closes; no accidental upgrade picks. |
 | 2026-11-09 | 5E, 7G | A real transformation between forms (spin as a setting while it's compared); fusions stay at max level if they're impressive enough. |
 | 2026-11-09 | 4F | A wording checker for player-facing text. |
 | 2026-11-09 | 4E | Cold reviews in small, focused batches; every finding triaged into the review log. |

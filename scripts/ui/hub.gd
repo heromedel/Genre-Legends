@@ -6,6 +6,9 @@ extends Control
 
 ## event: what a route event (RouteEvents) leaves for the mission, or {} for a quiet trip.
 signal launch_requested(node_id: String, event: Dictionary)
+## The player chose to continue the mission the browser closed on (main rebuilds and fast-forwards it).
+## abandon: settle it as abandoned instead (fast-forwarded first, so the partial rewards of a loss still pay).
+signal resume_requested(abandon: bool)
 
 var star_map: StarMap
 var page := "map"
@@ -42,6 +45,23 @@ func _ready() -> void:
 	show_page(page)
 	Sound.play_music("hub")
 	_show_radio_queue()
+	_offer_saved_mission()
+
+
+## A mission the browser closed on: continue it, or let it go. A checkpoint from an older build can't be
+## replayed (the game plays differently), so the player is told instead.
+func _offer_saved_mission() -> void:
+	var checkpoint := Save.read_checkpoint()
+	if checkpoint.is_empty() or not checkpoint.has("launch"):
+		return
+	var launch: Dictionary = checkpoint["launch"]
+	var planet: String = launch["node"].get("name", "a planet")
+	if launch.get("build", "") != BuildInfo.label():
+		Save.clear_checkpoint()
+		_confirm("Mission lost in the update", "You left %s mid-mission, but the game has updated since, so it can't be picked up again." % planet, "OK", func(): pass, "")
+		return
+	_confirm("Mission in progress", "You left %s mid-mission. Pick up where you left off?" % planet, "Continue",
+		func(): resume_requested.emit(false), "Abandon", func(): resume_requested.emit(true))
 
 
 ## Messages waiting from the operations officer: lessons, new arrivals (GDD 9E).
@@ -67,7 +87,7 @@ func _show_radio_queue() -> void:
 
 
 ## A pop-up that asks before doing something you can't take back: a title, what will happen, and two buttons.
-func _confirm(title: String, text: String, confirm_label: String, on_confirm: Callable) -> void:
+func _confirm(title: String, text: String, confirm_label: String, on_confirm: Callable, cancel_label: String = "Cancel", on_cancel: Callable = Callable()) -> void:
 	var box := UiKit.panel(Color(0.03, 0.07, 0.12, 0.98), Color(1.0, 0.75, 0.35))
 	var column := VBoxContainer.new()
 	column.custom_minimum_size = Vector2(520, 0)
@@ -80,7 +100,11 @@ func _confirm(title: String, text: String, confirm_label: String, on_confirm: Ca
 	buttons.add_theme_constant_override("separation", 12)
 	buttons.alignment = BoxContainer.ALIGNMENT_END
 	column.add_child(buttons)
-	buttons.add_child(UiKit.button("Cancel", func(): popup.queue_free(), "%s: cancel" % title))
+	if cancel_label != "":
+		buttons.add_child(UiKit.button(cancel_label, func():
+			popup.queue_free()
+			if on_cancel.is_valid():
+				on_cancel.call(), "%s: %s" % [title, cancel_label]))
 	buttons.add_child(UiKit.button(confirm_label, func():
 		popup.queue_free()
 		on_confirm.call(), "%s: %s" % [title, confirm_label], true))

@@ -76,6 +76,10 @@
 
 (Note) Built 2026-11-09: tabs on top and a full-width star map (GDD 11R), readable banners (11S), Blood Pact's own price (11T), Thunder Lance from the muzzle, audio that resumes on a tap and is logged.
 
+## Build 0.5 (2026-11-09)
+
+(Note) Built 2026-11-09: the vector art painter and art pass 1 (frames, gear, the Dropship transitions), transforming frames (GDD 5E), fusion reworks (7G), mission autosave and resume (11U), deliberate upgrade picks (11V), boss banner and wording fixes, the wording checker (4F). Next art passes: enemies, bosses, backgrounds and HUD.
+
 ## Plan C: Defense and tanks
 
 1. Planetary Defense and Tank Assault, sharing the tank form.
