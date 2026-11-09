@@ -84,6 +84,12 @@
 
 (Note) 0.5.1, on playtest: diving darts return from the top edge, the return transition, Drone Pods, page and memory logging. 0.5.2, on Claude's branch: art pass 2, every enemy and boss redrawn in the five-pass style with moving parts, each through a cold review. Next art passes: backgrounds, HUD, the Hangar.
 
+## Build 0.6: hits that matter (2026-11-09)
+
+(Note) Plan A of the overhaul in `docs/OVERHAUL_0_6.md` (GDD 13): one Armor pool read as hits, the Generator and
+Plating slots, the Shield Generator and DSP-1 Drop Plate, the fixes the new rules need, a fresh save. Next, build
+0.6.1 (Plan B): Load and Mawjig Output, overclock heat, frame identities and upgrades, the other plates.
+
 ## Plan C: Defense and tanks
 
 1. Planetary Defense and Tank Assault, sharing the tank form.

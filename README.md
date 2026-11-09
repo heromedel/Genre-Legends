@@ -6,7 +6,21 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
-## What's new in 0.5.2 (on Claude's branch)
+## What's new in 0.6 (on Claude's branch)
+
+- **Hits matter.** Your frame has one Armor pool and the bar reads as hits: the Vanguard takes about eight. Big
+  attacks take more, every hit gives a second of immunity, the hitbox is smaller than the art, and repairs are rare.
+  Boss fights are shorter to match.
+- **Seven slots.** A Generator slot holds what keeps you alive, one at a time: the new **Shield Generator** (blocks
+  one hit of any size, then recharges), the Arc Blade, Mirror Aegis or Soul Lantern. A Plating slot holds your
+  outer armour: the **DSP-1 Drop Plate** levels up as you play.
+- The needle planet now hands you the Shield Generator. The Vanguard's Second Wind is now Breacher Plating (two
+  extra hits); the Bulwark's armoured front throws bullets back.
+- **Chain Bolts** replace Ricochet: a kill arcs to the next enemy. Orbital Halo saws break after eating three
+  bullets. Cards are retuned (Mawjig Siphon, Juggernaut Servos). Auto-fire starts off.
+- **A fresh save**: 0.6 changes too much to carry old progress over.
+
+## What's new in 0.5.2
 
 - **Every enemy redrawn** in the same five-pass style as the frames: wasps buzz, crawlers scuttle, spitters' acid sacs swell, the Pillar Eye follows you, the Mimic's lid gapes over its teeth, and every enemy has a thin rim of its own colour so the small ones stand out.
 - **Every boss and mini-boss redrawn:** hulls drawn as set pieces, and each part you can shoot (bays, turrets, vents, pods, legs, fists, sacs, crystals, cores) is its own piece that glows, opens or breaks. Cores slide open when they can be hurt. The Clone Projector's hologram is clearly violet and see-through.

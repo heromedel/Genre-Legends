@@ -143,7 +143,7 @@
 - **11N. Likely (2026-11-09):** Auto-fire can be turned off in every mission type: Settings, "Auto-fire: On > Off". (heromedel's request.)
   - **Ai-Generated-Proposal (2026-11-09):** Off, weapons fire while you steer the ship or hold the mech's aim stick, or hold a fire key or trigger. Support tech (pods, lantern, halo) keeps working on its own.
 - **11O. Ai-Generated-Proposal (2026-11-09):** The pause menu has the music and sound sliders and the in-mission accessibility toggles (screen shake, glowing bullets). Auto-aim and auto-fire stay on the Settings page, since they apply from the next mission.
-- **11P. Likely (2026-11-09):** Ricochet shots that miss leave the screen and come back from out of view, so space doesn't feel like a small box. (heromedel's idea.)
+- **11P. Rejected (2026-11-09):** Ricochet shots that miss leave the screen and come back from out of view. (heromedel: "I think the ricochet shots are dumb"; replaced by Chain Bolts, 13W.)
   - **Ai-Generated-Proposal (2026-11-09):** Each flies 25–90 px out of view, then comes back the way it came, turned up to about 45 degrees as if off a round rock, at 70% damage. Planet and dungeon walls still bounce where you can see.
 - **11Q. Ai-Generated-Proposal (2026-11-09):** If the last boss falls to your shots while your wreck is still burning, you traded with it: the mission counts as won and the prize is yours.
 - **11R. Likely (2026-11-09):** The command center's pages are tabs along the top and the planet card is a strip under the star map, so the map gets the full width. (heromedel's idea.)
@@ -168,6 +168,21 @@
 - **12C. Ai-Generated-Proposal (2026-11-08):** New tech: Option Pods (renamed Drone Pods in 0.5.1, heromedel) and Soul Lantern (support), Ion Cannon and Thruster Explosion (special), with the Starbreaker and Wraith Drive fusions. Thruster Explosion is built from heromedel's Rule of Cool example (1A).
 - **12D. Ai-Generated-Proposal (2026-11-08):** Route events on the way to a planet: a choice with a risk, paying out at once or shaping the mission.
 - **12E. Ai-Generated-Proposal (2026-11-08):** Big moments freeze the action for a heartbeat (boss kills, elites, Resonance tiers, fusions), and each genre has its own instruments.
+
+## 13. Build 0.6: Hits That Matter
+
+(Note) The full spec, with every number and the research behind it, is `docs/OVERHAUL_0_6.md`; its points keep
+these letters. Plan B (build 0.6.1: Load, Mawjig Output, heat, frame identities, the other plates) is points 21A–21H
+there.
+
+- **13A. Proposed (2026-11-09):** Health is a hidden fine-grained number, read as hits. (heromedel.)
+  - **Likely (2026-11-09):** One pool, called **Armor**. (heromedel.)
+- **13B. Proposed (2026-11-09):** The starter has no shield and about 6 hits, plus built-in plating worth 2 more. (heromedel.) Vanguard: 60 + 20.
+- **13C–13I. Ai-Generated-Proposal (2026-11-09):** Five hit sizes (5, 10, 15, 20, 25); bigger hits each region; 1 s of immunity after a hit; smaller hitboxes; repairs +15 and rarer (13G Proposed, heromedel); bosses at 70% health; difficulty targets in hits.
+- **13J. Likely (2026-11-09):** Two new slots, Generator and Plating. (heromedel.) **13K:** the Shield Generator, Arc Blade, Mirror Aegis and Soul Lantern share the Generator slot.
+- **13L, 13M. Proposed (2026-11-09):** Plating is the frame's outer armour, mostly basic, named with intent; each plate levels up in its own way. (heromedel.)
+- **13N–13Q. Ai-Generated-Proposal (2026-11-09):** Halo saws break after three bullets; Reflex Blade fuses Arc Blade with Graze Engine; Capacitor Discharge on any hit; cards retuned for an 80-Armor pool.
+- **13R, 13S:** Frame Armor; built-in parts are bonuses on top (Proposed, heromedel). **13T:** the planet 3 lesson gives the Shield Generator (9C). **13V:** a fresh save (Proposed, heromedel). **13W:** Chain Bolts replace Ricochet (Proposed, heromedel). **13X:** auto-fire off by default (Proposed, heromedel).
 
 ## Decision Log
 
@@ -201,3 +216,4 @@
 | 2026-11-09 | 10E | A Jig Drive only jumps through space; crossing realms is ancient Chulak tech or a Jig Phase Drive. |
 | 2026-11-09 | 1D | Alternatives offered side by side are never the same kind of ability; a dash or ram on its own is fine. |
 | 2026-11-09 | 3E | Hard Rule: only real questions; never invent questions, end on them by habit, or re-ask decided points. |
+| 2026-11-09 | 13A–13X, 11P | Build 0.6 built: hits that matter, the Generator and Plating slots, the Shield Generator, Chain Bolts replacing Ricochet. |
