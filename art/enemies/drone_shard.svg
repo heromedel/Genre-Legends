@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Drone Shard: a small homing dart from a broken Cluster Drone. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M0,-14 L-9,8 L0,4 L9,8 Z" fill="#2a0a20" stroke="#2a0a20" stroke-width="2.2"/>
+<path d="M0,-14 L-9,8 L0,4 Z" fill="#ff8cd9"/>
+<path d="M0,-14 L9,8 L0,4 Z" fill="#c0559a"/>
+<path d="M-0.6,-11 L-7.6,6" stroke="#ffe0f5" stroke-width="0.9"/>
+<circle cx="0" cy="-2" r="1.6" fill="#ffffff"/>
+</g>
+</svg>

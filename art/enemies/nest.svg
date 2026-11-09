@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Hive Nest: a pulsing organic mound studded with eggs. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M0,-16 C9,-16 16,-10 16,0 C16,10 9,16 0,16 C-9,16 -16,10 -16,0 C-16,-10 -9,-16 0,-16 Z" fill="#1f0a2a" stroke="#1f0a2a" stroke-width="2.6"/>
+<path d="M0,-16 C9,-16 16,-10 16,0 C16,10 9,16 0,16 C-9,16 -16,10 -16,0 C-16,-10 -9,-16 0,-16 Z" fill="#b65ad9"/>
+<path d="M0.6,-16 C9,-16 16,-10 16,0 C16,10 9,16 0.6,16 Z" fill="#8a3aab"/>
+<path d="M-12,-10 C-14,-7 -15,-3 -15,0" stroke="#f0ccff" stroke-width="1.1" fill="none"/>
+<circle cx="-8" cy="-6" r="3" fill="#1f0a2a"/><circle cx="-8" cy="-6" r="2.2" fill="#f2c4ff"/>
+<circle cx="8" cy="-6" r="3" fill="#1f0a2a"/><circle cx="8" cy="-6" r="2.2" fill="#e0a6f5"/>
+<circle cx="-9" cy="5" r="3" fill="#1f0a2a"/><circle cx="-9" cy="5" r="2.2" fill="#f2c4ff"/>
+<circle cx="9" cy="5" r="3" fill="#1f0a2a"/><circle cx="9" cy="5" r="2.2" fill="#e0a6f5"/>
+<circle cx="0" cy="11" r="3" fill="#1f0a2a"/><circle cx="0" cy="11" r="2.2" fill="#eab8fa"/>
+<circle cx="0" cy="-11" r="3" fill="#1f0a2a"/><circle cx="0" cy="-11" r="2.2" fill="#f2c4ff"/>
+<g id="core"><circle cx="0" cy="0" r="5.6" fill="#1f0a2a"/><circle cx="0" cy="0" r="4.4" fill="#ff8cff"/><circle cx="-1.2" cy="-1.2" r="1.6" fill="#ffe6ff"/></g>
+</g>
+</svg>

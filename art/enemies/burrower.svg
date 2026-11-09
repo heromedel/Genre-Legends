@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Burrower, surfaced: an armoured shell around a grinding star-shaped maw. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M0,-15 C9,-15 15,-9 15,0 C15,9 9,15 0,15 C-9,15 -15,9 -15,0 C-15,-9 -9,-15 0,-15 Z" fill="#2a1a0a" stroke="#2a1a0a" stroke-width="2.6"/>
+<path d="M0,-15 C9,-15 15,-9 15,0 C15,9 9,15 0,15 C-9,15 -15,9 -15,0 C-15,-9 -9,-15 0,-15 Z" fill="#d9b072"/>
+<path d="M0.6,-15 C9,-15 15,-9 15,0 C15,9 9,15 0.6,15 Z" fill="#a6804a"/>
+<path d="M-11,-9 C-13,-6 -14,-3 -14,0" stroke="#fff0d4" stroke-width="1.1" fill="none"/>
+<circle cx="0" cy="0" r="9" fill="#1a0505"/>
+<g id="maw"><path d="M0,-8 L2.2,-3 L7.6,-2.4 L3.4,1.4 L4.6,6.6 L0,3.8 L-4.6,6.6 L-3.4,1.4 L-7.6,-2.4 L-2.2,-3 Z" fill="#ff6a50"/></g>
+<circle cx="0" cy="0" r="2" fill="#ffd0b0"/>
+</g>
+</svg>

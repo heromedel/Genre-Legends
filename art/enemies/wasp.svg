@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Wasp: a striped weaver with buzzing wings. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<g id="wing_l"><path d="M-3,-2 L-17,-8 L-15,4 Z" fill="#ffffff" opacity="0.35" stroke="#fff6cc" stroke-width="0.8"/></g>
+<g id="wing_r"><path d="M3,-2 L17,-8 L15,4 Z" fill="#ffffff" opacity="0.3" stroke="#fff6cc" stroke-width="0.8"/></g>
+<path d="M0,-15 C6,-15 9,-8 9,0 C9,9 5,15 0,17 C-5,15 -9,9 -9,0 C-9,-8 -6,-15 0,-15 Z" fill="#2a1f05" stroke="#2a1f05" stroke-width="2.4"/>
+<path d="M0,-15 C6,-15 9,-8 9,0 C9,9 5,15 0,17 C-5,15 -9,9 -9,0 C-9,-8 -6,-15 0,-15 Z" fill="#ffd94d"/>
+<path d="M0.6,-15 C6,-15 9,-8 9,0 C9,9 5,15 0.6,17 Z" fill="#d9a92b"/>
+<path d="M-8.6,-3 L8.6,-3 L8.8,1 L-8.8,1 Z M-8,5 L8,5 L7,9 L-7,9 Z" fill="#2a1f05"/>
+<path d="M-6.4,-11 C-7.6,-8 -8,-6 -8,-4" stroke="#fff6cc" stroke-width="1" fill="none"/>
+<path d="M-1.6,17 L0,22 L1.6,17 Z" fill="#2a1f05"/>
+<circle cx="-3" cy="-10" r="1.8" fill="#2a1f05"/><circle cx="3" cy="-10" r="1.8" fill="#2a1f05"/>
+<circle cx="-3.4" cy="-10.5" r="0.6" fill="#ffffff"/><circle cx="2.6" cy="-10.5" r="0.6" fill="#ffffff"/>
+</g>
+</svg>

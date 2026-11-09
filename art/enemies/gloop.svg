@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Gloop: a wobbling slime blob; burst it and it splits into smaller ones. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M0,-14 C8,-14 15,-8 15,1 C15,9 9,14 0,14 C-9,14 -15,9 -15,1 C-15,-8 -8,-14 0,-14 Z" fill="#05260a" stroke="#05260a" stroke-width="2.2" opacity="0.95"/>
+<path d="M0,-14 C8,-14 15,-8 15,1 C15,9 9,14 0,14 C-9,14 -15,9 -15,1 C-15,-8 -8,-14 0,-14 Z" fill="#5ad96a" opacity="0.88"/>
+<path d="M-15,3 C-14,10 -8,14 0,14 C8,14 14,10 15,3 C10,8 -10,8 -15,3 Z" fill="#2fa040" opacity="0.9"/>
+<circle cx="-6" cy="-6" r="3.6" fill="#e8ffe8" opacity="0.75"/><circle cx="-2.6" cy="-8.4" r="1.2" fill="#ffffff"/>
+<circle cx="6" cy="4" r="1.6" fill="#9cff9c" opacity="0.8"/>
+<g id="face"><circle cx="-3" cy="1" r="1.8" fill="#052a0a"/><circle cx="3.6" cy="1" r="1.8" fill="#052a0a"/></g>
+</g>
+</svg>

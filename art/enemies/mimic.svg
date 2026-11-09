@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Mimic, awake: the chest's lid gapes open over a mouth full of teeth. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M-16,0 L16,0 L16,14 L-16,14 Z" fill="#1f0f05" stroke="#1f0f05" stroke-width="2.4"/>
+<path d="M-16,0 L16,0 L16,14 L-16,14 Z" fill="#8c5222"/>
+<path d="M1,0 L16,0 L16,14 L1,14 Z" fill="#6a3a14"/>
+<path d="M-16,5 L16,5" stroke="#ffcc4d" stroke-width="1.6"/>
+<path d="M-14,-6 L14,-6 L14,1 L-14,1 Z" fill="#4a0510"/>
+<path d="M-12,1 L-10,-3 L-8,1 Z M-7,1 L-5,-3 L-3,1 Z M-2,1 L0,-3 L2,1 Z M3,1 L5,-3 L7,1 Z M8,1 L10,-3 L12,1 Z" fill="#fffbe8"/>
+<circle cx="0" cy="-3" r="2" fill="#ff6699"/>
+<g id="lid">
+  <path d="M-16,-6 L-13,-17 L13,-17 L16,-6 Z" fill="#1f0f05" stroke="#1f0f05" stroke-width="2.4"/>
+  <path d="M-16,-6 L-13,-17 L13,-17 L16,-6 Z" fill="#a8662c"/>
+  <path d="M1,-17 L13,-17 L16,-6 L1,-6 Z" fill="#7a4618"/>
+  <path d="M-14.6,-7 L-12.2,-16" stroke="#ffd9a6" stroke-width="1"/>
+  <path d="M-11,-8 L-9,-11 L-7,-8 Z M-3,-8 L-1,-11 L1,-8 Z M5,-8 L7,-11 L9,-8 Z" fill="#fffbe8"/>
+</g>
+</g>
+</svg>

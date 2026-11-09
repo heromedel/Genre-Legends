@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Hollow Knight-Drone: an armoured drone behind a tall kite shield. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M-5,-11 L5,-11 L11,-4 L11,6 L5,12 L-5,12 L-11,6 L-11,-4 Z" fill="#1f1810" stroke="#1f1810" stroke-width="2.4"/>
+<path d="M-5,-11 L5,-11 L11,-4 L11,6 L5,12 L-5,12 L-11,6 L-11,-4 Z" fill="#c8ac84"/>
+<path d="M0.6,-11 L5,-11 L11,-4 L11,6 L5,12 L0.6,12 Z" fill="#94795a"/>
+<path d="M-4.6,-10 L-10,-4 L-10,4" stroke="#fff0d9" stroke-width="1" fill="none"/>
+<path d="M-4,-2 L4,-2" stroke="#1f1810" stroke-width="2.6"/><path d="M-3.4,-2 L3.4,-2" stroke="#9cd0ff" stroke-width="1.4"/>
+<g id="shield">
+  <path d="M-15,-14 L0,-20 L15,-14 L13,-10 L0,-14 L-13,-10 Z" fill="#141a24" stroke="#141a24" stroke-width="2.6"/>
+  <path d="M-15,-14 L0,-20 L15,-14 L13,-10 L0,-14 L-13,-10 Z" fill="#c4ccdc"/>
+  <path d="M0,-20 L15,-14 L13,-10 L0,-14 Z" fill="#8a94aa"/>
+  <path d="M-13.6,-14 L-0.4,-19" stroke="#ffffff" stroke-width="1"/>
+  <circle cx="0" cy="-16.6" r="1.4" fill="#9cd0ff"/>
+</g>
+</g>
+</svg>

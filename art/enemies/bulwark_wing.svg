@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Bulwark Wing: a heavy pentagon hull behind a curved shield plate held out front. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M0,-11 L11,-3 L7,10 L-7,10 L-11,-3 Z" fill="#200a2a" stroke="#200a2a" stroke-width="2.4"/>
+<path d="M0,-11 L11,-3 L7,10 L-7,10 L-11,-3 Z" fill="#c36be6"/>
+<path d="M0.6,-10.6 L11,-3 L7,10 L0.6,10 Z" fill="#8f45b0"/>
+<path d="M-0.6,-10 L-10,-3.2 L-7.2,6" stroke="#f1d4ff" stroke-width="1" fill="none"/>
+<circle cx="0" cy="1" r="3" fill="#200a2a"/><circle cx="0" cy="1" r="2" fill="#ffb3ff"/>
+<g id="plate">
+  <path d="M-18,-12 C-10,-21 10,-21 18,-12 L15,-9 C8,-16 -8,-16 -15,-9 Z" fill="#0f1a2a" stroke="#0f1a2a" stroke-width="2.6"/>
+  <path d="M-18,-12 C-10,-21 10,-21 18,-12 L15,-9 C8,-16 -8,-16 -15,-9 Z" fill="#a8d0ff"/>
+  <path d="M0.5,-18.2 C7,-18 13,-15.6 18,-12 L15,-9 C10,-13.4 5,-15.6 0.5,-16 Z" fill="#6e9ad6"/>
+  <path d="M-16.4,-12.4 C-9,-19.6 -2,-19.8 0,-19.8" stroke="#ffffff" stroke-width="1" fill="none"/>
+</g>
+</g>
+</svg>

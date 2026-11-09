@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Wisp: a ghostly flame with two bright eyes; shots pass through it while it fades. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<g id="flame">
+  <path d="M0,-18 C3,-12 10,-8 10,1 C10,8 6,12 0,12 C-6,12 -10,8 -10,1 C-10,-6 -4,-8 -3,-14 C-1,-10 1,-12 0,-18 Z" fill="#0a2a10" stroke="#0a2a10" stroke-width="2" opacity="0.5"/>
+  <path d="M0,-18 C3,-12 10,-8 10,1 C10,8 6,12 0,12 C-6,12 -10,8 -10,1 C-10,-6 -4,-8 -3,-14 C-1,-10 1,-12 0,-18 Z" fill="#a6ffb3" opacity="0.55"/>
+  <path d="M0,-12 C2,-8 7,-5 7,1 C7,6 4,9 0,9 C-4,9 -7,6 -7,1 C-7,-4 -3,-5 -2,-9 C-1,-6 1,-8 0,-12 Z" fill="#d4ffdb" opacity="0.8"/>
+  <path d="M0,-4 C3,-2 4,1 4,3 C4,6 2,7 0,7 C-2,7 -4,6 -4,3 C-4,1 -2,-1 0,-4 Z" fill="#ffffff" opacity="0.95"/>
+</g>
+<circle cx="-3" cy="2" r="1.6" fill="#0a2a10"/><circle cx="3" cy="2" r="1.6" fill="#0a2a10"/>
+</g>
+</svg>

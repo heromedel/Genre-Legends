@@ -2,7 +2,7 @@ class_name ArtGallery
 extends Control
 ## Debug page for art tests: draws one piece of the game's art alone, centred, on a plain background,
 ## at a chosen zoom, so old and new art can be compared at the same size (main.gd: gallery=<subject>&zoom=N).
-## Subjects: ship, mech, dart, any boss id (hive_carrier, warden, ...), or an SVG drawn through VectorArt
+## Subjects: ship, mech, dart, "enemies" (every regular enemy in a grid, named), any boss id (hive_carrier, warden, ...), or an SVG drawn through VectorArt
 ## (gallery=art/test/ship.svg; add rim=1 for the rim light), or "morph": the transformation looping,
 ## without the spin on the left and with it on the right, or "cutscene:<kind>": one of the Dropship
 ## transitions on a loop (cutscene:return_win, cutscene:launch_planet, ...). Frames: add frame=tempest (or bulwark).
@@ -24,6 +24,7 @@ class Stand:
 	var time := 0.0
 	var boss: BossBase
 	var enemy: Enemy
+	var lineup: Array = []      # "enemies": every regular enemy, laid out in a grid
 	var rim := false
 
 	func _process(delta: float) -> void:
@@ -36,6 +37,10 @@ class Stand:
 				FrameArt.draw_frame(self, Save.data["frame"], subject, Vector2.ZERO, -PI * 0.5, time, {})
 			"dart":
 				EnemyArt.draw(self, enemy, time)
+			"enemies":
+				for shown: Enemy in lineup:
+					EnemyArt.draw(self, shown, time)
+					draw_string(UiKit.font("bold"), shown.pos + Vector2(-32, 34), shown.look, HORIZONTAL_ALIGNMENT_CENTER, 64, 7, Color(0.8, 0.9, 1.0))
 			"morph":
 				# Mech, fold into the ship, hold, fold back: 0.8 s each way with a pause between.
 				var cycle := fmod(time, 3.2)
@@ -64,6 +69,15 @@ func _ready() -> void:
 	if subject == "dart":
 		_stage.enemy = mission.world.spawn_enemy("dart", Vector2.ZERO)
 		_stage.enemy.facing = PI * 0.5
+	elif subject == "enemies":
+		var kinds := EnemyData.ENEMIES.keys().filter(func(k): return k not in ["boss_part", "cracked_wall", "gloopling"])
+		kinds.append("mimic")     # a second Mimic, awake, beside the sleeping one
+		for i in kinds.size():
+			var shown := mission.world.spawn_enemy(kinds[i], Vector2((i % 7 - 3) * 74.0, (i / 7 - 1.5) * 78.0))
+			shown.facing = PI * 0.5
+			shown.state = 1 if i == kinds.size() - 1 else 0
+			shown.hidden = false
+			_stage.lineup.append(shown)
 	elif subject not in ["ship", "mech", "morph"] and not subject.ends_with(".svg"):
 		_stage.boss = BossRoster.make(subject, mission.world)
 		_stage.boss.spawn()

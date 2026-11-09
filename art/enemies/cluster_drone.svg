@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Cluster Drone: four pods orbiting a glowing core; break it and they hunt you. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<g id="pods">
+  <path d="M0,-14 L4,-10 L0,-6 L-4,-10 Z M14,0 L10,4 L6,0 L10,-4 Z M0,14 L-4,10 L0,6 L4,10 Z M-14,0 L-10,-4 L-6,0 L-10,4 Z" fill="#2a0a20" stroke="#2a0a20" stroke-width="2.2"/>
+  <path d="M0,-14 L4,-10 L0,-6 L-4,-10 Z M14,0 L10,4 L6,0 L10,-4 Z M0,14 L-4,10 L0,6 L4,10 Z M-14,0 L-10,-4 L-6,0 L-10,4 Z" fill="#f080c8"/>
+  <path d="M0,-14 L4,-10 L0,-6 Z M14,0 L10,4 L6,0 Z M0,14 L-4,10 L0,6 Z M-14,0 L-10,-4 L-6,0 Z" fill="#b8508f"/>
+  <path d="M0,-10 L0,-6 M10,0 L6,0 M0,10 L0,6 M-10,0 L-6,0" stroke="#ffd9f0" stroke-width="1"/>
+</g>
+<circle cx="0" cy="0" r="6.4" fill="#2a0a20"/><circle cx="0" cy="0" r="5" fill="#ff9ce0"/><circle cx="-1.4" cy="-1.4" r="1.8" fill="#fff0fa"/>
+</g>
+</svg>

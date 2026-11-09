@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Mimic, asleep: just a treasure chest. Probably. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M-16,-6 L16,-6 L16,12 L-16,12 Z" fill="#1f0f05" stroke="#1f0f05" stroke-width="2.4"/>
+<path d="M-16,-6 L16,-6 L16,12 L-16,12 Z" fill="#8c5222"/>
+<path d="M1,-6 L16,-6 L16,12 L1,12 Z" fill="#6a3a14"/>
+<path d="M-16,-6 L-13,-15 L13,-15 L16,-6 Z" fill="#1f0f05" stroke="#1f0f05" stroke-width="2.4"/>
+<path d="M-16,-6 L-13,-15 L13,-15 L16,-6 Z" fill="#a8662c"/>
+<path d="M1,-15 L13,-15 L16,-6 L1,-6 Z" fill="#7a4618"/>
+<path d="M-14.6,-7 L-12.2,-14 M-15,-5 L-15,11" stroke="#ffd9a6" stroke-width="1"/>
+<path d="M-16,3 L16,3 M-9,-15 L-9,12 M9,-15 L9,12" stroke="#ffcc4d" stroke-width="1.6"/>
+<rect x="-3" y="-8.6" width="6" height="7" rx="1" fill="#1f0f05"/><rect x="-2.2" y="-7.8" width="4.4" height="5.4" rx="0.8" fill="#ffd24d"/>
+<circle cx="0" cy="-5" r="0.9" fill="#1f0f05"/>
+</g>
+</svg>

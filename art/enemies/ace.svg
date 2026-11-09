@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Ace: a sharp forward-swept interceptor with a long canopy. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<g id="flame"><path d="M-2.4,12 L0,20 L2.4,12 Z" fill="#ff7ab0" opacity="0.9"/><path d="M-1.2,12 L0,16 L1.2,12 Z" fill="#ffe6f0"/></g>
+<path d="M0,-21 L4,-6 L18,12 L5,8 L3,13 L-3,13 L-5,8 L-18,12 L-4,-6 Z" fill="#2a0712" stroke="#2a0712" stroke-width="2.4"/>
+<path d="M0,-21 L-4,-6 L-18,12 L-5,8 L-3,13 L0,13 Z" fill="#f2507a"/>
+<path d="M0,-21 L4,-6 L18,12 L5,8 L3,13 L0,13 Z" fill="#b8325a"/>
+<path d="M-0.6,-18 L-4.4,-6 L-16,10" stroke="#ffc2d6" stroke-width="1" fill="none"/>
+<path d="M0,-15 C1.6,-12 1.6,-6 0,-3 C-1.6,-6 -1.6,-12 0,-15 Z" fill="#ffe0ea" stroke="#2a0712" stroke-width="0.8"/>
+<path d="M-12,8 L-6,5 M12,8 L6,5" stroke="#ffd0e0" stroke-width="1.2"/>
+</g>
+</svg>

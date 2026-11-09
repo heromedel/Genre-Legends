@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Supply Barge: a fat cargo hauler with crates lashed down its spine. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<g id="flame"><path d="M-6,15 L-4,21 L-2,15 Z M2,15 L4,21 L6,15 Z" fill="#ffb347" opacity="0.9"/></g>
+<path d="M0,-20 C9,-20 13,-12 13,0 C13,12 9,16 0,16 C-9,16 -13,12 -13,0 C-13,-12 -9,-20 0,-20 Z" fill="#2a2208" stroke="#2a2208" stroke-width="2.4"/>
+<path d="M0,-20 C9,-20 13,-12 13,0 C13,12 9,16 0,16 C-9,16 -13,12 -13,0 C-13,-12 -9,-20 0,-20 Z" fill="#e8cc5a"/>
+<path d="M0.6,-20 C9,-20 13,-12 13,0 C13,12 9,16 0.6,16 Z" fill="#b39635"/>
+<path d="M-10,-12 C-12,-6 -12.4,-2 -12.4,2" stroke="#fff3c4" stroke-width="1" fill="none"/>
+<rect x="-5" y="-13" width="10" height="7" rx="1" fill="#2a2208"/><rect x="-4.2" y="-12.2" width="8.4" height="5.4" rx="0.8" fill="#ffd95a"/>
+<rect x="-5" y="-4" width="10" height="7" rx="1" fill="#2a2208"/><rect x="-4.2" y="-3.2" width="8.4" height="5.4" rx="0.8" fill="#f2c040"/>
+<rect x="-5" y="5" width="10" height="7" rx="1" fill="#2a2208"/><rect x="-4.2" y="5.8" width="8.4" height="5.4" rx="0.8" fill="#ffd95a"/>
+<path d="M-4,-9.5 L4,-9.5 M-4,-0.5 L4,-0.5 M-4,8.5 L4,8.5" stroke="#8a6a1a" stroke-width="0.8"/>
+</g>
+</svg>

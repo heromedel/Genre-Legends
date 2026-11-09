@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 60 60">
+<!-- Brute: a hulking charger with a horned head plate and tusks. Facing up (toward where it flies), nominal radius 16, game units. Light from the top-left.
+     Each component: 1 outline, 2 fill, 3 shading, 4 highlights, 5 details. Back to front. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M-8,-14 L8,-14 L16,-4 L14,10 L6,16 L-6,16 L-14,10 L-16,-4 Z" fill="#2a0a05" stroke="#2a0a05" stroke-width="2.8"/>
+<path d="M-8,-14 L8,-14 L16,-4 L14,10 L6,16 L-6,16 L-14,10 L-16,-4 Z" fill="#e05a45"/>
+<path d="M0.6,-14 L8,-14 L16,-4 L14,10 L6,16 L0.6,16 Z" fill="#a83a2a"/>
+<path d="M-7.4,-13 L-15,-4 L-13,8" stroke="#ffc4b8" stroke-width="1.2" fill="none"/>
+<path d="M-6,-10 L6,-10 L9,-3 L5,4 L-5,4 L-9,-3 Z" fill="#2a0a05" stroke="#2a0a05" stroke-width="1.6"/>
+<path d="M-6,-10 L6,-10 L9,-3 L5,4 L-5,4 L-9,-3 Z" fill="#b8402e"/>
+<path d="M-9,-12 L-15,-22 L-12,-12 Z M9,-12 L15,-22 L12,-12 Z" fill="#2a0a05" stroke="#2a0a05" stroke-width="1.6"/>
+<path d="M-9,-12 L-15,-22 L-12,-12 Z M9,-12 L15,-22 L12,-12 Z" fill="#f2e6cc"/>
+<circle cx="-3.4" cy="-5" r="1.8" fill="#ffd040"/><circle cx="3.4" cy="-5" r="1.8" fill="#ffd040"/>
+<path d="M-12,10 L12,10" stroke="#6e2216" stroke-width="1"/>
+</g>
+</svg>
