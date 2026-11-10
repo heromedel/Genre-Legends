@@ -57,7 +57,7 @@ const FIRST_REGION_BASELINE := [
 ## Each genre's own weight, found with the average-player bot: the shooters' open field is easy to dodge in,
 ## the corridor's walls and the planet's open swarm are not.
 const TYPE_DIFFICULTY := {
-	"star_cluster": {"damage": 1.08, "fire": 1.08},
+	"star_cluster": {"damage": 1.0, "fire": 0.95},
 	"corridor": {"damage": 0.75, "fire": 0.85},
 	"planet": {"damage": 0.75, "fire": 0.78},
 	"dungeon": {"damage": 1.3, "fire": 1.25},

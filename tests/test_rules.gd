@@ -525,9 +525,9 @@ func _hits_that_matter() -> void:
 	var armor_before := player.armor
 	world.damage_player(25.0, "test")
 	check(player.armor == armor_before and player.shield_charges == 0, "the shield takes a whole heavy hit")
-	for i in int(13.0 / World.DT):
+	for i in int(8.5 / World.DT):
 		mission.weapons._shield_generator(World.DT)
-	check(player.shield_charges == 1, "the shield comes back 12 s after it breaks")
+	check(player.shield_charges == 1, "the shield comes back 8 s after it breaks")
 	# DSP-1 Drop Plate: each level adds Armor at once.
 	var max_before := player.max_armor
 	mission.offers.apply({"kind": "upgrade", "tech": "dsp1_plate", "fork": "", "fusion": "", "field": ""})

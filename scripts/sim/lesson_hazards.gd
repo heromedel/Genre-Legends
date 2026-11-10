@@ -2,8 +2,8 @@ class_name LessonHazards
 extends RefCounted
 ## The threats that make a lesson planet a lesson (GDD 9C). Needle swarms: volleys of tiny, fast,
 ## gently homing needles from off screen, weak alone and deadly in numbers. A Shield Generator answers them:
-## a volley costs at most one hit (immunity after a hit, GDD 13E), and a level 1 generator is back for every
-## other volley. A blade can cut them, Mirror Aegis turns them around, and dodging well survives them.
+## a volley costs at most one hit (immunity after a hit, GDD 13E), and a level 1 generator is back in time
+## for nearly every volley. A blade can cut them, Mirror Aegis turns them around, and dodging well survives them.
 ## In a dungeon they come out of vents in the room's own walls, glowing first, and only while the room still
 ## has enemies: never out of nowhere, through walls, or in a room already cleared (heromedel).
 

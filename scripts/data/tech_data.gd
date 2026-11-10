@@ -168,7 +168,7 @@ const TECH := {
 	"shield_generator": {
 		"name": "Shield Generator", "slot": "generator", "element": "energy",
 		"text": "A bubble that takes one hit of any size, then recharges.",
-		"levels": ["One charge, back 12 s after it breaks", "Back in 11 s", "Fork", "Back in 9 s", "Hardened bubble: back in 8 s"],
+		"levels": ["One charge, back 8 s after it breaks", "Back in 7 s", "Fork", "Back in 5 s", "Hardened bubble: back in 4 s"],
 		"blueprint_from": ["planet", "dungeon", "star_cluster"],
 		"forks": {
 			"a": {"name": "Twin Cell", "text": "Holds two charges."},

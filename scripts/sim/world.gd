@@ -533,9 +533,10 @@ func reflect_shot(shot: Shot, damage: float, homing: bool, splits: int) -> void:
 	emit("spark", {"pos": shot.pos, "color": Color(0.7, 1.0, 1.0)})
 
 
-## Seconds a Shield Generator charge takes to come back: 12 at level 1, one less each level (GDD 13K).
+## Seconds a Shield Generator charge takes to come back: 8 at level 1, one less each level, 4 at level 5
+## (GDD 13K). Set against the Arc Blade, which cuts bullets all the time, so neither is the obvious pick.
 func shield_recharge_seconds() -> float:
-	return 13.0 - maxi(run.level_of("shield_generator"), 1)
+	return 9.0 - maxi(run.level_of("shield_generator"), 1)
 
 
 ## Sets max Armor to the frame's plus what the plating adds now, keeping the damage already taken.
