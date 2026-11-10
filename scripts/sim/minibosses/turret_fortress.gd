@@ -38,12 +38,14 @@ func behave(dt: float) -> void:
 	if phase == 0 and turrets.is_empty():
 		core.invulnerable = false
 		set_phase(1, "THE FORTRESS GUNS FALL SILENT")
+	# Each gun fires a short spread in turn; with hits that matter (GDD 13), three guns at full rate down a
+	# trench was a wall of fire, so they take turns and the core's ring comes less often.
 	for turret: Enemy in turrets:
 		turret.facing = (world.player.pos - turret.pos).angle()
-		if fmod(time + turret.id * 0.4, 1.6) < dt:
-			world.enemy_aimed(turret.pos, 4, 0.5, 260.0, {"color": Color(1, 0.6, 0.3)})
+		if fmod(time + turret.id * 0.7, 2.2) < dt:
+			world.enemy_aimed(turret.pos, 3, 0.45, 260.0, {"color": Color(1, 0.6, 0.3)})
 			world.emit("sound", {"name": "enemy_shot"})
-	if fmod(time, 3.5) < dt:
+	if fmod(time, 4.5) < dt:
 		world.enemy_ring(core.pos, 14 if phase == 0 else 22, 150.0, time, {"color": Color(1, 0.5, 0.35)})
 	if phase == 1 and fmod(time, 0.15) < dt:
 		world.enemy_shot(core.pos, PI * 0.5 + sin(time * 2.0) * 1.1, 220.0, {"color": Color(1, 0.75, 0.4)})

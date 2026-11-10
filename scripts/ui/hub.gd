@@ -497,19 +497,25 @@ func _slot_card(slot_index: int) -> Control:
 		_rebuild())
 	var box := VBoxContainer.new()
 	box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.offset_top = 10
+	box.alignment = BoxContainer.ALIGNMENT_BEGIN
+	box.add_theme_constant_override("separation", 6)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	button.add_child(box)
 	for new_id in Save.data["new_unlocks"]:
 		if TechData.TECH.has(new_id) and TechData.TECH[new_id]["slot"] == slot:
 			button.add_child(NewDot.new())
 			break
-	var slot_label := UiKit.label(TechData.SLOT_NAMES[slot].to_upper(), 12, Color(0.55, 0.7, 0.85), "bold")
+	var slot_label := UiKit.label(TechData.SLOT_NAMES[slot].to_upper(), 14, Color(0.55, 0.7, 0.85), "bold")
 	slot_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	slot_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(slot_label)
 	if tech_id == "":
-		var empty := UiKit.label("empty — tap", 14, Color(0.5, 0.55, 0.65))
+		var plus := UiKit.label("+", 40, Color(0.45, 0.6, 0.75), "bold")
+		plus.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		plus.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(plus)
+		var empty := UiKit.label("empty", 15, Color(0.5, 0.55, 0.65))
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		empty.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_child(empty)
@@ -521,7 +527,7 @@ func _slot_card(slot_index: int) -> Control:
 		name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_child(name)
-		var mk := UiKit.label("Mk %d" % Save.tech_mk(tech_id), 13, Art.GOLD)
+		var mk := UiKit.label("Mk %d" % Save.tech_mk(tech_id), 15, Art.GOLD)
 		mk.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		mk.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_child(mk)

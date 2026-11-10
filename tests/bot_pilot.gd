@@ -43,8 +43,8 @@ func next_input() -> InputFrame:
 	var dodge := _dodge_vector()
 	if player.form == "ship":
 		var target_x := world.bounds.get_center().x
-		var nearest := world.nearest_enemy(player.pos, 2000.0)
-		if nearest != null and nearest.pos.y > 0.0:
+		var nearest := _hittable_target(player.pos)
+		if nearest != null:
 			target_x = nearest.pos.x
 		var desired := Vector2(target_x, world.bounds.end.y - 120.0) - player.pos
 		if mission.stage is CorridorStage:
@@ -99,6 +99,22 @@ func next_input() -> InputFrame:
 			threats += 1
 	frame.special = threats > 10 or (player.armor_fraction() < 0.35 and threats > 3)
 	return frame.quantized()
+
+
+## The closest enemy on screen that a shot can actually hurt: an armoured boss core isn't worth lining up under,
+## so the bot goes for the turrets, pods or legs that open it (a bot shooting at what can't be hurt is a bug,
+## GDD 4D).
+func _hittable_target(from: Vector2) -> Enemy:
+	var best: Enemy = null
+	var best_distance := INF
+	for enemy: Enemy in mission.world.enemies:
+		if enemy.dead or enemy.hidden or enemy.invulnerable or enemy.pos.y <= 0.0:
+			continue
+		var distance := from.distance_squared_to(enemy.pos)
+		if distance < best_distance:
+			best_distance = distance
+			best = enemy
+	return best
 
 
 func _dodge_vector() -> Vector2:

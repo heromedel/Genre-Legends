@@ -87,3 +87,11 @@ a design point).
 | 0.6 wording | Mawjig Siphon, Juggernaut Servos, Blood Pact | The cap is per copy; ramming doesn't hurt bosses; give Blood Pact's number. | **Acted on** | Texts now say so. |
 | 0.6 wording | DSP-1, Vanguard, Tempest, Guide, title notice | "what your Dropship prints" coy; armour/Armor mixed; Tempest's afterimages "beside" vs "behind"; Realms sentence clumsy; notice didn't say progress was cleared. | **Acted on** | Rewritten; player-facing text spells it "armor" throughout. |
 | 0.6 wording | Reflex Blade | Check that caught bullets really count as grazes. | **Discarded** | Verified in World.update_blades: each caught bullet calls the graze callback when the fusion is active. |
+| 0.6 cold review | Armor bar | Short ticks too faint to count; the bar read as four big blocks. | **Acted on** | Separate cells, one per 10 Armor, a wider gap every three. |
+| 0.6 cold review | Shield cells | Tiny, dim, easy to miss; full vs recharging unclear. | **Acted on** | Bigger cells under the bar; full ones glow, an empty one fills as it recharges; the bubble shows on the frame. |
+| 0.6 cold review | Hangar slots | Empty slots looked like full ones; the slot name jumped to the middle; small text. | **Acted on** | Name stays at the top, empty slots show "+", larger labels. |
+| 0.6 cold review | "Generator" | A blade in a slot called Generator reads oddly. | **Discarded** | heromedel named the slot (GDD 13J); the Hangar line explains what it holds. |
+| 0.6 cold review | HUD said 120, Hangar said 80 | Mismatch. | **Discarded** | The capture had the plate levelled to +40 by a debug power-up; a real mission starts at the Hangar's number. |
+| 0.6 QA harness | Corridor | The bot sat under the Bulkhead Fortress's armoured core for 150 s. | **Acted on** | Bot now lines up under what it can hurt (a bot shooting at the invulnerable is a bug, 4D); the fortress's guns take turns. |
+| 0.6 QA harness | Later regions | Mid and late kits die fast; hits grow by region before Armor can. | **Acted on** | Region steps gentler until 0.6.1's frame upgrades; fire carries on from the gate's level. |
+| 0.6 difficulty | First region | The bot lost planet 1 even on 0.5 (21 hits); density, not damage, was the problem. | **Acted on** | Density ramp, drill telegraphs, shorter acid, wall turrets silent beside you, Shield Generator 8 s. |

@@ -73,7 +73,7 @@ const ENEMIES := {
 ## Which enemies each mission type draws from, and how often (weights).
 const ROSTERS := {
 	"star_cluster": {"dart": 10, "wasp": 6, "splitter": 3, "bulwark_wing": 2, "minelayer": 2},
-	"corridor": {"drill": 6, "wasp": 5, "dart": 4, "minelayer": 2},
+	"corridor": {"drill": 3, "wasp": 5, "dart": 5, "minelayer": 2},
 	"planet": {"crawler": 10, "spitter": 5, "brute": 2, "burrower": 3},
 	"dungeon": {"skullbot": 6, "wisp": 5, "gloop": 4, "knight": 2, "pillar_turret": 2},
 }

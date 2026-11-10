@@ -247,11 +247,13 @@ func _barge(enemy: Enemy, dt: float) -> void:
 		world.emit("escaped", {"name": "Supply Barge"})
 
 
+## Wall turrets fire down the trench while they're ahead of you, then fall silent as they scroll alongside:
+## in a narrow corridor, a spread from beside you can't be dodged, and every hit counts (GDD 13).
 func _wall_turret(enemy: Enemy, dt: float) -> void:
 	enemy.facing = _aim_angle(enemy)
-	if enemy.fire_timer <= 0.0 and enemy.pos.y > 0.0 and enemy.pos.y < world.bounds.end.y - 80.0:
+	if enemy.fire_timer <= 0.0 and enemy.pos.y > 0.0 and enemy.pos.y < world.bounds.end.y * 0.55:
 		enemy.fire_timer = world.rng.randf_range(1.6, 2.4)
-		world.enemy_aimed(enemy.pos, 3, 0.3, 240.0)
+		world.enemy_aimed(enemy.pos, 2, 0.35, 240.0)
 		world.emit("sound", {"name": "enemy_shot"})
 	_despawn_if_gone(enemy)
 

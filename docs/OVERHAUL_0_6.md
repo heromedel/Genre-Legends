@@ -63,14 +63,14 @@ From the code audit (2026-11-09):
   | Boss heavy attack: lasers, bombs, shockwaves, always telegraphed | 25 |
 
   The sources that ignore scaling today (acid, wall scrape, Brood Queen acid) scale like everything else.
-- **13D. Harder means bigger hits.** In region 0, the hand-tuned planet steps stay (0.7 to 1.1). Each later region
-  multiplies hits in steps:
+- **13D. Harder means bigger hits.** Each later region multiplies hits in steps, gently until build 0.6.1 adds
+  frame upgrades (more Armor):
 
   | Region | Hits ×, on top of each region's planet steps |
   |---|---|
-  | 1 | 1.3 |
-  | 2 | 1.6 |
-  | 3 and beyond | +0.25 per region |
+  | 1 | 1.15 |
+  | 2 | 1.3 |
+  | 3 and beyond | +0.15 per region |
 
   - This replaces the old smooth formula.
   - Genre weights, Hazard routes and Threat stay as they are.
@@ -88,7 +88,11 @@ From the code audit (2026-11-09):
 - **13H. Boss length.** Every boss and mini-boss has 70% of its current health, through one factor (BOSS_HEALTH in
   mission data), not 21 separate edits. The average-player bot then tunes that factor until a planet 1 boss lasts
   30–45 s and a gate boss 60–90 s.
-- **13I. Difficulty targets,** replacing 9A's, for an average player on Standard:
+- **13I. Difficulty targets,** replacing 9A's, for an average player on Standard. Tuned (2026-11-10) with the
+  average-player bot: the first region now ramps bullet density from sparse on planet 1 (fire 0.38, hits 0.5) to
+  the gate (0.55, 0.75), Star Cluster and Corridor genre weights eased, drills show their charge line, acid puddles
+  last 2 s, wall turrets stop firing once they're beside you, the Bulkhead Fortress's guns take turns. The bot dodges
+  about as badly at any density, so heromedel's first 0.6 logs are the real calibration.
 
   | Planet | Hits taken |
   |---|---|
@@ -106,7 +110,7 @@ From the code audit (2026-11-09):
 
   | Generator part | What it does |
   |---|---|
-  | **Shield Generator** (new) | A bubble that blocks one hit of any size, then 1 s of immunity as it breaks. It recharges 12 s later (8 s at level 5). The frame shows it. Fork A, Twin Cell: two charges. Fork B, Breaker Pulse: a breaking shield sets off a blast that clears bullets around you. |
+  | **Shield Generator** (new) | A bubble that blocks one hit of any size, then 1 s of immunity as it breaks. It recharges 8 s later (4 s at level 5; tuned so it stands up to the Arc Blade, which cuts bullets all the time). The frame shows it. Fork A, Twin Cell: two charges. Fork B, Breaker Pulse: a breaking shield sets off a blast that clears bullets around you. |
   | **Arc Blade** (moves from weapon) | Unchanged. |
   | **Mirror Aegis** (moves from support) | Unchanged. |
   | **Soul Lantern** (moves from support) | Unchanged. |

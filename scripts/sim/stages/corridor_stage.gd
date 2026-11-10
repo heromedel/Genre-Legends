@@ -138,7 +138,7 @@ func _spawn_event() -> void:
 	var top := -30.0
 	var left := left_edge(0)
 	var right := right_edge(0)
-	if roll < 0.32:
+	if roll < 0.26:
 		var on_left := world.rng.randf() < 0.5
 		var turret := world.spawn_enemy("wall_turret", Vector2(left + 16.0 if on_left else right - 16.0, top))
 		turret.memory["left"] = on_left

@@ -35,8 +35,9 @@ const HIT_BODY := 20.0     # elites', bosses' and boss parts' bodies; shockwave 
 const HIT_HEAVY := 25.0    # bosses' telegraphed heavy attacks: lasers and bombs
 ## Past the first region, hits grow in steps rather than your pool shrinking (GDD 13D, Isaac's later floors):
 ## index = region, and each region past the last adds REGION_HITS_STEP.
-const REGION_HITS := [1.0, 1.3, 1.6]
-const REGION_HITS_STEP := 0.25
+## Gentle until build 0.6.1 brings frame upgrades (more Armor); then the steps can grow.
+const REGION_HITS := [1.0, 1.15, 1.3]
+const REGION_HITS_STEP := 0.15
 ## Every boss and mini-boss part's health, as a share of what it was before hits mattered (GDD 13H). Tuned with
 ## the average-player bot: a planet 1 boss should last 30-45 s and a gate boss 60-90 s.
 const BOSS_HEALTH := 0.7
@@ -60,7 +61,7 @@ const FIRST_REGION_BASELINE := [
 ## the corridor's walls and the planet's open swarm are not.
 const TYPE_DIFFICULTY := {
 	"star_cluster": {"damage": 1.0, "fire": 0.95},
-	"corridor": {"damage": 0.75, "fire": 0.85},
+	"corridor": {"damage": 0.65, "fire": 0.7},
 	"planet": {"damage": 0.75, "fire": 0.78},
 	"dungeon": {"damage": 1.3, "fire": 1.25},
 }
