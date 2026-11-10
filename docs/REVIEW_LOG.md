@@ -95,3 +95,8 @@ a design point).
 | 0.6 QA harness | Corridor | The bot sat under the Bulkhead Fortress's armoured core for 150 s. | **Acted on** | Bot now lines up under what it can hurt (a bot shooting at the invulnerable is a bug, 4D); the fortress's guns take turns. |
 | 0.6 QA harness | Later regions | Mid and late kits die fast; hits grow by region before Armor can. | **Acted on** | Region steps gentler until 0.6.1's frame upgrades; fire carries on from the gate's level. |
 | 0.6 difficulty | First region | The bot lost planet 1 even on 0.5 (21 hits); density, not damage, was the problem. | **Acted on** | Density ramp, drill telegraphs, shorter acid, wall turrets silent beside you, Shield Generator 8 s. |
+| 0.6 blind playtest | Whole run | The tester never launched: its Launch tap missed the button after the planet strip moved up. | **Acted on** | Tap moved to the button's new place; rerun. |
+| 0.6 blind playtest | Title notice | No fresh-save notice on the title. | **Discarded** | Correct: the test browser has no old save; the notice only shows when an older save is replaced. |
+| 0.6 blind playtest | Star map | Selecting a locked planet pans the map so the reachable planet is off screen; locked and open planets look alike. | **Saved** | Star map readability pass (HUD and map art pass). |
+| 0.6 blind playtest | Play log | Taps on the planet card are logged as "empty space on the star map". | **Saved** | Small play-log fix for the next build. |
+| 0.6 blind playtest | Planet reward | A planet can offer DSP-1 Drop Plate blueprints, which reads as a dull prize. | **Saved** | They raise its Mk (more plating levels), but plates should mostly come from bosses and branches in 0.6.1 (21G). |
