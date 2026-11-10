@@ -96,13 +96,13 @@ func _apply_difficulty() -> void:
 	var modifier: Dictionary = MissionData.MODIFIERS.get(node.get("modifier", ""), {})
 	var threat: Dictionary = MissionData.THREAT.get(node.get("threat", "standard"), MissionData.THREAT["standard"])
 	# The first region is hand-set (GDD 9A). Past it, enemies grow tougher and busier from the gate's level, and
-	# hits grow in region steps (GDD 13D): within a region they climb from 0.85 at its first planet to about 1.1
+	# hits grow in region steps (GDD 13D): within a region they climb from 0.75 at its first planet to about 1.0
 	# at its last, branches and Hazards push them a little further, and the region's step multiplies it all.
 	var region: int = node.get("region", 0)
 	var within_region := difficulty - (1.0 + 0.3 * region)
 	# Fire carries on from the gate's level rather than jumping to full density: with a hit budget, how much is
 	# thrown at you matters as much as how hard each hit lands.
-	var base := {"enemy_hp": 1.0 + 0.55 * (difficulty - 1.0), "damage": region_hits(region) * (0.85 + 0.8 * within_region),
+	var base := {"enemy_hp": 1.0 + 0.55 * (difficulty - 1.0), "damage": region_hits(region) * (0.75 + 0.8 * within_region),
 		"fire": 0.55 + 0.15 * region + 0.3 * within_region, "bullet_speed": 0.95 + 0.08 * (difficulty - 1.0)}
 	var column: int = node.get("baseline", -1)
 	if column >= 0:
@@ -411,6 +411,7 @@ func debug_power_up(fork: String) -> void:
 		if run.tech_level[tech_id] >= TechData.FORK_LEVEL:
 			run.forks[tech_id] = fork
 	player.special_charges = 1
+	world.refresh_plate_armor()
 	note("Debug: powered up with forks %s" % fork)
 
 
