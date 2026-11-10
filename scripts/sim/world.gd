@@ -110,6 +110,7 @@ func spawn_enemy(kind: String, at: Vector2, overrides: Dictionary = {}) -> Enemy
 	enemy.elite = data.get("elite", false)
 	enemy.objective = data.get("objective", false)
 	enemy.drops_crate = data.get("drops_crate", false)
+	enemy.drops_repair = data.get("drops_repair", false)
 	enemy.front_shield = data.get("front_shield", false)
 	enemy.ghost = data.get("ghost", false)
 	enemy.fire_timer = rng.randf_range(0.6, 1.8)
@@ -401,6 +402,8 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 		shard_total -= value
 	if enemy.drops_crate or (enemy.elite and rng.randf() < crate_chance * 1.4):
 		drop_pickup("crate", enemy.pos)
+	if enemy.drops_repair:
+		drop_pickup("repair", enemy.pos + Vector2(0, 14))
 	if enemy.elite and elite_blueprint_tech != "":
 		drop_pickup("blueprint", enemy.pos, 1.0, elite_blueprint_tech)
 	elif enemy.elite_mod != "" and reward_tech != "" and rng.randf() < 0.3:

@@ -21,14 +21,16 @@ func spawn() -> void:
 
 
 func behave(dt: float) -> void:
-	var speed := 1.6 if angry else 1.1
+	# A loop slow enough to line up under (about 240 px/s across at full sweep, 330 angry): with one straight gun,
+	# the old 400 px/s sweep made a planet 1 mini-boss a one-to-two-minute chase.
+	var speed := 1.1 if angry else 0.8
 	var aces := living_parts("ace")
 	# The aces dive in from off screen; once both are on the field the fight (and its health bar) starts.
 	if entering and aces.all(func(ace): return ace.pos.y > 40.0):
 		entering = false
 	for ace: Enemy in aces:
 		var side := -1.0 if ace.part == "ace0" else 1.0
-		var target := origin + Vector2(side * cos(time * speed) * 360.0, sin(time * speed * 2.0) * 90.0)
+		var target := origin + Vector2(side * cos(time * speed) * 300.0, sin(time * speed * 2.0) * 90.0)
 		ace.pos = ace.pos.move_toward(target, 420.0 * dt)
 		ace.facing = PI * 0.5
 		if fmod(time + (0.0 if side < 0 else 0.5), 1.0 if angry else 1.4) < dt:

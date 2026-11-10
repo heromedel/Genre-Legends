@@ -116,7 +116,7 @@ func field_card(upgrade_id: String) -> Dictionary:
 
 ## When everything is maxed out: something still worth having.
 func _cache_card() -> Dictionary:
-	return _card("cache", "", "Salvage Cache", "Gain a reroll and repair 15 armor.", "common", 1.0)
+	return _card("cache", "", "Salvage Cache", "Gain a reroll and repair 10 Armor.", "common", 1.0)
 
 
 ## Fills in the card's build lines: Resonance progress or a tier unlock, and fusion progress.

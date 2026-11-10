@@ -8,6 +8,7 @@ const FIELD := Rect2(0, 0, 1200, 800)
 const SCROLL_SPEED := 170.0
 const LENGTH := 20000.0             # pixels of corridor before the boss (about five minutes, GDD 9B)
 const FORTRESS_AT := 9500.0          # where the mini-boss bulkhead blocks the trench
+const REPAIRS_AT := [0.25, 0.75]    # parts of the run where a repair kit drifts down the trench (GDD 13G)
 const SEGMENT := 40.0               # wall collision is built from strips this tall
 
 var distance := 0.0                 # how far the corridor has scrolled
@@ -16,6 +17,7 @@ var gates: Array = []               # {y, zone, period, timer}
 var scrape_timer := 0.0
 var corridor_seed := 0.0
 var fortress_skipped := false
+var repairs_sent := 0
 var length := LENGTH                 # shorter when a mission dives into this corridor from another stage
 
 
@@ -117,6 +119,10 @@ func step(dt: float) -> void:
 	if distance >= next_event and distance < length:
 		_spawn_event()
 		next_event += world.rng.randf_range(260.0, 420.0) / world.spawn_scale
+	# The trench has nothing placed to repair at, so kits drift down it, one each side of the bulkhead.
+	if repairs_sent < REPAIRS_AT.size() and distance >= length * REPAIRS_AT[repairs_sent]:
+		repairs_sent += 1
+		world.drop_pickup("repair", Vector2(center_at(corridor_y_at(-20.0)), -20.0))
 	if distance >= length + 500.0 and not boss_started:
 		start_boss(BossRoster.make(BossRoster.for_node(mission.node, "boss"), world))
 

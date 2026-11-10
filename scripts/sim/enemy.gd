@@ -21,6 +21,7 @@ var elite_mod := ""            # a promoted elite's twist: shielded, splitting o
 var shield_hp := 0.0           # a shielded elite's barrier, spent before its health
 var objective := false        # counts toward the mission's goal
 var drops_crate := false
+var drops_repair := false           # Star Cluster has no placed repairs, so its barge carries one (GDD 13G)
 var front_shield := false     # blocks shots arriving from in front of it
 var ghost := false            # passes through walls
 var dead := false

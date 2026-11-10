@@ -84,7 +84,8 @@ From the code audit (2026-11-09):
   - Planet missions place two.
   - In dungeons, a cleared room drops one 15% of the time, plus the shrine room.
   - Every mini-boss drops one when it falls.
-  - Star Cluster and Corridor have none, as now.
+  - Star Cluster's Supply Barge drops one along with its crate, and Corridor has two kits drift down the trench, one each
+    side of the bulkhead. (Changed 2026-11-10: with none, the blind playtester lost planet 1 to 18 chip hits and no way back.)
 - **13H. Boss length.** Every boss and mini-boss has 70% of its current health, through one factor (BOSS_HEALTH in
   mission data), not 21 separate edits. The average-player bot then tunes that factor until a planet 1 boss lasts
   30–45 s and a gate boss 60–90 s.

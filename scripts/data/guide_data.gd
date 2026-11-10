@@ -31,7 +31,7 @@ const ENEMIES := {
 	"bulwark_wing": "Its front plating blocks your shots. Hit it from the side, or with anything that curves.",
 	"minelayer": "Crosses the screen dropping mines that drift down and burst into rings.",
 	"ace": "An elite pilot that loops across the top of the field. Leaves after a while if you can't catch it.",
-	"supply_barge": "A fat freighter crossing the screen. Destroy it before it escapes and it drops a Salvage Crate.",
+	"supply_barge": "A fat freighter crossing the screen. Destroy it before it escapes and it drops a Salvage Crate and a repair kit.",
 	"wall_turret": "Bolted into the corridor walls, firing short aimed bursts.",
 	"drill": "A kamikaze that lines you up and rams.",
 	"crawler": "Fast, weak and many. Runs straight at you.",
