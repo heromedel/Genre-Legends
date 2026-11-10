@@ -475,7 +475,7 @@ func _dungeon_needles() -> void:
 	var guard := mission.world.spawn_enemy("skullbot", stage.room_rect(stage.current).get_center())
 	stage.room_enemies = [guard.id]
 	mission.world.events.clear()
-	for i in 300:
+	for i in 420:
 		hazards.update(World.DT)
 	var warned := mission.world.events.any(func(e): return e["type"] == "needle_warning")
 	var room := stage.room_rect(stage.current).grow(20.0)
