@@ -47,10 +47,11 @@ func update(input: InputFrame, dt: float) -> void:
 		var slot: String = TechData.TECH[tech_id]["slot"]
 		if slot == "special":
 			continue
-		if not firing and slot != "support" and tech_id != "orbital_halo":
+		var passive := _always_working(tech_id)
+		if not firing and not passive:
 			run.tech_timer[tech_id] = maxf(float(run.tech_timer.get(tech_id, 0.0)) - dt, 0.0)
 			continue
-		run.tech_timer[tech_id] = float(run.tech_timer.get(tech_id, 0.0)) - dt * (fire_rate if slot != "support" else 1.0)
+		run.tech_timer[tech_id] = float(run.tech_timer.get(tech_id, 0.0)) - dt * (1.0 if passive else fire_rate)
 		_update_tech(tech_id, dt)
 	_update_special(input, dt)
 	_update_ion_beam(dt)
@@ -61,6 +62,16 @@ func update(input: InputFrame, dt: float) -> void:
 		vent_echo -= dt
 		if vent_echo <= 0.0:
 			_vent(1.5)
+
+
+## Tech that works whether or not you're firing (GDD 11N): supports, plating, and the defences that guard you
+## on their own. Weapons, and the Arc Blade's swings, wait for the trigger when auto-fire is off.
+const ALWAYS_WORKING := ["orbital_halo", "shield_generator", "mirror_aegis", "soul_lantern"]
+
+
+func _always_working(tech_id: String) -> bool:
+	var slot: String = TechData.TECH[tech_id]["slot"]
+	return slot == "support" or slot == "plating" or ALWAYS_WORKING.has(tech_id)
 
 
 ## How long the mech keeps its aim after the aim stick is let go.

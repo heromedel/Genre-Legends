@@ -45,14 +45,16 @@ const BOSS_HEALTH := 0.7
 ## bot to land in its target. Index = column in the first region (5 = the gate). After that, a formula
 ## takes over from where the gate leaves off.
 ## Re-set for build 0.6 (GDD 13I): with a six-to-eight-hit pool, the early planets throw fewer, slower and
-## lighter bullets, so planet 1 teaches the hit budget and the gate still bites.
+## lighter bullets, so planet 1 teaches the hit budget and the gate still bites. Tuned with the average-player
+## bot (tests/difficulty_report.gd), which dodges about as well at any density, so heromedel's first 0.6 logs
+## are the real calibration.
 const FIRST_REGION_BASELINE := [
 	{"enemy_hp": 0.85, "damage": 0.5, "fire": 0.38, "bullet_speed": 0.8},    # planet 1: learn to fly
 	{"enemy_hp": 0.95, "damage": 0.6, "fire": 0.45, "bullet_speed": 0.85},   # planet 2: first real fights
 	{"enemy_hp": 1.0, "damage": 0.65, "fire": 0.48, "bullet_speed": 0.88},   # planet 3: the needle lesson
 	{"enemy_hp": 1.1, "damage": 0.7, "fire": 0.5, "bullet_speed": 0.92},     # planet 4: builds start to matter
-	{"enemy_hp": 1.2, "damage": 0.75, "fire": 0.53, "bullet_speed": 0.95},   # planet 5
-	{"enemy_hp": 1.3, "damage": 0.8, "fire": 0.6, "bullet_speed": 0.97},     # planet 6: the gate
+	{"enemy_hp": 1.2, "damage": 0.72, "fire": 0.52, "bullet_speed": 0.95},   # planet 5
+	{"enemy_hp": 1.25, "damage": 0.75, "fire": 0.55, "bullet_speed": 0.97},  # planet 6: the gate
 ]
 ## Each genre's own weight, found with the average-player bot: the shooters' open field is easy to dodge in,
 ## the corridor's walls and the planet's open swarm are not.
