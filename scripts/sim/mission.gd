@@ -75,6 +75,9 @@ func _init(map_node: Dictionary, mission_seed: int, frame_id: String, loadout: A
 
 ## What happened on the way here (RouteEvents): a scored hull, a crate waiting, more elites, faster
 ## enemy bullets, or a field upgrade from a Mawjig beacon.
+var route_banners: Array = []    # what the route event changed, announced on the mission's first tick
+
+
 func _apply_route_event(effects: Dictionary) -> void:
 	if effects.is_empty():
 		return
@@ -83,11 +86,35 @@ func _apply_route_event(effects: Dictionary) -> void:
 	run.rerolls += int(effects.get("rerolls", 0))
 	world.elite_chance *= float(effects.get("elites", 1.0))
 	world.bullet_speed_scale *= float(effects.get("bullet_speed", 1.0))
+	world.enemy_hp_scale *= float(effects.get("enemy_hp", 1.0))
+	world.boss_health_scale *= float(effects.get("boss_health", 1.0))
+	player.heat = float(effects.get("start_heat", player.heat))
+	var fitted := []
 	if effects.get("start_field", "") == "random":
 		var choices := UpgradeData.FIELD.keys().filter(func(id): return id != "field_repair")
-		offers.apply(offers.field_card(choices[world.rng.randi() % choices.size()]))
+		var field_id: String = choices[world.rng.randi() % choices.size()]
+		offers.apply(offers.field_card(field_id))
+		fitted.append(UpgradeData.FIELD[field_id]["name"])
+	if effects.get("start_risky", "") == "random":
+		var risky := UpgradeData.RISKY_FIELD.keys()
+		var risky_id: String = risky[world.rng.randi() % risky.size()]
+		var card := offers.field_card(risky_id)
+		offers.apply(card)
+		fitted.append(UpgradeData.RISKY_FIELD[risky_id]["name"])
 	if effects.has("title"):
-		note("En route: %s" % effects["title"])
+		# Said out loud as the mission starts, so you see what the trip changed (heromedel never could).
+		var lines: Array = fitted + RouteEvents.mission_summary(effects)
+		note("En route: %s (%s)" % [effects["title"], ", ".join(lines)])
+		if not lines.is_empty():
+			# The event's name, then what it changed, a few short items per banner so each fits the screen.
+			route_banners.append(str(effects["title"]).to_upper())
+			var chunk := []
+			for line in lines:
+				if not chunk.is_empty() and ", ".join(chunk + [line]).length() > 40:
+					route_banners.append(", ".join(chunk).to_upper())
+					chunk = []
+				chunk.append(line)
+			route_banners.append(", ".join(chunk).to_upper())
 
 
 ## Difficulty from the planet's danger, and its special condition (GDD 5C proposal).
@@ -169,6 +196,10 @@ func start_stage(new_stage: Stage) -> void:
 func step(input: InputFrame) -> void:
 	tick += 1
 	world.tick = tick
+	# The route event's banners wait for the first tick of the mission itself, after the launch transition.
+	for text in route_banners:
+		world.emit("banner", {"text": text, "style": "gold"})
+	route_banners.clear()
 	match state:
 		"offer":
 			_resolve_offer(input.choice)

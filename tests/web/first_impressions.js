@@ -30,6 +30,10 @@ scenarios.push({ name: 'power_hangar_overclocked', query: '?page=hangar&mk=3&loa
 scenarios.push({ name: 'power_hangar_over_load', query: '?page=hangar&mk=3&loadout=pulse_driver,swarm_pods,orbital_halo,aux_generator,nova_bomb,shield_generator,lunarium_plate', shots: [5000] });
 scenarios.push({ name: 'power_map_over_load', query: '?page=map&mk=3&loadout=pulse_driver,swarm_pods,orbital_halo,aux_generator,nova_bomb,shield_generator,lunarium_plate', shots: [5000] });
 scenarios.push({ name: 'power_heat_mission', query: '?test=star_cluster&god=1&power=a&mk=3&loadout=thunder_lance,starfall,orbital_halo,coolant_loop,ion_cannon,shield_generator,arc_lined_plate', shots: [8000, 13000, 16000] });
+// Route events (GDD 12D): the pop-up on LAUNCH, an outcome, and the banners as the mission starts.
+scenarios.push({ name: 'event_derelict_shielded', query: '?page=map&event=derelict&mk=1&loadout=pulse_driver,,,,nova_bomb,shield_generator,dsp1_plate', shots: [6500], taps: [[5000, 970, 621]] });
+scenarios.push({ name: 'event_bounty', query: '?page=map&event=bounty', shots: [6500], taps: [[5000, 970, 621]] });
+scenarios.push({ name: 'event_prototype_start', query: '?page=map&event=prototype', shots: [6500, 7800, 13600, 16400], taps: [[5000, 970, 621], [6600, 566, 404], [7900, 566, 459]] });
 scenarios.push({ name: 'depot_page', query: '?page=depot&crystals=1250', shots: [5000] });
 scenarios.push({ name: 'new_tech_pods_ion', query: '?test=star_cluster&god=1&power=b&mk=3&loadout=pulse_driver,swarm_pods,arc_blade,option_pods,ion_cannon', shots: [6000, 6600, 9000], keys: [[6100, 'Space']] });
 scenarios.push({ name: 'new_tech_lantern_thruster', query: '?test=planet&god=1&power=a&mk=3&loadout=pulse_driver,arc_blade,starfall,soul_lantern,thruster_explosion', shots: [9000, 9350, 12000], keys: [[9100, 'Space']] });
@@ -58,13 +62,14 @@ for (const type of ['star_cluster', 'corridor', 'planet', 'dungeon']) {
     page.on('pageerror', e => errors.push(e.message));
     await page.goto(BASE + scenario.query);
     await page.waitForFunction(() => document.querySelector('#status') == null || getComputedStyle(document.querySelector('#status')).display === 'none' || document.querySelector('#status').style.visibility === 'hidden', null, { timeout: 30000 }).catch(() => {});
+    // One timeline of key presses, taps ([ms, x, y]) and screenshots, in time order.
+    const timeline = [
+      ...(scenario.keys || []).map(([at, key]) => ({ at, run: () => page.keyboard.press(key) })),
+      ...(scenario.taps || []).map(([at, x, y]) => ({ at, run: () => page.mouse.click(x, y) })),
+      ...scenario.shots.map(at => ({ at, run: () => page.screenshot({ path: `${out}/${scenario.name}_${String(at / 1000).padStart(4, '0')}s.png` }) })),
+    ].sort((a, b) => a.at - b.at);
     let elapsed = 0;
-    for (const [at, key] of scenario.keys || []) { await page.waitForTimeout(at - elapsed); elapsed = at; await page.keyboard.press(key); }
-    for (const at of scenario.shots) {
-      await page.waitForTimeout(at - elapsed);
-      elapsed = at;
-      await page.screenshot({ path: `${out}/${scenario.name}_${String(at / 1000).padStart(4, '0')}s.png` });
-    }
+    for (const step of timeline) { await page.waitForTimeout(step.at - elapsed); elapsed = step.at; await step.run(); }
     console.log(`${scenario.name}: ${errors.length ? errors.slice(0, 5).join(' | ') : 'ok'}`);
     await page.close();
   }

@@ -107,8 +107,8 @@ func _card(kind: String, tech_id: String, title: String, text: String, rarity: S
 
 ## A card for one ordinary field upgrade (route events hand these out too).
 func field_card(upgrade_id: String) -> Dictionary:
-	var upgrade: Dictionary = UpgradeData.FIELD[upgrade_id]
-	var card := _card("field", "", upgrade["name"], upgrade["text"], "field", 0.7)
+	var upgrade: Dictionary = UpgradeData.field_upgrade(upgrade_id)
+	var card := _card("field", "", upgrade["name"], upgrade["text"], "risky" if UpgradeData.RISKY_FIELD.has(upgrade_id) else "field", 0.7)
 	card["field"] = upgrade_id
 	card["element"] = upgrade.get("element", "")
 	return card

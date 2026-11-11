@@ -61,6 +61,7 @@ func fresh_data() -> Dictionary:
 		"dive_wrecks": [],        # a scan waiting for you to pick a wreck
 		"dives_since_rare": 0,    # the pity count: a Rare at least every 10 dives
 		"start_crate": 0,         # Salvage Crates waiting at the start of the next mission
+		"last_event": "",         # the last route event met, so the same one never comes twice in a row
 	}
 
 

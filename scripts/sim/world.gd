@@ -54,6 +54,7 @@ var next_enemy_id := 1
 
 # Difficulty and modifiers, set by Mission from the planet's danger and special condition.
 var enemy_hp_scale := 1.0
+var boss_health_scale := 1.0        # route events can weaken or toughen the boss
 var enemy_damage_scale := 1.0
 var plain_hit := 10.0               # this planet's plain bullet: one cell of the Armor bar (Mission sets it)
 var bullet_speed_scale := 1.0

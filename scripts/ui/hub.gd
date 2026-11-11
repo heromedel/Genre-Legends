@@ -114,10 +114,11 @@ func _confirm(title: String, text: String, confirm_label: String, on_confirm: Ca
 ## On the way to a planet something may happen (RouteEvents): a choice, its outcome, then the launch.
 func _launch(node: Dictionary) -> void:
 	var missions_flown: int = Save.data["stats"]["missions"]
-	var event_id := RouteEvents.roll(node, missions_flown, Save.data["map_seed"])
+	var event_id := RouteEvents.roll(node, missions_flown, Save.data["map_seed"], Save.data["last_event"])
 	if event_id == "":
 		launch_requested.emit(node["id"], {})
 		return
+	Save.data["last_event"] = event_id
 	var event: Dictionary = RouteEvents.EVENTS[event_id]
 	PlayLog.note("event", "On the way to %s: %s" % [node["name"], event["title"]])
 	Sound.play("radio")
@@ -133,12 +134,25 @@ func _launch(node: Dictionary) -> void:
 	var choices: Array = event["choices"]
 	for i in choices.size():
 		var choice: Dictionary = choices[i]
-		var affordable: bool = _largest_blueprint_pile() >= int(choice.get("needs_blueprints", 0))
-		# Just the action: what each choice leads to is for the player to learn or intuit.
-		var button := UiKit.button(choice["label"], func():
+		if not RouteEvents.offered(choice, Save.data["loadout"]):
+			continue
+		var affordable: bool = _largest_blueprint_pile() >= int(choice.get("needs_blueprints", 0)) \
+			and Save.data["crystals"] >= int(choice.get("needs_crystals", 0))
+		# Just the action: what each choice leads to is for the player to learn or intuit. An option your loadout
+		# unlocks names the tech that makes it possible.
+		var label: String = choice["label"]
+		var needs: Array = choice.get("needs_tech", [])
+		if not needs.is_empty():
+			var having: Array = needs.filter(func(t): return Save.data["loadout"].has(t))
+			label = "%s: %s" % [TechData.TECH[having[0]]["name"], label]
+		var button := UiKit.button(label, func():
 			var outcome := RouteEvents.resolve(event_id, i, node["id"], missions_flown, Save.data["map_seed"])
 			_route_outcome(popup, column, node, event, choice, outcome), "Event %s: %s" % [event_id, choice["label"]])
 		button.disabled = not affordable
+		if not needs.is_empty():
+			# Your build opened this option: it stands out in the tech's cyan.
+			button.add_theme_color_override("font_color", Color(0.5, 0.95, 1.0))
+			button.add_theme_stylebox_override("normal", UiKit._box(Color(0.04, 0.12, 0.18), Color(0.4, 0.85, 1.0), 2))
 		column.add_child(button)
 	add_child(popup)
 
@@ -151,9 +165,16 @@ func _route_outcome(popup: Control, column: VBoxContainer, node: Dictionary, eve
 	var effects: Dictionary = outcome[1]
 	column.add_child(UiKit.wrapped(outcome[0], 17, Color(1, 0.85, 0.55)))
 	if effects.has("blueprints_random"):
-		var ids := TechData.TECH.keys()
+		var ids := TechData.findable_ids()
 		for n in int(effects["blueprints_random"]):
 			Save.add_blueprints(ids[randi() % ids.size()], 1)
+	if effects.has("crystals"):
+		if int(effects["crystals"]) > 0:
+			Save.add_crystals(int(effects["crystals"]), "route event")
+		else:
+			Save.data["crystals"] = maxi(Save.data["crystals"] + int(effects["crystals"]), 0)
+	Save.data["frame_blueprints"] += int(effects.get("frame_blueprints", 0))
+	Save.data["free_dives"] += int(effects.get("free_dive", 0))
 	if effects.has("blueprints_planet"):
 		Save.add_blueprints(node["reward_tech"], int(effects["blueprints_planet"]))
 	if effects.has("spend_blueprints"):

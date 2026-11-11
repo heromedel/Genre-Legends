@@ -31,6 +31,7 @@ func _init() -> void:
 	_hits_that_matter()
 	_building_a_frame()
 	_crates_deepen()
+	_route_events()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -677,3 +678,30 @@ func _crates_deepen() -> void:
 		elif card["kind"] == "online":
 			brought_online += 1
 	check(deepened > 150 and brought_online > 10, "crate upgrades mostly deepen online tech, sometimes bring new tech online (%d / %d)" % [deepened, brought_online])
+
+
+## Route events (GDD 12D): real choices, build-gated options, and effects the mission applies and announces.
+func _route_events() -> void:
+	var known := ["blueprints_random", "blueprints_planet", "spend_blueprints", "crystals", "frame_blueprints", "free_dive",
+		"start_armor", "start_crates", "rerolls", "start_field", "start_risky", "start_heat", "elites", "bullet_speed", "enemy_hp", "boss_health"]
+	for event_id in RouteEvents.EVENTS:
+		var choices: Array = RouteEvents.EVENTS[event_id]["choices"]
+		var bare := choices.filter(func(c): return RouteEvents.offered(c, ["pulse_driver"]))
+		check(bare.size() >= 2, "%s offers a real choice to any loadout" % event_id)
+		for choice in choices:
+			for need in choice.get("needs_tech", []):
+				check(TechData.TECH.has(need), "%s's %s needs real tech" % [event_id, choice["label"]])
+			for outcome in choice["outcomes"]:
+				for key in outcome[2]:
+					check(known.has(key), "%s uses a known effect (%s)" % [event_id, key])
+	check(not RouteEvents.offered(RouteEvents.EVENTS["derelict"]["choices"][1], ["pulse_driver"]), "a build-gated option is hidden without its tech")
+	check(RouteEvents.offered(RouteEvents.EVENTS["derelict"]["choices"][1], ["pulse_driver", "shield_generator"]), "and shown with it")
+	var node := {"id": "t", "name": "T", "region": 0, "column": 1, "row": 0.0, "type": "star_cluster", "need": "x",
+		"difficulty": 1.0, "danger": 1, "modifier": "", "reward_tech": "arc_blade", "prize": "", "prize_text": "",
+		"event": {"title": "Prototype Testers", "start_field": "random", "start_risky": "random", "boss_health": 0.75, "start_heat": 60.0, "start_crates": 1}}
+	var mission := Mission.new(node, 7, "vanguard", TechData.STARTING_LOADOUT, func(t): return 1)
+	mission.step(InputFrame.new())
+	var banners := mission.drain_events().filter(func(e): return e["type"] == "banner" and str(e["text"]) == "PROTOTYPE TESTERS")
+	check(not banners.is_empty(), "the mission announces what the route event changed")
+	check(is_equal_approx(mission.world.boss_health_scale, 0.75) and is_equal_approx(mission.player.heat, 60.0) and mission.pending_crates == 1, "route effects reach the mission")
+	check(mission.run.field.size() == 2, "a field upgrade and a risky card are fitted")

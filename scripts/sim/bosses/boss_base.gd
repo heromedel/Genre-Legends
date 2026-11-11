@@ -69,7 +69,7 @@ func add_part(part_name: String, offset: Vector2, hp: float, radius: float, opti
 	var part := world.spawn_enemy("boss_part", origin + offset)
 	part.boss = self
 	part.part = part_name
-	part.max_hp = hp * 1.3 * MissionData.BOSS_HEALTH * world.enemy_hp_scale
+	part.max_hp = hp * 1.3 * MissionData.BOSS_HEALTH * world.enemy_hp_scale * world.boss_health_scale
 	part.hp = part.max_hp
 	part.radius = radius
 	part.look = look
