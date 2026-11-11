@@ -115,6 +115,10 @@ func _apply_difficulty() -> void:
 	base["fire"] *= genre.get("fire", 1.0)
 	world.enemy_hp_scale = base["enemy_hp"] * modifier.get("enemy_hp", 1.0) * threat["enemy_hp"]
 	world.enemy_damage_scale = base["damage"] * threat["damage"]
+	# Armor reads as hits (GDD 13A): this planet's plain bullet is one cell of the Armor bar, and a big hit is
+	# anything worth two cells or more (longer immunity, Spaced Armor).
+	world.plain_hit = MissionData.HIT_SMALL * world.enemy_damage_scale
+	player.heavy_hit = world.plain_hit * 2.0
 	world.bullet_speed_scale = base["bullet_speed"] * modifier.get("bullet_speed", 1.0) * threat["bullet_speed"]
 	world.enemy_fire_scale = base["fire"] * threat["fire"]
 	world.spawn_scale = modifier.get("spawn", 1.0)

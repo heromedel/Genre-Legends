@@ -14,6 +14,18 @@ moves into `docs/GAME_DESIGN.md` or `docs/ROADMAP.md` and is struck off here.
 - **Ai-Generated-Proposal (2026-11-11):** A frame's tier picks could add a fourth, frame-specific pick at tier 3
   (the Tempest: afterimages fire twice; the Bulwark: Fortress Field throws back a third).
 
+## From the 0.6 design review (2026-11-11)
+
+- **Ai-Generated-Proposal (2026-11-11):** Forks set a tech's element (Splitfire turns Kinetic, Breaker Pulse turns
+  Explosive), so a fork is also a Resonance direction. Today Resonance follows the slot layout: Kinetic and Explosive
+  have no main weapon or Generator part, and three of the four element-tagged field cards are Kinetic. Make Tractor
+  Beam neutral at the same time.
+- **Ai-Generated-Proposal (2026-11-11):** An R&D focus: pick one tech, and half of every replay's blueprints and its
+  elite drops go to it (Derelict Dives lean on it too), so the Mk 3 needed for a fusion isn't 15+ replays of two
+  particular planets.
+- **Ai-Generated-Proposal (2026-11-11):** Level 5 of each fork becomes a visible behaviour change, the way Chain
+  Bolts gains a third jump, instead of a stat line ("Faster rails", "Heavier rail"). About ten techs (GDD 1C).
+
 ## Salvage Crates
 
 - **Proposed (2026-11-11):** The crate as a high-tech lock taking its combination, as an alternative to the slot

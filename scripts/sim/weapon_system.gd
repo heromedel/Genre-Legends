@@ -76,7 +76,8 @@ func update(input: InputFrame, dt: float) -> void:
 
 ## Tech that works whether or not you're firing (GDD 11N): supports, plating, and the defences that guard you
 ## on their own. Weapons, and the Arc Blade's swings, wait for the trigger when auto-fire is off.
-const ALWAYS_WORKING := ["orbital_halo", "shield_generator", "mirror_aegis", "soul_lantern"]
+## Drone Pods keep trailing you too: they only fire when the main weapon does.
+const ALWAYS_WORKING := ["orbital_halo", "option_pods", "shield_generator", "mirror_aegis", "soul_lantern"]
 
 
 func _always_working(tech_id: String) -> bool:

@@ -10,7 +10,7 @@ const LORE := [
 ]
 
 const HOW_IT_WORKS := [
-	["Armor", "Your frame's Armor is one pool, and the bar reads as hits: each cell is 10 Armor, a plain bullet's worth, grouped in threes. Big hits take more, and after any hit you can't be hit again for a moment. Repairs are rare, so every hit counts."],
+	["Armor", "Your frame's Armor is one pool, and the bar reads as hits: each cell is one plain bullet on the planet you're on, grouped in threes. Early planets hit softly, so the bar has more cells; later regions hit harder. Big hits take two cells or more, and after any hit you can't be hit again for a moment. Repairs are rare, so every hit counts."],
 	["Loadout", "Seven slots: a main weapon, two weapons, a support, a special, a generator and your plating. The generator slot holds what keeps you alive, a shield, a blade, a mirror or a lantern, one at a time. Plating is your outer armor and is worn from the start of every mission."],
 	["Load and Output", "Every part weighs something, and a frame can only carry its Max Load: a build that's too heavy can't launch. Powered parts draw Mawjig Output. You may run past your Output on purpose: that's overclocking, and the Hangar's pips turn orange."],
 	["Heat", "An overclocked frame heats up as its powered parts come online, faster the more pips you're over. At full heat it vents: for 3 s every powered part but your main weapon goes quiet, shield included. Unpowered parts keep working, and the vent itself costs no Armor. A Coolant Loop cancels a pip or two of overclock, an Auxiliary Generator adds Output, and an Overheat Core makes every vent a shockwave."],

@@ -51,8 +51,11 @@ func setup(frame: String, equipped: Array, mk_lookup: Callable, tier_picks: Arra
 		tech_mk[tech_id] = mk
 		tech_cap[tech_id] = TechData.MK_LEVEL_CAP[mk]
 		# GDD 7D: only the main weapon starts online, and the parts that are the frame itself: the plating is worn,
-		# and the power parts run it (GDD 21A).
-		tech_level[tech_id] = 1 if slot_index == 0 or TechData.TECH[tech_id].get("starts_online", false) else 0
+		# the power parts run it (GDD 21A), and the Generator part keeps it alive. With hits that matter, a run could
+		# end before a level-up ever brought the Generator online (the design review's bot runs died at level 1-2
+		# with it still offline), so what keeps you alive is there from the first second.
+		var slot: String = TechData.TECH[tech_id]["slot"]
+		tech_level[tech_id] = 1 if slot_index == 0 or slot == "generator" or TechData.TECH[tech_id].get("starts_online", false) else 0
 		tech_timer[tech_id] = 0.0
 
 

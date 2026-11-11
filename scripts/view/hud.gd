@@ -166,22 +166,25 @@ func _draw() -> void:
 		draw_rect(Rect2(Vector2.ZERO, screen), Color(flash_color.r, flash_color.g, flash_color.b, flash_amount * 0.6))
 
 
-## The Armor bar as cells: one cell per 10 Armor (one bullet), a wider gap every three, so how many hits you
+## The Armor bar as cells: one cell per plain bullet on this planet, a wider gap every three, so how many hits you
 ## have left can be counted at a glance (GDD 13A). The cells a hit just took flash white and drain away.
 func _armor_bar(at: Vector2, size: Vector2, player: PlayerFrame) -> void:
 	var maximum := maxf(player.max_armor, 1.0)
 	var low := player.armor / maximum < 0.34
 	var color := Color(1.0, 0.62, 0.25) if not low else Color(1.0, 0.35, 0.25).lerp(Color(1.0, 0.62, 0.25), 0.5 + 0.5 * sin(time * 8.0))
-	var cells := int(ceil(maximum / 10.0 - 0.01))
-	var gap := 3.0
-	var group_gap := 7.0
+	# One cell is one plain bullet on this planet (GDD 13A), so the bar counts the hits you can take here.
+	var cell_size := maxf(mission.world.plain_hit, 1.0)
+	var cells := int(ceil(maximum / cell_size - 0.01))
+	# Soft-hitting early planets give many cells; the gaps narrow so the cells stay readable.
+	var gap := 3.0 if cells <= 16 else 2.0
+	var group_gap := 7.0 if cells <= 16 else 5.0
 	var cell_width := (size.x - gap * (cells - 1) - (group_gap - gap) * ((cells - 1) / 3)) / cells
 	draw_rect(Rect2(at - Vector2(3, 3), size + Vector2(6, 6)), Color(0, 0, 0, 0.55))
 	var x := at.x
 	for i in cells:
-		var low_edge := i * 10.0
-		var high_edge := minf((i + 1) * 10.0, maximum)
-		var cell := Rect2(Vector2(x, at.y), Vector2(cell_width * (high_edge - low_edge) / 10.0, size.y))
+		var low_edge := i * cell_size
+		var high_edge := minf((i + 1) * cell_size, maximum)
+		var cell := Rect2(Vector2(x, at.y), Vector2(cell_width * (high_edge - low_edge) / cell_size, size.y))
 		draw_rect(cell, color.darkened(0.78))
 		var filled := clampf((player.armor - low_edge) / (high_edge - low_edge), 0.0, 1.0)
 		var flashing := clampf((armor_trail - low_edge) / (high_edge - low_edge), 0.0, 1.0)

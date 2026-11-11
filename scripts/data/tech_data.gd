@@ -145,7 +145,7 @@ const TECH := {
 		},
 	},
 	"option_pods": {
-		"name": "Drone Pods", "slot": "support", "element": "kinetic", "weight": 2, "draw": 1,
+		"name": "Drone Pods", "slot": "weapon", "element": "kinetic", "weight": 2, "draw": 1,
 		"text": "Two pods trail your path and fire weaker copies of your main weapon.",
 		"levels": ["Two pods", "Stronger copies", "Fork", "Third pod", "Strongest copies"],
 		"blueprint_from": ["star_cluster", "corridor"],
@@ -206,7 +206,7 @@ const TECH := {
 		"starts_online": true, "plate_armor": 0.0, "armor_per_level": 10.0,
 		"blueprint_from": [], "source": "Printed by your Dropship: every frame has it.",
 		"forks": {
-			"a": {"name": "Spaced Armor", "text": "+10 Armor, and hits of 20 or more do 5 less."},
+			"a": {"name": "Spaced Armor", "text": "+10 Armor, and big hits (two cells of the Armor bar or more) do a cell less."},
 			"b": {"name": "Field Patches", "text": "+10 Armor, and every repair you pick up restores 5 more."},
 		},
 	},

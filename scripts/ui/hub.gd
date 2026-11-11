@@ -464,7 +464,7 @@ func _build_hangar_page() -> Control:
 	if power["over_load"]:
 		column.add_child(UiKit.wrapped("Over Max Load: swap a heavy part for a lighter one, or leave a slot empty, before you launch.", 15, Color(1, 0.45, 0.4)))
 	elif power["overclocked"]:
-		column.add_child(UiKit.wrapped("Overclocked: this build draws more power than your Output gives. In a mission the frame heats up as those parts come online, and at full heat it vents: for 3 s every powered part but your main weapon goes quiet, shield included.", 14, Color(1, 0.7, 0.35)))
+		column.add_child(UiKit.wrapped("Overclocked: this build draws more power than your Output gives. In a mission the frame heats up as those parts come online, and at full heat it vents: for 3 s every powered part but your main weapon goes quiet, shield included. With everything online, it vents about every %d s." % roundi(power["vent_every"]), 14, Color(1, 0.7, 0.35)))
 	var slots_row := HBoxContainer.new()
 	slots_row.add_theme_constant_override("separation", 8)
 	column.add_child(slots_row)
@@ -509,7 +509,7 @@ func _frame_card(frame_id: String) -> Control:
 	column.add_child(UiKit.label(data["name"], 22, data["hull"] if unlocked else Color(0.5, 0.55, 0.65), "title"))
 	column.add_child(UiKit.wrapped(data["tagline"], 13, Color(0.7, 0.8, 0.9)))
 	var stats := FrameData.stats(frame_id, Save.frame_tiers(frame_id))
-	column.add_child(UiKit.label("Armor %d (%d hits)   Speed %d" % [stats["armor"], int(stats["armor"] / MissionData.HIT_SMALL), stats["speed"]], 13, Color(0.6, 0.75, 0.9)))
+	column.add_child(UiKit.label("Armor %d   Speed %d" % [stats["armor"], stats["speed"]], 13, Color(0.6, 0.75, 0.9)))
 	column.add_child(UiKit.label("Max Load %d   Mawjig Output %d" % [stats["load"], stats["output"]], 13, Color(0.6, 0.75, 0.9)))
 	column.add_child(UiKit.label(data["trait_name"], 15, Art.GOLD, "bold"))
 	column.add_child(UiKit.wrapped(data["trait_text"], 13, Color(0.85, 0.8, 0.65)))

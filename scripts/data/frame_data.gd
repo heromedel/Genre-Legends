@@ -51,7 +51,7 @@ const TIER_PICK_TEXT := {
 ## and a little longer after a big hit.
 const HIT_GRACE := 1.0
 const HEAVY_HIT_GRACE := 1.3
-const HEAVY_HIT := 20.0
+const HEAVY_HIT := 20.0          # the default; in a mission a big hit is two of that planet's plain bullets
 ## Bulwark's Fortress Field: how wide its armoured front is, either side of where it faces (radians).
 const FORTRESS_FRONT := 1.05
 

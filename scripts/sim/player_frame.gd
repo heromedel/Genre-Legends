@@ -30,6 +30,7 @@ var alive := true
 var graze := 0.0
 var overdrive := 0.0            # seconds of Overdrive left
 var heat := 0.0                 # frame heat, 0 to 100 (GDD 21D): overclocking and the Overheat Core raise it
+var heavy_hit := FrameData.HEAVY_HIT   # a big hit, two cells or more; Mission sets it from the planet's plain bullet
 var vent_trip := 0.0            # seconds the powered parts stay offline after an overclocked vent
 # Plates (GDD 21H)
 var weave_cooldown := 0.0       # Jig-Weave Composite: seconds until it can shrug off another light hit
@@ -111,7 +112,7 @@ func tick_timers(dt: float) -> void:
 func take_hit(amount: float) -> float:
 	if not alive or grace > 0.0 or amount <= 0.0:
 		return 0.0
-	grace = FrameData.HEAVY_HIT_GRACE if amount >= FrameData.HEAVY_HIT else FrameData.HIT_GRACE
+	grace = FrameData.HEAVY_HIT_GRACE if amount >= heavy_hit else FrameData.HIT_GRACE
 	armor -= amount
 	if armor <= 0.0:
 		armor = 0.0

@@ -393,6 +393,9 @@ func power_summary() -> Dictionary:
 	# A Coolant Loop cancels the first pip over, so one pip past Output with it fitted never heats.
 	summary["cooled"] = 1 if loadout.has("coolant_loop") else 0
 	summary["overclocked"] = summary["draw"] > summary["output"] + summary["cooled"]
+	# How often it vents with everything online: heat climbs from 40% to 100% at 2.5% a second per pip over.
+	var over: int = summary["draw"] - summary["output"] - summary["cooled"]
+	summary["vent_every"] = 60.0 / (2.5 * over * float(stats["heat_rate"])) if over > 0 else 0.0
 	return summary
 
 

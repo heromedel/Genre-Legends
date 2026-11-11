@@ -81,6 +81,7 @@
 - **7B. Proposed (2026-11-08):** A limited number can be equipped before a mission, either by category (e.g. Weapon, Armor, Passive, Special) or by Armored Core-style slots (e.g. back-mounted shield, shoulder chaingun, primary weapon in one hand, thruster/legs). Slots might complicate it.
 - **7C. Proposed (2026-11-08):** Equipping doesn't give full power. Tech is upgraded during missions, like Vampire Survivors or Cell Survivor, probably with a point system, missable drops and occasionally a slot-machine upgrade.
 - **7D. Proposed (2026-11-08):** Only the base weapon starts working in a mission, so base weapons are their own category.
+  - **Ai-Generated-Proposal (2026-11-11):** The parts that are the frame itself start working too: the plating, the power parts, and the Generator part. With hits that matter, the design review's bot runs died at level 1-2 with the Generator part still offline, so the slot that keeps you alive meant nothing in exactly the deaths players remember. Weapons, supports and specials still come online through level-ups and crates.
 - **7E. Proposed (2026-11-08):** Tech can draw on MechWarrior, Armored Core and The Guardian Legend, or be magic abilities described as Mawjig energy.
 - **7G. Likely (2026-11-09):** Fusions stay at max level (both tech at level 5, so Mk 3), as a late-game goal, as long as each fusion is game-changing enough to be impressive. (heromedel.) The game only mentions a fusion when the mission can reach it.
 - **7F. Proposed (2026-11-08):** Upgrades fork a weapon into different behaviours (e.g. ricochet as an upgrade step of the starter weapon), and two pieces of high-level tech can fuse into a named fusion with a new effect. (Claude's idea; heromedel: "sounds cool".)
@@ -225,5 +226,6 @@ there.
 | 2026-11-09 | 13A–13X, 11P | Build 0.6 built: hits that matter, the Generator and Plating slots, the Shield Generator, Chain Bolts replacing Ricochet. |
 | 2026-11-10 | 13Y | Build 0.6.1 built: Load and Output, heat, power parts, frame tiers, the other plates. |
 | 2026-11-11 | 10F | Mawjig tech is physics bending, not witchcraft: Hex becomes Flux, hexed becomes unstable. |
+| 2026-11-11 | 7D, 13A | From the design review: the Generator part starts online; the Armor bar's cells are this planet's plain bullet; Drone Pods move to the weapon slot; the Hangar says how often an overclocked build vents. |
 | 2026-11-11 | 8E | Mawjig Crystals, a daily check-in and Derelict Dives in a Supply Depot tab. |
 | 2026-11-11 | 11Y | Crates deepen your build, are rarer and smaller, and roll like real slot reels. |

@@ -55,6 +55,7 @@ var next_enemy_id := 1
 # Difficulty and modifiers, set by Mission from the planet's danger and special condition.
 var enemy_hp_scale := 1.0
 var enemy_damage_scale := 1.0
+var plain_hit := 10.0               # this planet's plain bullet: one cell of the Armor bar (Mission sets it)
 var bullet_speed_scale := 1.0
 var spawn_scale := 1.0
 var xp_scale := 1.0
@@ -572,9 +573,9 @@ func damage_player(amount: float, source: String) -> void:
 		if resonance["energy"] >= 2:
 			_capacitor_discharge()
 		return
-	# DSP-1 Spaced Armor: a big hit loses some of its punch in the gap between the plates.
-	if run.plating() == "dsp1_plate" and run.fork_of("dsp1_plate") == "a" and amount >= FrameData.HEAVY_HIT:
-		amount -= 5.0
+	# DSP-1 Spaced Armor: a big hit (two cells or more) loses a cell of its punch in the gap between the plates.
+	if run.plating() == "dsp1_plate" and run.fork_of("dsp1_plate") == "a" and amount >= player.heavy_hit:
+		amount -= plain_hit
 	# Lantern Ward: a wisp throws itself in front of the hit and takes half of it.
 	if run.fork_of("soul_lantern") == "b" and wisps > 0:
 		wisps -= 1

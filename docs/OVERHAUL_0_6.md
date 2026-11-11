@@ -116,8 +116,9 @@ From the code audit (2026-11-09):
   | **Mirror Aegis** (moves from support) | Unchanged. |
   | **Soul Lantern** (moves from support) | Unchanged. |
 
-  - The weapon slots keep Swarm Pods, Orbital Halo and Starfall.
-  - The support slot keeps Graze Engine, Overheat Core and Drone Pods.
+  - The weapon slots keep Swarm Pods, Orbital Halo and Starfall, and (from 0.6.1) Drone Pods, so two weapon slots
+    have four weapons to pair.
+  - The support slot keeps Graze Engine and Overheat Core, and gains the Coolant Loop and Auxiliary Generator.
 - **13L. Proposed (2026-11-09): plating is the frame's outer armour.** Most plates are basic and trade Armor
   against weight and speed. A few rare ones are strange and change how you play, and only rare or carefully balanced
   ones may touch attack. Names are chosen with intent. (heromedel.)

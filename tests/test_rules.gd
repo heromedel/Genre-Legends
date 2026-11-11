@@ -579,7 +579,7 @@ func _building_a_frame() -> void:
 	check(is_equal_approx(tiered.player.max_armor, 90.0) and is_equal_approx(tiered.run.frame_stats["heat_rate"], 0.75), "a mission flies the frame's tiers")
 	# The starter runs cool; offline parts draw nothing.
 	var mission := _mission_with(TechData.STARTING_LOADOUT)
-	check(mission.run.online_draw() == 1 and mission.run.overclock_pips() < 0.0, "a mission starts within its Output")
+	check(mission.run.online_draw() == 3 and mission.run.overclock_pips() < 0.0, "a mission starts within its Output, Generator part online")
 	# An overclocked build heats up, vents and trips its powered parts.
 	var hot := ["thunder_lance", "", "starfall", "", "ion_cannon", "shield_generator", "dsp1_plate"]
 	check(TechData.loadout_weight(hot) <= 12 and TechData.loadout_draw(hot) == 12, "the hot test build fits and draws 12")
@@ -619,7 +619,7 @@ func _building_a_frame() -> void:
 	mission.weapons._add_heat(100.0)
 	check(mission.player.vent_trip <= 0.0 and is_equal_approx(mission.player.heat, WeaponSystem.VENT_HEAT_LEFT), "a core vent within Output never trips parts")
 	# The Hangar's power summary and the launch rule.
-	var summary_loadout := ["pulse_driver", "swarm_pods", "orbital_halo", "option_pods", "nova_bomb", "shield_generator", "lunarium_plate"]
+	var summary_loadout := ["pulse_driver", "swarm_pods", "option_pods", "graze_engine", "nova_bomb", "shield_generator", "lunarium_plate"]
 	check(TechData.loadout_weight(summary_loadout) > 12, "a greedy build overflows the Vanguard's Load")
 	# Plates.
 	var plated := TechData.STARTING_LOADOUT.duplicate()
