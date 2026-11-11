@@ -32,17 +32,17 @@ const EVENTS := {
 		"choices": [
 			{"label": "Answer it", "outcomes": [
 				[1.0, "You'll land among the raiders, with twice the elites. The drone drops you a Salvage Crate as you arrive.", {"elites": 2.0, "start_crates": 1}]]},
-			{"label": "Send 3 crystals' worth of decoys", "needs_crystals": 3, "outcomes": [
+			{"label": "Send decoys (3 crystals)", "needs_crystals": 3, "outcomes": [
 				[1.0, "The decoys draw the raiders off. The drone gets clear and drops you a Salvage Crate.", {"crystals": -3, "start_crates": 1}]]},
 			{"label": "Ignore it", "outcomes": [[1.0, "The signal fades behind you.", {}]]}]},
 	"trader": {"title": "Wandering Trader", "text": "A Mawjig trader hails you: salvage for salvage, no questions asked.",
 		"choices": [
 			{"label": "Trade 2 blueprints", "needs_blueprints": 2, "outcomes": [
 				[1.0, "Two blueprints from your biggest pile buy a Salvage Crate and a spare reroll.", {"spend_blueprints": 2, "start_crates": 1, "rerolls": 1}]]},
-			{"label": "Pay 4 crystals", "needs_crystals": 4, "outcomes": [
+			{"label": "Pay the trader (4 crystals)", "needs_crystals": 4, "outcomes": [
 				[1.0, "He fits something to your frame before you can ask what. You'll start with a field upgrade.", {"crystals": -4, "start_field": "random"}]]},
 			{"label": "Sell him your reactor's waste heat", "needs_tech": ["overheat_core", "aux_generator", "coolant_loop"], "outcomes": [
-				[1.0, "He pays in spare parts: +2 rerolls, and you'll start hot (60% heat).", {"rerolls": 2, "start_heat": 60.0}]]},
+				[1.0, "He takes the heat and pays in spare parts, but the transfer runs your reactor hot: +2 rerolls, and you'll start at 60% heat.", {"rerolls": 2, "start_heat": 60.0}]]},
 			{"label": "Decline", "outcomes": [[1.0, "The trader shrugs and drifts off.", {}]]}]},
 	"ambush": {"title": "Ambush", "text": "Hunters lie in wait in the debris field ahead. There's no clean way past.",
 		"choices": [
@@ -57,28 +57,28 @@ const EVENTS := {
 			{"label": "Touch it", "outcomes": [
 				[0.5, "It sings to your frame. You'll start with a field upgrade.", {"start_field": "random"}],
 				[0.3, "It screams. You'll start with a field upgrade, but enemy bullets fly faster.", {"start_field": "random", "bullet_speed": 1.12}],
-				[0.2, "It drinks from your plating and gives nothing back. You'll start at 75% Armor.", {"start_armor": 0.75}]]},
+				[0.2, "It drinks from your frame and gives nothing back. You'll start at 75% Armor.", {"start_armor": 0.75}]]},
 			{"label": "Tune it to your Mawjig tech", "needs_tech": ["flux_repeater", "starfall", "soul_lantern", "time_brake"], "outcomes": [
-				[1.0, "Your tech hums in key with it. You'll start with a field upgrade, no strings attached.", {"start_field": "random"}]]},
-			{"label": "Leave it", "outcomes": [[1.0, "Some things are better left humming.", {}]]}]},
+				[1.0, "Your tech hums in key with it. You'll start with a field upgrade, and nothing else.", {"start_field": "random"}]]},
+			{"label": "Leave it", "outcomes": [[1.0, "You leave it humming behind you.", {}]]}]},
 	"bounty": {"title": "Rival Hunter", "text": "A bounty hunter blocks your path and offers a wager: whoever clears the planet first takes the purse.",
 		"choices": [
 			{"label": "Take the wager", "outcomes": [
-				[1.0, "Game on. The hunter stirs up the planet: twice the elites and a tougher boss. Win the mission and the purse is yours: +4 of this planet's blueprints and 5 crystals. Lose, and you get nothing extra.", {"elites": 2.0, "boss_health": 1.2, "wager_blueprints": 4, "wager_crystals": 5}]]},
+				[1.0, "The hunter stirs up the planet: twice the elites, and every boss here, mini-bosses too, a fifth tougher. Win the mission and the purse is yours: +4 of this planet's blueprints and 5 crystals. Lose, and you get nothing extra.", {"elites": 2.0, "boss_health": 1.2, "wager_blueprints": 4, "wager_crystals": 5}]]},
 			{"label": "Turn it down", "outcomes": [
 				[1.0, "The hunter laughs and spreads the word. A few more elites come looking for you.", {"elites": 1.4}]]}]},
 	"sabotage": {"title": "Inside Job", "text": "Operations has a contact near the planet's boss. A little help would go a long way.",
 		"choices": [
 			{"label": "Fund the sabotage (6 crystals)", "needs_crystals": 6, "outcomes": [
-				[1.0, "The charges are set. The boss will start a quarter weaker.", {"crystals": -6, "boss_health": 0.75}]]},
+				[1.0, "The charges are set. Every boss here, mini-bosses too, will have a quarter less health.", {"crystals": -6, "boss_health": 0.75}]]},
 			{"label": "Plant the charges yourself", "outcomes": [
-				[0.7, "In and out. The boss will start a fifth weaker, but the guards winged you: 80% Armor.", {"boss_health": 0.8, "start_armor": 0.8}],
+				[0.7, "In and out. Every boss here, mini-bosses too, will have a fifth less health, but the guards winged you: 80% Armor.", {"boss_health": 0.8, "start_armor": 0.8}],
 				[0.3, "The guards were waiting. You get out at 70% Armor, charges unplanted.", {"start_armor": 0.7}]]},
 			{"label": "Leave it to the contact", "outcomes": [[1.0, "Operations sighs. You'll do it the hard way.", {}]]}]},
 	"ion_squall": {"title": "Ion Squall", "text": "A storm of charged dust sweeps across the route. It'll cook anything that runs hot.",
 		"choices": [
 			{"label": "Ride it out", "outcomes": [
-				[1.0, "The squall bakes your reactor. You'll start at 70% heat, but the static charge gives you a spare reroll.", {"start_heat": 70.0, "rerolls": 1}]]},
+				[1.0, "The squall bakes your reactor and scorches your plating: you'll start at 70% heat and 90% Armor, but the static charge gives you a spare reroll.", {"start_heat": 70.0, "start_armor": 0.9, "rerolls": 1}]]},
 			{"label": "Vent through it", "needs_tech": ["coolant_loop"], "outcomes": [
 				[1.0, "Your Coolant Loop drinks the storm. +2 rerolls and you arrive cool.", {"rerolls": 2}]]},
 			{"label": "Go around", "outcomes": [
@@ -88,7 +88,7 @@ const EVENTS := {
 			{"label": "Share your repair kits", "outcomes": [
 				[1.0, "They patch their hulls with your kits and hand you a set of frame plans. +1 Frame Blueprint, and you'll start at 85% Armor.", {"frame_blueprints": 1, "start_armor": 0.85}]]},
 			{"label": "Escort them to the jump point", "outcomes": [
-				[1.0, "A quiet escort. They pay in crystals: +4. You arrive late, and the planet's defenders have dug in: enemies are a little tougher.", {"crystals": 4, "enemy_hp": 1.1}]]},
+				[1.0, "A quiet escort. They pay in crystals: +4, but the escort costs you time and the defenders dig in: enemies are a little tougher.", {"crystals": 4, "enemy_hp": 1.1}]]},
 			{"label": "Wave them on", "outcomes": [[1.0, "They limp on toward the jump point.", {}]]}]},
 	"prototype": {"title": "Prototype Testers", "text": "An R&D lab ship wants a field test of something unstable. They'll pay in research.",
 		"choices": [
@@ -101,7 +101,7 @@ const EVENTS := {
 			{"label": "Send the drone in", "outcomes": [
 				[1.0, "The drone marks a wreck worth diving. A free Derelict Dive waits at the Depot, but a turret wakes up as you leave: 85% Armor.", {"free_dive": 1, "start_armor": 0.85}]]},
 			{"label": "Strip a hull yourself", "outcomes": [
-				[0.6, "Good plating, still warm. +3 of this planet's blueprints.", {"blueprints_planet": 3}],
+				[0.6, "Its systems are still warm. +3 of this planet's blueprints.", {"blueprints_planet": 3}],
 				[0.4, "The hull shifts and pins you for a moment. +1 of this planet's blueprints, and you'll start at 75% Armor.", {"blueprints_planet": 1, "start_armor": 0.75}]]},
 			{"label": "Skirt the field", "outcomes": [[1.0, "You give the dead a wide berth.", {}]]}]},
 }
@@ -153,9 +153,9 @@ static func mission_summary(effects: Dictionary) -> Array:
 	if effects.has("rerolls"):
 		lines.append("+%d reroll%s" % [int(effects["rerolls"]), "" if int(effects["rerolls"]) == 1 else "s"])
 	if float(effects.get("boss_health", 1.0)) < 1.0:
-		lines.append("boss weakened")
+		lines.append("bosses weakened")
 	if float(effects.get("boss_health", 1.0)) > 1.0:
-		lines.append("boss tougher")
+		lines.append("bosses tougher")
 	if float(effects.get("elites", 1.0)) > 1.0:
 		lines.append("more elites")
 	if effects.has("start_armor"):

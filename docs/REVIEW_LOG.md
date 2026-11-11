@@ -146,5 +146,9 @@ a design point).
 | 0.6.1 events cold review | Start banners | Names only: you can't tell the field upgrade from the risky card. | **Acted on** | The risky card is labelled ("RISKY: BLOOD PACT"). |
 | 0.6.1 events cold review | Banner over action | An enemy is already on screen while the banners play. | **Saved** | Minor; the radio hold covers the first seconds. Watch heromedel's logs. |
 | 0.6.1 events cold review | Two LAUNCH buttons | The pop-up's Launch and the planet card's show together. | **Discarded** | The pop-up covers the map with its own; the card's button is behind it and harmless. |
+| 0.6.1 events wording | Boss health | "The boss will start weaker": it's less health for the whole fight, and mini-bosses too. | **Acted on** | "Every boss here, mini-bosses too, will have a quarter less health"; banners say "bosses weakened/tougher". |
+| 0.6.1 events wording | Ion Squall | "Ride it out" was a free reroll for any build that isn't overclocked (heat sheds in about 23 s). | **Acted on** | It also scorches the plating: 90% Armor at the start. |
+| 0.6.1 events wording | Smaller lines | Selling waste heat then arriving hot read backwards; "drinks from your plating"; "Good plating"; a repeated line; stock phrases; three cost-label formats. | **Acted on** | Each reworded; cost labels read "Action (n crystals)". |
+| 0.6.1 events wording | Bounty pays on a loss | The checker read the version before the cold-review fix. | **Discarded** | Already fixed: the purse pays only for a win. |
 | 0.6 blind playtest (re-triage) | Play log | "Card taps logged as empty map space" was wrong: the tester's extra Continue taps really landed on the map. | **Acted on** | Not a bug; map taps now log screen pixels so they're easy to read. |
 | Star map (from 0.6 blind) | Locked vs open planets | Locked and open planets looked alike. | **Acted on** | Locked planets are grey, smaller and quiet; planets you can fly keep their colour and get a gold NEXT tag. |
