@@ -164,10 +164,10 @@ func _spawn_event() -> void:
 			dart.vel = Vector2(0, 160)
 
 
-## A laser gate spans the corridor and cycles: warning flicker, then a deadly beam, then off.
+## A laser gate spans the corridor and cycles: warning flicker, then a deadly beam, then off. No banner: the
+## flicker says it all (heromedel).
 func _add_gate() -> void:
 	gates.append({"y": -20.0, "zone": null, "timer": world.rng.randf_range(0.0, 1.0)})
-	world.emit("banner", {"text": "LASER GATE", "style": "red"})
 
 
 func _update_gates(dt: float, scroll: float) -> void:

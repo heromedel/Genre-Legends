@@ -12,7 +12,7 @@ const VENT_OFFSETS := [Vector2(-160, -62), Vector2(0, -84), Vector2(160, -62)]
 ## Who this boss is, known from the moment it's made so its warning can name it.
 func introduce() -> void:
 	boss_name = "Mirror Dreadnought"
-	title = "The First Gate Holds"
+	title = "Nothing Gets Through"
 	look = "mirror_dreadnought"
 	color = Color(0.75, 0.9, 1.0)
 

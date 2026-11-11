@@ -9,7 +9,9 @@ class_name Browser
 
 static func set_fullscreen_wanted(wanted: bool) -> void:
 	if OS.has_feature("web"):
-		JavaScriptBridge.eval("window.glFullscreen && (window.glFullscreen.want = %s);" % ("true" if wanted else "false"), true)
+		# Turning it on in Settings gives it two fresh tries (it gives up after two, so a browser that refuses
+		# isn't asked on every tap: each ask can blur the page, which used to drop the player's touch).
+		JavaScriptBridge.eval("window.glFullscreen && (window.glFullscreen.want = %s, window.glFullscreen.tries = 0);" % ("true" if wanted else "false"), true)
 
 
 ## Removes the offline copy of the game (the service worker and its cached files) and reloads the page,

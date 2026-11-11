@@ -339,7 +339,7 @@ func _build_map_page() -> Control:
 	var info_panel := UiKit.panel()
 	info_panel.custom_minimum_size = Vector2(0, 204)
 	column.add_child(info_panel)
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScroll.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	# Most planets fit; the rare one with more to say still scrolls, without a bar eating the width.
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
@@ -469,7 +469,7 @@ func _info_column(weight: float) -> VBoxContainer:
 # ---------------------------------------------------------------- hangar
 
 func _build_hangar_page() -> Control:
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScroll.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -649,7 +649,7 @@ func _tech_picker(slot_index: int) -> Control:
 		picker_slot = -1
 		_rebuild(), "Hangar: close picker"))
 	column.add_child(header)
-	var list_scroll := ScrollContainer.new()
+	var list_scroll := TouchScroll.new()
 	list_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	list_scroll.custom_minimum_size = Vector2(640, 420)
 	column.add_child(list_scroll)
@@ -691,7 +691,7 @@ func _tech_picker(slot_index: int) -> Control:
 # ---------------------------------------------------------------- R&D
 
 func _build_rnd_page() -> Control:
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScroll.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -770,7 +770,7 @@ var last_haul: Dictionary = {}  # what the last Derelict Dive brought, shown unt
 
 
 func _build_depot_page() -> Control:
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScroll.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -917,7 +917,7 @@ func _dives_panel() -> Control:
 
 ## Milestones (GDD 9D): what's been earned, what's still out there. Hidden ones stay "???" until earned.
 func _build_records_page() -> Control:
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScroll.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -948,7 +948,7 @@ func _build_records_page() -> Control:
 ## The Guide to Guardians: lore and how things work are always there; enemies, bosses, tech and fusions
 ## fill in as you meet, beat or unlock them, so the guide is also a record of how far you've come.
 func _build_guide_page() -> Control:
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScroll.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1027,7 +1027,7 @@ func _guide_section(column: VBoxContainer, heading: String, entries: Array, undi
 # ---------------------------------------------------------------- settings
 
 func _build_settings_page() -> Control:
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScroll.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL

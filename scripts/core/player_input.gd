@@ -84,6 +84,7 @@ func clear() -> void:
 
 ## Builds this tick's InputFrame and resets the one-shot parts.
 func poll() -> InputFrame:
+	_check_focus()
 	var frame := InputFrame.new()
 	var keyboard := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var left_stick := Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y))
@@ -217,8 +218,26 @@ func _release_everything(reason: String) -> void:
 	queue_redraw()
 
 
+## iPad Safari blurs the page for a moment during ordinary taps (a fullscreen request, a gesture); dropping the
+## held touch on every blur locked the controls mid-flight (heromedel's 0.6.1 log). So a blur only counts once it
+## has lasted FOCUS_GRACE_MSEC; focus coming back sooner cancels it.
+const FOCUS_GRACE_MSEC := 500
+var _focus_lost_at := -1
+
+
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		_focus_lost_at = Time.get_ticks_msec()
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN or what == NOTIFICATION_WM_WINDOW_FOCUS_IN:
+		if _focus_lost_at >= 0 and Time.get_ticks_msec() - _focus_lost_at < FOCUS_GRACE_MSEC:
+			PlayLog.note("input", "brief blur ignored (%d ms)" % (Time.get_ticks_msec() - _focus_lost_at))
+		_focus_lost_at = -1
+
+
+## Called every frame: a blur that has lasted is real, and only then are held touches let go.
+func _check_focus() -> void:
+	if _focus_lost_at >= 0 and Time.get_ticks_msec() - _focus_lost_at >= FOCUS_GRACE_MSEC:
+		_focus_lost_at = -1
 		if not _touches.is_empty() or _mouse_down:
 			_release_everything("the page lost focus")
 

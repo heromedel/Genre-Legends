@@ -14,7 +14,7 @@ var charge_time := 0.0
 ## Who this boss is, known from the moment it's made so its warning can name it.
 func introduce() -> void:
 	boss_name = "Wyrm Engine"
-	title = "The Corridor's End"
+	title = "Teeth in the Tunnel"
 	look = "wyrm_engine"
 	color = Color(0.5, 1.0, 0.75)
 

@@ -14,6 +14,11 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
   Brood Queen's sacs and the Clone Projector's shell all glide into new positions instead of snapping. A rules test
   now flies every boss and fails if any part jumps.
 - **The Salvage Crate reels roll downward,** like a real slot machine.
+- **Controls no longer lock.** iPad Safari blurs the page for a moment during ordinary taps; the game used to drop your
+  finger and pause on every blur. A blur now only counts if it lasts half a second, and the page asks for full screen
+  at most twice instead of on every tap. The play log notes each fullscreen request and each brief blur it ignored.
+- **Swipe to scroll** in every menu, from anywhere, without pressing the button you started on.
+- No "LASER GATE" banner (you can see the gate), and boss titles that don't state the obvious.
 
 ## What's new in 0.6.1
 

@@ -159,6 +159,8 @@
   - **Ai-Generated-Proposal (2026-11-09):** The map zooms out a little on short screens so a whole region fits top to bottom, and each region's name stays pinned inside the view.
 - **11S. Likely (2026-11-09):** Banners stay up long enough to read comfortably: 1.2 s was too fast even for a fast reader. (heromedel.)
   - **Ai-Generated-Proposal (2026-11-09):** 2 s plus a little per letter, at most 3.2 s.
+  - **Likely (2026-11-11):** Banners and titles don't announce what the player can already see: no "LASER GATE" banner (the gate's flicker says it), and boss titles add character rather than state the obvious (the Wyrm Engine's "The Corridor's End" became "Teeth in the Tunnel", the Mirror Dreadnought's "The First Gate Holds" became "Nothing Gets Through"). (heromedel.)
+- **11Z. Likely (2026-11-11):** Menus scroll with a swipe, wherever the swipe starts, and a swipe never presses the button it began on. The controls never lock: a moment's blur of the page (which iPad Safari does during ordinary taps) neither drops the held finger nor pauses the mission. (heromedel.)
 - **11T. Ai-Generated-Proposal (2026-11-09):** Each risky card has its own price, so taking one never makes another free (heromedel spotted Glass Reactor and Blood Pact both costing the shield). Blood Pact: kills repair armor, but two seconds without a kill bleeds armor away, never below a third.
 - **11U. Likely (2026-11-09):** A mission in progress autosaves every few seconds, and if the browser closes mid-mission, the next start offers to continue it. (heromedel.)
   - **Ai-Generated-Proposal (2026-11-09):** Every 5 s (and when the tab loses focus) the checkpoint saves how the mission was launched and every input so far; continuing rebuilds the mission and fast-forwards the deterministic simulation through the inputs, then resumes paused. Abandoning settles it like the pause menu's abandon, so a loss still pays. A checkpoint from an older build can't be replayed, and the player is told so.
@@ -238,5 +240,6 @@ there.
 | 2026-11-11 | 12D | Route events rebuilt: real trade-offs, build-gated options, no repeats, and the mission announces what changed. |
 | 2026-11-11 | 9A, 11Y | From heromedel's 0.6.1 log: first region about 30% busier; bosses no longer snap to new positions (a shared glide); the crate reels roll downward. |
 | 2026-11-11 | 4G | The bots plan their dodges like a player and have a skill dial calibrated on heromedel's own run. |
+| 2026-11-11 | 11S, 11Z | No banners for what's on screen; swipe to scroll in every menu; brief page blurs no longer drop the finger or pause. |
 | 2026-11-11 | 8E | Mawjig Crystals, a daily check-in and Derelict Dives in a Supply Depot tab. |
 | 2026-11-11 | 11Y | Crates deepen your build, are rarer and smaller, and roll like real slot reels. |

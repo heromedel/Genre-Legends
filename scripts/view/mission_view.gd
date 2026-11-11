@@ -177,11 +177,25 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _notification(what: int) -> void:
-	# Going to the background (home button, app switch, closing the tab) saves and pauses the mission.
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
+	# Going to the background (home button, app switch, closing the tab) saves and pauses the mission. A blur alone
+	# saves at once but only pauses if it lasts: iPad Safari blurs the page for a moment during ordinary taps, and
+	# pausing on every one stopped heromedel mid-fight.
+	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		_write_checkpoint()
-		if not paused and not done and mission != null and mission.state in ["play", "intro"]:
-			set_paused(true)
+		_pause_for_background()
+	elif what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_write_checkpoint()
+		_focus_lost_at = Time.get_ticks_msec()
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		_focus_lost_at = -1
+
+
+var _focus_lost_at := -1
+
+
+func _pause_for_background() -> void:
+	if not paused and not done and mission != null and mission.state in ["play", "intro"]:
+		set_paused(true)
 
 
 # ---------------------------------------------------------------- saving and resuming
@@ -399,6 +413,9 @@ func _close_overlay() -> void:
 # ---------------------------------------------------------------- camera and drawing
 
 func _process(delta: float) -> void:
+	if _focus_lost_at >= 0 and Time.get_ticks_msec() - _focus_lost_at >= PlayerInput.FOCUS_GRACE_MSEC:
+		_focus_lost_at = -1
+		_pause_for_background()
 	_checkpoint_timer -= delta
 	if _checkpoint_timer <= 0.0:
 		_checkpoint_timer = CHECKPOINT_SECONDS

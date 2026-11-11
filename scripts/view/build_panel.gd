@@ -6,7 +6,7 @@ class_name BuildPanel
 
 static func build(run: RunState) -> Control:
 	var panel := UiKit.panel(Color(0.03, 0.05, 0.09, 0.97), Color(0.3, 0.5, 0.7))
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScroll.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.custom_minimum_size = Vector2(560, 520)
 	panel.add_child(scroll)
