@@ -21,7 +21,7 @@ const CHAIN_REACTION_GENERATIONS := 3
 ## How far a Chain Bolt's kill arcs to find the next enemy, and how much of the bolt each jump keeps (GDD 13W).
 const CHAIN_RANGE := 260.0
 const CHAIN_KEEPS := 0.8
-## Meteors (Starfall, Doom Bell) streak in from the upper left; Comet Trail fires lie along that path.
+## Meteors (Starfall, Meteor Lure) streak in from the upper left; Comet Trail fires lie along that path.
 const METEOR_FROM := Vector2(-0.5, -0.866)
 const GRAZE_MARGIN := 26.0
 const MIRROR_RADIUS := 66.0
@@ -58,7 +58,7 @@ var enemy_damage_scale := 1.0
 var bullet_speed_scale := 1.0
 var spawn_scale := 1.0
 var xp_scale := 1.0
-var crate_chance := 0.35
+var crate_chance := 0.2
 var elite_blueprint_tech := ""
 var elite_chance := 0.0          # chance an ordinary enemy spawns as an elite with a twist
 var elite_mods: Array = []       # which twists elites can have on this planet
@@ -305,12 +305,12 @@ func hurt_enemy(enemy: Enemy, amount: float, tech: String = "") -> bool:
 	if enemy.dead or enemy.invulnerable or enemy.hidden or amount <= 0.0:
 		return false
 	var from_resonance := tech == "resonance"
-	# Mawjig resonance: hits hex, and hexed enemies take more damage.
+	# Mawjig resonance (Destabilize): hits leave enemies unstable, and unstable enemies take more damage.
 	if resonance["mawjig"] >= 1:
-		if enemy.hex_marked:
+		if enemy.unstable:
 			amount *= 1.3
 		elif not from_resonance:
-			enemy.hex_marked = true
+			enemy.unstable = true
 	# A shielded elite's barrier soaks damage before its health does.
 	if enemy.shield_hp > 0.0:
 		var absorbed := minf(enemy.shield_hp, amount)
@@ -435,9 +435,9 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 		player.since_kill = 0.0
 	if run.is_online("soul_lantern"):
 		wisps = mini(wisps + 1, max_wisps())
-	# Hexplosion fork, or Mawjig resonance II: hexed enemies burst and spread the hex.
-	if enemy.hex_marked and (run.fork_of("hex_repeater") == "a" or resonance["mawjig"] >= 2) and tech != "resonance":
-		explode(enemy.pos, 95.0, 34.0 * run.damage_multiplier("hex_repeater", player.armor_fraction()), "hex_repeater", Color(0.85, 0.45, 1.0), true)
+	# Critical Mass fork, or Mawjig resonance II (Cascade): unstable enemies burst and destabilize what's near.
+	if enemy.unstable and (run.fork_of("flux_repeater") == "a" or resonance["mawjig"] >= 2) and tech != "resonance":
+		explode(enemy.pos, 95.0, 34.0 * run.damage_multiplier("flux_repeater", player.armor_fraction()), "flux_repeater", Color(0.85, 0.45, 1.0), true)
 	# Mawjig Siphon: 1 Armor a kill per stack, at most 10 a stage per stack, so killing never replaces dodging.
 	var siphon := run.field_count("mawjig_siphon")
 	if siphon > 0 and siphoned_this_stage < 10.0 * siphon:
@@ -475,7 +475,7 @@ func update_allies(dt: float) -> void:
 
 
 ## A player explosion that damages every enemy in range once.
-func explode(at: Vector2, radius: float, damage: float, tech: String, color: Color, spreads_hex: bool = false) -> void:
+func explode(at: Vector2, radius: float, damage: float, tech: String, color: Color, spreads_instability: bool = false) -> void:
 	# Explosive resonance III (Wildfire): blasts leave flames burning.
 	if resonance["explosive"] >= 3 and radius >= 40.0 and zones.size() < 40:
 		add_zone("fire", at, radius * 0.6, 1.6, 6.0, false, {"tick": 0.4, "color": Color(1, 0.5, 0.2)})
@@ -484,8 +484,8 @@ func explode(at: Vector2, radius: float, damage: float, tech: String, color: Col
 		if enemy.dead or enemy.hidden:
 			continue
 		if at.distance_to(enemy.pos) < radius + enemy.radius:
-			if spreads_hex:
-				enemy.hex_marked = true
+			if spreads_instability:
+				enemy.unstable = true
 			var killed := hurt_enemy(enemy, damage, tech)
 			# Explosive resonance II (Chain Reaction): what a blast kills goes off a moment later.
 			if killed and resonance["explosive"] >= 2 and _chain_generation < CHAIN_REACTION_GENERATIONS:
@@ -667,8 +667,8 @@ func update_player_shots(dt: float) -> void:
 		if shot.accel > 0.0:
 			shot.vel = shot.vel.normalized() * minf(shot.vel.length() + shot.accel * dt, shot.max_speed)
 		if shot.devours:
-			# Event Horizon: each hex orb is a small black hole. It drags in bullets (and eats them) and
-			# smaller enemies, then collapses in a burst that hexes everything around it.
+			# Event Horizon: each flux orb is a small black hole. It drags in bullets (and eats them) and
+			# smaller enemies, then collapses in a burst that destabilizes everything around it.
 			for enemy_bullet in enemy_shots:
 				if not enemy_bullet.dead and shot.pos.distance_to(enemy_bullet.pos) < 90.0:
 					enemy_bullet.vel = enemy_bullet.vel.lerp((shot.pos - enemy_bullet.pos) * 4.0, 0.2)
@@ -799,11 +799,11 @@ func _chain_bolt(from: Enemy, damage: float, jumps: int) -> void:
 func _collapse_horizon(shot: Shot) -> void:
 	shot.devours = false
 	shot.dead = true
-	explode(shot.pos, 100.0, shot.damage * 1.5, "hex_repeater", Color(0.6, 0.3, 1.0), true)
+	explode(shot.pos, 100.0, shot.damage * 1.5, "flux_repeater", Color(0.6, 0.3, 1.0), true)
 	emit("sound", {"name": "black_hole"})
 
 
-## On-hit effects carried by the shot: splash, cluster bomblets, chain lightning, hexes, meteors.
+## On-hit effects carried by the shot: splash, cluster bomblets, chain lightning, instability, meteors.
 func _on_shot_impact(shot: Shot, enemy: Enemy) -> void:
 	if shot.devours:
 		_collapse_horizon(shot)
@@ -820,10 +820,10 @@ func _on_shot_impact(shot: Shot, enemy: Enemy) -> void:
 			call_meteor(shot.pos + Vector2(rng.randf_range(-40, 40), rng.randf_range(-40, 40)), 70.0, shot.damage * 1.5, false)
 	if enemy == null:
 		return
-	if shot.hex_mark:
-		enemy.hex_marked = true
-	if shot.hex_shatter:
-		shot.hex_shatter = false
+	if shot.destabilizes:
+		enemy.unstable = true
+	if shot.shatters:
+		shot.shatters = false
 		for i in 3:
 			var hunter := player_shot(shot.pos, Vector2.from_angle(rng.randf() * TAU) * 420.0, shot.damage * 0.4, shot.tech, "orb_small", shot.color)
 			hunter.homing = 7.0

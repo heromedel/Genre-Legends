@@ -68,7 +68,7 @@ func _mirror_main_weapon(clone: Enemy, dt: float) -> void:
 		"thunder_lance":
 			if fmod(time, 1.1 if phase == 0 else 0.85) < dt:
 				world.enemy_shot(clone.pos + Vector2(0, 16), PI * 0.5, 620.0, {"radius": 6.0, "color": hologram, "look": "needle", "damage": MissionData.HIT_LARGE})
-		"hex_repeater":
+		"flux_repeater":
 			if fmod(time, 0.9 if phase == 0 else 0.7) < dt:
 				var orb := world.enemy_shot(clone.pos + Vector2(0, 16), PI * 0.5, 150.0, {"radius": 8.0, "color": hologram})
 				orb.homing = 1.2

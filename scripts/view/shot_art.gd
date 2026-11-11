@@ -29,7 +29,7 @@ static func draw_player_shot(ci: CanvasItem, shot: Shot, time: float) -> void:
 			ci.draw_colored_polygon(PackedVector2Array([Vector2(7, 0), Vector2(-4, -3), Vector2(-4, 3)]), Color(1, 0.9, 0.75))
 			ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 			Art.draw_glow(ci, shot.pos - direction * 6.0, 10.0, Color(1, 0.5, 0.2, 0.8))
-		"hex", "orb_small":
+		"flux", "orb_small":
 			if shot.devours:
 				# Event Horizon: a small black hole, its accretion ring spinning around a dark core.
 				Art.draw_glow(ci, shot.pos, 34.0, Color(0.55, 0.25, 1.0, 0.6))
@@ -38,7 +38,7 @@ static func draw_player_shot(ci: CanvasItem, shot: Shot, time: float) -> void:
 					var spin := time * (5.0 + i) + i * 2.1
 					ci.draw_arc(shot.pos, 12.0 + i * 4.0, spin, spin + 2.4, 12, Color(0.75, 0.45, 1.0, 0.8 - i * 0.2), 2.5 - i * 0.6, true)
 				return
-			var size := 7.0 if shot.look == "hex" else 4.5
+			var size := 7.0 if shot.look == "flux" else 4.5
 			Art.draw_glow(ci, shot.pos, size * 3.0, Art.with_alpha(shot.color, 0.7))
 			ci.draw_set_transform(shot.pos, time * 6.0, Vector2.ONE)
 			Art.shape(ci, Art.ngon(6, size), Art.with_alpha(shot.color, 0.6), Color(1, 0.9, 1), 1.5)

@@ -20,7 +20,7 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 				ci.draw_line(p.call(-0.8 + i * 0.5, 0.35), p.call(-0.3 + i * 0.5, -0.35), color, w * 1.4, true)
 		"thunder_lance":
 			ci.draw_polyline(PackedVector2Array([p.call(-0.2, -0.9), p.call(0.25, -0.1), p.call(-0.15, 0.05), p.call(0.3, 0.9)]), color, w * 1.3, true)
-		"hex_repeater":
+		"flux_repeater":
 			Art.shape(ci, Transform2D(0, c) * Art.ngon(6, s * 0.65), Art.with_alpha(color, 0.25), color, w)
 			ci.draw_circle(c, s * 0.2, color)
 		"arc_blade":
@@ -217,6 +217,21 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 			ci.draw_arc(p.call(-0.3, 0), s * 0.55, 0, TAU, 24, color, w * 1.2, true)
 			ci.draw_arc(p.call(0.3, 0), s * 0.55, 0, TAU, 24, color, w * 1.2, true)
 			ci.draw_circle(c, s * 0.18, color)
+		"crystal":
+			# A Mawjig Crystal: a tall faceted shard with a bright core line.
+			var shard := PackedVector2Array([p.call(0, -0.95), p.call(0.5, -0.3), p.call(0.35, 0.75), p.call(0, 0.95), p.call(-0.35, 0.75), p.call(-0.5, -0.3)])
+			ci.draw_colored_polygon(shard, Art.with_alpha(color, 0.45))
+			ci.draw_colored_polygon(PackedVector2Array([p.call(0, -0.95), p.call(0.5, -0.3), p.call(0, 0.1), p.call(-0.5, -0.3)]), Art.with_alpha(Color(1, 1, 1), 0.35))
+			ci.draw_polyline(shard + PackedVector2Array([shard[0]]), color, w, true)
+			ci.draw_line(p.call(0, -0.6), p.call(0, 0.7), Color(1, 1, 1, 0.8), w * 0.6, true)
+		"wreck_gunship", "wreck_carrier", "wreck_research", "wreck_freighter":
+			_draw_wreck(ci, icon, c, s, w, color)
+		"depot":
+			# A supply drop: a crate under a parachute.
+			ci.draw_arc(p.call(0, -0.2), s * 0.75, PI, TAU, 16, color, w * 1.2, true)
+			for x in [-0.7, 0.0, 0.7]:
+				ci.draw_line(p.call(x, -0.2), p.call(0, 0.3), color, w * 0.7, true)
+			ci.draw_rect(Rect2(p.call(-0.35, 0.3), Vector2(s * 0.7, s * 0.6)), color)
 		"prize":
 			Art.shape(ci, Transform2D(-PI * 0.5, c) * Art.star(5, s * 0.9, s * 0.4), Art.with_alpha(color, 0.4), color, w)
 		_:
@@ -261,3 +276,31 @@ static func _draw_plate(ci: CanvasItem, plate_id: String, c: Vector2, s: float, 
 			ci.draw_arc(c, s * 0.3, 0, TAU, 16, color, w, true)
 		"last_legend_plate":
 			Art.shape(ci, Transform2D(-PI * 0.5, c) * Art.star(5, s * 0.45, s * 0.2), Art.with_alpha(color, 0.6), color, w * 0.8)
+
+
+
+## A derelict on the scanner: a broken hull in the shape of what it was, split by a jagged crack.
+static func _draw_wreck(ci: CanvasItem, kind: String, c: Vector2, s: float, w: float, color: Color) -> void:
+	var p := func(x: float, y: float) -> Vector2: return c + Vector2(x, y) * s
+	var hull: PackedVector2Array
+	match kind:
+		"wreck_gunship":
+			hull = PackedVector2Array([p.call(0.9, 0), p.call(0.2, -0.35), p.call(-0.2, -0.75), p.call(-0.5, -0.3), p.call(-0.85, -0.2), p.call(-0.85, 0.2), p.call(-0.5, 0.3), p.call(-0.2, 0.75), p.call(0.2, 0.35)])
+		"wreck_carrier":
+			hull = PackedVector2Array([p.call(0.9, -0.3), p.call(0.9, 0.3), p.call(-0.9, 0.45), p.call(-0.9, -0.45)])
+		"wreck_research":
+			hull = PackedVector2Array([p.call(0.6, 0), p.call(0.3, -0.5), p.call(-0.3, -0.5), p.call(-0.6, 0), p.call(-0.3, 0.5), p.call(0.3, 0.5)])
+		_:
+			hull = PackedVector2Array([p.call(0.85, -0.4), p.call(0.85, 0.4), p.call(-0.85, 0.4), p.call(-0.85, -0.4)])
+	ci.draw_colored_polygon(hull, Art.with_alpha(color, 0.3))
+	ci.draw_polyline(hull + PackedVector2Array([hull[0]]), color, w, true)
+	if kind == "wreck_research":
+		ci.draw_arc(c, s * 0.85, -0.6, 0.6, 10, color, w * 0.8, true)
+	elif kind == "wreck_carrier":
+		for x in [-0.5, 0.0, 0.5]:
+			ci.draw_line(p.call(x, -0.35), p.call(x, 0.35), Art.with_alpha(color, 0.6), w * 0.7, true)
+	elif kind == "wreck_freighter":
+		ci.draw_rect(Rect2(p.call(-0.6, -0.25), Vector2(s * 0.5, s * 0.5)), Art.with_alpha(color, 0.6))
+		ci.draw_rect(Rect2(p.call(0.1, -0.25), Vector2(s * 0.5, s * 0.5)), Art.with_alpha(color, 0.6))
+	# The crack that made it a wreck.
+	ci.draw_polyline(PackedVector2Array([p.call(0.1, -0.8), p.call(-0.05, -0.2), p.call(0.15, 0.1), p.call(-0.1, 0.8)]), Color(0.02, 0.03, 0.06), w * 1.6, true)

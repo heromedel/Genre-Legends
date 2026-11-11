@@ -185,13 +185,14 @@ func _largest_blueprint_pile_id() -> String:
 func _build_tabs() -> Control:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
-	for entry in [["map", "map", "STAR MAP"], ["hangar", "hangar", "HANGAR"], ["rnd", "lab", "R&D"], ["guide", "guide", "GUIDE"], ["records", "prize", "RECORDS"], ["settings", "settings", "SETTINGS"]]:
+	# Settings is the gear alone, so seven tabs fit an iPad's width.
+	for entry in [["map", "map", "STAR MAP"], ["hangar", "hangar", "HANGAR"], ["rnd", "lab", "R&D"], ["depot", "depot", "DEPOT"], ["guide", "guide", "GUIDE"], ["records", "prize", "RECORDS"], ["settings", "settings", ""]]:
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(118, 46)
+		button.custom_minimum_size = Vector2(108 if entry[2] != "" else 50, 46)
 		button.focus_mode = Control.FOCUS_NONE
 		var page_id: String = entry[0]
 		button.pressed.connect(func():
-			PlayLog.button("Tab: %s" % entry[2])
+			PlayLog.button("Tab: %s" % page_id)
 			Sound.play("ui")
 			show_page(page_id))
 		var box := HBoxContainer.new()
@@ -202,13 +203,14 @@ func _build_tabs() -> Control:
 		var icon := IconView.make(entry[1], 22, Color(0.6, 0.9, 1.0))
 		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		box.add_child(icon)
-		var text := UiKit.label(entry[2], 13, Color(0.7, 0.85, 1.0), "bold")
-		text.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		box.add_child(text)
+		if entry[2] != "":
+			var text := UiKit.label(entry[2], 13, Color(0.7, 0.85, 1.0), "bold")
+			text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			box.add_child(text)
 		button.add_child(box)
 		row.add_child(button)
 		tab_buttons[page_id] = button
-		if page_id in ["hangar", "rnd"]:
+		if page_id in ["hangar", "rnd", "depot"]:
 			var dot := NewDot.new()
 			button.add_child(dot)
 			tab_dots[page_id] = dot
@@ -220,6 +222,7 @@ func _build_tabs() -> Control:
 func _refresh_tab_dots() -> void:
 	tab_dots["hangar"].visible = not Save.data["new_unlocks"].is_empty()
 	tab_dots["rnd"].visible = TechData.TECH.keys().any(func(tech_id): return Save.can_upgrade(tech_id))
+	tab_dots["depot"].visible = Save.checkin_ready() or Save.data["crystals"] >= DepotData.DIVE_COST or Save.data["free_dives"] > 0 or not Save.data["dive_wrecks"].is_empty()
 
 
 func _build_top_bar() -> Control:
@@ -238,21 +241,34 @@ func _build_top_bar() -> Control:
 	stats.add_theme_constant_override("separation", -2)
 	stats.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_child(stats)
+	_frame_label = UiKit.label("", 14, Color.WHITE, "bold")
+	_frame_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	stats.add_child(_frame_label)
+	_progress_label = UiKit.label("", 13, Color(0.6, 0.78, 0.95))
+	_progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	stats.add_child(_progress_label)
+	_refresh_top_bar()
+	return bar
+
+
+var _frame_label: Label
+var _progress_label: Label
+
+
+## The top bar's frame and progress, refreshed on every rebuild so a check-in or a new frame shows at once.
+func _refresh_top_bar() -> void:
 	var frame := FrameData.get_frame(Save.data["frame"])
 	var total_blueprints := 0
 	for tech_id in Save.data["blueprints"]:
 		total_blueprints += int(Save.data["blueprints"][tech_id])
-	var name_label := UiKit.label("Frame: %s" % frame["name"], 14, frame["hull"], "bold")
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	stats.add_child(name_label)
-	var progress := UiKit.label("Cleared %d  •  Blueprints %d  •  Frame Blueprints %d" % [Save.data["cleared"].size(), total_blueprints, Save.data["frame_blueprints"]], 13, Color(0.6, 0.78, 0.95))
-	progress.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	stats.add_child(progress)
-	return bar
+	_frame_label.text = "Frame: %s" % frame["name"]
+	_frame_label.add_theme_color_override("font_color", frame["hull"])
+	_progress_label.text = "Cleared %d  •  Blueprints %d  •  Crystals %d" % [Save.data["cleared"].size(), total_blueprints, Save.data["crystals"]]
 
 
 func show_page(page_id: String) -> void:
 	page = page_id
+	last_haul = {}
 	picker_slot = -1
 	PlayLog.set_screen(page_id)
 	_rebuild()
@@ -264,6 +280,8 @@ func _rebuild() -> void:
 	for key in tab_buttons:
 		tab_buttons[key].add_theme_stylebox_override("normal", UiKit._box(Color(0.12, 0.2, 0.3) if key == page_id else Color(0.06, 0.09, 0.14), Color(0.5, 0.85, 1.0) if key == page_id else Color(0.2, 0.3, 0.42), 2))
 	_refresh_tab_dots()
+	if _progress_label != null:
+		_refresh_top_bar()
 	for child in content.get_children():
 		child.queue_free()
 	match page_id:
@@ -273,6 +291,7 @@ func _rebuild() -> void:
 		"settings": content.add_child(_build_settings_page())
 		"guide": content.add_child(_build_guide_page())
 		"records": content.add_child(_build_records_page())
+		"depot": content.add_child(_build_depot_page())
 
 
 # ---------------------------------------------------------------- star map
@@ -722,6 +741,154 @@ func _source_text(tech_id: String) -> String:
 	return "Found on: %s" % ", ".join(sources)
 
 
+# ---------------------------------------------------------------- supply depot (DepotData)
+
+var last_haul: Dictionary = {}  # what the last Derelict Dive brought, shown until you leave the page
+
+
+func _build_depot_page() -> Control:
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 12)
+	scroll.add_child(column)
+	var head := HBoxContainer.new()
+	var title := UiKit.label("SUPPLY DEPOT", 20, Color(0.6, 0.9, 1.0), "title")
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(title)
+	head.add_child(IconView.make("crystal", 30, Color(0.55, 0.9, 1.0)))
+	head.add_child(UiKit.label("%d Mawjig Crystals" % Save.data["crystals"], 22, Color(0.65, 0.95, 1.0), "bold"))
+	column.add_child(head)
+	column.add_child(UiKit.wrapped("Crystals come from missions (more for a win, most for a first clear), milestones and checking in. They can't be bought: the Depot's quartermaster doesn't take money, only proof you've been out there.", 14, Color(0.65, 0.75, 0.88)))
+	if Save.data["start_crate"] > 0:
+		column.add_child(UiKit.wrapped("A Salvage Crate is waiting for you at the start of your next mission.", 14, Color(1, 0.85, 0.5)))
+	column.add_child(_checkin_panel())
+	column.add_child(_dives_panel())
+	return scroll
+
+
+## The week's check-in tiles: past ones ticked, today's ready to claim, the rest waiting.
+func _checkin_panel() -> Control:
+	var panel := UiKit.panel()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 8)
+	panel.add_child(column)
+	column.add_child(UiKit.label("DAILY CHECK-IN", 17, Art.GOLD, "bold"))
+	column.add_child(UiKit.wrapped("One tile for each day you fly, any days you like: missing a day never resets it. Day 7 is the big one.", 13, Color(0.65, 0.75, 0.88)))
+	var ready := Save.checkin_ready()
+	var tile := Save.checkin_tile()
+	var claimed := tile if (ready or tile > 0) else DepotData.CHECKIN.size()
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	column.add_child(row)
+	for i in DepotData.CHECKIN.size():
+		var reward: Dictionary = DepotData.CHECKIN[i]
+		var today := ready and i == tile
+		var done := i < claimed
+		var cell := UiKit.panel(Color(0.12, 0.2, 0.3) if today else Color(0.04, 0.06, 0.1), Art.GOLD if today else (Color(0.3, 0.6, 0.45) if done else Color(0.2, 0.3, 0.42)))
+		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var box := VBoxContainer.new()
+		box.alignment = BoxContainer.ALIGNMENT_CENTER
+		cell.add_child(box)
+		var day := UiKit.label("DAY %d" % (i + 1), 13, Color(0.6, 0.72, 0.86), "bold")
+		day.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(day)
+		var icon := IconView.make(_checkin_icon(reward), 26 if i < 6 else 34, Color(0.55, 0.9, 1.0) if not done else Color(0.35, 0.5, 0.55))
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		box.add_child(icon)
+		var amount := UiKit.wrapped(reward["text"], 12, Color(0.5, 0.7, 0.65) if done else Color(1, 1, 1))
+		amount.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(amount)
+		var state := UiKit.label("CLAIMED" if done else ("TODAY" if today else ""), 12, Color(0.5, 1.0, 0.65) if done else Art.GOLD, "bold")
+		state.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(state)
+		row.add_child(cell)
+	if ready:
+		column.add_child(UiKit.button("Check in: claim day %d" % (tile + 1), func():
+			var reward := Save.claim_checkin()
+			if not reward.is_empty():
+				Sound.play("upgrade")
+			_rebuild(), "Depot: check in", true))
+	else:
+		column.add_child(UiKit.label("Checked in today. The next tile opens tomorrow.", 14, Color(0.5, 1.0, 0.65)))
+	return panel
+
+
+func _checkin_icon(reward: Dictionary) -> String:
+	if reward.has("free_dive"):
+		return "wreck_research"
+	if reward.has("start_crate"):
+		return "crate"
+	if reward.has("main_blueprints"):
+		return Save.data["loadout"][0]
+	if reward.has("frame_blueprints") and not reward.has("crystals"):
+		return "frame_blueprint"
+	return "crystal"
+
+
+## Derelict Dives: scan a field of wrecks, pick one to board, see what the drone brings back.
+func _dives_panel() -> Control:
+	var panel := UiKit.panel()
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 8)
+	panel.add_child(column)
+	column.add_child(UiKit.label("DERELICT DIVES", 17, Art.GOLD, "bold"))
+	column.add_child(UiKit.wrapped("The Dropship scans a field of wrecks and sends its drone aboard the one you pick. Each kind of wreck carries its own salvage. Odds: Common 67%, Rare 28%, Prototype 5% (a piece of tech you haven't found, unlocked), and a Rare or better at least every 10 dives.", 13, Color(0.65, 0.75, 0.88)))
+	var wrecks: Array = Save.data["dive_wrecks"]
+	if wrecks.is_empty():
+		var free: int = Save.data["free_dives"]
+		var label := "Scan for wrecks: free dive (%d left)" % free if free > 0 else "Scan for wrecks: %d crystals" % DepotData.DIVE_COST
+		var can: bool = free > 0 or Save.data["crystals"] >= DepotData.DIVE_COST
+		var button := UiKit.button(label, func():
+			if not DerelictDives.scan().is_empty():
+				Sound.play("ui")
+			last_haul = {}
+			_rebuild(), "Depot: scan", can)
+		button.disabled = not can
+		column.add_child(button)
+	else:
+		column.add_child(UiKit.label("Three wrecks on the scanner. Pick one to board:", 15, Color(0.85, 0.92, 1.0), "bold"))
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		column.add_child(row)
+		for kind in wrecks:
+			var wreck: Dictionary = DepotData.WRECKS[kind]
+			var card := Button.new()
+			card.focus_mode = Control.FOCUS_NONE
+			card.custom_minimum_size = Vector2(0, 138)
+			card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			card.add_theme_stylebox_override("normal", UiKit._box(Color(0.05, 0.08, 0.13), wreck["color"], 2))
+			card.pressed.connect(func():
+				PlayLog.button("Depot: board %s" % kind)
+				last_haul = DerelictDives.board(kind)
+				Sound.play("jackpot" if last_haul.get("rarity", "") == "legendary" else "crate")
+				_rebuild())
+			var box := VBoxContainer.new()
+			box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			box.offset_top = 8
+			box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			card.add_child(box)
+			var icon := IconView.make("wreck_" + kind, 48, wreck["color"])
+			icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			box.add_child(icon)
+			var name := UiKit.label(wreck["name"], 16, wreck["color"], "bold")
+			name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			name.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			box.add_child(name)
+			var text := UiKit.wrapped(wreck["text"], 12, Color(0.75, 0.82, 0.92))
+			text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			box.add_child(text)
+			row.add_child(card)
+	if not last_haul.is_empty():
+		var reveal := DropCard.new()
+		reveal.result = last_haul
+		column.add_child(reveal)
+	return panel
+
+
 # ---------------------------------------------------------------- records
 
 ## Milestones (GDD 9D): what's been earned, what's still out there. Hidden ones stay "???" until earned.
@@ -989,6 +1156,44 @@ class PowerMeters:
 		var over := used > limit
 		draw_string(font, Vector2(x + 8, y + 14), "%s %d of %d%s%s" % [verb, used, limit, "   " + over_word if over and over_word != "" else "", note], HORIZONTAL_ALIGNMENT_LEFT, -1, 15,
 			over_color if over else Color(0.85, 0.9, 1.0))
+
+
+## One Derelict Dive's haul: a card that flips in, coloured by its rarity, a Prototype with a gold burst.
+class DropCard:
+	extends Control
+	var result := {}
+	var delay := 0.0
+	var time := 0.0
+
+	func _ready() -> void:
+		custom_minimum_size = Vector2(196, 128)
+		size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _process(delta: float) -> void:
+		time += delta
+		if time < delay + 1.5:
+			queue_redraw()
+
+	func _draw() -> void:
+		var flip := clampf((time - delay) / 0.35, 0.0, 1.0)
+		if flip <= 0.0:
+			return
+		var color: Color = DepotData.RARITY_COLORS[result["rarity"]]
+		var width := size.x * ease(flip, 0.5)
+		var rect := Rect2(Vector2((size.x - width) * 0.5, 0), Vector2(width, size.y))
+		if result["rarity"] == "legendary":
+			Art.draw_glow(self, size * 0.5, 110.0, Art.with_alpha(color, 0.35 * flip))
+		draw_rect(rect, Color(0.05, 0.08, 0.13))
+		draw_rect(rect, color, false, 2.5)
+		if flip < 1.0:
+			return
+		var font := UiKit.font("bold")
+		draw_string(font, Vector2(10, 20), DepotData.RARITY_NAMES[result["rarity"]].to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, color)
+		var icon_color := TechData.element_color(result["icon"]) if TechData.TECH.has(result["icon"]) else Art.GOLD
+		IconPainter.draw(self, result["icon"], Rect2(Vector2(size.x * 0.5 - 20, 26), Vector2(40, 40)), icon_color)
+		draw_string(font, Vector2(8, 88), result["title"], HORIZONTAL_ALIGNMENT_CENTER, size.x - 16, 14, Color(1, 1, 1))
+		draw_string(UiKit.font(), Vector2(8, 110), result["text"], HORIZONTAL_ALIGNMENT_CENTER, size.x - 16, 11, Color(0.7, 0.8, 0.9))
 
 
 ## A pulsing green dot in a control's corner: something new is waiting there (GDD 9C).

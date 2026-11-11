@@ -119,7 +119,7 @@ func _apply_difficulty() -> void:
 	world.enemy_fire_scale = base["fire"] * threat["fire"]
 	world.spawn_scale = modifier.get("spawn", 1.0)
 	world.xp_scale = modifier.get("xp", 1.0)
-	world.crate_chance = 0.35 * modifier.get("crates", 1.0)
+	world.crate_chance = 0.2 * modifier.get("crates", 1.0)
 	world.dark = modifier.get("dark", false)
 	# Only the very first planet eases you in.
 	world.gentle = node.get("id", "") == "r0c0n0"

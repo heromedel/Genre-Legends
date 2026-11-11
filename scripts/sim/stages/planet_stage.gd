@@ -15,7 +15,7 @@ var roster: Dictionary
 var fissure_open := false        # chained missions: the way down into the next stage
 var fissure_pos := Vector2.ZERO
 var dived := false
-var pod_timer := 35.0            # supply pods: a crate dropped from orbit, with an ambush riding along
+var pod_timer := 55.0            # supply pods: a crate dropped from orbit, with an ambush riding along
 var pending_pods: Array = []     # {pos, time}: pods on their way down
 
 
@@ -130,7 +130,7 @@ func _update_supply_pods(dt: float) -> void:
 	if boss == null and not miniboss_active():
 		pod_timer -= dt
 		if pod_timer <= 0.0:
-			pod_timer = world.rng.randf_range(38.0, 50.0)
+			pod_timer = world.rng.randf_range(80.0, 105.0)
 			var at := (mission.player.pos + Vector2.from_angle(world.rng.randf() * TAU) * world.rng.randf_range(220.0, 360.0)).clamp(Vector2(200, 200), WORLD_SIZE - Vector2(200, 200))
 			world.add_zone("bomb_warning", at, 70.0, 0.1, MissionData.HIT_LARGE * world.enemy_damage_scale, true, {"warn": 1.5, "color": Color(1, 0.8, 0.4)})
 			world.emit("banner", {"text": "SUPPLY POD INCOMING", "style": "gold"})
@@ -142,8 +142,9 @@ func _update_supply_pods(dt: float) -> void:
 			crate.vel = Vector2.ZERO
 			world.emit("burst_ground", {"pos": pod["pos"]})
 			world.emit("shake", {"amount": 8.0})
-			for i in 4:
-				var raider := world.spawn_enemy("crawler" if i < 3 else "spitter", pod["pos"] + Vector2.from_angle(TAU * i / 4.0) * 160.0)
+			# The locals want it too: a crate is never free.
+			for i in 6:
+				var raider := world.spawn_enemy("crawler" if i < 4 else "spitter", pod["pos"] + Vector2.from_angle(TAU * i / 6.0) * 160.0)
 				raider.memory["awake"] = true
 	pending_pods = pending_pods.filter(func(p): return float(p["time"]) > 0.0)
 

@@ -232,7 +232,11 @@ func reroll(count: int) -> Array:
 
 
 ## Spins a Salvage Crate: three reels land on faces that add up to 1-6 upgrades, applied at once.
-## Crates never pick forks, fusions or risky cards for you; those are always your choice.
+## Crates never pick forks, fusions or risky cards for you; those are always your choice. They deepen the build
+## you're flying rather than steer it (heromedel: crates kept pushing him into a different build): each upgrade
+## levels tech that's already online, leaning on what you've put the most into. Now and then (CRATE_NEW_TECH) one
+## brings a new piece of tech online instead, and it does whenever nothing online can level; field upgrades only
+## when there's nothing else.
 func open_crate() -> Array:
 	last_reel_faces = spin_reels()
 	var count := 0
@@ -240,13 +244,31 @@ func open_crate() -> Array:
 		count += face
 	var results := []
 	for i in count:
-		var pool := _card_pool(false, false).filter(func(c): return c["field"] != "field_repair" and c["kind"] != "fusion")
+		var pool := _crate_pool()
 		var card: Dictionary = _cache_card() if pool.is_empty() else _pick_weighted(pool)
 		_describe_build_effect(card)
 		apply(card)
 		results.append(card)
 	run.crates_opened += 1
 	return results
+
+
+const CRATE_NEW_TECH := 0.15
+
+
+func _crate_pool() -> Array:
+	var pool := _card_pool(false, false).filter(func(c): return c["field"] != "field_repair" and c["kind"] != "fusion")
+	var order := ["upgrade", "online", "field"]
+	if world.rng.randf() < CRATE_NEW_TECH:
+		order = ["online", "upgrade", "field"]
+	for kind in order:
+		var cards := pool.filter(func(c): return c["kind"] == kind)
+		if not cards.is_empty():
+			if kind == "upgrade":
+				for card in cards:
+					card["weight"] = 1.0 + run.level_of(card["tech"])
+			return cards
+	return []
 
 
 ## The faces each reel can land on. Lucky Salvage turns the first reel's zeros into ones (average 2.8).

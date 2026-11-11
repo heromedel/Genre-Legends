@@ -73,9 +73,9 @@ const RESONANCE := {
 		["Splinter Rounds", "Shots that have flown a while burst into two fragments when they hit."],
 		["Railstorm", "Every 2 s a slug tears through the nearest enemy and everything behind it."]]},
 	"mawjig": {"name": "Mawjig", "tiers": [
-		["Hex Touch", "Your hits hex enemies, and hexed enemies take 30% more damage."],
-		["Contagion", "Hexed enemies burst when they die and hex everything nearby."],
-		["Doom Bell", "Every 8 s, meteors fall on up to three hexed enemies."]]},
+		["Destabilize", "Your hits leave enemies unstable, and unstable enemies take 30% more damage."],
+		["Cascade", "Unstable enemies burst when they die and destabilize everything nearby."],
+		["Meteor Lure", "Every 8 s, bent gravity pulls meteors down onto up to three unstable enemies."]]},
 }
 
 ## Fusions: two pieces of tech, both at max level, merge into something new (GDD 7F proposal).
@@ -110,8 +110,8 @@ const FUSIONS := {
 		"text": "Dashing turns you into a wraith. Every enemy you tear through releases a hunting spirit, your wisps launch and the lantern refills.",
 	},
 	"event_horizon": {
-		"name": "Event Horizon", "needs": ["hex_repeater", "time_brake"],
-		"text": "Hex orbs become small black holes: they swallow bullets, drag in smaller enemies, then collapse in a burst that hexes everything nearby.",
+		"name": "Event Horizon", "needs": ["flux_repeater", "time_brake"],
+		"text": "Flux orbs become small black holes: they swallow bullets, drag in smaller enemies, then collapse in a burst that destabilizes everything nearby.",
 	},
 }
 
@@ -119,9 +119,9 @@ const FUSIONS := {
 ## Zeros outnumber ones, which outnumber twos; the last reel has no zeros, so every crate gives at least 1.
 ## Odds: 1 = 28.8%, 2 = 36%, 3 = 24%, 4 = 9%, 5 = 2%, 6 = 0.2% (average 2.2).
 const CRATE_REELS := [
-	[0, 0, 0, 0, 0, 0, 1, 1, 1, 2],
-	[0, 0, 0, 0, 0, 0, 1, 1, 1, 2],
-	[1, 1, 1, 1, 1, 1, 1, 1, 2, 2],
+	[0, 0, 0, 0, 0, 0, 0, 1, 1, 2],
+	[0, 0, 0, 0, 0, 0, 0, 1, 1, 2],
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
 ]
 ## Rerolls per mission on the level-up screen.
 const REROLLS := 2

@@ -11,6 +11,8 @@ const CHECKPOINT_PATH := "user://mission_checkpoint.json"
 ## Bumped when a build changes the game so much that old progress no longer fits. Build 0.6 (hits that matter,
 ## GDD 13V) starts everyone fresh: heromedel would reset anyway, and nothing can carry over wrong.
 const VERSION := 2
+## Tech ids that were renamed, old to new, so a save carries its progress across.
+const RENAMED_TECH := {"hex_repeater": "flux_repeater"}
 
 signal changed
 
@@ -51,6 +53,14 @@ func fresh_data() -> Dictionary:
 		"counters": {},
 		"enemies_unlocked": [],
 		"notice": "",     # a one-time message for the title screen (a fresh start after a big update)
+		# Supply Depot (DepotData): Mawjig Crystals, the daily check-in and Derelict Dives.
+		"crystals": 0,
+		"checkin_day": 0,         # how many check-ins so far; the tile is this modulo 7
+		"checkin_last": "",       # the date of the last check-in, YYYY-MM-DD
+		"free_dives": 0,          # Derelict Dives paid for by the check-in
+		"dive_wrecks": [],        # a scan waiting for you to pick a wreck
+		"dives_since_rare": 0,    # the pity count: a Rare at least every 10 dives
+		"start_crate": 0,         # Salvage Crates waiting at the start of the next mission
 	}
 
 
@@ -124,6 +134,15 @@ func repair(raw: Dictionary) -> Dictionary:
 	for key in default_stats:
 		if not clean["stats"].has(key):
 			clean["stats"][key] = default_stats[key]
+	# Renamed tech keeps its progress (0.6.1: the Hex Repeater became the Flux Repeater).
+	for old_id in RENAMED_TECH:
+		var new_id: String = RENAMED_TECH[old_id]
+		for key in ["tech_mk", "blueprints"]:
+			if clean[key].has(old_id):
+				clean[key][new_id] = clean[key][old_id]
+				clean[key].erase(old_id)
+		clean["loadout"] = clean["loadout"].map(func(t): return new_id if t == old_id else t)
+		clean["new_unlocks"] = clean["new_unlocks"].map(func(t): return new_id if t == old_id else t)
 	# Tech: drop unknown ids, clamp grades, keep the starters unlocked.
 	var tech_mk := {}
 	for tech_id in clean["tech_mk"]:
@@ -155,6 +174,9 @@ func repair(raw: Dictionary) -> Dictionary:
 			var picks: Array = clean["frame_tiers"][frame_id].filter(func(p): return FrameData.TIER_PICKS.has(p))
 			tiers[frame_id] = picks.slice(0, FrameData.TIER_COSTS.size())
 	clean["frame_tiers"] = tiers
+	clean["dive_wrecks"] = clean["dive_wrecks"].filter(func(k): return DepotData.WRECKS.has(k))
+	for key in ["crystals", "checkin_day", "free_dives", "dives_since_rare", "start_crate"]:
+		clean[key] = maxi(int(raw.get(key, 0)) if typeof(raw.get(key)) in [TYPE_INT, TYPE_FLOAT] else 0, 0)
 	clean["version"] = VERSION
 	return clean
 
@@ -274,6 +296,46 @@ func equip(slot_index: int, tech_id: String) -> void:
 	data["new_unlocks"].erase(tech_id)
 	data["loadout"] = _repair_loadout(loadout, data["tech_mk"])
 	write()
+
+
+# ---------------------------------------------------------------- Supply Depot (DepotData)
+
+func add_crystals(amount: int, why: String) -> void:
+	if amount <= 0:
+		return
+	data["crystals"] += amount
+	_log("depot", "+%d Mawjig Crystals (%s), now %d" % [amount, why, data["crystals"]])
+
+
+static func today() -> String:
+	return Time.get_date_string_from_system()
+
+
+func checkin_ready() -> bool:
+	return data["checkin_last"] != today()
+
+
+## Today's check-in tile, which loops through the week.
+func checkin_tile() -> int:
+	return int(data["checkin_day"]) % DepotData.CHECKIN.size()
+
+
+## Claims today's tile and returns what it gave, or {} if today is already claimed.
+func claim_checkin() -> Dictionary:
+	if not checkin_ready():
+		return {}
+	var reward: Dictionary = DepotData.CHECKIN[checkin_tile()]
+	add_crystals(int(reward.get("crystals", 0)), "check-in day %d" % (checkin_tile() + 1))
+	data["frame_blueprints"] += int(reward.get("frame_blueprints", 0))
+	data["free_dives"] += int(reward.get("free_dive", 0))
+	data["start_crate"] += int(reward.get("start_crate", 0))
+	if reward.has("main_blueprints"):
+		add_blueprints(data["loadout"][0], int(reward["main_blueprints"]))
+	_log("depot", "Checked in: day %d, %s" % [checkin_tile() + 1, reward["text"]])
+	data["checkin_day"] += 1
+	data["checkin_last"] = today()
+	write()
+	return reward
 
 
 # ---------------------------------------------------------------- frame upgrades and power (GDD 21A–21F)

@@ -35,7 +35,7 @@ static func draw(ci: CanvasItem, enemy: Enemy, time: float) -> void:
 			"alpha": 0.9 if enemy.look == "wisp" else 1.0,
 			"rim": Art.with_alpha(enemy.color, 0.45),
 			"groups": _moving_parts(enemy, t)})
-	if enemy.hex_marked:
+	if enemy.unstable:
 		Art.dashed_circle(ci, enemy.pos, enemy.radius + 8.0, Color(0.85, 0.45, 1.0, 0.8), 2.0, 6, time * 2.0)
 	_draw_elite_twist(ci, enemy, time)
 	if (enemy.elite or enemy.objective) and enemy.hp < enemy.max_hp:

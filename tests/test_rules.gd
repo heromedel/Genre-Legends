@@ -30,6 +30,7 @@ func _init() -> void:
 	_aim_hold()
 	_hits_that_matter()
 	_building_a_frame()
+	_crates_deepen()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -199,7 +200,7 @@ func _build_022() -> void:
 		total += sum
 	check(lowest == 1, "a crate always gives at least 1 upgrade")
 	check(highest >= 5, "crates can land on 5 or more")
-	check(absf(total / 6000.0 - 2.2) < 0.1, "crates average about 2.2 upgrades (got %.2f)" % (total / 6000.0))
+	check(absf(total / 6000.0 - 1.9) < 0.1, "crates average about 1.9 upgrades (got %.2f)" % (total / 6000.0))
 	mission.run.field["lucky_salvage"] = 1
 	var lucky_low := 99
 	var lucky_total := 0
@@ -208,7 +209,7 @@ func _build_022() -> void:
 		lucky_low = mini(lucky_low, sum)
 		lucky_total += sum
 	check(lucky_low == 2, "Lucky Salvage: every crate gives at least 2")
-	check(absf(lucky_total / 6000.0 - 2.8) < 0.1, "Lucky Salvage averages about 2.8 (got %.2f)" % (lucky_total / 6000.0))
+	check(absf(lucky_total / 6000.0 - 2.6) < 0.1, "Lucky Salvage averages about 2.6 (got %.2f)" % (lucky_total / 6000.0))
 	# A laser beam hits once per pass, however long you sit in it.
 	mission = _test_mission("star_cluster")
 	var world := mission.world
@@ -408,13 +409,13 @@ func _fusions() -> void:
 	var bullet := world.enemy_shot((saws[0] + saws[1]) * 0.5, 0.0, 0.0)
 	mission.weapons._orbital_halo(0.0)
 	check(bullet.dead, "Storm Halo's fence erases a bullet between two saws")
-	# Event Horizon: a hex orb drags a small enemy toward it, then collapses in a burst.
+	# Event Horizon: a flux orb drags a small enemy toward it, then collapses in a burst.
 	mission = _test_mission("planet")
 	world = mission.world
 	world.enemies.clear()
 	var drifter := world.spawn_enemy("dart", Vector2(700, 400))
 	drifter.hp = 9999.0
-	var orb := world.player_shot(Vector2(620, 400), Vector2.ZERO, 10.0, "hex_repeater", "hex", Color.WHITE)
+	var orb := world.player_shot(Vector2(620, 400), Vector2.ZERO, 10.0, "flux_repeater", "flux", Color.WHITE)
 	orb.devours = true
 	orb.life = 1.0
 	var before := drifter.pos.distance_to(orb.pos)
@@ -423,7 +424,7 @@ func _fusions() -> void:
 	check(drifter.pos.distance_to(orb.pos) < before, "Event Horizon drags enemies toward the orb")
 	for i in 60:
 		world.update_player_shots(World.DT)
-	check(orb.dead and drifter.hex_marked, "Event Horizon collapses in a burst that hexes what's around it")
+	check(orb.dead and drifter.unstable, "Event Horizon collapses in a burst that destabilizes what's around it")
 	# A formation dart that dives off the top of the screen comes back to its slot (heromedel's 0.5 log:
 	# one climbed away forever and the wave never ended).
 	mission = _test_mission("star_cluster")
@@ -660,3 +661,19 @@ func _building_a_frame() -> void:
 	var won := mission.results(false)
 	check(int(won["blueprints"].get("mirrorwork_plate", 0)) > 0 and won["frame_blueprints"] == 2, "a win pays the boss plate and the Frame Blueprints")
 	check(TechData.has_forks("pulse_driver") and not TechData.has_forks("qrf_shell"), "plates level without forks")
+
+
+## Crates deepen the build you're flying (GDD 11Y): mostly levels for online tech, rarely something new.
+func _crates_deepen() -> void:
+	var loadout := ["pulse_driver", "swarm_pods", "orbital_halo", "graze_engine", "nova_bomb", "arc_blade", "dsp1_plate"]
+	var deepened := 0
+	var brought_online := 0
+	for i in 200:
+		var mission := Mission.new({"id": "t", "name": "T", "region": 0, "column": 1, "row": 0.0, "type": "star_cluster", "need": "x",
+			"difficulty": 1.0, "danger": 1, "modifier": "", "reward_tech": "arc_blade", "prize": "", "prize_text": ""}, 100 + i, "vanguard", loadout, func(t): return 3)
+		var card: Dictionary = mission.offers._pick_weighted(mission.offers._crate_pool())
+		if card["kind"] == "upgrade":
+			deepened += 1
+		elif card["kind"] == "online":
+			brought_online += 1
+	check(deepened > 150 and brought_online > 10, "crate upgrades mostly deepen online tech, sometimes bring new tech online (%d / %d)" % [deepened, brought_online])

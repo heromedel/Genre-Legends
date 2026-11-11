@@ -21,7 +21,14 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
   - Rare: Jig Phase and Last Legend, as branch prizes.
 - Star Cluster's Supply Barge now carries a repair, the Corridor drifts two down the trench, and the Twin Aces fly a
   loop you can follow.
-- Admin console: `framebp <n>` and `power`.
+- **Supply Depot.** Earn **Mawjig Crystals** from missions, milestones and a daily check-in (seven varied tiles,
+  never reset for a missed day), and spend them on **Derelict Dives**: scan a field of wrecks, pick one to board,
+  and see what the drone brings back. Crystals can't be bought.
+- **Salvage Crates deepen your build** instead of steering it: they level up tech you already have online, and only
+  sometimes bring something new online. They're rarer and a little smaller, and the reels roll like a real slot
+  machine.
+- **Hex is now Flux:** the Flux Repeater's orbs leave enemies unstable. Mawjig is physics bending, not witchcraft.
+- Admin console: `framebp <n>`, `crystals <n>` and `power`. Debug: `?crystals=<n>`.
 
 ## What's new in 0.6 (on Claude's branch)
 
@@ -168,6 +175,7 @@ Requires Godot 4.6 with the web export templates.
 
 ```
 tools/export_web.sh                                   # export to play/
+godot --headless --quit-after 90 2>&1 | grep "SCRIPT ERROR"  # boot check: every script compiles (the rules tests skip the view)
 godot --headless -s tests/test_rules.gd               # rules tests
 godot --headless -s tests/qa_harness.gd -- all 2 all  # QA bots: every mission type at three progress levels
 godot --headless -s tests/difficulty_report.gd -- 2   # average-player bot against the first region's targets

@@ -89,6 +89,8 @@
 
 - **8A. Likely (2026-11-08):** No ads and no real money. The game is played instead of ad-driven mobile games.
 - **8B. Proposed (2026-11-08):** A few mock mobile-game features such as rewards, gems and reward paths, maybe with fake in-game money.
+- **8E. Proposed (2026-11-11):** A few of the mock mobile features: gems called **Mawjig Crystals**, spent on rare draws, and daily check-ins. Daily rewards are varied, and the amounts are small (one tenth of a typical mobile game's). (heromedel: "maybe instead of drops it could be something cooler".)
+  - **Ai-Generated-Proposal (2026-11-11):** Built in 0.6.1 as the **Supply Depot** tab. Crystals come from missions (1, +1 for a win, +2 for a first clear, +5 for a gate's first clear), milestones (+3) and the check-in, never from money (8A). The check-in is a 7-tile week that never resets for a missed day: 2 crystals, 3 main-weapon blueprints, a Frame Blueprint, 3 crystals, a free dive, a Salvage Crate at the start of the next mission, then 10 crystals and 2 Frame Blueprints. The draw is a **Derelict Dive** (10 crystals): a scan turns up three of four kinds of wreck (Gunship: weapon blueprints; Frame Carrier: Frame Blueprints; Research Vessel: twice the Prototype chance; Armored Freighter: plating, generator and support blueprints), you pick one, and its haul is Common 67% (2 blueprints), Rare 28% (5, or 3 Frame Blueprints), or Prototype 5% (an unfound tech, unlocked), with a Rare at least every 10 dives. Boss plates and branch prizes never come from dives.
 - **8C. Likely (2026-11-08):** Co-op is not shared-screen.
 - **8D. Proposed (2026-11-08):** Co-op device to device or over the local network, with controllers, and maybe trading frames or cards.
   - **Ai-Generated-Proposal (2026-11-08):** Pairing uses a code shown on one device and entered on the other (peer-to-peer, no server to set up). Trading uses single-use trade codes that remove the item from the sender's save.
@@ -108,7 +110,7 @@
 - **9G. Proposed (2026-11-08):** Some branches, forks or clusters are intentionally hard until you have a good build or grind a little.
 - **9H. Ai-Generated-Proposal (2026-11-08):** In-mission upgrades get strategy from fewer, bigger level-ups, elemental Resonance tiers, cards that show what they build toward, risky cards, two rerolls per mission and a Build screen.
   - **Likely (2026-11-09):** Reaching a Resonance tier is obvious when it happens, shown right as you pick the upgrade that gave it, with a little splash. (heromedel.)
-  - **Ai-Generated-Proposal (2026-11-09):** Built in 0.4.1. A card that unlocks a tier wears the element's colour and a RESONANCE badge; picking it holds the action on a splash naming the tier and what it does; the frame glows in the element's colour, more with each tier. Tiers that were plain stat boosts became effects you can see: Capacitor Discharge (Energy II: a breaking shield lets go in a lightning nova), Chain Reaction (Explosive II: what a blast kills explodes a beat later, up to three links), Splinter Rounds (Kinetic II: shots that have flown a while burst into two fragments on hit). Tier I is stronger: arcs every 4th hit, Volatile 1 in 3, Hex Touch +30%; Storm Front arcs every 2nd hit.
+  - **Ai-Generated-Proposal (2026-11-09):** Built in 0.4.1. A card that unlocks a tier wears the element's colour and a RESONANCE badge; picking it holds the action on a splash naming the tier and what it does; the frame glows in the element's colour, more with each tier. Tiers that were plain stat boosts became effects you can see: Capacitor Discharge (Energy II: a breaking shield lets go in a lightning nova), Chain Reaction (Explosive II: what a blast kills explodes a beat later, up to three links), Splinter Rounds (Kinetic II: shots that have flown a while burst into two fragments on hit). Tier I is stronger: arcs every 4th hit, Volatile 1 in 3, Destabilize (then Hex Touch) +30%; Storm Front arcs every 2nd hit.
 
 ## 10. Setting & Lore
 
@@ -120,12 +122,13 @@
 - **10E. Proposed (2026-11-08):** A regular Jig Drive isn't built to jump dimensions; a temporal variant might be. In Infall, rumours said an ancient relic, the Orb of Chulak (a Stargate SG-1 nod), could open a wormhole to another dimension.
   - **Likely (2026-11-09):** A Jig Drive is a jump drive for travelling through space, never between realms. Crossing into another dimension is ancient Chulak tech (the SG-1 nod), or needs its own name, such as a **Jig Phase Drive** (phasing into a different dimension). Jigawatt-powered tech in general is just Jigawatt-powered, not Jig Drive. (heromedel.)
   - **Ai-Generated-Proposal (2026-11-08):** Reaching a realm is a big, rare event (a relic, a temporal drive), and each realm plays by its own rules, so the late game can feel like a different game.
+- **10F. Likely (2026-11-11):** Mawjig is high-tech, physics-bending technology, not witchcraft, so its tech isn't named like spells or curses. (heromedel didn't like "Hex".) The Hex Repeater became the **Flux Repeater**: its orbs leave enemies **unstable**. The Mawjig Resonance tiers are now Destabilize, Cascade and Meteor Lure.
 
 ## 11. Playtest Refinements (builds 0.2.2 and 0.3)
 
 - **11A. Likely (2026-11-08):** A Salvage Crate is three reels whose faces add up to the number of upgrades. Zeros outnumber ones, which outnumber twos, and the last reel has no zeros, so every crate gives 1 to 6 with no jumps. (heromedel's design.)
   - **Ai-Generated-Proposal (2026-11-08):** Reels of six 0s, three 1s and one 2, then eight 1s and two 2s: 1 = 28.8%, 2 = 36%, 3 = 24%, 4 = 9%, 5 = 2%, 6 = 0.2%, average 2.2. The crate screen lists what every upgrade does.
-- **11B. Likely (2026-11-08):** Lucky Salvage reads "Crates have improved odds": the first reel loses its zeros (at least 2, average 2.8).
+- **11B. Likely (2026-11-08):** Lucky Salvage reads "Crates have improved odds": the first reel loses its zeros (at least 2; average 2.6 since 11Y).
 - **11C. Likely (2026-11-08):** The in-game encyclopedia is called the Guide to Guardians. Explanations such as Mawjig live there rather than on working screens.
   - **Ai-Generated-Proposal (2026-11-08):** Lore, how-it-works, Resonance and special conditions are always there; enemies, bosses, tech and fusions fill in as you meet, beat or unlock them.
 - **11D. Proposed (2026-11-08):** Tractor Beam is a visible beam that reels in semi-nearby drops, as long as it doesn't clutter the battlefield.
@@ -159,6 +162,8 @@
 - **11J. Likely (2026-11-08):** Bullets that glow in the dark are an accessibility option, not a rule: Settings, "Bullets glow in the dark: Off > On".
 - **11H. Ai-Generated-Proposal (2026-11-08):** Explosive Resonance III is renamed Wildfire, and burning effects never mention the ground, since many fights are in space.
 
+- **11Y. Likely (2026-11-11):** Salvage Crates came too often and pushed heromedel into a different build than the one he was going for. They now lean mostly toward deepening the tech you have, and only rarely unlock something new. (heromedel.)
+  - **Ai-Generated-Proposal (2026-11-11):** Each crate upgrade levels tech already online, weighted toward what you've levelled most; 15% of the time it brings new tech online instead (always, if nothing online can level). Crates are rarer and a little smaller: elites drop one 28% of the time (was 49%), planet supply pods land every 80–105 s with six raiders (was 38–50 s with four), and the reels are 7 zeros, 2 ones and 1 two on the first two and 9 ones and 1 two on the last: 1 = 44%, 2 = 30%, 3 = 19%, 4 = 5%, 5 = 1.3%, 6 = 0.1%, average 1.9. The reels are now rolling slot-machine drums that blur, then settle on their faces with a bounce.
 - **11X. Proposed (2026-11-09):** Real environmental hazards on some planets: meteor swarms that can hit you or your shields (and maybe enemies and theirs), and ion storms whose pulses knock one or two pieces of equipment offline for 15 to 30 seconds. (heromedel's idea, saved for the roadmap: Plan H.)
 
 ## 12. Build 0.3 Content
@@ -219,3 +224,6 @@ there.
 | 2026-11-09 | 3E | Hard Rule: only real questions; never invent questions, end on them by habit, or re-ask decided points. |
 | 2026-11-09 | 13A–13X, 11P | Build 0.6 built: hits that matter, the Generator and Plating slots, the Shield Generator, Chain Bolts replacing Ricochet. |
 | 2026-11-10 | 13Y | Build 0.6.1 built: Load and Output, heat, power parts, frame tiers, the other plates. |
+| 2026-11-11 | 10F | Mawjig tech is physics bending, not witchcraft: Hex becomes Flux, hexed becomes unstable. |
+| 2026-11-11 | 8E | Mawjig Crystals, a daily check-in and Derelict Dives in a Supply Depot tab. |
+| 2026-11-11 | 11Y | Crates deepen your build, are rarer and smaller, and roll like real slot reels. |

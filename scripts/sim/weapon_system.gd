@@ -22,7 +22,7 @@ var vent_echo := 0.0          # Chain Vent's delayed second blast
 var rage_timer := 0.0
 var railstorm_timer := 2.0
 var flare_cooldown := 0.0
-var doom_bell_timer := 8.0
+var meteor_lure_timer := 8.0
 var pod_positions: Array = []   # Drone Pods, where they are now (the view draws them here)
 var ion_beams: Array = []       # Ion Cannon beams this tick: [from, angle, width] (the view draws them)
 var wisp_dart_timer := 1.4      # Will-o'-Wisps: seconds until a wisp darts out
@@ -162,7 +162,7 @@ func _update_tech(tech_id: String, dt: float) -> void:
 	match tech_id:
 		"pulse_driver": _pulse_driver()
 		"thunder_lance": _thunder_lance()
-		"hex_repeater": _hex_repeater()
+		"flux_repeater": _flux_repeater()
 		"arc_blade": _arc_blade()
 		"swarm_pods": _swarm_pods()
 		"orbital_halo": _orbital_halo(dt)
@@ -255,27 +255,27 @@ func _thunder_lance() -> void:
 	world.emit("sound", {"name": "rail"})
 
 
-func _hex_repeater() -> void:
-	var level := run.level_of("hex_repeater")
-	if not _ready_to_fire("hex_repeater", 0.36 - 0.03 * level):
+func _flux_repeater() -> void:
+	var level := run.level_of("flux_repeater")
+	if not _ready_to_fire("flux_repeater", 0.36 - 0.03 * level):
 		return
-	var damage := _damage("hex_repeater", 12.0, 0.16)
-	var fork := run.fork_of("hex_repeater")
+	var damage := _damage("flux_repeater", 12.0, 0.16)
+	var fork := run.fork_of("flux_repeater")
 	var horizon := run.has_fusion("event_horizon")
 	var fire := func(origin: Vector2, scale: float) -> void:
 		var count := 2 if level < 4 else 3
 		for i in count:
 			var angle := player.facing + lerpf(-0.6, 0.6, float(i) / float(count - 1))
 			var shot := world.player_shot(origin, Vector2.from_angle(angle) * (480.0 + 30.0 * level),
-				damage * scale, "hex_repeater", "hex", Color(0.85, 0.5, 1.0))
+				damage * scale, "flux_repeater", "flux", Color(0.85, 0.5, 1.0))
 			shot.radius = 7.0
 			shot.homing = 4.0 + 0.5 * level
 			shot.life = 1.8
-			shot.hex_mark = fork == "a"
-			shot.hex_shatter = fork == "b"
+			shot.destabilizes = fork == "a"
+			shot.shatters = fork == "b"
 			shot.devours = horizon
 	_main_volley(fire)
-	world.emit("sound", {"name": "hex"})
+	world.emit("sound", {"name": "flux"})
 
 
 # ---------------------------------------------------------------- weapons
@@ -585,12 +585,12 @@ func _update_resonance(dt: float) -> void:
 				slug.life = 0.6
 				world.emit("sound", {"name": "rail"})
 	if world.resonance["mawjig"] >= 3:
-		doom_bell_timer -= dt
-		if doom_bell_timer <= 0.0:
-			doom_bell_timer = 8.0
+		meteor_lure_timer -= dt
+		if meteor_lure_timer <= 0.0:
+			meteor_lure_timer = 8.0
 			var rung := 0
 			for enemy: Enemy in world.enemies:
-				if rung < 3 and enemy.hex_marked and not enemy.dead and not enemy.hidden:
+				if rung < 3 and enemy.unstable and not enemy.dead and not enemy.hidden:
 					world.call_meteor(enemy.pos, 70.0, 50.0, false)
 					rung += 1
 			if rung > 0:

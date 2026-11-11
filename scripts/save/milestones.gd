@@ -51,12 +51,13 @@ static func _met(milestone: Dictionary, result: Dictionary, counters: Dictionary
 
 
 static func _pay(milestone: Dictionary) -> void:
+	Save.add_crystals(DepotData.MILESTONE_CRYSTALS, "milestone %s" % milestone["name"])
 	var parts: PackedStringArray = milestone["reward"].split(":")
 	match parts[0]:
 		"blueprints":
 			Save.add_blueprints(parts[1], int(parts[2]))
 		"random_blueprints":
-			var ids := TechData.TECH.keys()
+			var ids := TechData.findable_ids()
 			for i in int(parts[1]):
 				Save.add_blueprints(ids[randi() % ids.size()], 1)
 		"tech":
@@ -72,6 +73,10 @@ static func _pay(milestone: Dictionary) -> void:
 
 
 static func reward_text(milestone: Dictionary) -> String:
+	return "%s, and %d Mawjig Crystals" % [_reward_text(milestone), DepotData.MILESTONE_CRYSTALS]
+
+
+static func _reward_text(milestone: Dictionary) -> String:
 	var parts: PackedStringArray = milestone["reward"].split(":")
 	match parts[0]:
 		"blueprints": return "%s %s blueprints" % [parts[2], TechData.TECH[parts[1]]["name"]]

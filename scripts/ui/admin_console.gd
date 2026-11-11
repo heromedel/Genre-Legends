@@ -15,6 +15,7 @@ const HELP := """Commands:
   help                     this list
   blueprints <n>           add n blueprints to every tech
   framebp <n>              add n Frame Blueprints (frame tiers in the Hangar)
+  crystals <n>             add n Mawjig Crystals (Supply Depot)
   power                    the selected frame and loadout's Load, Output and tiers
   unlockall                unlock every tech at Mk 3 and every frame
   mk <tech_id> <0-3>       set a tech's Mk
@@ -70,6 +71,12 @@ func execute(text: String) -> String:
 			Save.write()
 			changed.emit()
 			return "Added %d Frame Blueprints (now %d)." % [amount, Save.data["frame_blueprints"]]
+		"crystals":
+			var gift := int(parts[1]) if parts.size() > 1 else 500
+			Save.add_crystals(gift, "admin")
+			Save.write()
+			changed.emit()
+			return "Added %d Mawjig Crystals (now %d)." % [gift, Save.data["crystals"]]
 		"power":
 			var power := Save.power_summary()
 			return "%s, tiers %s: weighs %d of %d Load, draws %d of %d Output%s%s" % [Save.data["frame"], str(Save.frame_tiers(Save.data["frame"])),

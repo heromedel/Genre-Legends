@@ -224,8 +224,9 @@ static func _floating(panel: Control) -> Control:
 	return holder
 
 
-## The Salvage Crate: three slot-machine reels of gems spin and stop one by one; the crate gives one upgrade
-## per gem. Then every upgrade it landed on is listed with what it does.
+## The Salvage Crate: three slot-machine drums of gems spin and stop one by one; the crate gives one upgrade
+## per gem. Each drum rolls its real strip of faces (UpgradeData.CRATE_REELS) round a curved window, blurs while
+## it spins, and settles on its face with a little bounce. Then every upgrade it landed on is listed.
 class CrateReel:
 	extends Control
 	var touched := false          # the finger came down here after the reels stopped
@@ -234,7 +235,7 @@ class CrateReel:
 	var reels: Array = []          # every face each reel can show while spinning
 	var on_done: Callable
 	var time := 0.0
-	var spin_seconds := 1.8
+	var spin_seconds := 2.3
 
 	func _ready() -> void:
 		set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -242,6 +243,64 @@ class CrateReel:
 
 	func _stop_time(reel_index: int) -> float:
 		return spin_seconds * (0.45 + 0.27 * reel_index)
+
+
+	## Where a drum is, in faces along its strip: it runs at full speed, then eases onto the landed face with
+	## an overshoot (an ease-out-back curve), so it lands like a real reel catching its stop.
+	func _drum_position(reel_index: int) -> float:
+		var strip: Array = reels[reel_index]
+		var landing := float(strip.find(faces[reel_index]))
+		var travel := strip.size() * (3.0 + reel_index) + landing
+		var x := clampf(time / _stop_time(reel_index), 0.0, 1.0)
+		var back := 1.4
+		var eased := 1.0 + (back + 1.0) * pow(x - 1.0, 3.0) + back * pow(x - 1.0, 2.0)
+		return travel * eased
+
+
+	## One drum: the faces around its current position, curved onto a cylinder (squashed and dimmed toward the
+	## edges), with ghost copies trailing while it spins fast.
+	func _draw_drum(rect: Rect2, reel_index: int) -> void:
+		var strip: Array = reels[reel_index]
+		var position := _drum_position(reel_index)
+		var landed := time >= _stop_time(reel_index)
+		var speed := absf(_drum_position_at(reel_index, time + 0.02) - position) / 0.02
+		var radius := rect.size.y * 0.5
+		var center := rect.get_center()
+		var base := floori(position)
+		for k in range(-2, 3):
+			var index := base + k
+			var offset := float(index) - position
+			var angle := offset * 0.62
+			if absf(angle) >= PI * 0.5:
+				continue
+			var face: int = strip[posmod(index, strip.size())]
+			var at := Vector2(center.x, center.y + sin(angle) * radius * 0.92)
+			var squash := cos(angle)
+			var on_payline := landed and k == 0 and absf(offset) < 0.05
+			_draw_reel_face(at, face, squash, squash * (1.0 if on_payline or not landed else 0.45))
+			if speed > 6.0:
+				for trail: float in [0.18, 0.36]:
+					var ghost_angle := (offset - trail) * 0.62
+					if absf(ghost_angle) < PI * 0.5:
+						_draw_reel_face(Vector2(center.x, center.y + sin(ghost_angle) * radius * 0.92), face, cos(ghost_angle), 0.18)
+		# Glass: darker at the drum's top and bottom edges, a highlight across the top, and the payline.
+		for band in 6:
+			var t := band / 6.0
+			var shade := Color(0, 0, 0, 0.45 * (1.0 - t))
+			draw_rect(Rect2(rect.position + Vector2(0, t * rect.size.y * 0.3), Vector2(rect.size.x, rect.size.y * 0.05)), shade)
+			draw_rect(Rect2(Vector2(rect.position.x, rect.end.y - (t + 1.0 / 6.0) * rect.size.y * 0.3), Vector2(rect.size.x, rect.size.y * 0.05)), shade)
+		draw_rect(Rect2(rect.position + Vector2(4, 6), Vector2(rect.size.x - 8, 5)), Color(1, 1, 1, 0.12))
+		var payline := Art.GOLD if landed else Color(1, 0.8, 0.4, 0.4)
+		draw_line(Vector2(rect.position.x - 6, center.y), Vector2(rect.position.x + 2, center.y), payline, 3.0)
+		draw_line(Vector2(rect.end.x - 2, center.y), Vector2(rect.end.x + 6, center.y), payline, 3.0)
+
+
+	func _drum_position_at(reel_index: int, at_time: float) -> float:
+		var keep := time
+		time = at_time
+		var position := _drum_position(reel_index)
+		time = keep
+		return position
 
 	func _process(delta: float) -> void:
 		var before := time
@@ -262,17 +321,19 @@ class CrateReel:
 			on_done.call()
 			accept_event()
 
-	## A reel face is gems, not digits: none, one or two, so it reads at a glance like a slot machine.
-	func _draw_reel_face(rect: Rect2, face: int, landed: bool) -> void:
-		var center := rect.get_center()
-		var alpha := 1.0 if landed else 0.55
+	## A reel face is gems, not digits: none, one or two, so it reads at a glance like a slot machine. squash
+	## flattens it vertically as it rolls round the drum.
+	func _draw_reel_face(center: Vector2, face: int, squash: float, alpha: float) -> void:
 		if face == 0:
 			# An empty socket: no gem on this reel (a dash would read as a minus sign next to the "+").
-			draw_arc(center, 14.0, 0, TAU, 20, Color(0.55, 0.45, 0.3, alpha), 3.0, true)
+			draw_set_transform(center, 0.0, Vector2(1.0, squash))
+			draw_arc(Vector2.ZERO, 14.0, 0, TAU, 20, Color(0.55, 0.45, 0.3, alpha), 3.0, true)
+			draw_set_transform(Vector2.ZERO)
 			return
 		for g in face:
 			var at := center + Vector2((g - (face - 1) * 0.5) * 34.0, 0)
-			var gem := PackedVector2Array([at + Vector2(0, -20), at + Vector2(14, 0), at + Vector2(0, 20), at + Vector2(-14, 0)])
+			var tall := 20.0 * squash
+			var gem := PackedVector2Array([at + Vector2(0, -tall), at + Vector2(14, 0), at + Vector2(0, tall), at + Vector2(-14, 0)])
 			draw_colored_polygon(gem, Color(1, 0.82, 0.35, alpha))
 			draw_polyline(PackedVector2Array([gem[0], gem[1], gem[2], gem[3], gem[0]]), Color(1, 1, 0.85, alpha), 2.0, true)
 
@@ -300,10 +361,7 @@ class CrateReel:
 					total_color = Color(1, 1, 1).lerp(Art.GOLD, 0.5 + 0.5 * sin(time * 10.0))
 				draw_string(title_font, rect.position + Vector2(0, box.y * 0.7), total, HORIZONTAL_ALIGNMENT_CENTER, box.x, 60, total_color)
 			else:
-				var options: Array = reels[i]
-				var landed := time >= _stop_time(i)
-				var face: int = faces[i] if landed else options[int(time * 20.0 + i * 3) % options.size()]
-				_draw_reel_face(rect, face, landed)
+				_draw_drum(rect, i)
 			if i < 3:
 				var sign_at := Vector2(rect.end.x, top + box.y * 0.62)
 				draw_string(title_font, sign_at, "=" if i == 2 else "+", HORIZONTAL_ALIGNMENT_CENTER, gap, 34, Color(1, 0.85, 0.5))

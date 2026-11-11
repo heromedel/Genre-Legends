@@ -62,14 +62,14 @@ const TECH := {
 			"b": {"name": "Twin Rails", "text": "Fires two rails in a V. Three at level 5."},
 		},
 	},
-	"hex_repeater": {
-		"name": "Hex Repeater", "slot": "main", "element": "mawjig", "weight": 1, "draw": 2,
-		"text": "Mawjig orbs that hunt down enemies on their own.",
-		"levels": ["Seeking orbs", "Faster orbs", "Fork", "Third orb", "Deep hex: orbs hit harder"],
+	"flux_repeater": {
+		"name": "Flux Repeater", "slot": "main", "element": "mawjig", "weight": 1, "draw": 2,
+		"text": "Orbs of Mawjig flux that hunt down enemies on their own.",
+		"levels": ["Seeking orbs", "Faster orbs", "Fork", "Third orb", "Dense flux: orbs hit harder"],
 		"blueprint_from": ["dungeon", "planet"],
 		"forks": {
-			"a": {"name": "Hexplosion", "text": "Hexed enemies explode when they die, and the blast spreads the hex."},
-			"b": {"name": "Hex Swarm", "text": "Orbs shatter into three smaller hunters on impact."},
+			"a": {"name": "Critical Mass", "text": "Orbs leave enemies unstable. Unstable enemies blow apart when they die, and the blast destabilizes everything near them."},
+			"b": {"name": "Flux Swarm", "text": "Orbs shatter into three smaller hunters on impact."},
 		},
 	},
 	# ---- Weapons: start offline, brought online by level-ups and Salvage Crates.
@@ -343,6 +343,12 @@ static func ids_for_slot(slot: String) -> Array:
 
 static func element_color(tech_id: String) -> Color:
 	return ELEMENT_COLORS.get(get_tech(tech_id).get("element", "none"), ELEMENT_COLORS["none"])
+
+
+## Tech found on planets. Boss plates and branch prizes stay prizes, so random rewards (milestones, Supply
+## Drops) only hand out these.
+static func findable_ids() -> Array:
+	return TECH.keys().filter(func(t): return not TECH[t]["blueprint_from"].is_empty())
 
 
 ## Whether reaching the fork level asks for a choice. Plates level in their own way, with no forks (GDD 13M).

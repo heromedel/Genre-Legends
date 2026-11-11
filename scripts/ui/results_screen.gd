@@ -58,7 +58,7 @@ func _ready() -> void:
 	var earned := HFlowContainer.new()
 	earned.add_theme_constant_override("h_separation", 16)
 	column.add_child(earned)
-	if result["blueprints"].is_empty() and int(result.get("frame_blueprints", 0)) <= 0:
+	if result["blueprints"].is_empty() and int(result.get("frame_blueprints", 0)) <= 0 and int(result.get("crystals", 0)) <= 0:
 		earned.add_child(UiKit.label("None this time.", 15, Color(0.6, 0.65, 0.75)))
 	for tech_id in result["blueprints"]:
 		if int(result["blueprints"][tech_id]) <= 0:
@@ -67,6 +67,11 @@ func _ready() -> void:
 		chip.add_child(IconView.make(tech_id, 30, TechData.element_color(tech_id)))
 		chip.add_child(UiKit.label("%s +%d" % [TechData.TECH[tech_id]["name"], result["blueprints"][tech_id]], 16, Color(1, 1, 1)))
 		earned.add_child(chip)
+	if int(result.get("crystals", 0)) > 0:
+		var crystal_chip := HBoxContainer.new()
+		crystal_chip.add_child(IconView.make("crystal", 30, Color(0.55, 0.9, 1.0)))
+		crystal_chip.add_child(UiKit.label("Mawjig Crystals +%d" % int(result["crystals"]), 16, Color(0.6, 0.95, 1.0)))
+		earned.add_child(crystal_chip)
 	if int(result.get("frame_blueprints", 0)) > 0:
 		var chip := HBoxContainer.new()
 		chip.add_child(IconView.make("frame_blueprint", 30, Art.GOLD))

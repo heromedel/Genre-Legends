@@ -38,7 +38,11 @@ func show_hub(page: String) -> void:
 
 func launch_mission(node_id: String, event: Dictionary = {}) -> void:
 	var node := _test_node(node_id.trim_prefix("test:")) if node_id.begins_with("test:") else star_map.get_node(node_id).duplicate(true)
-	node["event"] = event
+	node["event"] = event.duplicate()
+	# A check-in's Salvage Crate rides along on the next real mission (DepotData).
+	if Save.data["start_crate"] > 0 and not node_id.begins_with("test:"):
+		node["event"]["start_crates"] = int(node["event"].get("start_crates", 0)) + Save.data["start_crate"]
+		Save.data["start_crate"] = 0
 	node["threat"] = Save.setting("threat")
 	node["auto_aim"] = Save.setting("auto_aim")
 	node["autofire"] = Save.setting("autofire")
@@ -107,6 +111,15 @@ func finish_mission(node_id: String, result: Dictionary) -> void:
 		Save.queue_radio(Radio.came_prepared_line(lesson_tech))
 		hints.append("+%d %s blueprints." % [LESSON_BLUEPRINTS_IF_OWNED, TechData.TECH[lesson_tech]["name"]])
 		PlayLog.note("unlock", "Lesson tech %s already owned: +%d blueprints" % [lesson_tech, LESSON_BLUEPRINTS_IF_OWNED])
+	# Mawjig Crystals (DepotData): something for every mission, more for a win, most for a first clear.
+	if not is_test:
+		var crystals := DepotData.MISSION_CRYSTALS
+		if result["won"]:
+			crystals += DepotData.WIN_CRYSTALS
+			if not Save.is_cleared(node_id):
+				crystals += DepotData.GATE_FIRST_CLEAR_CRYSTALS if node.get("is_gate", false) else DepotData.FIRST_CLEAR_CRYSTALS
+		Save.add_crystals(crystals, "mission")
+		result["crystals"] = crystals
 	if result["won"] and not is_test:
 		Save.mark_cleared(node_id)
 		Save.data["stats"]["wins"] += 1
@@ -141,6 +154,7 @@ func finish_mission(node_id: String, result: Dictionary) -> void:
 ##   frame=<id>   fly a frame              mk=3     all tech unlocked at that Mk
 ##   chain=<type>  the test planet chains into that mission type partway       cutscene=1  keep the transitions
 ##   bossid=<id> / minibossid=<id>   pick the test planet's boss or mini-boss (see BossRoster)
+##   crystals=<n>  set Mawjig Crystals (Supply Depot)
 ##   crate=<n>    open n Salvage Crates as soon as play starts      event=<id>  the next launch meets that route event      phase=<n>  with boss=1, the boss starts in phase n
 func _debug_launch() -> bool:
 	var options := {}
@@ -164,6 +178,8 @@ func _debug_launch() -> bool:
 		if not Save.data["frames_unlocked"].has(options["frame"]):
 			Save.data["frames_unlocked"].append(options["frame"])
 		Save.data["frame"] = options["frame"]
+	if options.has("crystals"):
+		Save.data["crystals"] = int(options["crystals"])
 	if options.has("loadout"):
 		Save.data["loadout"] = Array(options["loadout"].split(","))
 		Save.data = Save.repair(Save.data)

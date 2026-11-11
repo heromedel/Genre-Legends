@@ -32,7 +32,7 @@ func _node(mission_type: String) -> Dictionary:
 func _abuse_mission(mission_type: String, style: String) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(mission_type + style)
-	var all_tech := ["hex_repeater", "orbital_halo", "starfall", "overheat_core", "time_brake"]
+	var all_tech := ["flux_repeater", "orbital_halo", "starfall", "overheat_core", "time_brake"]
 	var mission := Mission.new(_node(mission_type), rng.randi(), "tempest", all_tech, func(t): return 3)
 	mission.debug_power_up("b")
 	var peak := 0
@@ -97,6 +97,9 @@ func _abuse_saves() -> void:
 		{"loadout": ["arc_blade", "arc_blade", "arc_blade", "arc_blade", "arc_blade"]},
 		{"frame": "unicorn", "frames_unlocked": ["unicorn"], "settings": "loud", "blueprints": {"pulse_driver": -5}},
 		{"map_seed": 1.5e300, "cleared": [1, 2], "stats": null},
+		{"version": 2, "crystals": -50, "checkin_day": "soon", "frame_blueprints": 1e9,
+			"frame_tiers": {"vanguard": ["load", "bogus", "armor", "armor", "armor"], "unicorn": ["load"]},
+			"tech_mk": {"hex_repeater": 2}, "loadout": ["hex_repeater", "", "", "", "", "", ""]},
 	]
 	for raw in garbage:
 		var fixed: Dictionary = save.repair(raw)
@@ -110,5 +113,12 @@ func _abuse_saves() -> void:
 		for tech_id in fixed["blueprints"]:
 			if fixed["blueprints"][tech_id] < 0:
 				report("save repair kept negative blueprints")
+		if fixed["crystals"] < 0 or typeof(fixed["checkin_day"]) != TYPE_INT:
+			report("save repair kept bad Depot numbers from %s" % str(raw))
+		for frame_id in fixed["frame_tiers"]:
+			if not FrameData.FRAMES.has(frame_id) or fixed["frame_tiers"][frame_id].size() > FrameData.TIER_COSTS.size():
+				report("save repair kept bad frame tiers %s" % str(fixed["frame_tiers"]))
+		if raw.get("tech_mk", {}).has("hex_repeater") and (fixed["tech_mk"].get("flux_repeater", 0) != 2 or fixed["loadout"][0] != "flux_repeater"):
+			report("an old save lost its Hex Repeater progress in the rename")
 	save.free()
 	print("  saves: %d damaged saves repaired" % garbage.size())

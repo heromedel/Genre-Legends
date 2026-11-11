@@ -4,7 +4,7 @@ extends Node
 ## also a slice per frame, and fades in when ready.
 ## On iPad, browsers only allow sound after a tap: the title screen's "tap to start" provides it.
 
-const EFFECT_NAMES := ["shot", "rail", "hex", "slash", "missiles", "explode", "explode_big", "player_hit",
+const EFFECT_NAMES := ["shot", "rail", "flux", "slash", "missiles", "explode", "explode_big", "player_hit",
 	"enemy_shot", "pickup", "level_up", "upgrade", "pick", "crate", "reel", "reel_stop", "jackpot", "blueprint",
 	"key", "repair", "warning", "phase", "boss_down", "victory", "nova", "black_hole", "time_brake", "shatter",
 	"mirror", "vent", "overdrive", "meteor", "transform", "dive", "charge", "spawn", "door_slam", "door_open",
@@ -12,8 +12,8 @@ const EFFECT_NAMES := ["shot", "rail", "hex", "slash", "missiles", "explode", "e
 	"laser", "ui", "radio", "shield_break", "shield_up"]
 const POLYPHONY := 14
 ## Quieter or rarer effects get a minimum gap so a hundred bullets don't make a hundred clicks.
-const MIN_GAP := {"shot": 0.06, "enemy_shot": 0.09, "pickup": 0.05, "explode": 0.05, "block": 0.08, "hex": 0.12, "rail": 0.08}
-const VOLUME := {"shot": -6.0, "enemy_shot": -8.0, "pickup": -6.0, "block": -8.0, "hex": -9.0, "ui": -4.0}
+const MIN_GAP := {"shot": 0.06, "enemy_shot": 0.09, "pickup": 0.05, "explode": 0.05, "block": 0.08, "flux": 0.12, "rail": 0.08}
+const VOLUME := {"shot": -6.0, "enemy_shot": -8.0, "pickup": -6.0, "block": -8.0, "flux": -9.0, "ui": -4.0}
 
 var synth := Synth.new()
 var effects := {}

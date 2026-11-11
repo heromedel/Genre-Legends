@@ -15,7 +15,7 @@ const MILESTONES := [
 	{"id": "gatebreaker", "name": "Gatebreaker", "text": "Break a region gate.", "reward": "random_blueprints:6"},
 	{"id": "wasp_swatter", "name": "Wasp Swatter", "text": "Destroy 80 Wasps.", "counter": "kill_wasp", "goal": 80, "reward": "enemy:cluster_drone"},
 	{"id": "hive_breaker", "name": "Hive Breaker", "text": "Destroy 12 Hive Nests.", "counter": "kill_hive_nest", "goal": 12, "reward": "enemy:centi_mech"},
-	{"id": "mimic_hunter", "name": "Mimic Hunter", "text": "Defeat 6 Mimics.", "counter": "kill_mimic", "goal": 6, "reward": "tech:hex_repeater"},
+	{"id": "mimic_hunter", "name": "Mimic Hunter", "text": "Defeat 6 Mimics.", "counter": "kill_mimic", "goal": 6, "reward": "tech:flux_repeater"},
 	{"id": "comeback", "name": "Comeback", "text": "Win a mission with less than 15% armor left.", "reward": "blueprints:graze_engine:4"},
 	# Hard, rare feats.
 	{"id": "untouchable", "name": "Untouchable", "text": "Defeat a boss without being hit during the fight.", "hidden": true, "reward": "tech:thunder_lance"},
