@@ -31,7 +31,8 @@ func behave(dt: float) -> void:
 	if entering:
 		clone.pos.y = move_toward(clone.pos.y, CLONE_Y, 220.0 * dt)
 		if shell != null:
-			shell.pos = Vector2(world.bounds.get_center().x + float(memory["shell_side"]) * 380.0, clone.pos.y - 70.0)
+			# The shell slides out to its side of the field as the clone arrives.
+			shell.pos = shell.pos.move_toward(Vector2(world.bounds.get_center().x + float(memory["shell_side"]) * 380.0, clone.pos.y - 70.0), 420.0 * dt)
 		if clone.pos.y >= CLONE_Y:
 			entering = false
 		return
@@ -56,7 +57,8 @@ func behave(dt: float) -> void:
 		world.emit("sound", {"name": "enemy_shot"})
 	# The projector shell bobs on its side of the field, protected by a slow spin of bullets.
 	if shell != null and not shell.dead:
-		shell.pos = Vector2(world.bounds.get_center().x + float(memory["shell_side"]) * 380.0, 110.0 + sin(time * 1.2) * 40.0)
+		var bob := Vector2(world.bounds.get_center().x + float(memory["shell_side"]) * 380.0, 110.0 + sin(time * 1.2) * 40.0)
+		shell.pos = shell.pos.move_toward(bob, 160.0 * dt)
 		if fmod(time, 2.0) < dt:
 			world.enemy_ring(shell.pos, 8, 140.0, time * 2.0, {"color": Color(0.6, 1.0, 0.7)})
 

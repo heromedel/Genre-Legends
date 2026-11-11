@@ -32,7 +32,9 @@ func behave(dt: float) -> void:
 		return
 	var to_player := world.player.pos - origin
 	origin += to_player.normalized() * 40.0 * dt if to_player.length() > 260.0 else Vector2.ZERO
-	place_parts(to_player.angle())
+	# She turns to face you at a queen's pace; snapping round would fling her sacs across the field.
+	memory["facing"] = rotate_toward(float(memory.get("facing", 0.0)), to_player.angle(), 1.6 * dt)
+	place_parts(memory["facing"])
 	var core := part_named("core")
 	var sacs := living_parts("sac")
 	if phase == 0 and sacs.is_empty():

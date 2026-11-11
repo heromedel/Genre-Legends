@@ -32,6 +32,7 @@ func _init() -> void:
 	_building_a_frame()
 	_crates_deepen()
 	_route_events()
+	_bosses_move_smoothly()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -712,3 +713,35 @@ func _route_events() -> void:
 	check(int(wager.results(false)["wager_crystals"]) == 0, "a lost wager pays nothing")
 	wager.state = "won"
 	check(int(wager.results(false)["wager_crystals"]) == 5, "a won wager pays the purse")
+
+
+## No boss part jumps across the screen (heromedel saw the Hive Carrier snap sideways): every boss and mini-boss,
+## through its entrance and early phases, moves at most 30 px a tick. The Hollow King's blink is its telegraphed
+## teleport, by design.
+func _bosses_move_smoothly() -> void:
+	for mission_type in BossRoster.POOLS:
+		for kind in ["boss", "miniboss"]:
+			for boss_id in BossRoster.POOLS[mission_type][kind]:
+				if boss_id == "hollow_king":
+					continue
+				var node := {"id": "t", "name": "T", "region": 0, "column": 3, "row": 0.0, "type": mission_type, "need": "x",
+					"difficulty": 1.2, "danger": 2, "modifier": "", "reward_tech": "arc_blade", "prize": "", "prize_text": "", kind: boss_id}
+				var mission := Mission.new(node, 11, "vanguard", TechData.STARTING_LOADOUT, func(t): return 1)
+				if kind == "boss":
+					mission.stage.debug_skip_to_boss()
+				else:
+					mission.stage.debug_skip_to_miniboss()
+				var last := {}
+				var worst := 0.0
+				for i in 60 * 20:
+					mission.player.grace = 99.0
+					mission.step(InputFrame.new())
+					mission.drain_events()
+					var boss = mission.stage.boss if kind == "boss" else mission.stage.miniboss
+					if boss == null:
+						continue
+					for part in boss.parts:
+						if last.has(part.part) and not part.dead:
+							worst = maxf(worst, part.pos.distance_to(last[part.part]))
+						last[part.part] = part.pos
+				check(worst <= 30.0, "%s moves smoothly (worst %.0f px in a tick)" % [boss_id, worst])

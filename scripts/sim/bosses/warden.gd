@@ -80,8 +80,12 @@ func behave(dt: float) -> void:
 ## The flail circles on its chain; it blocks your shots and hurts on contact.
 func _swing(flail: Enemy, reach: float) -> void:
 	var speed := 1.5 if phase == 0 else (2.0 if phase == 1 else 2.5)
-	flail.pos = origin + Vector2.from_angle(time * speed) * reach
-	memory["reach"] = reach
+	# The angle builds up tick by tick, so a faster phase spins it faster instead of snapping it across the room.
+	memory["flail_angle"] = float(memory.get("flail_angle", 0.0)) + speed * World.DT
+	# The chain pays out to its new length rather than snapping to it.
+	var current := move_toward(float(memory.get("reach", reach)), reach, 80.0 * World.DT)
+	flail.pos = origin + Vector2.from_angle(memory["flail_angle"]) * current
+	memory["reach"] = current
 
 
 func part_lost(part: Enemy) -> void:

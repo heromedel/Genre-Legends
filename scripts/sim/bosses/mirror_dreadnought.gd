@@ -36,7 +36,7 @@ func behave(dt: float) -> void:
 			entering = false
 			world.emit("banner", {"text": "THE HULL IS MIRRORED", "style": "blue"})
 		return
-	origin.x = world.bounds.get_center().x + sin(time * 0.4) * 170.0
+	glide_to(Vector2(world.bounds.get_center().x + sin(time * 0.4) * 170.0, origin.y), 160.0, dt)
 	place_parts()
 	var core := part_named("core")
 	var vents := living_parts("vent")

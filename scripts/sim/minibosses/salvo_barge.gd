@@ -31,7 +31,7 @@ func behave(dt: float) -> void:
 			entering = false
 			world.emit("shake", {"amount": 10.0})
 		return
-	origin.y = 140.0 + sin(time * 0.8) * 20.0
+	glide_to(Vector2(origin.x, 140.0 + sin(time * 0.8) * 20.0), 60.0, dt)
 	place_parts()
 	var core := part_named("core")
 	var pods := living_parts("pod")

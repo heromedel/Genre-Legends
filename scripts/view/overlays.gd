@@ -274,15 +274,17 @@ class CrateReel:
 			if absf(angle) >= PI * 0.5:
 				continue
 			var face: int = strip[posmod(index, strip.size())]
-			var at := Vector2(center.x, center.y + sin(angle) * radius * 0.92)
+			# Faces roll downward, like a real slot reel.
+			var at := Vector2(center.x, center.y - sin(angle) * radius * 0.92)
 			var squash := cos(angle)
 			var on_payline := landed and k == 0 and absf(offset) < 0.05
 			_draw_reel_face(at, face, squash, squash * (1.0 if on_payline or not landed else 0.45))
 			if speed > 6.0:
 				for trail: float in [0.18, 0.36]:
-					var ghost_angle := (offset - trail) * 0.62
+					# The blur trails above each face, where it's coming from.
+					var ghost_angle := (offset + trail) * 0.62
 					if absf(ghost_angle) < PI * 0.5:
-						_draw_reel_face(Vector2(center.x, center.y + sin(ghost_angle) * radius * 0.92), face, cos(ghost_angle), 0.18)
+						_draw_reel_face(Vector2(center.x, center.y - sin(ghost_angle) * radius * 0.92), face, cos(ghost_angle), 0.18)
 		# Glass: darker at the drum's top and bottom edges, a highlight across the top, and the payline.
 		for band in 6:
 			var t := band / 6.0

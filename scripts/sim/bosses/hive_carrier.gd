@@ -33,7 +33,7 @@ func behave(dt: float) -> void:
 		if origin.y >= settle_y:
 			entering = false
 		return
-	origin.x = world.bounds.get_center().x + sin(time * 0.35) * (90.0 if phase == 0 else 220.0)
+	glide_to(Vector2(world.bounds.get_center().x + sin(time * 0.35) * (90.0 if phase == 0 else 220.0), origin.y), 160.0, dt)
 	place_parts()
 	var core := part_named("core")
 	var bays := living_parts("bay")

@@ -130,7 +130,7 @@ func _apply_difficulty() -> void:
 	# Fire carries on from the gate's level rather than jumping to full density: with a hit budget, how much is
 	# thrown at you matters as much as how hard each hit lands.
 	var base := {"enemy_hp": 1.0 + 0.55 * (difficulty - 1.0), "damage": region_hits(region) * (0.75 + 0.8 * within_region),
-		"fire": 0.5 + 0.1 * region + 0.3 * within_region, "bullet_speed": 0.95 + 0.08 * (difficulty - 1.0)}
+		"fire": 0.68 + 0.1 * region + 0.3 * within_region, "bullet_speed": 0.98 + 0.08 * (difficulty - 1.0)}
 	var column: int = node.get("baseline", -1)
 	if column >= 0:
 		base = MissionData.FIRST_REGION_BASELINE[mini(column, MissionData.FIRST_REGION_BASELINE.size() - 1)].duplicate()

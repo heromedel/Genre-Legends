@@ -100,6 +100,8 @@
 
 - **9A. Likely (2026-11-08):** Difficulty for the first planets is set on purpose, with a target for how much an average player gets hurt, not an arbitrary formula. Losses are expected (as in FTL); challenge with some grind is good, all grind is bad, and there are never paywalls.
   - **Ai-Generated-Proposal (2026-11-08):** Targets on Standard: planet 1, 2–5 hits and 75–90% armor left; planets 2–3, 6–10 hits and 50–70% left; planets 4–5, 10–15 hits and 35–55% left; planet 6 (region gate), about 1 in 4 average attempts lost. Tuned with an "average player" QA bot. A Threat setting (Standard > Veteran > Casual) scales everything.
+  - **Likely (2026-11-11):** 0.6.1 was "definitely easy" (heromedel): planet 1 cleared with 0 hits and a median of 4 bullets on screen. The average-player bot takes 9+ hits on the same planet, so it dodges far worse than heromedel and can't set the targets on its own; his logs do.
+  - **Ai-Generated-Proposal (2026-11-11):** 0.6.2 raises the first region's bullet density about 30% (planet 1 fire 0.38 to 0.5, the gate 0.55 to 0.78) and enemy bullet speed a little, with hits the same size: more to dodge, not harsher punishment. Later regions start from the new gate level. Threat: Veteran is there for more.
 - **9B. Likely (2026-11-08):** Stages run about five minutes, and some have mini-bosses.
 - **9C. Likely (2026-11-08):** A planet can be built to beat you without one important tech; losing (or winning) unlocks that tech, and an indicator points you to equip it. It teaches that unlocks come even when you lose, that losses are expected, and to watch your build. The tech helps a lot rather than being strictly required, and you get it either way.
   - **Likely (2026-11-08):** Shields on planet 3, mini missiles on planet 6.
@@ -232,5 +234,6 @@ there.
 | 2026-11-11 | 7D, 13A | From the design review: the Generator part starts online; the Armor bar's cells are this planet's plain bullet; the Hangar says how often an overclocked build vents. (Drone Pods moving to the weapon slot was reverted: heromedel wants them beside the homing Swarm Pods.) |
 | 2026-11-11 | 10G | Beacons are jump beacons for Jig Drives; the "Mawjig Beacon" event became a Loose Mawjig Core and a Damaged Jump Beacon. |
 | 2026-11-11 | 12D | Route events rebuilt: real trade-offs, build-gated options, no repeats, and the mission announces what changed. |
+| 2026-11-11 | 9A, 11Y | From heromedel's 0.6.1 log: first region about 30% busier; bosses no longer snap to new positions (a shared glide); the crate reels roll downward. |
 | 2026-11-11 | 8E | Mawjig Crystals, a daily check-in and Derelict Dives in a Supply Depot tab. |
 | 2026-11-11 | 11Y | Crates deepen your build, are rarer and smaller, and roll like real slot reels. |

@@ -96,6 +96,11 @@ Plating slots, the Shield Generator and DSP-1 Drop Plate, the fixes the new rule
 Loop and Auxiliary Generator, frame tiers and Frame Blueprints, eight new plates. Next: more frames, each built
 around a built-in part (spec 21E), and the HUD, background and Hangar art passes.
 
+## Build 0.6.2 (2026-11-11, from heromedel's 0.6.1 log)
+
+(Note) A busier first region (0.6.1 was too easy), bosses that glide instead of snapping, downward-rolling crate
+reels.
+
 ## Plan C: Defense and tanks
 
 1. Planetary Defense and Tank Assault, sharing the tank form.

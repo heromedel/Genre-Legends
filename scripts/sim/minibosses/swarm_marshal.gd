@@ -32,7 +32,7 @@ func behave(dt: float) -> void:
 		if origin.y >= 150.0:
 			entering = false
 	else:
-		origin.x = world.bounds.get_center().x + sin(time * 0.6) * 300.0
+		glide_to(Vector2(world.bounds.get_center().x + sin(time * 0.6) * 300.0, origin.y), 260.0, dt)
 	core.pos = origin
 	_place_escorts(dt)
 	if phase == 0 and escorts.size() <= ESCORTS / 2:

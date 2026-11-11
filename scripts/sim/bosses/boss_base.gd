@@ -94,6 +94,13 @@ func living_parts(prefix: String) -> Array:
 	return parts.filter(func(p): return not p.dead and p.part.begins_with(prefix))
 
 
+## Moves the boss toward where its pattern wants it, never faster than max_speed. A pattern written straight from
+## the clock (sin(time)) would snap the moment the boss finished entering, or when a phase widened its sweep
+## (heromedel saw the Hive Carrier jump); gliding there dissolves both.
+func glide_to(target: Vector2, max_speed: float, dt: float) -> void:
+	origin = origin.move_toward(target, max_speed * dt)
+
+
 ## Places each living part at origin + its offset (rotated if the boss turns).
 func place_parts(rotation: float = 0.0) -> void:
 	for part: Enemy in parts:

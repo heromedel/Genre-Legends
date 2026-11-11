@@ -6,7 +6,16 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
-## What's new in 0.6.1 (on Claude's branch)
+## What's new in 0.6.2 (on Claude's branch)
+
+- **The first region is busier:** about 30% more enemy fire and slightly faster bullets, same hit sizes. 0.6.1 was
+  too easy (planet 1 cleared with no hits).
+- **Bosses no longer jump.** The Hive Carrier, Mirror Dreadnought, Swarm Marshal, Salvo Barge, Warden's flail,
+  Brood Queen's sacs and the Clone Projector's shell all glide into new positions instead of snapping. A rules test
+  now flies every boss and fails if any part jumps.
+- **The Salvage Crate reels roll downward,** like a real slot machine.
+
+## What's new in 0.6.1
 
 - **Building a frame.** Every part weighs something and powered parts draw Mawjig Output. The Hangar shows both as
   rows of pips: a build over its Max Load can't launch, and one past its Output is **overclocked**.
