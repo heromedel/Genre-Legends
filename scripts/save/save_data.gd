@@ -325,7 +325,9 @@ func power_summary() -> Dictionary:
 		"output": stats["output"] + TechData.loadout_output_bonus(loadout),
 	}
 	summary["over_load"] = summary["weight"] > summary["load"]
-	summary["overclocked"] = summary["draw"] > summary["output"]
+	# A Coolant Loop cancels the first pip over, so one pip past Output with it fitted never heats.
+	summary["cooled"] = 1 if loadout.has("coolant_loop") else 0
+	summary["overclocked"] = summary["draw"] > summary["output"] + summary["cooled"]
 	return summary
 
 

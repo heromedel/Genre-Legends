@@ -40,7 +40,7 @@ const STARTING_FRAME := "vanguard"
 ## changed in the Hangar at any time, so two Vanguards can grow differently and nobody is locked into a mistake.
 const TIER_COSTS := [3, 6, 10]
 const TIER_PICKS := ["load", "output", "armor", "cooling"]
-const TIER_PICK_NAMES := {"load": "+1 Max Load", "output": "+1 Mawjig Output", "armor": "+10 Armor", "cooling": "Cooler running"}
+const TIER_PICK_NAMES := {"load": "+1 Max Load", "output": "+1 Mawjig Output", "armor": "+10 Armor", "cooling": "25% slower heat"}
 const TIER_PICK_TEXT := {
 	"load": "Room for one more pip of weight.",
 	"output": "One more pip of Mawjig Output before you overclock.",

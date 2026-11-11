@@ -389,7 +389,7 @@ func _fill_info(node_id: String) -> void:
 	reward_row.add_child(reward_text)
 	payout.add_child(reward_row)
 	if TechData.TECH[node["reward_tech"]].has("from_boss"):
-		payout.add_child(UiKit.wrapped("Only if you beat the %s." % GuideData.BOSSES[TechData.TECH[node["reward_tech"]]["from_boss"]][0], 13, Color(1, 0.8, 0.6)))
+		payout.add_child(UiKit.wrapped("Paid only if you beat the %s." % GuideData.BOSSES[TechData.TECH[node["reward_tech"]]["from_boss"]][0], 13, Color(1, 0.8, 0.6)))
 	if int(node.get("frame_blueprints", 0)) > 0:
 		var frame_row := HBoxContainer.new()
 		frame_row.add_child(IconView.make("frame_blueprint", 26, Art.GOLD))
@@ -450,7 +450,7 @@ func _build_hangar_page() -> Control:
 	if power["over_load"]:
 		column.add_child(UiKit.wrapped("Over Max Load: swap a heavy part for a lighter one, or leave a slot empty, before you launch.", 15, Color(1, 0.45, 0.4)))
 	elif power["overclocked"]:
-		column.add_child(UiKit.wrapped("Overclocked: this build draws more power than your Output gives. In a mission the frame heats up as those parts come online, and at full heat it vents: your powered parts go offline for a few seconds.", 14, Color(1, 0.7, 0.35)))
+		column.add_child(UiKit.wrapped("Overclocked: this build draws more power than your Output gives. In a mission the frame heats up as those parts come online, and at full heat it vents: for 3 s every powered part but your main weapon goes quiet, shield included.", 14, Color(1, 0.7, 0.35)))
 	var slots_row := HBoxContainer.new()
 	slots_row.add_theme_constant_override("separation", 8)
 	column.add_child(slots_row)
@@ -523,7 +523,7 @@ func _frame_tiers(column: VBoxContainer, frame_id: String) -> void:
 		row.add_child(button)
 		column.add_child(row)
 	if not picks.is_empty():
-		column.add_child(UiKit.wrapped("Tap a tier to change what it gives, free, any time.", 12, Color(0.6, 0.7, 0.8)))
+		column.add_child(UiKit.wrapped("Tap a tier to change what it gives. Changing is free.", 12, Color(0.6, 0.7, 0.8)))
 	var cost := Save.next_tier_cost(frame_id)
 	if cost > 0:
 		var have: int = Save.data["frame_blueprints"]
@@ -585,7 +585,7 @@ func _slot_card(slot_index: int) -> Control:
 		mk.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		mk.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_child(mk)
-		var cost := UiKit.label("Wt %d  Pwr %d" % [TechData.weight_of(tech_id), TechData.draw_of(tech_id)], 13, Color(0.65, 0.75, 0.85))
+		var cost := UiKit.label("Weight %d · Draw %d" % [TechData.weight_of(tech_id), TechData.draw_of(tech_id)], 12, Color(0.65, 0.75, 0.85))
 		cost.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_child(cost)
@@ -966,8 +966,13 @@ class PowerMeters:
 
 	func _draw() -> void:
 		_row(0.0, "MAX LOAD", summary["weight"], summary["load"], Color(0.55, 0.85, 1.0), Color(1, 0.35, 0.35), "weighs", "OVER LOAD")
-		var generator: String = "  (+%d from the generator)" % TechData.loadout_output_bonus(Save.data["loadout"]) if TechData.loadout_output_bonus(Save.data["loadout"]) > 0 else ""
-		_row(32.0, "MAWJIG OUTPUT", summary["draw"], summary["output"], Color(0.85, 0.55, 1.0), Color(1, 0.6, 0.2), "draws", "OVERCLOCKED", generator)
+		var notes := []
+		if TechData.loadout_output_bonus(Save.data["loadout"]) > 0:
+			notes.append("+%d from the Auxiliary Generator" % TechData.loadout_output_bonus(Save.data["loadout"]))
+		if summary["cooled"] > 0 and summary["draw"] > summary["output"]:
+			notes.append("the Coolant Loop cancels 1")
+		var note := "  (%s)" % ", ".join(notes) if not notes.is_empty() else ""
+		_row(32.0, "MAWJIG OUTPUT", summary["draw"], summary["output"], Color(0.85, 0.55, 1.0), Color(1, 0.6, 0.2), "draws", "OVERCLOCKED" if summary["overclocked"] else "", note)
 
 	func _row(y: float, title: String, used: int, limit: int, color: Color, over_color: Color, verb: String, over_word: String, note: String = "") -> void:
 		var font := UiKit.font("bold")
@@ -982,7 +987,7 @@ class PowerMeters:
 			draw_rect(rect, Color(0.3, 0.4, 0.5) if i < limit else over_color, false, 1.5)
 			x += PIP.x + GAP
 		var over := used > limit
-		draw_string(font, Vector2(x + 8, y + 14), "%s %d of %d%s%s" % [verb, used, limit, "   " + over_word if over else "", note], HORIZONTAL_ALIGNMENT_LEFT, -1, 15,
+		draw_string(font, Vector2(x + 8, y + 14), "%s %d of %d%s%s" % [verb, used, limit, "   " + over_word if over and over_word != "" else "", note], HORIZONTAL_ALIGNMENT_LEFT, -1, 15,
 			over_color if over else Color(0.85, 0.9, 1.0))
 
 

@@ -470,9 +470,10 @@ func _mirror_aegis() -> void:
 
 # ---------------------------------------------------------------- heat (GDD 21D)
 
-## Powered parts sit out a vent's trip; unpowered weapons keep firing.
+## Powered parts sit out a vent's trip. The main weapon is wired straight to the reactor and keeps firing, so a
+## vent is a setback you fight through, never a few seconds with nothing to shoot back with.
 func is_tripped(tech_id: String) -> bool:
-	return player.vent_trip > 0.0 and TechData.draw_of(tech_id) > 0
+	return player.vent_trip > 0.0 and TechData.draw_of(tech_id) > 0 and tech_id != run.main_weapon()
 
 
 ## Overclocked, the frame heats by the pip; otherwise it cools. A trip lets it cool too.

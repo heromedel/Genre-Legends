@@ -593,7 +593,8 @@ func _building_a_frame() -> void:
 			vented = true
 			break
 	check(vented and is_equal_approx(mission.player.heat, WeaponSystem.VENT_HEAT_LEFT), "at full heat the frame vents and drops to 40%")
-	check(mission.weapons.is_tripped("thunder_lance") and not mission.weapons.is_tripped("dsp1_plate"), "a vent trips powered parts, not unpowered ones")
+	check(mission.weapons.is_tripped("starfall") and not mission.weapons.is_tripped("dsp1_plate"), "a vent trips powered parts, not unpowered ones")
+	check(not mission.weapons.is_tripped("thunder_lance"), "the main weapon keeps firing through a vent")
 	mission.player.shield_charges = 1
 	var armor_before := mission.player.armor
 	mission.world.damage_player(10.0, "test")

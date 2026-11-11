@@ -258,7 +258,8 @@ From the code audit (2026-11-09):
     faster, and every vent sets off its shockwave. Under your Output the frame sheds 3% heat a second.
   - **A vent only trips parts when you're overclocked.** A vent the core causes on a build within its Output is
     clean. Either way heat drops to 40%. While tripped, powered parts (and a powered special) sit out and the Shield
-    Generator can't block; unpowered weapons keep firing.
+    Generator can't block. Unpowered parts keep working, and so does the main weapon: every main weapon draws
+    power, and 3 s with nothing to shoot back with is a punishment, not a trade-off (the wording check caught it).
   - **Power parts run from the start,** like the plating, and level and fork like other tech (GDD 1C):
     - Coolant Loop (weight 2): cools 1 pip, 1.5 at level 4, 2 at level 5. Level 2 shortens a trip to 2 s.
       Forks: Cryo Purge (every vent slows the bullets around you to a crawl) or Flash Cooling (each kill sheds 2%).

@@ -221,7 +221,7 @@ const TECH := {
 	},
 	"jig_weave_plate": {
 		"name": "Jig-Weave Composite", "slot": "plating", "element": "none", "weight": 3, "draw": 0,
-		"text": "Armor woven through with Jigawatt-powered fibres. +15 Armor, and it shrugs off a light hit (10 or less) every 20 s. Each level, 3 s sooner.",
+		"text": "Armor woven through with Jigawatt-powered fibers. +15 Armor, and it shrugs off one light hit (10 or less), then needs 20 s to recover. Each level, 3 s sooner.",
 		"levels": ["A light hit every 20 s", "Every 17 s", "Every 14 s", "Every 11 s", "Every 8 s"],
 		"starts_online": true, "plate_armor": 15.0,
 		"blueprint_from": ["star_cluster", "planet", "dungeon"],
@@ -238,15 +238,15 @@ const TECH := {
 	# Uncommon plates: each is the prize of the boss it's named after, paid only when that boss falls (GDD 21G).
 	"mirrorwork_plate": {
 		"name": "Mirrorwork Half Plate", "slot": "plating", "element": "none", "weight": 2, "draw": 0,
-		"text": "Cut from the Mirror Dreadnought's hull. +10 Armor, and lasers and beams do half. From level 3 a beam that hits you throws a mirror bolt back.",
-		"levels": ["Beams do half", "Beams do 40%", "Beams throw back a mirror bolt", "Beams do 30%", "Beams do a quarter"],
+		"text": "Cut from the Mirror Dreadnought's hull. +10 Armor, and lasers and beams do half. From level 3, a beam that hits you fires a mirror bolt at the nearest enemy.",
+		"levels": ["Beams do half", "Beams do 40%", "Beams fire a mirror bolt at the nearest enemy", "Beams do 30%", "Beams do a quarter"],
 		"starts_online": true, "plate_armor": 10.0, "from_boss": "mirror_dreadnought",
 		"blueprint_from": [],
 		"forks": {},
 	},
 	"crusher_plate": {
 		"name": "Crusher-Rated Plate", "slot": "plating", "element": "none", "weight": 3, "draw": 0,
-		"text": "Rated to survive the Crusher Gate. +10 Armor, and blasts and shockwaves do half. From level 3 a blast that hits you throws the bullets around you away.",
+		"text": "Rated to survive the Crusher Gate. +10 Armor, and blasts and shockwaves do half. From level 3, a blast or shockwave that hits you clears the bullets around you.",
 		"levels": ["Blasts do half", "Blasts do 40%", "Blasts clear bullets around you", "Blasts do 30%", "Blasts do a quarter"],
 		"starts_online": true, "plate_armor": 10.0, "from_boss": "crusher_gate",
 		"blueprint_from": [],
@@ -263,7 +263,7 @@ const TECH := {
 	# Rare plates: strange, game-changing, and themed-branch prizes (GDD 21G).
 	"jig_phase_plate": {
 		"name": "Jig Phase Plate", "slot": "plating", "element": "none", "weight": 2, "draw": 0,
-		"text": "Salvaged from a Jig Phase Drive: hits phase partly out of this dimension. Half of every hit is held off for 3 s, and fades away if nothing else hits you meanwhile. Each level, 5% more is held off.",
+		"text": "Salvaged from a Jig Phase Drive: hits phase partly out of this dimension. Half of every hit is held off for 3 s. If you're hit again in that time, the held part lands too; if not, it fades away. Each level, 5% more is held off.",
 		"levels": ["Half held off", "55% held off", "60% held off", "65% held off", "70% held off"],
 		"starts_online": true, "plate_armor": 0.0,
 		"blueprint_from": [], "source": "Prize at the end of the Undervault.",
@@ -384,7 +384,7 @@ static func power_text(tech_id: String) -> String:
 	if tech_id == "aux_generator":
 		return "Weight %d, adds 3 Output" % weight_of(tech_id)
 	var draw := draw_of(tech_id)
-	return "Weight %d, %s" % [weight_of(tech_id), "draws %d" % draw if draw > 0 else "no power"]
+	return "Weight %d, %s" % [weight_of(tech_id), "draws %d" % draw if draw > 0 else "unpowered"]
 
 
 static func fork_name(tech_id: String, fork: String) -> String:
