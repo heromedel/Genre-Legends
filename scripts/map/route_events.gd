@@ -41,8 +41,8 @@ const EVENTS := {
 				[1.0, "Two blueprints from your biggest pile buy a Salvage Crate and a spare reroll.", {"spend_blueprints": 2, "start_crates": 1, "rerolls": 1}]]},
 			{"label": "Pay the trader (4 crystals)", "needs_crystals": 4, "outcomes": [
 				[1.0, "He fits something to your frame before you can ask what. You'll start with a field upgrade.", {"crystals": -4, "start_field": "random"}]]},
-			{"label": "Sell him your reactor's waste heat", "needs_tech": ["overheat_core", "aux_generator", "coolant_loop"], "outcomes": [
-				[1.0, "He takes the heat and pays in spare parts, but the transfer runs your reactor hot: +2 rerolls, and you'll start at 60% heat.", {"rerolls": 2, "start_heat": 60.0}]]},
+			{"label": "Let him charge his cells from your reactor", "needs_tech": ["aux_generator", "overheat_core", "coolant_loop"], "outcomes": [
+				[1.0, "He pays in spare parts, but charging his cells runs your reactor hard: +2 rerolls, and you'll start at 60% heat.", {"rerolls": 2, "start_heat": 60.0}]]},
 			{"label": "Decline", "outcomes": [[1.0, "The trader shrugs and drifts off.", {}]]}]},
 	"ambush": {"title": "Ambush", "text": "Hunters lie in wait in the debris field ahead. There's no clean way past.",
 		"choices": [
@@ -52,15 +52,24 @@ const EVENTS := {
 				[1.0, "Your special clears the debris in one shot. +2 of this planet's blueprints, and you're barely scratched (90% Armor).", {"blueprints_planet": 2, "start_armor": 0.9}]]},
 			{"label": "Take the long way", "outcomes": [
 				[1.0, "You slip past, but the planet knows you're coming: enemy bullets fly faster.", {"bullet_speed": 1.1}]]}]},
-	"beacon": {"title": "Mawjig Beacon", "text": "A beacon hums with raw Mawjig. Touching it could do anything, and not all of it good.",
+	"loose_core": {"title": "Loose Mawjig Core", "text": "A reactor core has spilled from a wreck and tumbles across your route, still crackling with raw Mawjig.",
 		"choices": [
-			{"label": "Touch it", "outcomes": [
-				[0.5, "It sings to your frame. You'll start with a field upgrade.", {"start_field": "random"}],
-				[0.3, "It screams. You'll start with a field upgrade, but enemy bullets fly faster.", {"start_field": "random", "bullet_speed": 1.12}],
-				[0.2, "It drinks from your frame and gives nothing back. You'll start at 75% Armor.", {"start_armor": 0.75}]]},
-			{"label": "Tune it to your Mawjig tech", "needs_tech": ["flux_repeater", "starfall", "soul_lantern", "time_brake"], "outcomes": [
-				[1.0, "Your tech hums in key with it. You'll start with a field upgrade, and nothing else.", {"start_field": "random"}]]},
-			{"label": "Leave it", "outcomes": [[1.0, "You leave it humming behind you.", {}]]}]},
+			{"label": "Tap its charge", "outcomes": [
+				[0.5, "The charge settles into your systems and tunes them. You'll start with a field upgrade.", {"start_field": "random"}],
+				[0.3, "The charge tunes your systems, but dumps its heat into your reactor. You'll start with a field upgrade, at 80% heat.", {"start_field": "random", "start_heat": 80.0}],
+				[0.2, "It arcs through your frame and burns out. You'll start at 75% Armor, with nothing to show for it.", {"start_armor": 0.75}]]},
+			{"label": "Draw it through your Mawjig tech", "needs_tech": ["flux_repeater", "starfall", "soul_lantern", "time_brake"], "outcomes": [
+				[1.0, "Your Mawjig tech takes the charge cleanly. You'll start with a field upgrade, and nothing else.", {"start_field": "random"}]]},
+			{"label": "Siphon it through the Coolant Loop", "needs_tech": ["coolant_loop"], "outcomes": [
+				[1.0, "The loop bleeds off the heat and keeps the charge. You'll start with a field upgrade.", {"start_field": "random"}]]},
+			{"label": "Let it tumble past", "outcomes": [[1.0, "You give it a wide berth and let it crackle away into the dark.", {}]]}]},
+	"jump_beacon": {"title": "Damaged Jump Beacon", "text": "The jump beacon that guides Jig Drives into this cluster is flickering. Someone has been at it.",
+		"choices": [
+			{"label": "Repair it for the network", "outcomes": [
+				[1.0, "It takes a while, but the beacon holds steady again. Operations pays the bounty: +4 crystals. The defenders below used the time to dig in: enemies are a little tougher.", {"crystals": 4, "enemy_hp": 1.1}]]},
+			{"label": "Strip it for parts", "outcomes": [
+				[1.0, "Its guidance core is worth a lot to R&D: +3 blueprints. Traffic control flags your frame, and more elites come looking.", {"blueprints_random": 3, "elites": 1.5}]]},
+			{"label": "Report it and fly on", "outcomes": [[1.0, "You log the fault for the network and jump on.", {}]]}]},
 	"bounty": {"title": "Rival Hunter", "text": "A bounty hunter blocks your path and offers a wager: whoever clears the planet first takes the purse.",
 		"choices": [
 			{"label": "Take the wager", "outcomes": [
@@ -85,8 +94,8 @@ const EVENTS := {
 				[1.0, "You arrive late, and the planet's defenders have dug in: enemies are a little tougher.", {"enemy_hp": 1.12}]]}]},
 	"convoy": {"title": "Refugee Convoy", "text": "A convoy of battered transports limps past. Their engineers wave you down.",
 		"choices": [
-			{"label": "Share your repair kits", "outcomes": [
-				[1.0, "They patch their hulls with your kits and hand you a set of frame plans. +1 Frame Blueprint, and you'll start at 85% Armor.", {"frame_blueprints": 1, "start_armor": 0.85}]]},
+			{"label": "Give them plating for their hulls", "outcomes": [
+				[1.0, "They patch their hulls with plating off your own frame and hand you a set of frame plans in thanks. +1 Frame Blueprint, and you'll start at 85% Armor.", {"frame_blueprints": 1, "start_armor": 0.85}]]},
 			{"label": "Escort them to the jump point", "outcomes": [
 				[1.0, "A quiet escort. They pay in crystals: +4, but the escort costs you time and the defenders dig in: enemies are a little tougher.", {"crystals": 4, "enemy_hp": 1.1}]]},
 			{"label": "Wave them on", "outcomes": [[1.0, "They limp on toward the jump point.", {}]]}]},

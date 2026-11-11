@@ -124,6 +124,7 @@
   - **Likely (2026-11-09):** A Jig Drive is a jump drive for travelling through space, never between realms. Crossing into another dimension is ancient Chulak tech (the SG-1 nod), or needs its own name, such as a **Jig Phase Drive** (phasing into a different dimension). Jigawatt-powered tech in general is just Jigawatt-powered, not Jig Drive. (heromedel.)
   - **Ai-Generated-Proposal (2026-11-08):** Reaching a realm is a big, rare event (a relic, a temporal drive), and each realm plays by its own rules, so the late game can feel like a different game.
 - **10F. Likely (2026-11-11):** Mawjig is high-tech, physics-bending technology, not witchcraft, so its tech isn't named like spells or curses. (heromedel didn't like "Hex".) The Hex Repeater became the **Flux Repeater**: its orbs leave enemies **unstable**. The Mawjig Resonance tiers are now Destabilize, Cascade and Meteor Lure.
+- **10G. Likely (2026-11-11):** A beacon is a jump beacon: it guides Jig Drives from cluster to cluster. Nobody touches one, and it isn't a Mawjig object. Raw Mawjig turns up in things like a reactor core spilled from a wreck. Events and text keep to what things would really be and do. (heromedel, on the 0.5 "Mawjig Beacon" event.)
 
 ## 11. Playtest Refinements (builds 0.2.2 and 0.3)
 
@@ -174,7 +175,7 @@
 - **12C. Ai-Generated-Proposal (2026-11-08):** New tech: Option Pods (renamed Drone Pods in 0.5.1, heromedel) and Soul Lantern (support), Ion Cannon and Thruster Explosion (special), with the Starbreaker and Wraith Drive fusions. Thruster Explosion is built from heromedel's Rule of Cool example (1A).
 - **12D. Ai-Generated-Proposal (2026-11-08):** Route events on the way to a planet: a choice with a risk, paying out at once or shaping the mission.
   - **Likely (2026-11-11):** The 0.5 events weren't good enough: "touch something for a bonus" with no real risk and the only other option doing nothing, the same few events again and again, and no way to see what you got once the mission started. (heromedel.)
-  - **Ai-Generated-Proposal (2026-11-11):** Rebuilt in 0.6.1 as eleven events where most options cost something (Armor at the start, crystals, blueprints, a harder mission) and pay something different; build-gated options in cyan that appear only with the right tech equipped (a Shield Generator boards the rigged derelict safely, a special blasts through the ambush, a Coolant Loop vents through the ion squall); the last event met is never met again next; and the mission opens with banners naming the event and exactly what it changed, including the names of any cards it fitted. Events have their own cold-review captures now.
+  - **Ai-Generated-Proposal (2026-11-11):** Rebuilt in 0.6.1 as twelve events where most options cost something (Armor at the start, crystals, blueprints, a harder mission) and pay something different; build-gated options in cyan that appear only with the right tech equipped (a Shield Generator boards the rigged derelict safely, a special blasts through the ambush, a Coolant Loop vents through the ion squall); the last event met is never met again next; and the mission opens with banners naming the event and exactly what it changed, including the names of any cards it fitted. Events have their own cold-review captures now.
 - **12E. Ai-Generated-Proposal (2026-11-08):** Big moments freeze the action for a heartbeat (boss kills, elites, Resonance tiers, fusions), and each genre has its own instruments.
 
 ## 13. Build 0.6: Hits That Matter
@@ -229,6 +230,7 @@ there.
 | 2026-11-10 | 13Y | Build 0.6.1 built: Load and Output, heat, power parts, frame tiers, the other plates. |
 | 2026-11-11 | 10F | Mawjig tech is physics bending, not witchcraft: Hex becomes Flux, hexed becomes unstable. |
 | 2026-11-11 | 7D, 13A | From the design review: the Generator part starts online; the Armor bar's cells are this planet's plain bullet; the Hangar says how often an overclocked build vents. (Drone Pods moving to the weapon slot was reverted: heromedel wants them beside the homing Swarm Pods.) |
+| 2026-11-11 | 10G | Beacons are jump beacons for Jig Drives; the "Mawjig Beacon" event became a Loose Mawjig Core and a Damaged Jump Beacon. |
 | 2026-11-11 | 12D | Route events rebuilt: real trade-offs, build-gated options, no repeats, and the mission announces what changed. |
 | 2026-11-11 | 8E | Mawjig Crystals, a daily check-in and Derelict Dives in a Supply Depot tab. |
 | 2026-11-11 | 11Y | Crates deepen your build, are rarer and smaller, and roll like real slot reels. |

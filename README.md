@@ -27,7 +27,7 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 - **Salvage Crates deepen your build** instead of steering it: they level up tech you already have online, and only
   sometimes bring something new online. They're rarer and a little smaller, and the reels roll like a real slot
   machine.
-- **Route events, rebuilt.** Eleven events with real trade-offs (most options cost Armor, crystals, blueprints or
+- **Route events, rebuilt.** Twelve events with real trade-offs (most options cost Armor, crystals, blueprints or
   a harder mission), options that only appear when your build has the right tech (shown in cyan), no repeats back
   to back, and banners at the start of the mission naming exactly what the event changed.
 - **The Generator part starts online** with the plating, and the **Armor bar's cells are this planet's plain

@@ -74,7 +74,7 @@ func _init(map_node: Dictionary, mission_seed: int, frame_id: String, loadout: A
 
 
 ## What happened on the way here (RouteEvents): a scored hull, a crate waiting, more elites, faster
-## enemy bullets, or a field upgrade from a Mawjig beacon.
+## enemy bullets, tougher bosses, or a field upgrade from a loose Mawjig core.
 var route_banners: Array = []    # what the route event changed, announced on the mission's first tick
 
 

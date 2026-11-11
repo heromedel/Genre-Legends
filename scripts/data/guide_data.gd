@@ -24,7 +24,7 @@ const HOW_IT_WORKS := [
 	["Supply Depot", "Mawjig Crystals come from missions, milestones and the daily check-in, never from money. Spend them on Derelict Dives: the Dropship scans a field of wrecks, you pick one, and its drone brings back blueprints, Frame Blueprints, or now and then a prototype of tech you haven't unlocked yet."],
 	["Risky cards", "Big power with a real cost, like losing a third of your Armor. Taking one is a bet on how you play."],
 	["Elites", "Some enemies arrive as elites with a twist. Shielded: break the barrier first. Splitting: breaks in two. Mirrored: throws straight shots back until enough hits crack it; homing shots, blades, blasts and meteors get through. Elites are worth more and sometimes carry blueprints."],
-	["Route events", "Things happen on the way to a planet: derelicts, distress calls, traders, ambushes, Mawjig beacons. Each is a choice, and some choices change the mission you're flying into."],
+	["Route events", "Things happen on the way to a planet: derelicts, distress calls, traders, ambushes, a damaged jump beacon, a loose Mawjig core. Each is a choice, and some choices change the mission you're flying into."],
 ]
 
 ## One line per enemy, shown once you've destroyed one. Kinds without a line here never get an entry.
