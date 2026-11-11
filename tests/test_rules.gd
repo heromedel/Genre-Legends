@@ -682,7 +682,7 @@ func _crates_deepen() -> void:
 
 ## Route events (GDD 12D): real choices, build-gated options, and effects the mission applies and announces.
 func _route_events() -> void:
-	var known := ["blueprints_random", "blueprints_planet", "spend_blueprints", "crystals", "frame_blueprints", "free_dive",
+	var known := ["blueprints_random", "blueprints_planet", "spend_blueprints", "crystals", "frame_blueprints", "free_dive", "wager_blueprints", "wager_crystals",
 		"start_armor", "start_crates", "rerolls", "start_field", "start_risky", "start_heat", "elites", "bullet_speed", "enemy_hp", "boss_health"]
 	for event_id in RouteEvents.EVENTS:
 		var choices: Array = RouteEvents.EVENTS[event_id]["choices"]
@@ -705,3 +705,10 @@ func _route_events() -> void:
 	check(not banners.is_empty(), "the mission announces what the route event changed")
 	check(is_equal_approx(mission.world.boss_health_scale, 0.75) and is_equal_approx(mission.player.heat, 60.0) and mission.pending_crates == 1, "route effects reach the mission")
 	check(mission.run.field.size() == 2, "a field upgrade and a risky card are fitted")
+	# The Rival Hunter's purse pays only for a win.
+	var wager_node: Dictionary = node.duplicate(true)
+	wager_node["event"] = {"title": "Rival Hunter", "elites": 2.0, "wager_blueprints": 4, "wager_crystals": 5}
+	var wager := Mission.new(wager_node, 7, "vanguard", TechData.STARTING_LOADOUT, func(t): return 1)
+	check(int(wager.results(false)["wager_crystals"]) == 0, "a lost wager pays nothing")
+	wager.state = "won"
+	check(int(wager.results(false)["wager_crystals"]) == 5, "a won wager pays the purse")

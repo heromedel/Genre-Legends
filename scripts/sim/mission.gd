@@ -100,7 +100,7 @@ func _apply_route_event(effects: Dictionary) -> void:
 		var risky_id: String = risky[world.rng.randi() % risky.size()]
 		var card := offers.field_card(risky_id)
 		offers.apply(card)
-		fitted.append(UpgradeData.RISKY_FIELD[risky_id]["name"])
+		fitted.append("risky: " + UpgradeData.RISKY_FIELD[risky_id]["name"])
 	if effects.has("title"):
 		# Said out loud as the mission starts, so you see what the trip changed (heromedel never could).
 		var lines: Array = fitted + RouteEvents.mission_summary(effects)
@@ -480,6 +480,10 @@ func results(first_clear: bool) -> Dictionary:
 	# Levels and crates picked up after the last boss fell come home as extra blueprints of the planet's tech.
 	if won:
 		amount += run.banked_levels
+	# A route event's wager (the Rival Hunter) pays only for a win.
+	var event: Dictionary = node.get("event", {})
+	if won:
+		amount += int(event.get("wager_blueprints", 0))
 	# A plate named after a boss is that boss's prize: only beating it pays (GDD 21G).
 	if reward != "" and TechData.get_tech(reward).has("from_boss") and not won:
 		amount = 0
@@ -499,6 +503,7 @@ func results(first_clear: bool) -> Dictionary:
 		"shards_missed": run.shards_missed,
 		"blueprints": blueprints,
 		"frame_blueprints": frame_blueprints,
+		"wager_crystals": int(event.get("wager_crystals", 0)) if won else 0,
 		"prize": node.get("prize", "") if won else "",
 		"prize_text": node.get("prize_text", "") if won else "",
 		"stages": stages_played,

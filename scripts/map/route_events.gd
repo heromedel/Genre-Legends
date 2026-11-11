@@ -15,7 +15,8 @@ const FIRST_AFTER_MISSIONS := 2
 ## Outcome effects.
 ##   Paid at once: blueprints_random, blueprints_planet, spend_blueprints, crystals (+/-), frame_blueprints, free_dive.
 ##   Carried into the mission: start_armor (fraction), start_crates, rerolls, start_field ("random"), start_risky
-##   ("random"), start_heat (0-100), elites, bullet_speed, enemy_hp, boss_health (multipliers).
+##   ("random"), start_heat (0-100), elites, bullet_speed, enemy_hp, boss_health (multipliers), and
+##   wager_blueprints / wager_crystals (paid with the results, only for a win).
 ## Choice gates: needs_tech (any of these equipped shows the option), needs_crystals, needs_blueprints.
 const EVENTS := {
 	"derelict": {"title": "Derelict Freighter", "text": "A gutted freighter drifts across your route. Its hold might still be sealed, or rigged.",
@@ -63,7 +64,7 @@ const EVENTS := {
 	"bounty": {"title": "Rival Hunter", "text": "A bounty hunter blocks your path and offers a wager: whoever clears the planet first takes the purse.",
 		"choices": [
 			{"label": "Take the wager", "outcomes": [
-				[1.0, "Game on. The hunter stakes the purse up front: +4 of this planet's blueprints and 5 crystals, now. Then stirs up the planet: twice the elites and a tougher boss.", {"elites": 2.0, "boss_health": 1.2, "blueprints_planet": 4, "crystals": 5}]]},
+				[1.0, "Game on. The hunter stirs up the planet: twice the elites and a tougher boss. Win the mission and the purse is yours: +4 of this planet's blueprints and 5 crystals. Lose, and you get nothing extra.", {"elites": 2.0, "boss_health": 1.2, "wager_blueprints": 4, "wager_crystals": 5}]]},
 			{"label": "Turn it down", "outcomes": [
 				[1.0, "The hunter laughs and spreads the word. A few more elites come looking for you.", {"elites": 1.4}]]}]},
 	"sabotage": {"title": "Inside Job", "text": "Operations has a contact near the planet's boss. A little help would go a long way.",
@@ -159,6 +160,8 @@ static func mission_summary(effects: Dictionary) -> Array:
 		lines.append("more elites")
 	if effects.has("start_armor"):
 		lines.append("Armor at %d%%" % roundi(float(effects["start_armor"]) * 100.0))
+	if effects.has("wager_blueprints"):
+		lines.append("win to claim the purse")
 	if effects.has("start_heat"):
 		lines.append("starting hot")
 	if effects.has("bullet_speed"):

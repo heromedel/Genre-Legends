@@ -118,6 +118,7 @@ func finish_mission(node_id: String, result: Dictionary) -> void:
 			crystals += DepotData.WIN_CRYSTALS
 			if not Save.is_cleared(node_id):
 				crystals += DepotData.GATE_FIRST_CLEAR_CRYSTALS if node.get("is_gate", false) else DepotData.FIRST_CLEAR_CRYSTALS
+		crystals += int(result.get("wager_crystals", 0))
 		Save.add_crystals(crystals, "mission")
 		result["crystals"] = crystals
 	if result["won"] and not is_test:

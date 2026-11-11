@@ -181,6 +181,7 @@ func _route_outcome(popup: Control, column: VBoxContainer, node: Dictionary, eve
 		var pile := _largest_blueprint_pile_id()
 		Save.add_blueprints(pile, -int(effects["spend_blueprints"]))
 	Save.write()
+	_refresh_top_bar()
 	PlayLog.note("event", "%s: chose \"%s\" - %s" % [event["title"], choice["label"], outcome[0]])
 	var carried := effects.duplicate()
 	carried["title"] = event["title"]
