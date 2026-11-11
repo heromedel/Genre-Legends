@@ -6,6 +6,13 @@ moves into `docs/GAME_DESIGN.md` or `docs/ROADMAP.md` and is struck off here.
 
 ## Frames and parts
 
+- **Proposed (2026-11-11):** Loadout slots named for where parts mount on the body, Armored Core style, instead of
+  "weapon" and "support": Frame, Plating, Core (or Generator), Left Arm, Right Arm, Left Shoulder, Right Shoulder,
+  Head, Back. Legs, or the leg type (bipedal, wheels and so on), could be part of the frame. Add more slots for a
+  spot if it needs them. Parts go where they'd really mount: homing mini missiles and most homing weapons belong on
+  a shoulder or the back, not in a hand as the primary aimed weapon. Go over later: which slots to add, rename or
+  remove. (heromedel, after Drone Pods were moved into a weapon slot and pushed out the homing Swarm Pods.)
+
 - **Proposed (2026-11-09):** More frames, each built around a built-in part: a built-in Arc Blade, a built-in Shield
   Generator, built-in shoulder mini missiles. Each pays for its part in Load, Output or Armor (spec 21E, 13S).
 - **Ai-Generated-Proposal (2026-11-11):** Frame names with intent for those three: the **Duelist** (built-in Arc

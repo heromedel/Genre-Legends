@@ -2,8 +2,8 @@ class_name BuildInfo
 ## Written by tools/export_web.sh on every export. Do not edit by hand.
 
 const VERSION := "0.6.1"
-const BUILT := "2026-11-11 04:22 UTC"
-const COMMIT := "9e7726e-dirty"
+const BUILT := "2026-11-11 04:23 UTC"
+const COMMIT := "7edb81d-dirty"
 
 
 static func label() -> String:

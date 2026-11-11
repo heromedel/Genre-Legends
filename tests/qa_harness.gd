@@ -38,8 +38,8 @@ func _loadout_for(progress: String, run_index: int) -> Dictionary:
 			for tech_id in TechData.TECH:
 				mk[tech_id] = 2 if progress == "mid" else 3
 			var mains := ["pulse_driver", "thunder_lance", "flux_repeater"]
-			var weapons := ["swarm_pods", "orbital_halo", "starfall", "option_pods"]
-			var supports := ["graze_engine", "overheat_core", "coolant_loop", "aux_generator"]
+			var weapons := ["swarm_pods", "orbital_halo", "starfall"]
+			var supports := ["graze_engine", "overheat_core", "option_pods", "coolant_loop", "aux_generator"]
 			var plates := ["dsp1_plate", "qrf_shell", "jig_weave_plate", "lunarium_plate", "mirrorwork_plate", "crusher_plate",
 				"arc_lined_plate", "jig_phase_plate", "last_legend_plate"]
 			var specials := ["nova_bomb", "time_brake", "ion_cannon", "thruster_explosion"]

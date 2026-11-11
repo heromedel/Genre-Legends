@@ -226,6 +226,6 @@ there.
 | 2026-11-09 | 13A–13X, 11P | Build 0.6 built: hits that matter, the Generator and Plating slots, the Shield Generator, Chain Bolts replacing Ricochet. |
 | 2026-11-10 | 13Y | Build 0.6.1 built: Load and Output, heat, power parts, frame tiers, the other plates. |
 | 2026-11-11 | 10F | Mawjig tech is physics bending, not witchcraft: Hex becomes Flux, hexed becomes unstable. |
-| 2026-11-11 | 7D, 13A | From the design review: the Generator part starts online; the Armor bar's cells are this planet's plain bullet; Drone Pods move to the weapon slot; the Hangar says how often an overclocked build vents. |
+| 2026-11-11 | 7D, 13A | From the design review: the Generator part starts online; the Armor bar's cells are this planet's plain bullet; the Hangar says how often an overclocked build vents. (Drone Pods moving to the weapon slot was reverted: heromedel wants them beside the homing Swarm Pods.) |
 | 2026-11-11 | 8E | Mawjig Crystals, a daily check-in and Derelict Dives in a Supply Depot tab. |
 | 2026-11-11 | 11Y | Crates deepen your build, are rarer and smaller, and roll like real slot reels. |

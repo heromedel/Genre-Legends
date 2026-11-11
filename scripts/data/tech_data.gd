@@ -145,7 +145,7 @@ const TECH := {
 		},
 	},
 	"option_pods": {
-		"name": "Drone Pods", "slot": "weapon", "element": "kinetic", "weight": 2, "draw": 1,
+		"name": "Drone Pods", "slot": "support", "element": "kinetic", "weight": 2, "draw": 1,
 		"text": "Two pods trail your path and fire weaker copies of your main weapon.",
 		"levels": ["Two pods", "Stronger copies", "Fork", "Third pod", "Strongest copies"],
 		"blueprint_from": ["star_cluster", "corridor"],
