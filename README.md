@@ -192,7 +192,7 @@ tools/export_web.sh                                   # export to play/
 godot --headless --quit-after 90 2>&1 | grep "SCRIPT ERROR"  # boot check: every script compiles (the rules tests skip the view)
 godot --headless -s tests/test_rules.gd               # rules tests
 godot --headless -s tests/qa_harness.gd -- all 2 all  # QA bots: every mission type at three progress levels
-godot --headless -s tests/difficulty_report.gd -- 2   # average-player bot against the first region's targets
+godot --headless -s tests/difficulty_report.gd -- 2 average   # planning bot against the first region's targets (average, heromedel, or 0-1)
 godot --headless -s tests/break_it.gd                 # break-it tester (headless half)
 godot --headless -s tests/replay_log.gd -- log.txt    # replay a play log
 tests/web/serve.sh &                                  # serve play/ on :8060, then:

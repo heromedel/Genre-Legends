@@ -1,7 +1,8 @@
 class_name BotPilot
 extends RefCounted
 ## A competent bot that plays any mission type through InputFrames only, like a player would.
-## Used by the QA harness (GDD 4A). It dodges bullets, chases objectives, explores dungeons room by room,
+## Used by the QA harness (GDD 4A). It plans its dodges (reads shot paths ahead, picks a safe spot that keeps it
+## on target, commits until it re-plans), chases objectives, explores dungeons room by room,
 ## uses its special when things get hairy, and picks level-up cards by a simple preference.
 ## Its aim is tracked: a bot that misses when it shouldn't is a bug (GDD 4D).
 
@@ -22,6 +23,17 @@ var path_age := 0
 const CELL := 40.0
 ## "average" plays like an average player: notices bullets later, sometimes freezes, picks cards loosely.
 var average := false
+## How well it dodges, 0 to 1 (heromedel: a bot that's too good is as misleading as one that's too bad). It sets
+## how often it re-plans (reaction), how far ahead it reads shots, how wide a margin it keeps, and how often it
+## lapses. Left at -1: 1.0, or 0.45 for an "average" bot. Calibrated against heromedel's own logs.
+var skill := -1.0
+var plan_target := Vector2.INF    # the safe spot it's heading for until the next re-plan
+var plan_age := 999
+const COMMIT_MARGIN := 12.0       # how much better another spot must score before it changes its mind
+## Calibrated on planet 1 at 0.6.1's density (2026-11-11), where heromedel took 0 hits: skill 1.0 takes 0, 0.8 about
+## half a hit, 0.4 about 2 (the design's "average player" target there), 0.2 about 6, 0.0 about 10.
+const AVERAGE_SKILL := 0.4
+const HEROMEDEL_SKILL := 0.85
 
 
 func _init(target: Mission, bot_seed: int, prefer_fork: String = "a") -> void:
@@ -40,7 +52,6 @@ func next_input() -> InputFrame:
 		return frame
 	var player := mission.player
 	var world := mission.world
-	var dodge := _dodge_vector()
 	if player.form == "ship":
 		var target_x := world.bounds.get_center().x
 		var nearest := _hittable_target(player.pos)
@@ -53,8 +64,9 @@ func next_input() -> InputFrame:
 			desired.x = clampf(desired.x, stage.left_edge(player.pos.y) + 40.0 - player.pos.x, stage.right_edge(player.pos.y) - 40.0 - player.pos.x)
 			if absf(player.pos.x - mid) > 200.0:
 				desired.x = mid - player.pos.x
-		var move := desired.limit_length(14.0) + dodge * 22.0
-		frame.drag = move.limit_length(26.0)
+		# Plan a safe spot that keeps it under its target, and go there at a player's pace.
+		var target := _plan(player.pos + desired)
+		frame.drag = (target - player.pos).limit_length(player.speed * 1.25 * World.DT)
 	else:
 		var goal := _waypoint(_ground_goal())
 		var to_goal := goal - player.pos
@@ -65,7 +77,9 @@ func next_input() -> InputFrame:
 		var boss := mission.stage.active_boss()
 		if boss != null and not boss.defeated and boss.origin.distance_to(player.pos) < 300.0:
 			direction += (player.pos - boss.origin).normalized() * 1.5
-		direction += dodge * 1.6
+		# Plan a safe spot on the way to the goal, and walk to it.
+		var planned := _plan(player.pos + direction.normalized() * 120.0 if direction.length() > 0.05 else player.pos)
+		direction = (planned - player.pos).normalized() if planned.distance_to(player.pos) > 4.0 else Vector2.ZERO
 		direction = _avoid_walls(direction)
 		if player.pos.distance_to(last_pos) < 1.0 and direction.length() > 0.2:
 			stuck_timer += World.DT
@@ -117,32 +131,104 @@ func _hittable_target(from: Vector2) -> Enemy:
 	return best
 
 
-func _dodge_vector() -> Vector2:
+func _skill() -> float:
+	if skill >= 0.0:
+		return skill
+	return AVERAGE_SKILL if average else 1.0
+
+
+## The shoot-'em-up loop (heromedel's three steps, and two more): read where every nearby shot will be over the
+## next fraction of a second; find the spots the frame can reach that none of them crosses on the way; among
+## those, prefer the one that keeps it on target (want); re-plan only at its reaction speed and commit in
+## between; and let shots the Arc Blade is about to cut through count for less.
+func _plan(want: Vector2) -> Vector2:
 	var player := mission.player
-	var push := Vector2.ZERO
-	var notice := 150.0
-	if average:
-		# Average players react late and now and then don't react at all.
-		notice = 85.0
-		if int(mission.tick / 20) % 4 == 0:
-			return Vector2.ZERO
-	for shot: Shot in mission.world.enemy_shots:
-		var offset := player.pos - shot.pos
-		var distance := offset.length()
-		if distance > notice or distance < 0.01:
+	var world := mission.world
+	var level := _skill()
+	var reaction := int(round(lerpf(36.0, 3.0, level)))
+	plan_age += 1
+	if plan_age < reaction and plan_target != Vector2.INF:
+		return plan_target
+	plan_age = 0
+	# A weaker player sometimes simply doesn't react this time.
+	if rng.randf() < maxf(0.6 - level, 0.0) * 0.8:
+		plan_target = want if plan_target == Vector2.INF else plan_target
+		return plan_target
+	var horizon := lerpf(0.2, 0.8, level)
+	var notice := lerpf(110.0, 380.0, level)
+	var margin := lerpf(0.0, 14.0, level)
+	# And misjudges where shots are by up to this much.
+	var misread := lerpf(28.0, 0.0, level)
+	var speed := player.speed * (1.25 if player.form == "ship" else 1.0)
+	var threats := []
+	for shot: Shot in world.enemy_shots:
+		if not shot.dead and shot.pos.distance_to(player.pos) < notice:
+			threats.append([shot.pos + Vector2(rng.randf_range(-misread, misread), rng.randf_range(-misread, misread)), shot.vel, shot.radius])
+	for enemy: Enemy in world.enemies:
+		if not enemy.dead and not enemy.hidden and enemy.contact > 0.0 and enemy.pos.distance_to(player.pos) < notice:
+			threats.append([enemy.pos, enemy.vel, enemy.radius])
+	var blade_ready: bool = mission.run.is_online("arc_blade") and float(mission.run.tech_timer.get("arc_blade", 9.0)) < 0.35
+	var blade_reach := 118.0 + 12.0 * mission.run.level_of("arc_blade")
+	var best := player.pos
+	var best_score := INF
+	var current_score := INF          # how the spot it's already heading for scores now
+	var candidates := [player.pos, plan_target if plan_target != Vector2.INF else player.pos, want]
+	for ring in [40.0, 80.0, 130.0, 190.0]:
+		for i in 12:
+			candidates.append(player.pos + Vector2.from_angle(TAU * i / 12.0) * ring)
+	for spot: Vector2 in candidates:
+		if not _spot_allowed(spot):
 			continue
-		var heading := shot.vel.normalized()
-		var closing := -offset.normalized().dot(heading)
-		if closing < -0.2:
-			continue
-		var side := offset - heading * offset.dot(heading)
-		if side.length() < 0.01:
-			side = heading.orthogonal()
-		push += side.normalized() * (150.0 - distance) / 150.0
-	for zone: Zone in mission.world.zones:
-		if zone.hostile and zone.kind != "laser" and player.pos.distance_to(zone.pos) < zone.radius + 30.0:
-			push += (player.pos - zone.pos).normalized()
-	return push.limit_length(1.0)
+		var distance := player.pos.distance_to(spot)
+		var danger := 0.0
+		for k in range(1, 9):
+			var t := horizon * k / 8.0
+			var at := player.pos.move_toward(spot, speed * t)
+			for threat in threats:
+				var future: Vector2 = threat[0] + threat[1] * t
+				var clearance: float = at.distance_to(future) - (player.radius + float(threat[2]) + margin)
+				var weight := 1.0
+				if blade_ready and future.y < at.y and future.distance_to(at) < blade_reach:
+					weight = 0.25
+				if clearance < 0.0:
+					danger += 1000.0 * weight / (1.0 + t * 3.0)
+				else:
+					danger += weight * exp(-clearance / 18.0) * 4.0
+		for zone: Zone in world.zones:
+			if zone.hostile and _zone_covers(zone, spot):
+				danger += 1500.0
+		var score := danger + spot.distance_to(want) * 0.08 + distance * 0.02
+		if plan_target != Vector2.INF and spot == plan_target:
+			current_score = score
+		if score < best_score:
+			best_score = score
+			best = spot
+	# Commit: keep heading for the chosen spot unless another is clearly better. Dodging left and dodging
+	# right score almost the same against a shot coming straight at you; re-picking every few ticks would
+	# swing between them and go nowhere (the first planning bot did exactly that).
+	if current_score < INF and best_score > current_score - COMMIT_MARGIN and player.pos.distance_to(plan_target) > 6.0:
+		best = plan_target
+	plan_target = best
+	return best
+
+
+func _spot_allowed(spot: Vector2) -> bool:
+	var world := mission.world
+	if not world.bounds.grow(-24.0).has_point(spot) or world.point_in_wall(spot):
+		return false
+	if mission.stage is CorridorStage:
+		var stage: CorridorStage = mission.stage
+		return spot.x > stage.left_edge(spot.y) + 26.0 and spot.x < stage.right_edge(spot.y) - 26.0
+	return true
+
+
+func _zone_covers(zone: Zone, spot: Vector2) -> bool:
+	if zone.kind == "laser":
+		var direction := Vector2.from_angle(zone.angle)
+		var along := (spot - zone.pos).dot(direction)
+		var across := absf((spot - zone.pos).dot(direction.orthogonal()))
+		return along >= 0.0 and along <= zone.length and across < zone.width * 0.5 + 16.0
+	return spot.distance_to(zone.pos) < zone.radius + 14.0
 
 
 func _avoid_walls(direction: Vector2) -> Vector2:

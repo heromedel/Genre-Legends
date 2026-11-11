@@ -14,6 +14,10 @@ const TARGETS := [
 func _init() -> void:
 	var args := OS.get_cmdline_user_args()
 	var runs := int(args[0]) if args.size() > 0 else 3
+	# Optional skill (BotPilot): "average" (the default), "heromedel", or a number from 0 to 1.
+	var skill_arg: String = args[1] if args.size() > 1 else "average"
+	var skill: float = BotPilot.AVERAGE_SKILL if skill_arg == "average" else (BotPilot.HEROMEDEL_SKILL if skill_arg == "heromedel" else float(skill_arg))
+	print("Bot skill %.2f (%s)" % [skill, skill_arg])
 	var lessons := {2: "needles", 5: "mirror"}
 	for column in 6:
 		print("Planet %d   target: %s" % [column + 1, TARGETS[column]])
@@ -41,6 +45,7 @@ func _init() -> void:
 					var mission := Mission.new(node, 500 + run * 31, "vanguard", variant[0], func(t): return 1)
 					var bot := BotPilot.new(mission, run)
 					bot.average = true
+					bot.skill = skill
 					var boss_start := -1.0
 					while not mission.is_finished() and mission.tick < 60 * 60 * 9:
 						mission.step(bot.next_input())
