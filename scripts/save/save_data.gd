@@ -177,6 +177,9 @@ func repair(raw: Dictionary) -> Dictionary:
 	clean["dive_wrecks"] = clean["dive_wrecks"].filter(func(k): return DepotData.WRECKS.has(k))
 	for key in ["crystals", "checkin_day", "free_dives", "dives_since_rare", "start_crate"]:
 		clean[key] = maxi(int(raw.get(key, 0)) if typeof(raw.get(key)) in [TYPE_INT, TYPE_FLOAT] else 0, 0)
+	# A save from before the Depot gets the crystals its earned milestones now pay.
+	if not raw.has("crystals"):
+		clean["crystals"] += DepotData.MILESTONE_CRYSTALS * clean["milestones"].size()
 	clean["version"] = VERSION
 	return clean
 

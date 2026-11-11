@@ -13,7 +13,7 @@ const CHECKIN := [
 	{"frame_blueprints": 1, "text": "1 Frame Blueprint"},
 	{"crystals": 3, "text": "3 Crystals"},
 	{"free_dive": 1, "text": "A free Derelict Dive"},
-	{"start_crate": 1, "text": "Your next mission opens with a Salvage Crate"},
+	{"start_crate": 1, "text": "Salvage Crate on your next mission"},
 	{"crystals": 10, "frame_blueprints": 2, "text": "10 Crystals and 2 Frame Blueprints"},
 ]
 
@@ -36,8 +36,8 @@ const RARITY_COLORS := {"common": Color(0.55, 0.85, 1.0), "rare": Color(0.8, 0.5
 ##   slots: which loadout slots its blueprints come from ([] = Frame Blueprints instead).
 ##   prototype: how much likelier a Prototype is aboard.
 const WRECKS := {
-	"gunship": {"name": "Gunship Wreck", "text": "Weapon blueprints: main weapons, weapons and specials.", "slots": ["main", "weapon", "special"], "prototype": 1.0, "color": Color(1.0, 0.55, 0.4)},
-	"carrier": {"name": "Frame Carrier", "text": "Frame Blueprints, for frame tiers.", "slots": [], "prototype": 1.0, "color": Color(1.0, 0.8, 0.35)},
+	"gunship": {"name": "Gunship Wreck", "text": "Blueprints for main weapons, weapons and specials.", "slots": ["main", "weapon", "special"], "prototype": 1.0, "color": Color(1.0, 0.55, 0.4)},
+	"carrier": {"name": "Frame Carrier", "text": "Frame Blueprints for frame tiers, or now and then a Prototype.", "slots": [], "prototype": 1.0, "color": Color(1.0, 0.8, 0.35)},
 	"research": {"name": "Research Vessel", "text": "Any blueprints, and twice the chance of a Prototype.", "slots": ["main", "weapon", "support", "special", "generator", "plating"], "prototype": 2.0, "color": Color(0.8, 0.55, 1.0)},
 	"freighter": {"name": "Armored Freighter", "text": "Plating, generator and support blueprints.", "slots": ["support", "generator", "plating"], "prototype": 1.0, "color": Color(0.55, 0.85, 1.0)},
 }

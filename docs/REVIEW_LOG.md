@@ -117,3 +117,8 @@ a design point).
 | 0.6.1 wording | Mirrorwork, Crusher-Rated | "throws a mirror bolt back" (it aims at the nearest enemy); "throws the bullets away" (it clears them, on shockwaves too). | **Acted on** | Texts say exactly that. |
 | 0.6.1 wording | Jig-Weave, Jig Phase | Weave read as a timer; Phase never said what happens if you're hit again. | **Acted on** | "then needs 20 s to recover"; "If you're hit again in that time, the held part lands too". "fibres" to "fibers". |
 | 0.6.1 wording | Small lines | "(+3 from the generator)" read as the Generator slot; "no power"; "Wt Pwr"; "Cooler running"; comma chains in the tier lines and Guide; "Only if you beat". | **Acted on** | Each reworded as suggested. |
+| 0.6.1 Depot wording | Check-in | "each day you fly", but checking in needs no mission. | **Acted on** | "each day you check in". |
+| 0.6.1 Depot wording | Dive blueprints | Could pay blueprints for tech already at Mk 3, while the card said "toward its next Mk". | **Acted on** | Maxed tech is left out (a fully maxed haul pays a Frame Blueprint); text: "Toward unlocking it or its next Mk." |
+| 0.6.1 Depot wording | Milestone rewards | Old saves showed crystals for milestones that never paid them; "..., and 3 Mawjig Crystals" broke grammar. | **Acted on** | A save from before the Depot is paid those crystals once; text "+3 Mawjig Crystals". |
+| 0.6.1 Depot wording | Smaller lines | Prototype odds wording, carrier text, "Weapon blueprints: ... weapons", an invented quartermaster, the free-dive count, a long day 6 tile, a singular crate count. | **Acted on** | Each reworded as suggested. |
+| 0.6.1 Depot wording | Stale comments | Crate odds comments and GDD 11A still gave the old reels. | **Acted on** | Updated; 11A points to 11Y. |

@@ -117,7 +117,7 @@ const FUSIONS := {
 
 ## Salvage Crate: three reels, and the crate gives the sum of the faces they land on, 1 to 6 upgrades.
 ## Zeros outnumber ones, which outnumber twos; the last reel has no zeros, so every crate gives at least 1.
-## Odds: 1 = 28.8%, 2 = 36%, 3 = 24%, 4 = 9%, 5 = 2%, 6 = 0.2% (average 2.2).
+## Odds: 1 = 44%, 2 = 30%, 3 = 19%, 4 = 5.4%, 5 = 1.3%, 6 = 0.1% (average 1.9; GDD 11Y).
 const CRATE_REELS := [
 	[0, 0, 0, 0, 0, 0, 0, 1, 1, 2],
 	[0, 0, 0, 0, 0, 0, 0, 1, 1, 2],

@@ -271,7 +271,7 @@ func _crate_pool() -> Array:
 	return []
 
 
-## The faces each reel can land on. Lucky Salvage turns the first reel's zeros into ones (average 2.8).
+## The faces each reel can land on. Lucky Salvage turns the first reel's zeros into ones (average 2.6).
 func crate_reels() -> Array:
 	var reels: Array = UpgradeData.CRATE_REELS.duplicate(true)
 	if run.field_count("lucky_salvage") > 0:

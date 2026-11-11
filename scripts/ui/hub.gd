@@ -453,12 +453,7 @@ func _build_hangar_page() -> Control:
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	column.add_theme_constant_override("separation", 12)
 	scroll.add_child(column)
-	column.add_child(UiKit.label("FRAME", 20, Color(0.6, 0.9, 1.0), "title"))
-	var frames_row := HBoxContainer.new()
-	frames_row.add_theme_constant_override("separation", 12)
-	column.add_child(frames_row)
-	for frame_id in FrameData.FRAMES:
-		frames_row.add_child(_frame_card(frame_id))
+	# The loadout comes first: it's what changes before most missions. The frames, chosen far less often, sit below.
 	column.add_child(UiKit.label("LOADOUT", 20, Color(0.6, 0.9, 1.0), "title"))
 	column.add_child(UiKit.wrapped("Your main weapon, plating and power parts are ready when a mission starts. Level-ups and Salvage Crates bring the rest online. The Generator slot holds what keeps you alive: a shield, a blade, a mirror or a lantern, one at a time.", 14, Color(0.65, 0.75, 0.88)))
 	# Load and Mawjig Output (GDD 21B): what the build weighs and draws against what the frame can take.
@@ -475,6 +470,12 @@ func _build_hangar_page() -> Control:
 	column.add_child(slots_row)
 	for slot_index in TechData.SLOTS.size():
 		slots_row.add_child(_slot_card(slot_index))
+	column.add_child(UiKit.label("FRAME", 20, Color(0.6, 0.9, 1.0), "title"))
+	var frames_row := HBoxContainer.new()
+	frames_row.add_theme_constant_override("separation", 12)
+	column.add_child(frames_row)
+	for frame_id in FrameData.FRAMES:
+		frames_row.add_child(_frame_card(frame_id))
 	if picker_slot < 0:
 		return scroll
 	# The picker opens as a pop-up over the hangar, so it's never off the bottom of the screen.
@@ -559,7 +560,7 @@ func _slot_card(slot_index: int) -> Control:
 	var tech_id: String = Save.data["loadout"][slot_index]
 	var button := Button.new()
 	button.focus_mode = Control.FOCUS_NONE
-	button.custom_minimum_size = Vector2(118, 150)
+	button.custom_minimum_size = Vector2(118, 174)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if picker_slot == slot_index:
 		button.add_theme_stylebox_override("normal", UiKit._box(Color(0.12, 0.2, 0.3), Color(0.6, 0.95, 1.0), 3))
@@ -760,9 +761,10 @@ func _build_depot_page() -> Control:
 	head.add_child(IconView.make("crystal", 30, Color(0.55, 0.9, 1.0)))
 	head.add_child(UiKit.label("%d Mawjig Crystals" % Save.data["crystals"], 22, Color(0.65, 0.95, 1.0), "bold"))
 	column.add_child(head)
-	column.add_child(UiKit.wrapped("Crystals come from missions (more for a win, most for a first clear), milestones and checking in. They can't be bought: the Depot's quartermaster doesn't take money, only proof you've been out there.", 14, Color(0.65, 0.75, 0.88)))
-	if Save.data["start_crate"] > 0:
-		column.add_child(UiKit.wrapped("A Salvage Crate is waiting for you at the start of your next mission.", 14, Color(1, 0.85, 0.5)))
+	column.add_child(UiKit.wrapped("Crystals come from missions (more for a win, most for a first clear), milestones and checking in. They can't be bought, only earned.", 14, Color(0.65, 0.75, 0.88)))
+	var waiting: int = Save.data["start_crate"]
+	if waiting > 0:
+		column.add_child(UiKit.wrapped("%s waiting for you at the start of your next mission." % ("A Salvage Crate is" if waiting == 1 else "%d Salvage Crates are" % waiting), 14, Color(1, 0.85, 0.5)))
 	column.add_child(_checkin_panel())
 	column.add_child(_dives_panel())
 	return scroll
@@ -775,7 +777,7 @@ func _checkin_panel() -> Control:
 	column.add_theme_constant_override("separation", 8)
 	panel.add_child(column)
 	column.add_child(UiKit.label("DAILY CHECK-IN", 17, Art.GOLD, "bold"))
-	column.add_child(UiKit.wrapped("One tile for each day you fly, any days you like: missing a day never resets it. Day 7 is the big one.", 13, Color(0.65, 0.75, 0.88)))
+	column.add_child(UiKit.wrapped("One tile for each day you check in, whichever days you like. Missing a day never resets it. Day 7 is the big one, then the week starts over.", 13, Color(0.65, 0.75, 0.88)))
 	var ready := Save.checkin_ready()
 	var tile := Save.checkin_tile()
 	var claimed := tile if (ready or tile > 0) else DepotData.CHECKIN.size()
@@ -834,11 +836,11 @@ func _dives_panel() -> Control:
 	column.add_theme_constant_override("separation", 8)
 	panel.add_child(column)
 	column.add_child(UiKit.label("DERELICT DIVES", 17, Art.GOLD, "bold"))
-	column.add_child(UiKit.wrapped("The Dropship scans a field of wrecks and sends its drone aboard the one you pick. Each kind of wreck carries its own salvage. Odds: Common 67%, Rare 28%, Prototype 5% (a piece of tech you haven't found, unlocked), and a Rare or better at least every 10 dives.", 13, Color(0.65, 0.75, 0.88)))
+	column.add_child(UiKit.wrapped("The Dropship scans a field of wrecks and sends its drone aboard the one you pick. Each kind of wreck carries its own salvage. Odds: Common 67%, Rare 28%, Prototype 5% (unlocks a tech you don't have yet), and a Rare or better at least every 10 dives.", 13, Color(0.65, 0.75, 0.88)))
 	var wrecks: Array = Save.data["dive_wrecks"]
 	if wrecks.is_empty():
 		var free: int = Save.data["free_dives"]
-		var label := "Scan for wrecks: free dive (%d left)" % free if free > 0 else "Scan for wrecks: %d crystals" % DepotData.DIVE_COST
+		var label := "Scan for wrecks: uses 1 of %d free dives" % free if free > 0 else "Scan for wrecks: %d crystals" % DepotData.DIVE_COST
 		var can: bool = free > 0 or Save.data["crystals"] >= DepotData.DIVE_COST
 		var button := UiKit.button(label, func():
 			if not DerelictDives.scan().is_empty():

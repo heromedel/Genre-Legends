@@ -86,11 +86,14 @@ static func _blueprints(rarity: String, amount: int, slots: Array) -> Dictionary
 	var fits := func(t): return slots.has(TechData.TECH[t]["slot"])
 	var owned: Array = TechData.findable_ids() + Save.data["tech_mk"].keys()
 	var equipped: Array = Save.data["loadout"].filter(func(t): return t != "" and fits.call(t) and Save.tech_mk(t) < TechData.MAX_MK)
-	var findable: Array = owned.filter(fits)
+	var findable: Array = owned.filter(func(t): return fits.call(t) and Save.tech_mk(t) < TechData.MAX_MK)
+	if findable.is_empty() and equipped.is_empty():
+		Save.data["frame_blueprints"] += 1
+		return _result(rarity, "Frame Blueprints x1", "Everything aboard was already maxed, so the drone took its frame plans.", "frame_blueprint")
 	var pool: Array = equipped if not equipped.is_empty() and rng.randf() < 0.5 else findable
 	var tech_id: String = pool[rng.randi() % pool.size()]
 	Save.add_blueprints(tech_id, amount)
-	return _result(rarity, "%s x%d" % [TechData.TECH[tech_id]["name"], amount], "Blueprints toward its next Mk.", tech_id)
+	return _result(rarity, "%s x%d" % [TechData.TECH[tech_id]["name"], amount], "Toward unlocking it or its next Mk.", tech_id)
 
 
 static func _result(rarity: String, title: String, text: String, icon: String) -> Dictionary:

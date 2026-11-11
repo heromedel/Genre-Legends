@@ -73,7 +73,7 @@ static func _pay(milestone: Dictionary) -> void:
 
 
 static func reward_text(milestone: Dictionary) -> String:
-	return "%s, and %d Mawjig Crystals" % [_reward_text(milestone), DepotData.MILESTONE_CRYSTALS]
+	return "%s, +%d Mawjig Crystals" % [_reward_text(milestone), DepotData.MILESTONE_CRYSTALS]
 
 
 static func _reward_text(milestone: Dictionary) -> String:
