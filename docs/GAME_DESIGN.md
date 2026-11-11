@@ -182,6 +182,7 @@ there.
 - **13J. Likely (2026-11-09):** Two new slots, Generator and Plating. (heromedel.) **13K:** the Shield Generator, Arc Blade, Mirror Aegis and Soul Lantern share the Generator slot.
 - **13L, 13M. Proposed (2026-11-09):** Plating is the frame's outer armour, mostly basic, named with intent; each plate levels up in its own way. (heromedel.)
 - **13N–13Q. Ai-Generated-Proposal (2026-11-09):** Halo saws break after three bullets; Reflex Blade fuses Arc Blade with Graze Engine; Capacitor Discharge on any hit; cards retuned for an 80-Armor pool.
+- **13Y. Ai-Generated-Proposal (2026-11-10):** Build 0.6.1 (Plan B, points 21A–21I of the spec): Max Load and Mawjig Output as pips in the Hangar, heat and vents for overclocked builds, the Coolant Loop and Auxiliary Generator, frame tiers bought with Frame Blueprints, and eight new plates from planets, bosses and branches.
 - **13R, 13S:** Frame Armor; built-in parts are bonuses on top (Proposed, heromedel). **13T:** the planet 3 lesson gives the Shield Generator (9C). **13V:** a fresh save (Proposed, heromedel). **13W:** Chain Bolts replace Ricochet (Proposed, heromedel). **13X:** auto-fire off by default (Proposed, heromedel).
 
 ## Decision Log
@@ -217,3 +218,4 @@ there.
 | 2026-11-09 | 1D | Alternatives offered side by side are never the same kind of ability; a dash or ram on its own is fine. |
 | 2026-11-09 | 3E | Hard Rule: only real questions; never invent questions, end on them by habit, or re-ask decided points. |
 | 2026-11-09 | 13A–13X, 11P | Build 0.6 built: hits that matter, the Generator and Plating slots, the Shield Generator, Chain Bolts replacing Ricochet. |
+| 2026-11-10 | 13Y | Build 0.6.1 built: Load and Output, heat, power parts, frame tiers, the other plates. |

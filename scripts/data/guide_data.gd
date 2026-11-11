@@ -10,10 +10,13 @@ const LORE := [
 ]
 
 const HOW_IT_WORKS := [
-	["Armor", "Your frame's Armor is one pool, and the bar reads as hits: each small tick is a bullet, each tall one three. Big hits take more, and after any hit you can't be hit again for a moment. Repairs are rare, so every hit counts."],
+	["Armor", "Your frame's Armor is one pool, and the bar reads as hits: each cell is 10 Armor, a plain bullet's worth, grouped in threes. Big hits take more, and after any hit you can't be hit again for a moment. Repairs are rare, so every hit counts."],
 	["Loadout", "Seven slots: a main weapon, two weapons, a support, a special, a generator and your plating. The generator slot holds what keeps you alive, a shield, a blade, a mirror or a lantern, one at a time. Plating is your outer armor and is worn from the start of every mission."],
+	["Load and Output", "Every part weighs something, and a frame can only carry its Max Load: a build that's too heavy can't launch. Powered parts draw Mawjig Output. You may run past your Output on purpose: that's overclocking, and the Hangar's pips turn orange."],
+	["Heat", "An overclocked frame heats up as its powered parts come online, faster the more pips you're over. At full heat it vents: your powered parts go offline for 3 s, while unpowered weapons keep firing, and you never lose Armor to it. A Coolant Loop takes the edge off, an Auxiliary Generator adds Output, and an Overheat Core turns heat into a weapon."],
+	["Frame upgrades", "Some planets pay Frame Blueprints. Spend them in the Hangar on three tiers for each frame (3, 6 and 10 blueprints). Each tier gives one pick, more Load, more Output, more Armor or cooler running, and you can change any pick for free, any time."],
 	["Level-ups", "Data Shards fill your level bar. Each level-up offers cards: bring tech online, level it, or take a field upgrade. Two rerolls per mission."],
-	["Forks", "At level 3 every tech forks into one of two paths that change how it behaves. You choose; crates never choose for you."],
+	["Forks", "At level 3 every tech forks into one of two paths that change how it behaves. You choose; crates never choose for you. Plates don't fork: each one levels up in its own way."],
 	["Resonance", "Levels of online tech of one element add up (field upgrades count 2). At 5, 10 and 15 points that element unlocks its next tier."],
 	["Fusions", "Two specific pieces of tech, both at level 5 (only Mk 3 tech gets there), fuse into something new. Both keep working."],
 	["Salvage Crates", "Three reels add up to how many upgrades you get, from 1 to 6. Most crates give 1 to 3; a 6 is a true jackpot. Lucky Salvage improves the odds."],

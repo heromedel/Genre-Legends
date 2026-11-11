@@ -251,6 +251,39 @@ From the code audit (2026-11-09):
   | Rare | **Jig Phase Plate** | +0, 2 | A hit drains in over 3 s; half of it fades if no other hit lands meanwhile | Each level, the fading part grows by 10% | Salvage from a Jig Phase Drive (GDD 10E): hits phase partly out of this dimension and arrive late |
   | Rare | **Last Legend Plate** | −10, 2 | Below a third of your Armor, weapons fire 30% faster | Each level, +5% faster | The Guardian Legend, and our own title |
 
+- **21I. Ai-Generated-Proposal (2026-11-10): how 0.6.1 filled the gaps,** built as follows.
+  - **Only online parts draw.** Offline parts draw nothing, so every mission starts cool and heat begins only as an
+    overclocked build comes online. Weight counts every equipped part.
+  - **One heat meter.** The Overheat Core now heats the frame itself (no second meter). Above 70% heat it fires 25%
+    faster, and every vent sets off its shockwave. Under your Output the frame sheds 3% heat a second.
+  - **A vent only trips parts when you're overclocked.** A vent the core causes on a build within its Output is
+    clean. Either way heat drops to 40%. While tripped, powered parts (and a powered special) sit out and the Shield
+    Generator can't block; unpowered weapons keep firing.
+  - **Power parts run from the start,** like the plating, and level and fork like other tech (GDD 1C):
+    - Coolant Loop (weight 2): cools 1 pip, 1.5 at level 4, 2 at level 5. Level 2 shortens a trip to 2 s.
+      Forks: Cryo Purge (every vent slows the bullets around you to a crawl) or Flash Cooling (each kill sheds 2%).
+    - Auxiliary Generator (weight 3): +3 Output, rising to +6 at level 5. Forks: Surge Cell (each unused pip of
+      Output gives weapons 3% damage) or Vent Tap (every vent gives 3 s of Overdrive).
+  - **Frame tiers can be re-picked free, any time.** Buying a tier is the cost; choosing isn't, so nobody is
+    trapped by an early pick and players are free to experiment.
+  - **Frame Blueprints are one currency** for every frame. About a third of planets (never the first) and every gate
+    show them on the card, 1 + region (+1 on a gate), paid like the planet's reward.
+  - **Plates don't fork;** each levels in its own way. Changes from 21H:
+    - Jig-Weave shrugs off a light hit (10 or less) every 20 s, 3 s sooner per level. Once per stage was too
+      rare in one-stage missions.
+    - Jig Phase holds 50% of a hit off for 3 s (+5% per level); a hit that lands while it's held brings it in. The
+      held part shows violet on the Armor bar.
+    - Mirrorwork and Crusher-Rated take 50/40/40/30/25% of the hits they guard. At level 3 Mirrorwork throws a
+      mirror bolt back at the nearest enemy and Crusher-Rated clears bullets around you. The game has no
+      knockback, and the planned "beam immunity after a hit" duplicated the immunity every hit already gives.
+    - Arc-Lined comes from the Storm Colossus.
+  - **Where plates come from:**
+    - Basic plates are planet rewards.
+    - A boss-named plate is the reward on every gate with that boss and on about half its other planets, paid only
+      for a win.
+    - The rare plates join the Tempest Run (Last Legend) and Undervault (Jig Phase) prizes at Mk 3.
+    - The DSP-1 is no longer a planet reward; it starts at Mk 3, so the starter plate can reach level 5.
+
 # Building it
 
 ## Plan A (0.6)

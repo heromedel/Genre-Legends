@@ -39,12 +39,14 @@ func _loadout_for(progress: String, run_index: int) -> Dictionary:
 				mk[tech_id] = 2 if progress == "mid" else 3
 			var mains := ["pulse_driver", "thunder_lance", "hex_repeater"]
 			var weapons := ["swarm_pods", "orbital_halo", "starfall"]
-			var supports := ["graze_engine", "overheat_core", "option_pods"]
+			var supports := ["graze_engine", "overheat_core", "option_pods", "coolant_loop", "aux_generator"]
+			var plates := ["dsp1_plate", "qrf_shell", "jig_weave_plate", "lunarium_plate", "mirrorwork_plate", "crusher_plate",
+				"arc_lined_plate", "jig_phase_plate", "last_legend_plate"]
 			var specials := ["nova_bomb", "time_brake", "ion_cannon", "thruster_explosion"]
 			var generators := ["shield_generator", "arc_blade", "mirror_aegis", "soul_lantern"]
 			loadout = [mains[run_index % 3], weapons[run_index % 3], weapons[(run_index + 1) % 3],
-				supports[(run_index + (2 if progress == "max" else 0)) % 3], specials[(run_index + (2 if progress == "max" else 0)) % 4],
-				generators[run_index % 4], "dsp1_plate"]
+				supports[(run_index + (2 if progress == "max" else 0)) % supports.size()], specials[(run_index + (2 if progress == "max" else 0)) % 4],
+				generators[run_index % 4], plates[(run_index * 2 + (1 if progress == "max" else 0)) % plates.size()]]
 	return {"mk": mk, "loadout": loadout}
 
 
@@ -66,7 +68,13 @@ func _run_one(mission_type: String, progress: String, run_index: int) -> void:
 	var frames := ["vanguard", "tempest", "bulwark"]
 	var frame: String = frames[run_index % 3] if progress != "fresh" else "vanguard"
 	var mk_lookup := func(tech_id): return int(kit["mk"].get(tech_id, 1))
-	var mission := Mission.new(node, 1000 + run_index * 77, frame, kit["loadout"], mk_lookup)
+	# A real player can't launch over Max Load (GDD 21B): empty weapon and support slots until the build fits.
+	var tiers: Array = ["load", "output", "armor"] if progress == "max" else []
+	var max_load: int = FrameData.stats(frame, tiers)["load"]
+	for slot_index in [2, 1, 3]:
+		if TechData.loadout_weight(kit["loadout"]) > max_load:
+			kit["loadout"][slot_index] = ""
+	var mission := Mission.new(node, 1000 + run_index * 77, frame, kit["loadout"], mk_lookup, tiers)
 	var bot := BotPilot.new(mission, run_index, "a" if run_index % 2 == 0 else "b")
 	var start_msec := Time.get_ticks_msec()
 	var max_ticks := int(MAX_MINUTES * 60.0 * 60.0)

@@ -25,6 +25,11 @@ const scenarios = [
   { name: 'lesson_needles', query: '?test=star_cluster&god=1&lesson=needles', shots: [8000, 14000] },
   { name: 'lesson_mirror_gate', query: '?test=star_cluster&god=1&lesson=mirror&boss=1', shots: [6000, 12000] },
 ];
+// Build 0.6.1: Load and Output in the Hangar, a build over its Load at launch, and a frame running hot.
+scenarios.push({ name: 'power_hangar_overclocked', query: '?page=hangar&mk=3&loadout=thunder_lance,starfall,orbital_halo,coolant_loop,ion_cannon,shield_generator,arc_lined_plate', shots: [5000] });
+scenarios.push({ name: 'power_hangar_over_load', query: '?page=hangar&mk=3&loadout=pulse_driver,swarm_pods,orbital_halo,aux_generator,nova_bomb,shield_generator,lunarium_plate', shots: [5000] });
+scenarios.push({ name: 'power_map_over_load', query: '?page=map&mk=3&loadout=pulse_driver,swarm_pods,orbital_halo,aux_generator,nova_bomb,shield_generator,lunarium_plate', shots: [5000] });
+scenarios.push({ name: 'power_heat_mission', query: '?test=star_cluster&god=1&power=a&mk=3&loadout=thunder_lance,starfall,orbital_halo,coolant_loop,ion_cannon,shield_generator,arc_lined_plate', shots: [8000, 13000, 16000] });
 scenarios.push({ name: 'new_tech_pods_ion', query: '?test=star_cluster&god=1&power=b&mk=3&loadout=pulse_driver,swarm_pods,arc_blade,option_pods,ion_cannon', shots: [6000, 6600, 9000], keys: [[6100, 'Space']] });
 scenarios.push({ name: 'new_tech_lantern_thruster', query: '?test=planet&god=1&power=a&mk=3&loadout=pulse_driver,arc_blade,starfall,soul_lantern,thruster_explosion', shots: [9000, 9350, 12000], keys: [[9100, 'Space']] });
 for (const [type, id] of Object.entries({ star_cluster: 'swarm_marshal', corridor: 'salvo_barge', planet: 'ring_obelisk', dungeon: 'blade_wraith' })) {

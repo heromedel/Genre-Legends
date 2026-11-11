@@ -50,6 +50,7 @@ func launch_mission(node_id: String, event: Dictionary = {}) -> void:
 		if tech_id != "":
 			mk[tech_id] = Save.tech_mk(tech_id)
 	var launch := {"build": BuildInfo.label(), "node_id": node_id, "node": node, "seed": randi(), "frame": Save.data["frame"],
+		"frame_tiers": Save.frame_tiers(Save.data["frame"]).duplicate(),
 		"loadout": Save.data["loadout"].duplicate(), "mk": mk, "first_clear": not Save.is_cleared(node_id)}
 	Save.data["stats"]["missions"] += 1
 	_start_mission(launch, "")
@@ -60,7 +61,8 @@ func launch_mission(node_id: String, event: Dictionary = {}) -> void:
 func _start_mission(launch: Dictionary, inputs: String, abandon_after_restore: bool = false) -> void:
 	var node_id: String = launch["node_id"]
 	var mk: Dictionary = launch["mk"]
-	var mission := Mission.new(launch["node"], launch["seed"], launch["frame"], launch["loadout"], func(tech_id): return int(mk.get(tech_id, 1)))
+	var mission := Mission.new(launch["node"], launch["seed"], launch["frame"], launch["loadout"], func(tech_id): return int(mk.get(tech_id, 1)),
+		launch.get("frame_tiers", []))
 	var view := MissionView.new()
 	view.setup(mission, launch["first_clear"])
 	view.checkpoint_launch = launch
@@ -111,6 +113,11 @@ func finish_mission(node_id: String, result: Dictionary) -> void:
 	if result["prize"] != "" and not is_test:
 		Save.claim_prize(node_id, result["prize"])
 	Save.data["stats"]["kills"] += result["kills"]
+	if int(result.get("frame_blueprints", 0)) > 0 and not is_test:
+		Save.data["frame_blueprints"] += int(result["frame_blueprints"])
+		var cost := Save.next_tier_cost(Save.data["frame"])
+		if cost > 0 and Save.data["frame_blueprints"] >= cost:
+			hints.append("Enough Frame Blueprints for a new %s tier: buy it in the Hangar." % FrameData.get_frame(Save.data["frame"])["name"])
 	for tech_id in result["blueprints"]:
 		Save.add_blueprints(tech_id, int(result["blueprints"][tech_id]))
 		var mk := Save.tech_mk(tech_id)

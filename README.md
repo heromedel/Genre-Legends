@@ -6,6 +6,23 @@ in Safari on an iPad (add it to the Home Screen for full screen). No ads, no rea
 
 **Play:** https://heromedel.github.io/Genre-Legends/ (GitHub Pages serves the `playtest` branch, which only gets builds that passed every tester)
 
+## What's new in 0.6.1 (on Claude's branch)
+
+- **Building a frame.** Every part weighs something and powered parts draw Mawjig Output. The Hangar shows both as
+  rows of pips: a build over its Max Load can't launch, and one past its Output is **overclocked**.
+- **Heat.** An overclocked frame heats up as its powered parts come online. At full heat it vents and its powered
+  parts drop offline for a few seconds. Two new support parts run the frame: the **Coolant Loop** and the
+  **Auxiliary Generator**. The **Overheat Core** now turns the frame's own heat into a weapon.
+- **Frame tiers.** Some planets pay Frame Blueprints. Each frame has three tiers, each giving more Load, more
+  Output, more Armor or cooler running, and you can change a tier's pick any time.
+- **Eight new plates**, each levelling its own way:
+  - Basic: QRF Shell, Jig-Weave Composite and Lunarium Bulk Plate, from planets.
+  - Uncommon: Mirrorwork, Crusher-Rated and Arc-Lined, from the bosses they're named after.
+  - Rare: Jig Phase and Last Legend, as branch prizes.
+- Star Cluster's Supply Barge now carries a repair, the Corridor drifts two down the trench, and the Twin Aces fly a
+  loop you can follow.
+- Admin console: `framebp <n>` and `power`.
+
 ## What's new in 0.6 (on Claude's branch)
 
 - **Hits matter.** Your frame has one Armor pool and the bar reads as hits: the Vanguard takes about eight. Big

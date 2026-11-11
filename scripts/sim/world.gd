@@ -384,6 +384,9 @@ func kill_enemy(enemy: Enemy, tech: String = "") -> void:
 		return
 	enemy.dead = true
 	run.kills += 1
+	# Coolant Loop's Flash Cooling: every kill sheds a little heat (GDD 21D).
+	if run.fork_of("coolant_loop") == "b":
+		player.heat = maxf(player.heat - 2.0, 0.0)
 	if enemy.boss == null:
 		run.kills_by_kind[enemy.kind] = int(run.kills_by_kind.get(enemy.kind, 0)) + 1
 	var size := enemy.radius * (2.4 if enemy.elite else 1.6)
@@ -556,8 +559,9 @@ func refresh_plate_armor() -> void:
 func damage_player(amount: float, source: String) -> void:
 	if not player.alive or player.grace > 0.0 or amount <= 0.0:
 		return
-	# A Shield Generator charge takes the whole hit, whatever its size (GDD 13K).
-	if player.shield_charges > 0:
+	# A Shield Generator charge takes the whole hit, whatever its size (GDD 13K), unless a vent has tripped it
+	# offline (GDD 21D).
+	if player.shield_charges > 0 and player.vent_trip <= 0.0:
 		player.block_with_shield(shield_recharge_seconds())
 		emit("player_shield_break", {"pos": player.pos})
 		emit("sound", {"name": "shield_break"})
@@ -576,9 +580,17 @@ func damage_player(amount: float, source: String) -> void:
 		wisps -= 1
 		amount *= 0.5
 		emit("spark", {"pos": player.pos, "color": Color(0.85, 0.6, 1.0)})
+	amount = _plate_meets_hit(amount, source)
+	if amount <= 0.0:
+		return
 	var taken := player.take_hit(amount)
 	if taken <= 0.0:
 		return
+	# Lunarium Bulk Plate work-hardens: every hit survived adds 1 max Armor, up to 5 per level.
+	if run.plating() == "lunarium_plate" and player.alive and player.hardened < 5.0 * run.level_of("lunarium_plate"):
+		player.hardened += 1.0
+		player.max_armor += 1.0
+		player.armor += 1.0
 	if resonance["energy"] >= 2:
 		_capacitor_discharge()
 	run.damage_taken += taken
@@ -593,6 +605,48 @@ func damage_player(amount: float, source: String) -> void:
 			shot.life = 0.7
 	if on_player_hurt.is_valid():
 		on_player_hurt.call(taken, source)
+
+
+## The plates (GDD 21H) each meet a hit their own way, and return what's left of it.
+const PLATE_SHARE := [0.5, 0.4, 0.4, 0.3, 0.25]   # Mirrorwork and Crusher-Rated: what a hit they guard does, by level
+func _plate_meets_hit(amount: float, source: String) -> float:
+	var level := run.level_of(run.plating())
+	match run.plating():
+		"mirrorwork_plate":
+			if source == "laser":
+				amount *= PLATE_SHARE[level - 1]
+				if level >= 3:
+					_mirror_bolt()
+		"crusher_plate":
+			if source in ["blast", "shockwave"]:
+				amount *= PLATE_SHARE[level - 1]
+				if level >= 3:
+					clear_bullets(player.pos, 200.0)
+					emit("explosion", {"pos": player.pos, "size": 200.0, "color": Color(1, 0.8, 0.5), "ring": true})
+		"jig_weave_plate":
+			# Shrugs off a light hit, then needs a while before it can again.
+			if amount <= MissionData.HIT_SMALL and player.weave_cooldown <= 0.0:
+				player.weave_cooldown = 23.0 - 3.0 * level
+				player.grace = FrameData.HIT_GRACE * 0.5
+				emit("spark", {"pos": player.pos, "color": Color(0.7, 0.9, 1.0)})
+				emit("sound", {"name": "shield_up"})
+				return 0.0
+		"jig_phase_plate":
+			# Part of the hit is held off for 3 s and fades if nothing else lands; a hit that does land brings
+			# the held part in with it.
+			var held := amount * (0.45 + 0.05 * level)
+			amount = amount - held + player.phase_held
+			player.phase_held = held
+			player.phase_time = 3.0
+	return amount
+
+
+## Mirrorwork's mirror bolt: the beam that hit you, thrown back at whatever is nearest.
+func _mirror_bolt() -> void:
+	var target := nearest_enemy(player.pos, 1200.0)
+	var direction := (target.pos - player.pos).normalized() if target != null else Vector2.UP
+	var shot := player_shot(player.pos, direction * 800.0, 60.0, "mirrorwork_plate", "reflect", Color(0.85, 0.95, 1.0))
+	shot.life = 1.5
 
 
 # ---------------------------------------------------------------- per-tick updates

@@ -29,6 +29,7 @@ func _init() -> void:
 	_dungeon_needles()
 	_aim_hold()
 	_hits_that_matter()
+	_building_a_frame()
 	print("%d checks, %d failed" % [checks, failures])
 	quit(1 if failures > 0 else 0)
 
@@ -37,9 +38,22 @@ func _tech_data() -> void:
 	for tech_id in TechData.TECH:
 		var tech: Dictionary = TechData.TECH[tech_id]
 		check(TechData.SLOTS.has(tech["slot"]), "%s has a real slot" % tech_id)
-		check(tech["forks"].has("a") and tech["forks"].has("b"), "%s has two forks" % tech_id)
+		# Plates level in their own way with no forks (GDD 13M); everything else forks.
+		check((tech["forks"].has("a") and tech["forks"].has("b")) or (tech["slot"] == "plating" and tech["forks"].is_empty()), "%s has two forks, or is a plate with none" % tech_id)
 		check(tech["levels"].size() == TechData.MAX_LEVEL, "%s describes every level" % tech_id)
-		check(not tech["blueprint_from"].is_empty(), "%s drops from some mission type" % tech_id)
+		var from_boss: String = tech.get("from_boss", "")
+		check(not tech["blueprint_from"].is_empty() or GuideData.BOSSES.has(from_boss) or tech.has("source"), "%s comes from somewhere" % tech_id)
+		check(tech.has("weight") and tech.has("draw"), "%s has a weight and a draw (GDD 21C)" % tech_id)
+	# Every frame can launch the starting kit (GDD 21C: 6 Load, 3 Output).
+	for frame_id in FrameData.FRAMES:
+		var stats := FrameData.stats(frame_id, [])
+		check(TechData.loadout_weight(TechData.STARTING_LOADOUT) <= stats["load"], "%s carries the starting kit" % frame_id)
+		check(TechData.loadout_draw(TechData.STARTING_LOADOUT) <= stats["output"], "%s powers the starting kit without heat" % frame_id)
+	# Branch prizes name real frames and tech.
+	for branch in MissionData.THEMED_BRANCHES:
+		for part in branch["prize"].split("+"):
+			var bits: PackedStringArray = part.split(":")
+			check((bits[0] == "frame" and FrameData.FRAMES.has(bits[1])) or (bits[0] == "tech" and TechData.TECH.has(bits[1])), "%s prize %s is real" % [branch["id"], part])
 	for slot_index in TechData.STARTING_LOADOUT.size():
 		var tech_id: String = TechData.STARTING_LOADOUT[slot_index]
 		if tech_id != "":
@@ -48,9 +62,9 @@ func _tech_data() -> void:
 	for element in UpgradeData.ELEMENTS:
 		check(UpgradeData.RESONANCE[element]["tiers"].size() == UpgradeData.RESONANCE_THRESHOLDS.size(), "%s resonance describes every tier" % element)
 	for tech_id in TechData.TECH:
-		# Plating is armour, outside the elements (it never feeds Resonance).
-		var plating: bool = TechData.TECH[tech_id]["slot"] == "plating"
-		check(UpgradeData.ELEMENTS.has(TechData.TECH[tech_id]["element"]) != plating, "%s has a resonance element, unless it's plating" % tech_id)
+		# Plating and the power parts are the frame itself, outside the elements (they never feed Resonance).
+		var frame_part: bool = TechData.TECH[tech_id]["slot"] == "plating" or TechData.TECH[tech_id].get("starts_online", false)
+		check(UpgradeData.ELEMENTS.has(TechData.TECH[tech_id]["element"]) != frame_part, "%s has a resonance element, unless it's part of the frame" % tech_id)
 	# Fusions pair parts that can be fitted together: never two parts for the same slot (GDD 13O).
 	for fusion_id in UpgradeData.FUSIONS:
 		var needs: Array = UpgradeData.FUSIONS[fusion_id]["needs"]
@@ -547,3 +561,101 @@ func _hits_that_matter() -> void:
 	# Harder means bigger hits past the first region; boss parts have less health than before.
 	check(Mission.region_hits(1) > 1.0 and Mission.region_hits(3) > Mission.region_hits(2), "hits grow region by region")
 	check(MissionData.BOSS_HEALTH < 1.0, "bosses are shorter fights now that hits matter")
+
+
+## Build 0.6.1: Load and Output, heat and vents, frame tiers, the plates (GDD 21A–21H).
+func _mission_with(loadout: Array, frame_id: String = "vanguard", tiers: Array = []) -> Mission:
+	var node := {"id": "t", "name": "T", "region": 0, "column": 1, "row": 0.0, "type": "star_cluster", "need": "x",
+		"difficulty": 1.0, "danger": 1, "modifier": "", "reward_tech": "arc_blade", "prize": "", "prize_text": ""}
+	return Mission.new(node, 7, frame_id, loadout, func(t): return 3, tiers)
+
+
+func _building_a_frame() -> void:
+	# Frame tiers change the frame's numbers, and the mission uses them.
+	var stats := FrameData.stats("vanguard", ["load", "output", "armor"])
+	check(stats["load"] == 13 and stats["output"] == 10 and is_equal_approx(stats["armor"], 90.0), "tier picks add Load, Output and Armor")
+	var tiered := _mission_with(TechData.STARTING_LOADOUT, "vanguard", ["armor", "cooling"])
+	check(is_equal_approx(tiered.player.max_armor, 90.0) and is_equal_approx(tiered.run.frame_stats["heat_rate"], 0.75), "a mission flies the frame's tiers")
+	# The starter runs cool; offline parts draw nothing.
+	var mission := _mission_with(TechData.STARTING_LOADOUT)
+	check(mission.run.online_draw() == 1 and mission.run.overclock_pips() < 0.0, "a mission starts within its Output")
+	# An overclocked build heats up, vents and trips its powered parts.
+	var hot := ["thunder_lance", "", "starfall", "", "ion_cannon", "shield_generator", "dsp1_plate"]
+	check(TechData.loadout_weight(hot) <= 12 and TechData.loadout_draw(hot) == 12, "the hot test build fits and draws 12")
+	mission = _mission_with(hot)
+	for tech_id in ["starfall", "ion_cannon", "shield_generator"]:
+		mission.run.tech_level[tech_id] = 1
+	check(is_equal_approx(mission.run.overclock_pips(), 3.0), "three pips past the Vanguard's Output")
+	var vented := false
+	for i in int(16.0 / World.DT):
+		mission.weapons._update_heat(World.DT)
+		if mission.player.vent_trip > 0.0:
+			vented = true
+			break
+	check(vented and is_equal_approx(mission.player.heat, WeaponSystem.VENT_HEAT_LEFT), "at full heat the frame vents and drops to 40%")
+	check(mission.weapons.is_tripped("thunder_lance") and not mission.weapons.is_tripped("dsp1_plate"), "a vent trips powered parts, not unpowered ones")
+	mission.player.shield_charges = 1
+	var armor_before := mission.player.armor
+	mission.world.damage_player(10.0, "test")
+	check(mission.player.armor < armor_before, "a tripped Shield Generator can't block")
+	# The Coolant Loop takes a pip off; the Auxiliary Generator adds Output.
+	var cooled := hot.duplicate()
+	cooled[3] = "coolant_loop"
+	mission = _mission_with(cooled)
+	for tech_id in ["starfall", "ion_cannon", "shield_generator"]:
+		mission.run.tech_level[tech_id] = 1
+	check(mission.run.is_online("coolant_loop") and is_equal_approx(mission.run.overclock_pips(), 2.0), "a Coolant Loop runs from the start and cools a pip")
+	var powered := hot.duplicate()
+	powered[3] = "aux_generator"
+	mission = _mission_with(powered)
+	check(mission.run.mawjig_output() == 12, "an Auxiliary Generator adds 3 Output")
+	# An Overheat Core's vent on a build within its Output is clean.
+	var cored := TechData.STARTING_LOADOUT.duplicate()
+	cored[3] = "overheat_core"
+	mission = _mission_with(cored)
+	mission.run.tech_level["overheat_core"] = 1
+	mission.weapons._add_heat(100.0)
+	check(mission.player.vent_trip <= 0.0 and is_equal_approx(mission.player.heat, WeaponSystem.VENT_HEAT_LEFT), "a core vent within Output never trips parts")
+	# The Hangar's power summary and the launch rule.
+	var summary_loadout := ["pulse_driver", "swarm_pods", "orbital_halo", "option_pods", "nova_bomb", "shield_generator", "lunarium_plate"]
+	check(TechData.loadout_weight(summary_loadout) > 12, "a greedy build overflows the Vanguard's Load")
+	# Plates.
+	var plated := TechData.STARTING_LOADOUT.duplicate()
+	plated[6] = "qrf_shell"
+	mission = _mission_with(plated)
+	check(is_equal_approx(mission.player.max_armor, 70.0) and is_equal_approx(mission.run.plate_speed(), 0.1), "QRF Shell: 10 less Armor, 10% faster")
+	plated[6] = "jig_weave_plate"
+	mission = _mission_with(plated)
+	armor_before = mission.player.armor
+	mission.world.damage_player(10.0, "bullet")
+	check(mission.player.armor == armor_before, "Jig-Weave shrugs off a light hit")
+	mission.player.grace = 0.0
+	mission.world.damage_player(10.0, "bullet")
+	check(mission.player.armor < armor_before, "and needs a while before it can again")
+	plated[6] = "jig_phase_plate"
+	mission = _mission_with(plated)
+	mission.world.damage_player(20.0, "bullet")
+	check(is_equal_approx(mission.player.armor, 70.0) and is_equal_approx(mission.player.phase_held, 10.0), "Jig Phase holds half a hit off")
+	for i in int(3.2 / World.DT):
+		mission.player.tick_timers(World.DT)
+	check(mission.player.phase_held == 0.0 and is_equal_approx(mission.player.armor, 70.0), "and it fades if nothing else lands")
+	plated[6] = "lunarium_plate"
+	mission = _mission_with(plated)
+	var max_before := mission.player.max_armor
+	mission.world.damage_player(10.0, "bullet")
+	check(is_equal_approx(mission.player.max_armor, max_before + 1.0), "Lunarium work-hardens with each hit")
+	plated[6] = "mirrorwork_plate"
+	mission = _mission_with(plated)
+	armor_before = mission.player.armor
+	mission.world.damage_player(20.0, "laser")
+	check(is_equal_approx(armor_before - mission.player.armor, 10.0), "Mirrorwork halves a beam")
+	# A boss-named plate pays only when its boss falls; prizes can carry several rewards at a higher Mk.
+	var boss_node := {"id": "t", "name": "T", "region": 0, "column": 1, "row": 0.0, "type": "star_cluster", "need": "x",
+		"difficulty": 1.0, "danger": 1, "modifier": "", "reward_tech": "mirrorwork_plate", "prize": "", "prize_text": "", "frame_blueprints": 2}
+	mission = Mission.new(boss_node, 7, "vanguard", TechData.STARTING_LOADOUT, func(t): return 1)
+	var lost := mission.results(false)
+	check(not lost["blueprints"].has("mirrorwork_plate"), "a boss plate isn't paid for a loss")
+	mission.state = "won"
+	var won := mission.results(false)
+	check(int(won["blueprints"].get("mirrorwork_plate", 0)) > 0 and won["frame_blueprints"] == 2, "a win pays the boss plate and the Frame Blueprints")
+	check(TechData.has_forks("pulse_driver") and not TechData.has_forks("qrf_shell"), "plates level without forks")

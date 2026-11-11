@@ -58,6 +58,24 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 			ci.draw_polyline(plate + PackedVector2Array([plate[0]]), color, w, true)
 			for corner in [p.call(-0.45, -0.38), p.call(0.45, -0.38), p.call(-0.4, 0.48), p.call(0.4, 0.48)]:
 				ci.draw_circle(corner, w * 0.8, color)
+		"qrf_shell", "jig_weave_plate", "lunarium_plate", "mirrorwork_plate", "crusher_plate", "arc_lined_plate", "jig_phase_plate", "last_legend_plate":
+			_draw_plate(ci, icon, c, s, w, color)
+		"coolant_loop":
+			# A coolant pipe looping round a frost crystal.
+			ci.draw_arc(c, s * 0.75, PI * 0.15, TAU - PI * 0.15, 22, color, w * 1.4, true)
+			for i in 3:
+				var a := PI * i / 3.0
+				ci.draw_line(c + Vector2.from_angle(a) * s * 0.4, c - Vector2.from_angle(a) * s * 0.4, color, w, true)
+		"aux_generator":
+			# A generator housing with a power bolt.
+			Art.shape(ci, Transform2D(0, c) * Art.ngon(6, s * 0.85, PI / 6.0), Art.with_alpha(color, 0.25), color, w)
+			ci.draw_colored_polygon(PackedVector2Array([p.call(0.1, -0.6), p.call(-0.3, 0.1), p.call(0.0, 0.1), p.call(-0.1, 0.6), p.call(0.3, -0.1), p.call(0.0, -0.1)]), color)
+		"frame_blueprint":
+			# A blueprint sheet with a frame's outline on it.
+			var sheet := Rect2(p.call(-0.75, -0.85), Vector2(s * 1.5, s * 1.7))
+			ci.draw_rect(sheet, Color(0.15, 0.3, 0.55, 0.8))
+			ci.draw_rect(sheet, color, false, w)
+			ci.draw_polyline(PackedVector2Array([p.call(0, -0.55), p.call(0.4, 0.35), p.call(0, 0.15), p.call(-0.4, 0.35), p.call(0, -0.55)]), color, w, true)
 		"graze_engine":
 			ci.draw_circle(c, s * 0.25, color)
 			for i in 6:
@@ -205,3 +223,41 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 			# Field upgrades and anything else: a diamond with a dot.
 			Art.shape(ci, PackedVector2Array([p.call(0, -0.85), p.call(0.85, 0), p.call(0, 0.85), p.call(-0.85, 0)]), Art.with_alpha(color, 0.25), color, w)
 			ci.draw_circle(c, s * 0.2, color)
+
+
+## The plates share an armour-plate outline; each adds the mark that says what it does.
+static func _draw_plate(ci: CanvasItem, plate_id: String, c: Vector2, s: float, w: float, color: Color) -> void:
+	var p := func(x: float, y: float) -> Vector2: return c + Vector2(x, y) * s
+	var outline := PackedVector2Array([p.call(-0.7, -0.6), p.call(0.7, -0.6), p.call(0.6, 0.7), p.call(-0.6, 0.7)])
+	if plate_id == "jig_phase_plate":
+		# A ghost of the plate, half a step out of this dimension.
+		var ghost := outline.duplicate()
+		for i in ghost.size():
+			ghost[i] += Vector2(s * 0.22, -s * 0.18)
+		ci.draw_polyline(ghost + PackedVector2Array([ghost[0]]), Art.with_alpha(color, 0.45), w, true)
+	ci.draw_colored_polygon(outline, Art.with_alpha(color, 0.3))
+	ci.draw_polyline(outline + PackedVector2Array([outline[0]]), color, w * (1.8 if plate_id == "lunarium_plate" else 1.0), true)
+	match plate_id:
+		"qrf_shell":
+			for i in 3:
+				ci.draw_line(p.call(-0.45 + i * 0.3, 0.35), p.call(-0.2 + i * 0.3, -0.35), color, w, true)
+		"jig_weave_plate":
+			for i in 4:
+				var t := -0.45 + i * 0.3
+				ci.draw_line(p.call(t, -0.45), p.call(t + 0.2, 0.55), Art.with_alpha(color, 0.8), w * 0.7, true)
+				ci.draw_line(p.call(-0.5, t + 0.05), p.call(0.5, t + 0.15), Art.with_alpha(color, 0.8), w * 0.7, true)
+		"lunarium_plate":
+			ci.draw_arc(c, s * 0.35, PI * 0.6, PI * 1.9, 14, color, w * 1.4, true)
+		"mirrorwork_plate":
+			ci.draw_colored_polygon(PackedVector2Array([p.call(0.0, -0.6), p.call(0.7, -0.6), p.call(0.6, 0.7), p.call(0.0, 0.7)]), Art.with_alpha(Color(1, 1, 1), 0.45))
+			ci.draw_line(p.call(-0.4, 0.4), p.call(0.4, -0.4), Color(1, 1, 1, 0.9), w, true)
+		"crusher_plate":
+			for x in [-0.3, 0.3]:
+				ci.draw_line(p.call(x, -0.4), p.call(x, 0.25), color, w * 1.3, true)
+				ci.draw_colored_polygon(PackedVector2Array([p.call(x - 0.18, 0.2), p.call(x + 0.18, 0.2), p.call(x, 0.5)]), color)
+		"arc_lined_plate":
+			ci.draw_polyline(PackedVector2Array([p.call(-0.5, 0), p.call(-0.25, -0.3), p.call(0, 0.25), p.call(0.25, -0.3), p.call(0.5, 0)]), Color(0.6, 0.95, 1.0), w * 1.2, true)
+		"jig_phase_plate":
+			ci.draw_arc(c, s * 0.3, 0, TAU, 16, color, w, true)
+		"last_legend_plate":
+			Art.shape(ci, Transform2D(-PI * 0.5, c) * Art.star(5, s * 0.45, s * 0.2), Art.with_alpha(color, 0.6), color, w * 0.8)

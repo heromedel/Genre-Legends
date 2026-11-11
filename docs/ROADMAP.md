@@ -90,6 +90,12 @@
 Plating slots, the Shield Generator and DSP-1 Drop Plate, the fixes the new rules need, a fresh save. Next, build
 0.6.1 (Plan B): Load and Mawjig Output, overclock heat, frame identities and upgrades, the other plates.
 
+## Build 0.6.1: building a frame (2026-11-10)
+
+(Note) Plan B of the overhaul (GDD 13Y, spec 21A–21I): Max Load and Mawjig Output, heat and vents, the Coolant
+Loop and Auxiliary Generator, frame tiers and Frame Blueprints, eight new plates. Next: more frames, each built
+around a built-in part (spec 21E), and the HUD, background and Hangar art passes.
+
 ## Plan C: Defense and tanks
 
 1. Planetary Defense and Tank Assault, sharing the tank form.

@@ -180,6 +180,7 @@ func begin_mission(mission: Mission, loadout: Array, mk: Dictionary) -> void:
 		"seed": mission.seed_value,
 		"node": mission.node.duplicate(true),
 		"frame": mission.run.frame_id,
+		"frame_tiers": mission.run.frame_tiers.duplicate(),
 		"loadout": loadout.duplicate(),
 		"mk": mk.duplicate(),
 		"snapshots": [],
@@ -189,6 +190,10 @@ func begin_mission(mission: Mission, loadout: Array, mk: Dictionary) -> void:
 		MissionData.TYPES[node["type"]]["name"], node["name"], node["danger"],
 		node["modifier"] if node["modifier"] != "" else "no special condition",
 		mission.run.frame_id, ", ".join(loadout.filter(func(t): return t != ""))])
+	var stats := mission.run.frame_stats
+	note("mission", "Frame: Armor %d, Load %d (build weighs %d), Output %d (build draws %d with everything online), tiers %s" % [
+		int(stats["armor"]), stats["load"], TechData.loadout_weight(loadout), stats["output"] + TechData.loadout_output_bonus(loadout),
+		TechData.loadout_draw(loadout), str(mission.run.frame_tiers)])
 
 
 func record_input(frame: InputFrame) -> void:
@@ -217,14 +222,17 @@ func observe(mission: Mission, frame: InputFrame, events: Array) -> void:
 				note("mission", "%s escaped" % event["name"])
 			"special_used":
 				note("input", "used special %s" % event["tech"])
+			"frame_vent":
+				note("mission", "frame vented (%s): heat %d%%, draw %d of %d Output" % ["tripped powered parts" if event["tripped"] else "clean",
+					int(player.heat), mission.run.online_draw(), mission.run.mawjig_output()])
 			"resonance":
 				var info: Dictionary = UpgradeData.RESONANCE[event["element"]]
 				note("mission", "Resonance: %s tier %d (%s)" % [info["name"], event["tier"], info["tiers"][int(event["tier"]) - 1][0]])
 			"room_entered":
 				note("mission", "entered %s room %s" % [event["kind"], str(event["room"])])
 	if mission.tick % 60 == 0:
-		var snapshot := "t=%ds pos=(%d,%d) armor=%d shield=%d lvl=%d enemies=%d bullets=%d state=%s" % [
-			mission.tick / 60, player.pos.x, player.pos.y, player.armor, player.shield_charges, mission.run.level,
+		var snapshot := "t=%ds pos=(%d,%d) armor=%d shield=%d heat=%d lvl=%d enemies=%d bullets=%d state=%s" % [
+			mission.tick / 60, player.pos.x, player.pos.y, player.armor, player.shield_charges, int(player.heat), mission.run.level,
 			mission.world.enemies.size(), mission.world.enemy_shots.size(), mission.state]
 		record["snapshots"].append(snapshot)
 	_watch_for_panic(time, frame, player)

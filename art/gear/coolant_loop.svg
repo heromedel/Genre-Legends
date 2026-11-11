@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32">
+<!-- Coolant Loop: a loop of coolant pipe wrapped round a frost core.
+     Gear part, facing up (forward), about 12 units across. Five passes: outline, fill, shading, highlights, details.
+     "#39ff14" is the tech's glow (swapped for its element colour). -->
+<g stroke-linejoin="round" stroke-linecap="round" fill="none">
+  <path d="M-4,5 C-8,4 -8,-4 -4,-5 L4,-5 C8,-4 8,4 4,5 Z" stroke="#0a1628" stroke-width="4.2"/>
+  <path d="M-4,5 C-8,4 -8,-4 -4,-5 L4,-5 C8,-4 8,4 4,5 Z" stroke="#55697d" stroke-width="2.6"/>
+  <path d="M-4,5 C-8,4 -8,0 -7,-1" stroke="#3a4a5a" stroke-width="2.6"/>
+  <path d="M-4,-5 L4,-5" stroke="#b4c8da" stroke-width="0.8"/>
+  <path d="M-2,5 L2,5" stroke="#39ff14" stroke-width="1.4"/>
+</g>
+<circle cx="0" cy="0" r="3" fill="#0a1628"/>
+<circle cx="0" cy="0" r="2.2" fill="#39ff14"/>
+<path d="M0,-1.8 L0,1.8 M-1.6,-0.9 L1.6,0.9 M-1.6,0.9 L1.6,-0.9" stroke="#d8ffcc" stroke-width="0.6" stroke-linecap="round"/>
+</svg>

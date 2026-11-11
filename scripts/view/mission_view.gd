@@ -511,6 +511,15 @@ func _paint_bodies(ci: CanvasItem) -> void:
 	if player.alive and mission.state != "lost":
 		var speed := clampf(player.vel.length() / 300.0, 0.0, 1.0)
 		var flicker := player.grace > 0.0 and player.grace < 5.0 and int(time * 16.0) % 2 == 0
+		# Frame heat (GDD 21D): the frame glows orange as it runs hot, then red, and flickers while it vents.
+		if player.heat > 50.0 or player.vent_trip > 0.0:
+			var hot := clampf((player.heat - 50.0) / 50.0, 0.0, 1.0)
+			if player.vent_trip > 0.0:
+				hot = 0.6 + 0.4 * sin(time * 20.0)
+			var heat_color := Color(1.0, 0.55 - 0.3 * hot, 0.2)
+			Art.draw_glow(ci, player.pos, 60.0, Art.with_alpha(heat_color, 0.2 + 0.5 * hot))
+			# A ring of heat shimmer that closes as the frame nears a vent.
+			ci.draw_arc(player.pos, 44.0, -PI * 0.5, -PI * 0.5 + TAU * player.heat / 100.0, 32, Art.with_alpha(heat_color, 0.5 + 0.4 * hot), 3.0, true)
 		if transform_time > 0.0:
 			# Changing form mid-mission (a chained stage): the frame folds from one form into the other.
 			var toward_ship := 1.0 - transform_time / TRANSFORM_SECONDS
@@ -524,7 +533,7 @@ func _paint_bodies(ci: CanvasItem) -> void:
 				{"speed": speed, "flash": 1.0 if flicker else hit_flash, "gear": _gear(), "fusions": mission.run.fusions,
 				"resonance": _top_resonance(), "alpha": 0.45 if wraith else 1.0})
 		# The Shield Generator's bubble while it holds a charge: a thin shimmering shell, brighter with two.
-		if player.shield_charges > 0:
+		if player.shield_charges > 0 and player.vent_trip <= 0.0:
 			var bubble := (34.0 if player.form == "ship" else 40.0) + sin(time * 5.0) * 1.5
 			Art.draw_glow(ci, player.pos, bubble * 1.4, Color(0.4, 0.85, 1.0, 0.12 * player.shield_charges))
 			ci.draw_arc(player.pos, bubble, 0, TAU, 40, Color(0.55, 0.92, 1.0, 0.35 + 0.2 * player.shield_charges), 2.0, true)

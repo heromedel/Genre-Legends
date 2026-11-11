@@ -136,11 +136,11 @@ const REGION_PALETTES := [
 ## Themed branches (GDD 5D): side routes that lean on one genre and end in a prize shown up front.
 const THEMED_BRANCHES := [
 	{"id": "tempest_run", "name": "The Tempest Run", "type": "star_cluster", "length": 3, "region": 0,
-		"modifier": "bounty_hunters", "prize": "frame:tempest", "boss": "bounty_ace",
-		"prize_text": "Unlocks the Tempest frame."},
+		"modifier": "bounty_hunters", "prize": "frame:tempest+tech:last_legend_plate:3", "boss": "bounty_ace",
+		"prize_text": "Unlocks the Tempest frame and the Last Legend Plate at Mk 3."},
 	{"id": "undervault", "name": "The Undervault", "type": "dungeon", "length": 3, "region": 1,
-		"modifier": "blackout", "prize": "tech:time_brake",
-		"prize_text": "Unlocks Time Brake at Mk 1."},
+		"modifier": "blackout", "prize": "tech:time_brake+tech:jig_phase_plate:3",
+		"prize_text": "Unlocks Time Brake at Mk 1 and the Jig Phase Plate at Mk 3."},
 	{"id": "meteor_coast", "name": "The Meteor Coast", "type": "planet", "length": 3, "region": 2,
 		"modifier": "derelict_field", "prize": "tech:starfall",
 		"prize_text": "Unlocks Starfall at Mk 1."},

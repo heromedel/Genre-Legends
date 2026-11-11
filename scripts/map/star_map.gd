@@ -116,7 +116,29 @@ func _generate_region(region: int) -> void:
 		columns.append(ids)
 		previous_ids = ids
 	_add_themed_branch(rng, region)
+	for node_id in nodes:
+		if nodes[node_id]["region"] == region:
+			_settle_rewards(nodes[node_id])
 	_generated_regions = region + 1
+
+
+## Last touches to what a planet pays, once its bosses are known. Neither draws from the region's rng, so adding
+## them never moved a planet on an existing map.
+## - A planet whose boss or mini-boss gives its name to a plate pays that plate's blueprints, for a win (GDD 21G).
+## - About a third of planets, and every gate, also pay Frame Blueprints (GDD 21F).
+func _settle_rewards(node: Dictionary) -> void:
+	var plate_roll := float(absi(hash("%s|plate|%d" % [node["id"], seed_value])) % 1000) / 1000.0
+	for tech_id in TechData.TECH:
+		var from_boss: String = TechData.TECH[tech_id].get("from_boss", "")
+		var fights_it := from_boss in [BossRoster.for_node(node, "boss"), BossRoster.for_node(node, "miniboss")]
+		# Gates always carry their boss's plate; elsewhere about half do, so the plate stays a prize.
+		if from_boss != "" and fights_it and (node["is_gate"] or plate_roll < BOSS_PLATE_CHANCE):
+			node["reward_tech"] = tech_id
+	var roll := float(absi(hash("%s|frame|%d" % [node["id"], seed_value])) % 1000) / 1000.0
+	var first_planet: bool = node["region"] == 0 and node["column"] == 0
+	node["frame_blueprints"] = 0
+	if node["is_gate"] or (not first_planet and roll < FRAME_BLUEPRINT_CHANCE):
+		node["frame_blueprints"] = 1 + node["region"] + (1 if node["is_gate"] else 0)
 
 
 func _types_for_column(rng: RandomNumberGenerator, count: int, region: int, local_column: int) -> Array:
@@ -187,6 +209,8 @@ func _make_node(rng: RandomNumberGenerator, node_id: String, region: int, column
 ## onto the surface. Picked from the planet's id and the map seed so the map itself never shifts.
 const CHAINS := {"planet": "corridor", "dungeon": "planet"}
 const CHAIN_CHANCE := 0.35
+const FRAME_BLUEPRINT_CHANCE := 0.35
+const BOSS_PLATE_CHANCE := 0.5
 
 
 func _chain_for(mission_type: String, node_id: String, region: int, local_column: int, is_gate: bool) -> String:

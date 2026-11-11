@@ -58,7 +58,7 @@ func _ready() -> void:
 	var earned := HFlowContainer.new()
 	earned.add_theme_constant_override("h_separation", 16)
 	column.add_child(earned)
-	if result["blueprints"].is_empty():
+	if result["blueprints"].is_empty() and int(result.get("frame_blueprints", 0)) <= 0:
 		earned.add_child(UiKit.label("None this time.", 15, Color(0.6, 0.65, 0.75)))
 	for tech_id in result["blueprints"]:
 		if int(result["blueprints"][tech_id]) <= 0:
@@ -66,6 +66,11 @@ func _ready() -> void:
 		var chip := HBoxContainer.new()
 		chip.add_child(IconView.make(tech_id, 30, TechData.element_color(tech_id)))
 		chip.add_child(UiKit.label("%s +%d" % [TechData.TECH[tech_id]["name"], result["blueprints"][tech_id]], 16, Color(1, 1, 1)))
+		earned.add_child(chip)
+	if int(result.get("frame_blueprints", 0)) > 0:
+		var chip := HBoxContainer.new()
+		chip.add_child(IconView.make("frame_blueprint", 30, Art.GOLD))
+		chip.add_child(UiKit.label("Frame Blueprints +%d" % int(result["frame_blueprints"]), 16, Art.GOLD))
 		earned.add_child(chip)
 	if int(result.get("banked_levels", 0)) > 0 and result["won"]:
 		column.add_child(UiKit.wrapped("Includes +%d %s for levels gained after the boss fell." % [int(result["banked_levels"]), TechData.TECH[result["reward_tech"]]["name"]], 14, Color(1, 0.85, 0.5)))

@@ -54,7 +54,7 @@ func _card_pool(include_forks: bool, include_risky: bool) -> Array:
 			pool.append(_card("online", tech_id, tech["name"], tech["text"], "rare", 3.2 if online_count < 3 else 2.0))
 		elif level < cap:
 			var next := level + 1
-			if next == TechData.FORK_LEVEL and run.fork_of(tech_id) == "":
+			if next == TechData.FORK_LEVEL and run.fork_of(tech_id) == "" and TechData.has_forks(tech_id):
 				if include_forks:
 					for fork in ["a", "b"]:
 						var card := _card("fork", tech_id, "%s: %s" % [tech["name"], tech["forks"][fork]["name"]],

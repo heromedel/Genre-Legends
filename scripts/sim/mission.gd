@@ -46,17 +46,17 @@ var time_brake_active := false
 var log_lines: Array = []       # notable moments, for the play log
 
 
-func _init(map_node: Dictionary, mission_seed: int, frame_id: String, loadout: Array, mk_lookup: Callable) -> void:
+func _init(map_node: Dictionary, mission_seed: int, frame_id: String, loadout: Array, mk_lookup: Callable, frame_tiers: Array = []) -> void:
 	node = map_node
 	seed_value = mission_seed
 	world = World.new()
 	world.rng.seed = mission_seed
 	run = RunState.new()
-	run.setup(frame_id, loadout, mk_lookup)
+	run.setup(frame_id, loadout, mk_lookup, frame_tiers)
 	world.run = run
 	player = PlayerFrame.new()
 	world.player = player
-	player.setup(frame_id, MissionData.TYPES[node["type"]]["form"])
+	player.setup(frame_id, MissionData.TYPES[node["type"]]["form"], run.frame_stats)
 	world.refresh_plate_armor()
 	_apply_difficulty()
 	weapons = WeaponSystem.new(world)
@@ -206,7 +206,7 @@ func _update_world(input: InputFrame, player_active: bool) -> void:
 	for element in world.resonance:
 		run.max_resonance = maxi(run.max_resonance, int(world.resonance[element]))
 	if player_active and player.alive:
-		player.move(input, DT, 1.0 + 0.15 * run.field_count("juggernaut_servos"))
+		player.move(input, DT, 1.0 + 0.15 * run.field_count("juggernaut_servos") + run.plate_speed())
 		_keep_player_in_bounds()
 		player.tick_timers(DT)
 		if run.field_count("blood_pact") > 0:
@@ -445,8 +445,13 @@ func results(first_clear: bool) -> Dictionary:
 	# Levels and crates picked up after the last boss fell come home as extra blueprints of the planet's tech.
 	if won:
 		amount += run.banked_levels
+	# A plate named after a boss is that boss's prize: only beating it pays (GDD 21G).
+	if reward != "" and TechData.get_tech(reward).has("from_boss") and not won:
+		amount = 0
 	if reward != "" and amount > 0:
 		blueprints[reward] = int(blueprints.get(reward, 0)) + amount
+	# Frame Blueprints (GDD 21F) pay like the planet's reward: all for a win, a share by progress for a loss.
+	var frame_blueprints := int(round(int(node.get("frame_blueprints", 0)) * progress * threat["blueprints"] * float(node.get("reward_scale", 1.0))))
 	return {
 		"won": won,
 		"seconds": world.time,
@@ -458,6 +463,7 @@ func results(first_clear: bool) -> Dictionary:
 		"crates": run.crates_opened,
 		"shards_missed": run.shards_missed,
 		"blueprints": blueprints,
+		"frame_blueprints": frame_blueprints,
 		"prize": node.get("prize", "") if won else "",
 		"prize_text": node.get("prize_text", "") if won else "",
 		"stages": stages_played,

@@ -245,7 +245,7 @@ func _build_top_bar() -> Control:
 	var name_label := UiKit.label("Frame: %s" % frame["name"], 14, frame["hull"], "bold")
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	stats.add_child(name_label)
-	var progress := UiKit.label("Cleared %d  •  Blueprints %d" % [Save.data["cleared"].size(), total_blueprints], 13, Color(0.6, 0.78, 0.95))
+	var progress := UiKit.label("Cleared %d  •  Blueprints %d  •  Frame Blueprints %d" % [Save.data["cleared"].size(), total_blueprints, Save.data["frame_blueprints"]], 13, Color(0.6, 0.78, 0.95))
 	progress.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	stats.add_child(progress)
 	return bar
@@ -388,6 +388,13 @@ func _fill_info(node_id: String) -> void:
 	reward_text.add_child(UiKit.label(TechData.TECH[node["reward_tech"]]["name"], 17, TechData.element_color(node["reward_tech"]), "bold"))
 	reward_row.add_child(reward_text)
 	payout.add_child(reward_row)
+	if TechData.TECH[node["reward_tech"]].has("from_boss"):
+		payout.add_child(UiKit.wrapped("Only if you beat the %s." % GuideData.BOSSES[TechData.TECH[node["reward_tech"]]["from_boss"]][0], 13, Color(1, 0.8, 0.6)))
+	if int(node.get("frame_blueprints", 0)) > 0:
+		var frame_row := HBoxContainer.new()
+		frame_row.add_child(IconView.make("frame_blueprint", 26, Art.GOLD))
+		frame_row.add_child(UiKit.label("Frame Blueprints x%d" % int(node["frame_blueprints"]), 15, Art.GOLD, "bold"))
+		payout.add_child(frame_row)
 	if node["prize"] != "":
 		var claimed: bool = Save.data["prizes_claimed"].has(node_id)
 		payout.add_child(UiKit.label("PRIZE" + (" (claimed)" if claimed else ""), 16, Art.GOLD, "bold"))
@@ -396,7 +403,13 @@ func _fill_info(node_id: String) -> void:
 	var available := star_map.is_available(node_id, Save.is_cleared)
 	if Save.is_cleared(node_id):
 		payout.add_child(UiKit.label("Cleared — fly it again any time.", 14, Color(0.5, 1.0, 0.65)))
-	if available:
+	var power := Save.power_summary()
+	if available and power["over_load"]:
+		var blocked := UiKit.button("LAUNCH", func(): pass, "Launch blocked %s" % node_id, true)
+		blocked.disabled = true
+		payout.add_child(blocked)
+		payout.add_child(UiKit.wrapped("Your build weighs %d, over its Max Load of %d. Lighten it in the Hangar." % [power["weight"], power["load"]], 14, Color(1, 0.5, 0.45)))
+	elif available:
 		payout.add_child(UiKit.button("LAUNCH", func(): _launch(node), "Launch %s" % node_id, true))
 	else:
 		payout.add_child(UiKit.wrapped("Out of reach. Clear a planet linked to this one first.", 14, Color(0.65, 0.7, 0.8)))
@@ -428,7 +441,16 @@ func _build_hangar_page() -> Control:
 	for frame_id in FrameData.FRAMES:
 		frames_row.add_child(_frame_card(frame_id))
 	column.add_child(UiKit.label("LOADOUT", 20, Color(0.6, 0.9, 1.0), "title"))
-	column.add_child(UiKit.wrapped("Your main weapon and plating are ready when a mission starts. Level-ups and Salvage Crates bring the rest online. The Generator slot holds what keeps you alive: a shield, a blade, a mirror or a lantern, one at a time.", 14, Color(0.65, 0.75, 0.88)))
+	column.add_child(UiKit.wrapped("Your main weapon, plating and power parts are ready when a mission starts. Level-ups and Salvage Crates bring the rest online. The Generator slot holds what keeps you alive: a shield, a blade, a mirror or a lantern, one at a time.", 14, Color(0.65, 0.75, 0.88)))
+	# Load and Mawjig Output (GDD 21B): what the build weighs and draws against what the frame can take.
+	var power := Save.power_summary()
+	var meters := PowerMeters.new()
+	meters.summary = power
+	column.add_child(meters)
+	if power["over_load"]:
+		column.add_child(UiKit.wrapped("Over Max Load: swap a heavy part for a lighter one, or leave a slot empty, before you launch.", 15, Color(1, 0.45, 0.4)))
+	elif power["overclocked"]:
+		column.add_child(UiKit.wrapped("Overclocked: this build draws more power than your Output gives. In a mission the frame heats up as those parts come online, and at full heat it vents: your powered parts go offline for a few seconds.", 14, Color(1, 0.7, 0.35)))
 	var slots_row := HBoxContainer.new()
 	slots_row.add_theme_constant_override("separation", 8)
 	column.add_child(slots_row)
@@ -466,10 +488,13 @@ func _frame_card(frame_id: String) -> Control:
 	column.add_child(art)
 	column.add_child(UiKit.label(data["name"], 22, data["hull"] if unlocked else Color(0.5, 0.55, 0.65), "title"))
 	column.add_child(UiKit.wrapped(data["tagline"], 13, Color(0.7, 0.8, 0.9)))
-	var armor: float = data["armor"] + data.get("built_in_armor", 0.0)
-	column.add_child(UiKit.label("Armor %d (%d hits)   Speed %d" % [armor, int(armor / MissionData.HIT_SMALL), data["speed"]], 13, Color(0.6, 0.75, 0.9)))
+	var stats := FrameData.stats(frame_id, Save.frame_tiers(frame_id))
+	column.add_child(UiKit.label("Armor %d (%d hits)   Speed %d" % [stats["armor"], int(stats["armor"] / MissionData.HIT_SMALL), stats["speed"]], 13, Color(0.6, 0.75, 0.9)))
+	column.add_child(UiKit.label("Max Load %d   Mawjig Output %d" % [stats["load"], stats["output"]], 13, Color(0.6, 0.75, 0.9)))
 	column.add_child(UiKit.label(data["trait_name"], 15, Art.GOLD, "bold"))
 	column.add_child(UiKit.wrapped(data["trait_text"], 13, Color(0.85, 0.8, 0.65)))
+	if unlocked:
+		_frame_tiers(column, frame_id)
 	if not unlocked:
 		column.add_child(UiKit.wrapped("Locked. " + data["unlock"], 13, Color(1, 0.6, 0.5)))
 	elif not selected:
@@ -479,6 +504,35 @@ func _frame_card(frame_id: String) -> Control:
 	else:
 		column.add_child(UiKit.label("Selected", 15, Color(0.5, 1.0, 0.65), "bold"))
 	return card
+
+
+## Frame upgrades (GDD 21F): each bought tier shows its pick, and tapping it moves to the next pick. The next tier
+## can be bought with Frame Blueprints.
+func _frame_tiers(column: VBoxContainer, frame_id: String) -> void:
+	var picks := Save.frame_tiers(frame_id)
+	for tier in picks.size():
+		var pick: String = picks[tier]
+		var next_pick: String = FrameData.TIER_PICKS[(FrameData.TIER_PICKS.find(pick) + 1) % FrameData.TIER_PICKS.size()]
+		var row := HBoxContainer.new()
+		row.add_child(UiKit.label("Tier %d" % (tier + 1), 13, Art.GOLD, "bold"))
+		var button := UiKit.button(FrameData.TIER_PICK_NAMES[pick], func():
+			Save.set_tier_pick(frame_id, tier, next_pick)
+			_rebuild(), "Hangar: %s tier %d -> %s" % [frame_id, tier + 1, next_pick])
+		button.tooltip_text = FrameData.TIER_PICK_TEXT[pick]
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(button)
+		column.add_child(row)
+	if not picks.is_empty():
+		column.add_child(UiKit.wrapped("Tap a tier to change what it gives, free, any time.", 12, Color(0.6, 0.7, 0.8)))
+	var cost := Save.next_tier_cost(frame_id)
+	if cost > 0:
+		var have: int = Save.data["frame_blueprints"]
+		var buy := UiKit.button("Buy tier %d: %d / %d Frame Blueprints" % [picks.size() + 1, have, cost], func():
+			if Save.buy_frame_tier(frame_id):
+				Sound.play("upgrade")
+				_rebuild(), "Hangar: buy %s tier %d" % [frame_id, picks.size() + 1], have >= cost)
+		buy.disabled = have < cost
+		column.add_child(buy)
 
 
 func _slot_card(slot_index: int) -> Control:
@@ -531,6 +585,10 @@ func _slot_card(slot_index: int) -> Control:
 		mk.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		mk.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_child(mk)
+		var cost := UiKit.label("Wt %d  Pwr %d" % [TechData.weight_of(tech_id), TechData.draw_of(tech_id)], 13, Color(0.65, 0.75, 0.85))
+		cost.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(cost)
 	return button
 
 
@@ -575,7 +633,9 @@ func _tech_picker(slot_index: int) -> Control:
 		text.add_child(UiKit.label("%s  %s%s" % [tech["name"], ("Mk %d" % mk) if mk > 0 else "(locked)", "   NEW" if Save.is_new(tech_id) else ""], 16,
 			Color(0.5, 1.0, 0.55) if Save.is_new(tech_id) else (Color(1, 1, 1) if mk > 0 else Color(0.5, 0.55, 0.65)), "bold"))
 		text.add_child(UiKit.wrapped(tech["text"], 13, Color(0.7, 0.8, 0.9)))
-		text.add_child(UiKit.wrapped("Forks: %s / %s" % [tech["forks"]["a"]["name"], tech["forks"]["b"]["name"]], 12, Color(0.8, 0.6, 1.0)))
+		text.add_child(UiKit.label(TechData.power_text(tech_id), 12, Color(0.7, 0.75, 0.6)))
+		if TechData.has_forks(tech_id):
+			text.add_child(UiKit.wrapped("Forks: %s / %s" % [tech["forks"]["a"]["name"], tech["forks"]["b"]["name"]], 12, Color(0.8, 0.6, 1.0)))
 		row.add_child(text)
 		if mk > 0:
 			row.add_child(UiKit.button("Equip", func():
@@ -627,10 +687,8 @@ func _rnd_card(tech_id: String) -> Control:
 	head.add_child(title)
 	column.add_child(head)
 	column.add_child(UiKit.wrapped(tech["text"], 14, Color(0.72, 0.82, 0.92)))
-	var sources := []
-	for source in tech["blueprint_from"]:
-		sources.append(MissionData.TYPES[source]["name"])
-	column.add_child(UiKit.label("Found on: %s" % ", ".join(sources), 13, Color(0.55, 0.7, 0.85)))
+	column.add_child(UiKit.label(TechData.power_text(tech_id), 13, Color(0.7, 0.75, 0.6)))
+	column.add_child(UiKit.wrapped(_source_text(tech_id), 13, Color(0.55, 0.7, 0.85)))
 	if need > 0:
 		var progress := ProgressBar.new()
 		progress.max_value = need
@@ -649,6 +707,19 @@ func _rnd_card(tech_id: String) -> Control:
 	else:
 		column.add_child(UiKit.label("Maxed: Mk %d" % mk, 13, Art.GOLD, "bold"))
 	return card
+
+
+## Where a tech's blueprints come from: planet types, a boss it's named after, or a one-off prize.
+func _source_text(tech_id: String) -> String:
+	var tech: Dictionary = TechData.TECH[tech_id]
+	if tech.has("from_boss"):
+		return "Prize of the %s: beat it to win its blueprints." % GuideData.BOSSES[tech["from_boss"]][0]
+	if tech["blueprint_from"].is_empty():
+		return tech.get("source", "")
+	var sources := []
+	for source in tech["blueprint_from"]:
+		sources.append(MissionData.TYPES[source]["name"])
+	return "Found on: %s" % ", ".join(sources)
 
 
 # ---------------------------------------------------------------- records
@@ -711,8 +782,10 @@ func _build_guide_page() -> Control:
 		if Save.tech_mk(tech_id) > 0:
 			var data: Dictionary = TechData.TECH[tech_id]
 			var forks: Dictionary = data["forks"]
-			tech.append([data["name"], "%s\nFork %s: %s\nFork %s: %s" % [data["text"], forks["a"]["name"], forks["a"]["text"],
-				forks["b"]["name"], forks["b"]["text"]], TechData.element_color(tech_id)])
+			var text: String = "%s\n%s" % [data["text"], TechData.power_text(tech_id)]
+			if TechData.has_forks(tech_id):
+				text += "\nFork %s: %s\nFork %s: %s" % [forks["a"]["name"], forks["a"]["text"], forks["b"]["name"], forks["b"]["text"]]
+			tech.append([data["name"], text, TechData.element_color(tech_id)])
 	_guide_section(column, "TECH", tech, TechData.TECH.size() - tech.size())
 	var fusions := []
 	for fusion_id in UpgradeData.FUSIONS:
@@ -877,6 +950,40 @@ class FramePreview:
 		var gear: Array = GearArt.loadout_gear(Save.data["loadout"], 3) if Save.data["frame"] == frame_id else []
 		FrameArt.draw_frame(self, frame_id, "ship", c + Vector2(-50, 0), -PI * 0.5, time, {"speed": 0.4, "scale": 1.7, "gear": gear})
 		FrameArt.draw_frame(self, frame_id, "mech", c + Vector2(50, 0), -PI * 0.5 + sin(time) * 0.4, time, {"speed": 0.6, "scale": 1.7, "gear": gear})
+
+
+## The Hangar's two rows of pips (GDD 21B): Max Load, a hard limit, and Mawjig Output, which you may run past
+## on purpose. Pips past the limit turn red (Load) or orange (Output, OVERCLOCKED).
+class PowerMeters:
+	extends Control
+	const PIP := Vector2(18, 16)
+	const GAP := 4.0
+	var summary := {}
+
+	func _ready() -> void:
+		custom_minimum_size = Vector2(0, 62)
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		_row(0.0, "MAX LOAD", summary["weight"], summary["load"], Color(0.55, 0.85, 1.0), Color(1, 0.35, 0.35), "weighs", "OVER LOAD")
+		var generator: String = "  (+%d from the generator)" % TechData.loadout_output_bonus(Save.data["loadout"]) if TechData.loadout_output_bonus(Save.data["loadout"]) > 0 else ""
+		_row(32.0, "MAWJIG OUTPUT", summary["draw"], summary["output"], Color(0.85, 0.55, 1.0), Color(1, 0.6, 0.2), "draws", "OVERCLOCKED", generator)
+
+	func _row(y: float, title: String, used: int, limit: int, color: Color, over_color: Color, verb: String, over_word: String, note: String = "") -> void:
+		var font := UiKit.font("bold")
+		draw_string(font, Vector2(0, y + 14), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(0.6, 0.72, 0.86))
+		var x := 150.0
+		for i in maxi(used, limit):
+			var rect := Rect2(Vector2(x, y), PIP)
+			var fill := Color(0.12, 0.16, 0.22)
+			if i < used:
+				fill = over_color if i >= limit else color
+			draw_rect(rect, fill)
+			draw_rect(rect, Color(0.3, 0.4, 0.5) if i < limit else over_color, false, 1.5)
+			x += PIP.x + GAP
+		var over := used > limit
+		draw_string(font, Vector2(x + 8, y + 14), "%s %d of %d%s%s" % [verb, used, limit, "   " + over_word if over else "", note], HORIZONTAL_ALIGNMENT_LEFT, -1, 15,
+			over_color if over else Color(0.85, 0.9, 1.0))
 
 
 ## A pulsing green dot in a control's corner: something new is waiting there (GDD 9C).

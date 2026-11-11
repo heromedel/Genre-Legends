@@ -37,15 +37,25 @@ func _init(target_world: World) -> void:
 	player = world.player
 
 
+## Frame heat (GDD 21D), 0 to 100. Only an overclocked build, or an Overheat Core, makes it.
+const HEAT_PER_PIP := 2.5       # % a second for each pip of draw past Mawjig Output
+const HEAT_COOLING := 3.0       # % a second the frame sheds when it isn't overclocked
+const VENT_HEAT_LEFT := 40.0    # a vent drops the frame to this
+const VENT_TRIP_SECONDS := 3.0  # how long powered parts stay offline when an overclocked frame vents
+const CORE_RUNS_HOT := 70.0     # Overheat Core: above this, weapons fire 25% faster
+const CRYO_PURGE_RADIUS := 260.0
+
+
 func update(input: InputFrame, dt: float) -> void:
 	_update_facing(input)
+	_update_heat(dt)
 	var fire_rate := _fire_rate_multiplier()
 	# With auto-fire off (Settings), weapons fire only while you hold fire; supports and the halo's
 	# orbit keep working either way.
 	var firing := world.autofire or input.fire
 	for tech_id in run.online_tech():
 		var slot: String = TechData.TECH[tech_id]["slot"]
-		if slot == "special":
+		if slot == "special" or is_tripped(tech_id):
 			continue
 		var passive := _always_working(tech_id)
 		if not firing and not passive:
@@ -125,8 +135,12 @@ func _fire_rate_multiplier() -> float:
 	var mult := 1.0
 	if player.overdrive > 0.0:
 		mult *= 1.8
-	if run.is_online("overheat_core") and player.heat > _heat_max() * 0.5:
+	if run.is_online("overheat_core") and player.heat > CORE_RUNS_HOT:
 		mult *= 1.25
+	# Last Legend Plate: low on Armor, the guns run faster.
+	var legend := run.plate_level("last_legend_plate")
+	if legend > 0 and player.armor_fraction() < 1.0 / 3.0:
+		mult *= 1.3 + 0.05 * (legend - 1)
 	if player.time_brake > 0.0 and run.fork_of("time_brake") == "b":
 		mult *= 1.3
 	return mult
@@ -181,12 +195,8 @@ func _main_volley(fire: Callable) -> void:
 	if FrameData.get_frame(run.frame_id)["trait"] == "afterimage" and player.afterimages.size() > 8:
 		fire.call(player.afterimages[8], 0.4)
 	if run.is_online("overheat_core"):
-		player.heat += 1.0
-		if player.heat >= _heat_max():
-			player.heat = 0.0
-			_vent(1.0)
-			if run.fork_of("overheat_core") == "b":
-				vent_echo = 0.4
+		# Each level runs the core hotter, so it vents more often.
+		_add_heat(1.4 + 0.1 * run.level_of("overheat_core"))
 
 
 func _pulse_driver() -> void:
@@ -458,8 +468,54 @@ func _mirror_aegis() -> void:
 	world.emit("sound", {"name": "mirror"})
 
 
-func _heat_max() -> float:
-	return 60.0 - 4.0 * run.level_of("overheat_core")
+# ---------------------------------------------------------------- heat (GDD 21D)
+
+## Powered parts sit out a vent's trip; unpowered weapons keep firing.
+func is_tripped(tech_id: String) -> bool:
+	return player.vent_trip > 0.0 and TechData.draw_of(tech_id) > 0
+
+
+## Overclocked, the frame heats by the pip; otherwise it cools. A trip lets it cool too.
+func _update_heat(dt: float) -> void:
+	if player.vent_trip > 0.0:
+		player.vent_trip -= dt
+	var over := run.overclock_pips()
+	if over > 0.0 and player.vent_trip <= 0.0:
+		_add_heat(HEAT_PER_PIP * over * dt)
+	else:
+		player.heat = maxf(player.heat - HEAT_COOLING * dt, 0.0)
+
+
+func _add_heat(amount: float) -> void:
+	player.heat += amount * float(run.frame_stats.get("heat_rate", 1.0))
+	if player.heat >= 100.0:
+		_frame_vent()
+
+
+## At full heat the frame vents. Overclocked, the vent trips the powered parts offline for a moment; a vent the
+## Overheat Core caused on a build within its Output is clean. The core, the Coolant Loop and the Auxiliary
+## Generator all hang their effects off the vent.
+func _frame_vent() -> void:
+	player.heat = VENT_HEAT_LEFT
+	var tripped := run.overclock_pips() > 0.0
+	if tripped:
+		player.vent_trip = VENT_TRIP_SECONDS - (1.0 if run.level_of("coolant_loop") >= 2 else 0.0)
+		world.emit("banner", {"text": "VENTING", "style": "orange"})
+	world.emit("frame_vent", {"pos": player.pos, "tripped": tripped})
+	world.emit("sound", {"name": "vent"})
+	if run.is_online("overheat_core"):
+		_vent(1.0)
+		if run.fork_of("overheat_core") == "b":
+			vent_echo = 0.4
+	if run.fork_of("coolant_loop") == "a":
+		# Cryo Purge: the vent's freezing ring slows the bullets around you to a crawl.
+		for shot: Shot in world.enemy_shots:
+			if not shot.dead and shot.pos.distance_to(player.pos) < CRYO_PURGE_RADIUS:
+				shot.vel *= 0.3
+		world.emit("explosion", {"pos": player.pos, "size": CRYO_PURGE_RADIUS, "color": Color(0.6, 0.9, 1.0), "ring": true})
+	if run.fork_of("aux_generator") == "b":
+		# Vent Tap: the dumped heat drives the guns.
+		player.overdrive = maxf(player.overdrive, 3.0)
 
 
 func _vent(scale: float) -> void:
@@ -617,7 +673,7 @@ func max_special_charges() -> int:
 
 func _update_special(input: InputFrame, dt: float) -> void:
 	var tech_id := run.special_tech()
-	if tech_id == "" or not run.is_online(tech_id):
+	if tech_id == "" or not run.is_online(tech_id) or is_tripped(tech_id):
 		return
 	if player.special_charges < max_special_charges():
 		player.special_cooldown -= dt

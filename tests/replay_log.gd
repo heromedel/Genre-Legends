@@ -29,7 +29,7 @@ func _init() -> void:
 	var replay: Dictionary = JSON.parse_string(replay_line)
 	var mk: Dictionary = replay["mk"]
 	var mission := Mission.new(replay["node"], int(replay["seed"]), replay["frame"], replay["loadout"],
-		func(tech_id): return int(mk.get(tech_id, 1)))
+		func(tech_id): return int(mk.get(tech_id, 1)), replay.get("frame_tiers", []))
 	var frames := InputFrame.decode_runs(replay["inputs"])
 	print("Replaying %s on build %s: %d ticks of input (%s)" % [replay["node"]["type"], replay["build"], frames.size(), str(replay.get("result", {}))])
 	var drift := 0

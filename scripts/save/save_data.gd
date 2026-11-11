@@ -30,7 +30,7 @@ func _log(category: String, text: String) -> void:
 func fresh_data() -> Dictionary:
 	var tech_mk := {}
 	for tech_id in TechData.STARTING_UNLOCKS:
-		tech_mk[tech_id] = 1
+		tech_mk[tech_id] = int(TechData.STARTING_MK.get(tech_id, 1))
 	return {
 		"version": VERSION,
 		"map_seed": randi() % 1000000,
@@ -40,6 +40,8 @@ func fresh_data() -> Dictionary:
 		"loadout": TechData.STARTING_LOADOUT.duplicate(),
 		"frame": FrameData.STARTING_FRAME,
 		"frames_unlocked": [FrameData.STARTING_FRAME],
+		"frame_blueprints": 0,
+		"frame_tiers": {},      # frame id -> its tier picks, one per tier bought (FrameData.TIER_PICKS)
 		"prizes_claimed": [],
 		"settings": {"music": 0.6, "sfx": 0.8, "play_log": true, "screen_shake": true, "fullscreen": true, "threat": "standard", "bullet_glow": false, "auto_aim": false, "autofire": false, "transform_spin": true, "double_tap_special": true},
 		"stats": {"missions": 0, "wins": 0, "kills": 0, "play_seconds": 0.0},
@@ -128,7 +130,7 @@ func repair(raw: Dictionary) -> Dictionary:
 		if TechData.TECH.has(tech_id):
 			tech_mk[tech_id] = clampi(int(clean["tech_mk"][tech_id]), 0, TechData.MAX_MK)
 	for tech_id in TechData.STARTING_UNLOCKS:
-		tech_mk[tech_id] = maxi(int(tech_mk.get(tech_id, 0)), 1)
+		tech_mk[tech_id] = maxi(int(tech_mk.get(tech_id, 0)), int(TechData.STARTING_MK.get(tech_id, 1)))
 	clean["tech_mk"] = tech_mk
 	var blueprints := {}
 	for tech_id in clean["blueprints"]:
@@ -145,6 +147,14 @@ func repair(raw: Dictionary) -> Dictionary:
 	clean["frames_unlocked"] = frames
 	if not frames.has(clean["frame"]):
 		clean["frame"] = FrameData.STARTING_FRAME
+	# Frame upgrades: JSON hands numbers back as floats, and only known picks on known frames are kept.
+	clean["frame_blueprints"] = maxi(int(raw.get("frame_blueprints", 0)) if typeof(raw.get("frame_blueprints")) in [TYPE_INT, TYPE_FLOAT] else 0, 0)
+	var tiers := {}
+	for frame_id in clean["frame_tiers"]:
+		if FrameData.FRAMES.has(frame_id) and clean["frame_tiers"][frame_id] is Array:
+			var picks: Array = clean["frame_tiers"][frame_id].filter(func(p): return FrameData.TIER_PICKS.has(p))
+			tiers[frame_id] = picks.slice(0, FrameData.TIER_COSTS.size())
+	clean["frame_tiers"] = tiers
 	clean["version"] = VERSION
 	return clean
 
@@ -266,22 +276,79 @@ func equip(slot_index: int, tech_id: String) -> void:
 	write()
 
 
+# ---------------------------------------------------------------- frame upgrades and power (GDD 21A–21F)
+
+func frame_tiers(frame_id: String) -> Array:
+	return data["frame_tiers"].get(frame_id, [])
+
+
+## The selected frame's numbers with its tiers applied.
+func frame_stats() -> Dictionary:
+	return FrameData.stats(data["frame"], frame_tiers(data["frame"]))
+
+
+func next_tier_cost(frame_id: String) -> int:
+	var bought := frame_tiers(frame_id).size()
+	return FrameData.TIER_COSTS[bought] if bought < FrameData.TIER_COSTS.size() else 0
+
+
+func buy_frame_tier(frame_id: String) -> bool:
+	var cost := next_tier_cost(frame_id)
+	if cost <= 0 or data["frame_blueprints"] < cost or not data["frames_unlocked"].has(frame_id):
+		return false
+	data["frame_blueprints"] -= cost
+	var picks := frame_tiers(frame_id).duplicate()
+	picks.append(FrameData.TIER_PICKS[0])
+	data["frame_tiers"][frame_id] = picks
+	_log("frame", "Bought tier %d for %s (%d Frame Blueprints)" % [picks.size(), frame_id, cost])
+	write()
+	return true
+
+
+## Changes what a bought tier gives. Free, any time: the cost is in buying the tier, not in choosing.
+func set_tier_pick(frame_id: String, tier: int, pick: String) -> void:
+	var picks := frame_tiers(frame_id).duplicate()
+	if tier < picks.size() and FrameData.TIER_PICKS.has(pick):
+		picks[tier] = pick
+		data["frame_tiers"][frame_id] = picks
+		write()
+
+
+## Load and Output of the loadout on the selected frame, for the Hangar's meters and the launch rule.
+func power_summary() -> Dictionary:
+	var stats := frame_stats()
+	var loadout: Array = data["loadout"]
+	var summary := {
+		"weight": TechData.loadout_weight(loadout),
+		"load": stats["load"],
+		"draw": TechData.loadout_draw(loadout),
+		"output": stats["output"] + TechData.loadout_output_bonus(loadout),
+	}
+	summary["over_load"] = summary["weight"] > summary["load"]
+	summary["overclocked"] = summary["draw"] > summary["output"]
+	return summary
+
+
 func select_frame(frame_id: String) -> void:
 	if data["frames_unlocked"].has(frame_id):
 		data["frame"] = frame_id
 		write()
 
 
-## Applies a prize string such as "frame:tempest" or "tech:starfall". Prizes are only ever given once.
+## Applies a prize string such as "frame:tempest", "tech:starfall" or "frame:tempest+tech:last_legend_plate:3".
+## Prizes are only ever given once.
 func claim_prize(prize_id: String, prize: String) -> void:
 	if data["prizes_claimed"].has(prize_id):
 		return
 	data["prizes_claimed"].append(prize_id)
-	var parts := prize.split(":")
-	if parts[0] == "frame" and not data["frames_unlocked"].has(parts[1]):
-		data["frames_unlocked"].append(parts[1])
-	elif parts[0] == "tech":
-		unlock_tech(parts[1])
+	for part in prize.split("+"):
+		var parts := part.split(":")
+		if parts[0] == "frame" and not data["frames_unlocked"].has(parts[1]):
+			data["frames_unlocked"].append(parts[1])
+		elif parts[0] == "tech":
+			unlock_tech(parts[1])
+			if parts.size() > 2:
+				data["tech_mk"][parts[1]] = maxi(tech_mk(parts[1]), clampi(int(parts[2]), 1, TechData.MAX_MK))
 	_log("prize", "Claimed %s (%s)" % [prize_id, prize])
 
 

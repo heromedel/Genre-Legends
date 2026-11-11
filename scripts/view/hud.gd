@@ -40,7 +40,7 @@ static func banner_seconds(text: String) -> float:
 
 const STYLE_COLORS := {
 	"gold": Color(1.0, 0.8, 0.35), "red": Color(1.0, 0.35, 0.4), "cyan": Color(0.45, 0.9, 1.0),
-	"violet": Color(0.8, 0.55, 1.0), "blue": Color(0.5, 0.75, 1.0),
+	"violet": Color(0.8, 0.55, 1.0), "blue": Color(0.5, 0.75, 1.0), "orange": Color(1.0, 0.6, 0.25),
 	"energy": Color(0.45, 0.9, 1.0), "explosive": Color(1.0, 0.6, 0.3), "kinetic": Color(1.0, 0.85, 0.45), "mawjig": Color(0.85, 0.55, 1.0),
 }
 
@@ -131,11 +131,15 @@ func _draw() -> void:
 		_bar(Vector2(x, meter_y), Vector2(150, 7), player.graze / needed if player.overdrive <= 0.0 else 1.0, Color(1, 0.85, 0.3), "")
 		draw_string(font_body, Vector2(x + 158, meter_y + 8), "OVERDRIVE" if player.overdrive > 0.0 else "GRAZE", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(1, 0.85, 0.4))
 		meter_y += 14.0
-	if run.is_online("overheat_core"):
-		var heat_max := 60.0 - 4.0 * run.level_of("overheat_core")
-		_bar(Vector2(x, meter_y), Vector2(150, 7), player.heat / heat_max, Color(1, 0.45, 0.25), "")
-		draw_string(font_body, Vector2(x + 158, meter_y + 8), "HEAT", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(1, 0.6, 0.4))
-		meter_y += 14.0
+	# Frame heat (GDD 21D): only shown once something can make it.
+	var overclocked := run.overclock_pips() > 0.0
+	if player.heat > 0.5 or overclocked or run.is_online("overheat_core"):
+		var hot := clampf((player.heat - 50.0) / 50.0, 0.0, 1.0)
+		var heat_color := Color(1, 0.65, 0.25).lerp(Color(1, 0.25, 0.2), hot)
+		_bar(Vector2(x, meter_y), Vector2(150, 7), player.heat / 100.0, heat_color, "")
+		var heat_word := "HEAT: VENTING" if player.vent_trip > 0.0 else ("HEAT: OVERCLOCKED" if overclocked else "HEAT")
+		draw_string(font_bold, Vector2(x + 158, meter_y + 9), heat_word, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, heat_color)
+		meter_y += 16.0
 	# Objective, in the HUD column under the bars: top centre is where a dungeon room's top door is
 	# (heromedel couldn't see the doorways under it), and the boss bar takes that spot in a fight anyway.
 	var objective := "COLLECT THE SALVAGE" if mission.world.prize_waiting else mission.stage.objective_text()
@@ -186,6 +190,12 @@ func _armor_bar(at: Vector2, size: Vector2, player: PlayerFrame) -> void:
 		if filled > 0.0:
 			draw_rect(Rect2(cell.position, Vector2(cell.size.x * filled, cell.size.y)), color)
 			draw_rect(Rect2(cell.position, Vector2(cell.size.x * filled, cell.size.y * 0.35)), Color(1, 1, 1, 0.25))
+			# Jig Phase Plate: the Armor a held-off hit would take if another lands shows violet, until it fades.
+			if player.phase_held > 0.0:
+				var safe := clampf((player.armor - player.phase_held - low_edge) / (high_edge - low_edge), 0.0, filled)
+				if safe < filled:
+					draw_rect(Rect2(cell.position + Vector2(cell.size.x * safe, 0), Vector2(cell.size.x * (filled - safe), cell.size.y)),
+						Color(0.75, 0.5, 1.0, 0.55 + 0.25 * sin(time * 10.0)))
 		x += cell_width + (group_gap if (i + 1) % 3 == 0 else gap)
 	draw_string_outline(font_bold, at + Vector2(size.x + 10, size.y - 3), "ARMOR %d" % ceili(player.armor), HORIZONTAL_ALIGNMENT_LEFT, -1, 15, 4, Color(0, 0, 0, 0.7))
 	draw_string(font_bold, at + Vector2(size.x + 10, size.y - 3), "ARMOR %d" % ceili(player.armor), HORIZONTAL_ALIGNMENT_LEFT, -1, 15, color.lightened(0.2))

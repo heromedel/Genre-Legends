@@ -29,7 +29,13 @@ var alive := true
 # Support tech meters
 var graze := 0.0
 var overdrive := 0.0            # seconds of Overdrive left
-var heat := 0.0
+var heat := 0.0                 # frame heat, 0 to 100 (GDD 21D): overclocking and the Overheat Core raise it
+var vent_trip := 0.0            # seconds the powered parts stay offline after an overclocked vent
+# Plates (GDD 21H)
+var weave_cooldown := 0.0       # Jig-Weave Composite: seconds until it can shrug off another light hit
+var phase_held := 0.0           # Jig Phase Plate: Armor held off from the last hit, fading when phase_time runs out
+var phase_time := 0.0
+var hardened := 0.0             # Lunarium Bulk Plate: max Armor gained by work-hardening this mission
 var mirror_time := 0.0          # seconds of Mirror Aegis bubble left
 var special_cooldown := 0.0
 var special_charges := 1
@@ -47,12 +53,11 @@ const DASH_SPEED := 1500.0
 const TRAIL_LENGTH := 40
 
 
-func setup(frame: String, stage_form: String) -> void:
+func setup(frame: String, stage_form: String, stats: Dictionary) -> void:
 	frame_id = frame
-	var data := FrameData.get_frame(frame)
-	max_armor = data["armor"] + data.get("built_in_armor", 0.0)
+	max_armor = stats["armor"]
 	armor = max_armor
-	speed = data["speed"]
+	speed = stats["speed"]
 	set_form(stage_form)
 
 
@@ -94,6 +99,11 @@ func tick_timers(dt: float) -> void:
 	mirror_time = maxf(mirror_time - dt, 0.0)
 	time_brake = maxf(time_brake - dt, 0.0)
 	ion_time = maxf(ion_time - dt, 0.0)
+	weave_cooldown = maxf(weave_cooldown - dt, 0.0)
+	if phase_time > 0.0:
+		phase_time -= dt
+		if phase_time <= 0.0:
+			phase_held = 0.0
 
 
 ## Applies a hit to Armor and returns the damage taken. Loss is by attrition (Game Design Philosophy): a

@@ -46,7 +46,7 @@ static func _tech_section(column: VBoxContainer, run: RunState) -> void:
 			next = "Offline. A level-up or crate brings it online."
 		elif level >= cap:
 			next = "Capped by Mk %d (raise it in R&D)" % int(run.tech_mk.get(tech_id, 1)) if cap < TechData.MAX_LEVEL else "Maxed"
-		elif level + 1 == TechData.FORK_LEVEL and fork == "":
+		elif level + 1 == TechData.FORK_LEVEL and fork == "" and TechData.has_forks(tech_id):
 			next = "Next: choose a path, %s or %s." % [tech["forks"]["a"]["name"], tech["forks"]["b"]["name"]]
 		else:
 			next = "Next: %s" % TechData.level_text(tech_id, level + 1)

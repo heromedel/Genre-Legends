@@ -14,6 +14,8 @@ var output: Label
 const HELP := """Commands:
   help                     this list
   blueprints <n>           add n blueprints to every tech
+  framebp <n>              add n Frame Blueprints (frame tiers in the Hangar)
+  power                    the selected frame and loadout's Load, Output and tiers
   unlockall                unlock every tech at Mk 3 and every frame
   mk <tech_id> <0-3>       set a tech's Mk
   frame <id>               unlock and select a frame (vanguard, tempest, bulwark)
@@ -62,6 +64,16 @@ func execute(text: String) -> String:
 			Save.write()
 			changed.emit()
 			return "Added %d blueprints to every tech." % amount
+		"framebp":
+			var amount := int(parts[1]) if parts.size() > 1 else 10
+			Save.data["frame_blueprints"] += amount
+			Save.write()
+			changed.emit()
+			return "Added %d Frame Blueprints (now %d)." % [amount, Save.data["frame_blueprints"]]
+		"power":
+			var power := Save.power_summary()
+			return "%s, tiers %s: weighs %d of %d Load, draws %d of %d Output%s%s" % [Save.data["frame"], str(Save.frame_tiers(Save.data["frame"])),
+				power["weight"], power["load"], power["draw"], power["output"], ", OVER LOAD" if power["over_load"] else "", ", overclocked" if power["overclocked"] else ""]
 		"unlockall":
 			for tech_id in TechData.TECH:
 				Save.data["tech_mk"][tech_id] = TechData.MAX_MK

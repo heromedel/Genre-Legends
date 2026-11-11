@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32">
+<!-- Auxiliary Generator: a squat hexagonal generator with cooling fins and a glowing power cell.
+     Gear part, facing up (forward), about 12 units across. Five passes: outline, fill, shading, highlights, details.
+     "#39ff14" is the tech's glow (swapped for its element colour). -->
+<g stroke-linejoin="round" stroke-linecap="round">
+  <path d="M-3.5,-6 L3.5,-6 L7,0 L3.5,6 L-3.5,6 L-7,0 Z" fill="#0a1628" stroke="#0a1628" stroke-width="1.8"/>
+  <path d="M-3.5,-6 L3.5,-6 L7,0 L3.5,6 L-3.5,6 L-7,0 Z" fill="#55697d"/>
+  <path d="M-7,0 L-3.5,6 L3.5,6 L7,0 Z" fill="#3a4a5a"/>
+  <path d="M-3.2,-5.4 L3.2,-5.4" stroke="#b4c8da" stroke-width="0.8" fill="none"/>
+  <path d="M-8.5,-2 L-7,-2 M-8.5,2 L-7,2 M8.5,-2 L7,-2 M8.5,2 L7,2" stroke="#0a1628" stroke-width="1.4"/>
+</g>
+<circle cx="0" cy="0" r="3.2" fill="#0a1628"/>
+<circle cx="0" cy="0" r="2.4" fill="#39ff14"/>
+<path d="M0.6,-1.8 L-0.8,0.2 L0.4,0.2 L-0.4,1.8" stroke="#d8ffcc" stroke-width="0.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
