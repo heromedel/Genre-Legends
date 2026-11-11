@@ -46,7 +46,7 @@ const playSeconds = Number(process.argv[3] || 150);
   for (const y of [530, 509, 493]) { await page.mouse.click(566, y); await page.waitForTimeout(800); }   // "Continue" (its height depends on the text above it)
   await page.waitForTimeout(1500);
   await snap('back_to_hub');
-  await page.mouse.click(643, 26); await page.waitForTimeout(1500);   // tab: SETTINGS
+  await page.mouse.click(724, 28); await page.waitForTimeout(1500);   // tab: Settings (the gear)
   const download = page.waitForEvent('download', { timeout: 15000 }).catch(() => null);
   // Scrolled to the bottom, the button sits at a fixed spot however many settings are added above it.
   await page.mouse.move(600, 500); await page.mouse.wheel(0, 3000); await page.waitForTimeout(800);

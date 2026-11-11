@@ -116,7 +116,8 @@ func _tap(at: Vector2) -> void:
 		Sound.play("ui")
 		node_selected.emit(best)
 	else:
-		PlayLog.note("tap", "tapped empty space on the star map at (%d, %d)" % [at.x, at.y])
+		# Screen pixels, not map units, so a log reader can match it to what was on screen.
+		PlayLog.note("tap", "tapped empty space on the star map at screen (%d, %d)" % [at.x * zoom + global_position.x, at.y * zoom + global_position.y])
 
 
 func _draw() -> void:
@@ -193,11 +194,17 @@ func _draw_planet(node_id: String) -> void:
 	var palette: Dictionary = star_map.regions[node["region"]]["palette"]
 	var type_colors := {"star_cluster": Color(0.45, 0.8, 1.0), "corridor": Color(0.6, 1.0, 0.75), "planet": Color(1.0, 0.7, 0.35), "dungeon": Color(0.8, 0.55, 1.0)}
 	var accent: Color = type_colors.get(node["type"], palette["accent"])
-	var radius := 34.0 if node["is_gate"] else 26.0
-	var dim := 1.0 if (cleared or available) else 0.35
+	var locked := not cleared and not available
+	# Locked planets read as out of reach at a glance: grey, smaller and quiet, so the ones you can fly stand out
+	# (the blind playtester couldn't tell them apart).
+	var radius := (34.0 if node["is_gate"] else 26.0) * (0.82 if locked else 1.0)
+	var dim := 0.6 if locked else 1.0
 	var look_rng := RandomNumberGenerator.new()
 	look_rng.seed = node["planet_look"]
 	var body := accent.darkened(0.5 + look_rng.randf() * 0.2).lerp(palette["ground"], 0.4)
+	if locked:
+		accent = accent.lerp(Color(0.45, 0.48, 0.55), 0.8)
+		body = body.lerp(Color(0.22, 0.24, 0.28), 0.8)
 	if available and not cleared:
 		var pulse := 0.5 + 0.5 * sin(time * 3.0)
 		draw_arc(at, radius + 10.0 + pulse * 4.0, 0, TAU, 32, Art.with_alpha(accent, 0.5 * pulse + 0.2), 2.5, true)
@@ -218,7 +225,9 @@ func _draw_planet(node_id: String) -> void:
 		IconPainter.draw(self, "lock", Rect2(at - Vector2(8, 8), Vector2(16, 16)), Color(0.6, 0.65, 0.75, 0.7))
 	if node["prize"] != "" and not cleared:
 		IconPainter.draw(self, "prize", Rect2(at + Vector2(radius * 0.6, -radius - 6), Vector2(22, 22)), Art.GOLD)
-	var label_color := Color(0.85, 0.92, 1.0, dim)
+	var label_color := Color(0.55, 0.58, 0.65) if locked else Color(0.85, 0.92, 1.0)
 	draw_string(UiKit.font("bold"), at + Vector2(-80, radius + 24), node["name"], HORIZONTAL_ALIGNMENT_CENTER, 160, 16, label_color)
+	if available and not cleared:
+		draw_string(UiKit.font("bold"), at + Vector2(-80, radius + 42), "NEXT", HORIZONTAL_ALIGNMENT_CENTER, 160, 13, Art.with_alpha(Art.GOLD, 0.7 + 0.3 * sin(time * 3.0)))
 	if node["branch"] != "" and node_id.ends_with("_0"):
 		draw_string(UiKit.font("bold"), at + Vector2(-110, -radius - 44), node["branch_name"].to_upper(), HORIZONTAL_ALIGNMENT_CENTER, 220, 15, Art.with_alpha(Art.GOLD, 0.9))

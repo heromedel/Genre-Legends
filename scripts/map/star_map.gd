@@ -166,8 +166,10 @@ func _make_node(rng: RandomNumberGenerator, node_id: String, region: int, column
 		var keys := MissionData.MODIFIERS.keys()
 		modifier = keys[1 + rng.randi() % (keys.size() - 1)]
 	var reward_choices := []
+	# The very first planet's reward is something exciting to unlock, a weapon or a support part, never a plate.
+	var first_planet := region == 0 and local_column == 0
 	for tech_id in TechData.TECH:
-		if TechData.TECH[tech_id]["blueprint_from"].has(mission_type):
+		if TechData.TECH[tech_id]["blueprint_from"].has(mission_type) and (not first_planet or TechData.TECH[tech_id]["slot"] in ["weapon", "support"]):
 			reward_choices.append(tech_id)
 	var needs: Array = MissionData.NEEDS[mission_type]
 	var prize := ""
