@@ -777,7 +777,7 @@ func _checkin_panel() -> Control:
 	column.add_theme_constant_override("separation", 8)
 	panel.add_child(column)
 	column.add_child(UiKit.label("DAILY CHECK-IN", 17, Art.GOLD, "bold"))
-	column.add_child(UiKit.wrapped("One tile for each day you check in, whichever days you like. Missing a day never resets it. Day 7 is the big one, then the week starts over.", 13, Color(0.65, 0.75, 0.88)))
+	column.add_child(UiKit.wrapped("One tile for each day you check in, whichever days you like. Missing a day never resets it. Day 7 is the big one, then the week starts over.", 14, Color(0.65, 0.75, 0.88)))
 	var ready := Save.checkin_ready()
 	var tile := Save.checkin_tile()
 	var claimed := tile if (ready or tile > 0) else DepotData.CHECKIN.size()
@@ -819,7 +819,7 @@ func _checkin_panel() -> Control:
 
 func _checkin_icon(reward: Dictionary) -> String:
 	if reward.has("free_dive"):
-		return "wreck_research"
+		return "scan"
 	if reward.has("start_crate"):
 		return "crate"
 	if reward.has("main_blueprints"):
@@ -836,7 +836,7 @@ func _dives_panel() -> Control:
 	column.add_theme_constant_override("separation", 8)
 	panel.add_child(column)
 	column.add_child(UiKit.label("DERELICT DIVES", 17, Art.GOLD, "bold"))
-	column.add_child(UiKit.wrapped("The Dropship scans a field of wrecks and sends its drone aboard the one you pick. Each kind of wreck carries its own salvage. Odds: Common 67%, Rare 28%, Prototype 5% (unlocks a tech you don't have yet), and a Rare or better at least every 10 dives.", 13, Color(0.65, 0.75, 0.88)))
+	column.add_child(UiKit.wrapped("The Dropship scans a field of wrecks and sends its drone aboard the one you pick. Each kind of wreck carries its own salvage. Odds: Common 67%, Rare 28%, Prototype 5% (unlocks a tech you don't have yet), and a Rare or better at least every 10 dives.", 14, Color(0.65, 0.75, 0.88)))
 	var wrecks: Array = Save.data["dive_wrecks"]
 	if wrecks.is_empty():
 		var free: int = Save.data["free_dives"]
@@ -1163,39 +1163,55 @@ class PowerMeters:
 ## One Derelict Dive's haul: a card that flips in, coloured by its rarity, a Prototype with a gold burst.
 class DropCard:
 	extends Control
+	const SCAN_SECONDS := 0.9         # the drone's sweep through the wreck before the haul shows
 	var result := {}
 	var delay := 0.0
 	var time := 0.0
 
 	func _ready() -> void:
-		custom_minimum_size = Vector2(196, 128)
+		custom_minimum_size = Vector2(196, 176)
 		size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	func _process(delta: float) -> void:
 		time += delta
-		if time < delay + 1.5:
+		if time < delay + SCAN_SECONDS + 2.0:
 			queue_redraw()
 
 	func _draw() -> void:
-		var flip := clampf((time - delay) / 0.35, 0.0, 1.0)
-		if flip <= 0.0:
+		var t := time - delay
+		if t <= 0.0:
 			return
 		var color: Color = DepotData.RARITY_COLORS[result["rarity"]]
-		var width := size.x * ease(flip, 0.5)
-		var rect := Rect2(Vector2((size.x - width) * 0.5, 0), Vector2(width, size.y))
-		if result["rarity"] == "legendary":
-			Art.draw_glow(self, size * 0.5, 110.0, Art.with_alpha(color, 0.35 * flip))
-		draw_rect(rect, Color(0.05, 0.08, 0.13))
-		draw_rect(rect, color, false, 2.5)
-		if flip < 1.0:
-			return
 		var font := UiKit.font("bold")
-		draw_string(font, Vector2(10, 20), DepotData.RARITY_NAMES[result["rarity"]].to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, color)
+		var rect := Rect2(Vector2.ZERO, size)
+		draw_rect(rect, Color(0.04, 0.06, 0.1))
+		if t < SCAN_SECONDS:
+			# Boarding: a scan line sweeps the hull while the drone searches it.
+			var sweep := t / SCAN_SECONDS
+			draw_rect(rect, Color(0.3, 0.5, 0.7), false, 2.0)
+			var y := size.y * sweep
+			draw_rect(Rect2(Vector2(0, y - 18), Vector2(size.x, 18)), Color(0.4, 0.8, 1.0, 0.18))
+			draw_line(Vector2(0, y), Vector2(size.x, y), Color(0.6, 0.95, 1.0, 0.9), 2.0)
+			draw_string(font, Vector2(0, size.y * 0.5), "BOARDING THE %s..." % str(result.get("wreck", "WRECK")).to_upper(), HORIZONTAL_ALIGNMENT_CENTER, size.x, 18, Color(0.6, 0.9, 1.0))
+			return
+		var reveal := clampf((t - SCAN_SECONDS) / 0.3, 0.0, 1.0)
+		var bright: bool = result["rarity"] != "common"
+		if bright:
+			Art.draw_glow(self, size * 0.5, size.x * 0.4, Art.with_alpha(color, (0.35 if result["rarity"] == "legendary" else 0.2) * reveal))
+			for i in 12:
+				var angle := TAU * i / 12.0 + t * 0.4
+				var from := size * 0.5 + Vector2.from_angle(angle) * 50.0
+				draw_line(from, from + Vector2.from_angle(angle) * (30.0 + 20.0 * reveal), Art.with_alpha(color, 0.35 * (1.0 - reveal * 0.5)), 2.0)
+		draw_rect(rect, color, false, 3.0)
+		draw_rect(Rect2(Vector2.ZERO, Vector2(size.x, 30)), Art.with_alpha(color, 0.25))
+		draw_string(font, Vector2(14, 21), DepotData.RARITY_NAMES[result["rarity"]].to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 17, color)
+		draw_string(UiKit.font(), Vector2(0, 21), "from the %s" % result.get("wreck", "wreck"), HORIZONTAL_ALIGNMENT_RIGHT, size.x - 14, 13, Color(0.7, 0.8, 0.9))
 		var icon_color := TechData.element_color(result["icon"]) if TechData.TECH.has(result["icon"]) else Art.GOLD
-		IconPainter.draw(self, result["icon"], Rect2(Vector2(size.x * 0.5 - 20, 26), Vector2(40, 40)), icon_color)
-		draw_string(font, Vector2(8, 88), result["title"], HORIZONTAL_ALIGNMENT_CENTER, size.x - 16, 14, Color(1, 1, 1))
-		draw_string(UiKit.font(), Vector2(8, 110), result["text"], HORIZONTAL_ALIGNMENT_CENTER, size.x - 16, 11, Color(0.7, 0.8, 0.9))
+		var icon_size := 56.0 * (0.6 + 0.4 * ease(reveal, 0.4))
+		IconPainter.draw(self, result["icon"], Rect2(Vector2(size.x * 0.5 - icon_size * 0.5, 74 - icon_size * 0.5), Vector2(icon_size, icon_size)), Art.with_alpha(icon_color, reveal))
+		draw_string(font, Vector2(8, 128), result["title"], HORIZONTAL_ALIGNMENT_CENTER, size.x - 16, 20, Color(1, 1, 1, reveal))
+		draw_string(UiKit.font(), Vector2(8, 154), result["text"], HORIZONTAL_ALIGNMENT_CENTER, size.x - 16, 15, Color(0.75, 0.85, 0.95, reveal))
 
 
 ## A pulsing green dot in a control's corner: something new is waiting there (GDD 9C).

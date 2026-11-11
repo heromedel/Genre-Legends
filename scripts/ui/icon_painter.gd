@@ -166,9 +166,17 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 			for i in 3:
 				ci.draw_line(p.call(-0.5, -0.25 + i * 0.25), p.call(0.5 - i * 0.2, -0.25 + i * 0.25), color, w * 0.8)
 		"crate":
-			ci.draw_rect(Rect2(p.call(-0.7, -0.6), Vector2(s * 1.4, s * 1.2)), Art.with_alpha(color, 0.3))
-			ci.draw_rect(Rect2(p.call(-0.7, -0.6), Vector2(s * 1.4, s * 1.2)), color, false, w)
-			ci.draw_line(p.call(-0.7, -0.1), p.call(0.7, -0.1), color, w)
+			# A Salvage Crate: a box seen at an angle, its lid and strap, a glint of what's inside.
+			var front := PackedVector2Array([p.call(-0.75, -0.25), p.call(0.45, -0.25), p.call(0.45, 0.75), p.call(-0.75, 0.75)])
+			var lid := PackedVector2Array([p.call(-0.75, -0.25), p.call(-0.4, -0.7), p.call(0.8, -0.7), p.call(0.45, -0.25)])
+			var side := PackedVector2Array([p.call(0.45, -0.25), p.call(0.8, -0.7), p.call(0.8, 0.3), p.call(0.45, 0.75)])
+			ci.draw_colored_polygon(front, Art.with_alpha(color, 0.35))
+			ci.draw_colored_polygon(lid, Art.with_alpha(color, 0.55))
+			ci.draw_colored_polygon(side, Art.with_alpha(color, 0.2))
+			for shape in [front, lid, side]:
+				ci.draw_polyline(shape + PackedVector2Array([shape[0]]), color, w, true)
+			ci.draw_line(p.call(-0.15, -0.25), p.call(-0.15, 0.75), color, w * 1.2)
+			ci.draw_circle(p.call(-0.15, 0.2), s * 0.12, Color(1, 1, 1, 0.9))
 		"frame":
 			FrameArt.draw_frame(ci, "vanguard", "ship", c, -PI * 0.5, 0.0, {})
 		"danger":
@@ -226,6 +234,12 @@ static func draw(ci: CanvasItem, icon: String, rect: Rect2, color: Color) -> voi
 			ci.draw_line(p.call(0, -0.6), p.call(0, 0.7), Color(1, 1, 1, 0.8), w * 0.6, true)
 		"wreck_gunship", "wreck_carrier", "wreck_research", "wreck_freighter":
 			_draw_wreck(ci, icon, c, s, w, color)
+		"scan":
+			# A scanner: a sweep across a radar with a wreck's blip on it.
+			ci.draw_arc(c, s * 0.85, 0, TAU, 24, color, w, true)
+			ci.draw_arc(c, s * 0.45, 0, TAU, 18, Art.with_alpha(color, 0.5), w * 0.7, true)
+			ci.draw_colored_polygon(PackedVector2Array([c, p.call(0.85, -0.05), p.call(0.6, -0.6)]), Art.with_alpha(color, 0.4))
+			ci.draw_circle(p.call(0.35, -0.35), s * 0.12, Color(1, 1, 1, 0.95))
 		"depot":
 			# A supply drop: a crate under a parachute.
 			ci.draw_arc(p.call(0, -0.2), s * 0.75, PI, TAU, 16, color, w * 1.2, true)

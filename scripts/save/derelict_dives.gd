@@ -42,6 +42,7 @@ static func board(kind: String) -> Dictionary:
 	var rarity := _roll_rarity(float(wreck["prototype"]))
 	Save.data["dives_since_rare"] = 0 if rarity != "common" else int(Save.data["dives_since_rare"]) + 1
 	var result := _haul(rarity, wreck)
+	result["wreck"] = wreck["name"]
 	PlayLog.note("depot", "Boarded the %s: %s %s" % [wreck["name"], rarity, result["title"]])
 	Save.write()
 	return result
@@ -93,7 +94,13 @@ static func _blueprints(rarity: String, amount: int, slots: Array) -> Dictionary
 	var pool: Array = equipped if not equipped.is_empty() and rng.randf() < 0.5 else findable
 	var tech_id: String = pool[rng.randi() % pool.size()]
 	Save.add_blueprints(tech_id, amount)
-	return _result(rarity, "%s x%d" % [TechData.TECH[tech_id]["name"], amount], "Toward unlocking it or its next Mk.", tech_id)
+	var mk := Save.tech_mk(tech_id)
+	var need := TechData.blueprints_for_next_mk(mk)
+	var have := Save.blueprints(tech_id)
+	var progress := ("%d / %d toward unlocking it" % [have, need]) if mk == 0 else ("%d / %d toward Mk %d" % [have, need, mk + 1])
+	if have >= need:
+		progress = "Ready to unlock in R&D!" if mk == 0 else "Ready for Mk %d in R&D!" % (mk + 1)
+	return _result(rarity, "%s x%d" % [TechData.TECH[tech_id]["name"], amount], progress, tech_id)
 
 
 static func _result(rarity: String, title: String, text: String, icon: String) -> Dictionary:

@@ -41,7 +41,13 @@ const playSeconds = Number(process.argv[3] || 150);
   // If the mission is still going, pause and abandon it; then continue past the results.
   await page.keyboard.press('Escape'); await page.waitForTimeout(800);
   await snap('pause');
-  await page.mouse.click(285, 493); await page.waitForTimeout(2500);   // "Abandon mission"
+  // The pause menu saves the play log itself, so it's taken here, mid-mission, then the mission is abandoned.
+  const pauseDownload = page.waitForEvent('download', { timeout: 15000 }).catch(() => null);
+  await page.mouse.click(285, 493);   // "Save play log file"
+  const pauseFile = await pauseDownload;
+  if (pauseFile) { await pauseFile.saveAs(`${out}/play_log_mid.txt`); console.log('mid-mission play log saved'); }
+  await page.waitForTimeout(800);
+  await page.mouse.click(285, 554); await page.waitForTimeout(2500);   // "Abandon mission"
   await snap('results');
   for (const y of [530, 509, 493]) { await page.mouse.click(566, y); await page.waitForTimeout(800); }   // "Continue" (its height depends on the text above it)
   await page.waitForTimeout(1500);

@@ -37,7 +37,7 @@ const RARITY_COLORS := {"common": Color(0.55, 0.85, 1.0), "rare": Color(0.8, 0.5
 ##   prototype: how much likelier a Prototype is aboard.
 const WRECKS := {
 	"gunship": {"name": "Gunship Wreck", "text": "Blueprints for main weapons, weapons and specials.", "slots": ["main", "weapon", "special"], "prototype": 1.0, "color": Color(1.0, 0.55, 0.4)},
-	"carrier": {"name": "Frame Carrier", "text": "Frame Blueprints for frame tiers, or now and then a Prototype.", "slots": [], "prototype": 1.0, "color": Color(1.0, 0.8, 0.35)},
+	"carrier": {"name": "Frame Carrier", "text": "Frame Blueprints for frame tiers.", "slots": [], "prototype": 1.0, "color": Color(1.0, 0.8, 0.35)},
 	"research": {"name": "Research Vessel", "text": "Any blueprints, and twice the chance of a Prototype.", "slots": ["main", "weapon", "support", "special", "generator", "plating"], "prototype": 2.0, "color": Color(0.8, 0.55, 1.0)},
 	"freighter": {"name": "Armored Freighter", "text": "Plating, generator and support blueprints.", "slots": ["support", "generator", "plating"], "prototype": 1.0, "color": Color(0.55, 0.85, 1.0)},
 }
